@@ -1,0 +1,255 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: ExampleJSONParsingTest</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">test.beast.integration</a> ]
+</div>
+
+<h1>Coverage Summary for Class: ExampleJSONParsingTest (test.beast.integration)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExampleJSONParsingTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    73.5%
+  </span>
+  <span class="absValue">
+    (50/ 68)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ExampleJSONParsingTest$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ExampleJSONParsingTest$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    90%
+  </span>
+  <span class="absValue">
+    (9/ 10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (54/ 72)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package test.beast.integration;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import java.io.File;
+<i>5</i>&nbsp;import java.io.FilenameFilter;
+<i>6</i>&nbsp;import java.util.ArrayList;
+<i>7</i>&nbsp;import java.util.List;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;import org.junit.Test;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;import beast.core.Logger;
+<i>12</i>&nbsp;import beast.core.MCMC;
+<i>13</i>&nbsp;import beast.util.JSONParser;
+<i>14</i>&nbsp;import beast.util.Randomizer;
+<i>15</i>&nbsp;import junit.framework.TestCase;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;/**
+<i>18</i>&nbsp; * check whether all example files parse *
+<i>19</i>&nbsp; */
+<b class="fc"><i>20</i>&nbsp;public class ExampleJSONParsingTest extends TestCase {</b>
+<i>21</i>&nbsp;	{
+<b class="fc"><i>22</i>&nbsp;		ExampleXmlParsingTest.setUpTestDir();</b>
+<b class="fc"><i>23</i>&nbsp;	}</b>
+<i>24</i>&nbsp;	
+<i>25</i>&nbsp;    @Test
+<i>26</i>&nbsp;    public void test_ThatXmlExamplesParse() {
+<b class="fc"><i>27</i>&nbsp;        String dir = System.getProperty(&quot;user.dir&quot;) + &quot;/examples&quot;;</b>
+<b class="fc"><i>28</i>&nbsp;    	test_ThatJSONExamplesParse(dir);</b>
+<b class="fc"><i>29</i>&nbsp;    }</b>
+<i>30</i>&nbsp;    
+<i>31</i>&nbsp;    public void test_ThatJSONExamplesParse(String dir) {
+<i>32</i>&nbsp;        try {
+<b class="fc"><i>33</i>&nbsp;            Randomizer.setSeed(127);</b>
+<b class="fc"><i>34</i>&nbsp;            Logger.FILE_MODE = Logger.LogFileMode.overwrite;</b>
+<b class="fc"><i>35</i>&nbsp;            System.out.println(&quot;Test JSON Examples in &quot; + dir);</b>
+<b class="fc"><i>36</i>&nbsp;            File exampleDir = new File(dir);</b>
+<b class="fc"><i>37</i>&nbsp;            String[] exampleFiles = exampleDir.list(new FilenameFilter() {</b>
+<i>38</i>&nbsp;                @Override
+<i>39</i>&nbsp;				public boolean accept(File dir, String name) {
+<b class="fc"><i>40</i>&nbsp;                    return name.endsWith(&quot;.json&quot;);</b>
+<i>41</i>&nbsp;                }
+<i>42</i>&nbsp;            });
+<i>43</i>&nbsp;
+<b class="fc"><i>44</i>&nbsp;            List&lt;String&gt; failedFiles = new ArrayList&lt;String&gt;();</b>
+<b class="fc"><i>45</i>&nbsp;            for (String fileName : exampleFiles) {</b>
+<b class="fc"><i>46</i>&nbsp;                System.out.println(&quot;Processing &quot; + fileName);</b>
+<b class="fc"><i>47</i>&nbsp;                JSONParser parser = new JSONParser();</b>
+<i>48</i>&nbsp;                try {
+<b class="fc"><i>49</i>&nbsp;                    parser.parseFile(new File(dir + &quot;/&quot; + fileName));</b>
+<b class="nc"><i>50</i>&nbsp;                } catch (Exception e) {</b>
+<b class="nc"><i>51</i>&nbsp;                    System.out.println(&quot;ExampleJSONParsing::Failed for &quot; + fileName</b>
+<b class="nc"><i>52</i>&nbsp;                            + &quot;: &quot; + e.getMessage());</b>
+<b class="nc"><i>53</i>&nbsp;                    failedFiles.add(fileName);</b>
+<b class="fc"><i>54</i>&nbsp;                }</b>
+<b class="fc"><i>55</i>&nbsp;                System.out.println(&quot;Done &quot; + fileName);</b>
+<i>56</i>&nbsp;            }
+<b class="fc"><i>57</i>&nbsp;            if (failedFiles.size() &gt; 0) {</b>
+<b class="nc"><i>58</i>&nbsp;                System.out.println(&quot;\ntest_ThatJSONExamplesParse::Failed for : &quot; + failedFiles.toString());</b>
+<i>59</i>&nbsp;            } else {
+<b class="fc"><i>60</i>&nbsp;                System.out.println(&quot;\ntest_ThatJSONExamplesParse::Success&quot;);</b>
+<i>61</i>&nbsp;            }
+<b class="fc"><i>62</i>&nbsp;            assertTrue(failedFiles.toString(), failedFiles.size() == 0);</b>
+<b class="nc"><i>63</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>64</i>&nbsp;            System.out.println(&quot;exception thrown &quot;);</b>
+<b class="nc"><i>65</i>&nbsp;            System.out.println(e.getMessage());</b>
+<b class="fc"><i>66</i>&nbsp;        }</b>
+<b class="fc"><i>67</i>&nbsp;    } // test_JSONExamples</b>
+<i>68</i>&nbsp;
+<i>69</i>&nbsp;    @Test
+<i>70</i>&nbsp;    public void test_ThatJSONExamplesRun() {
+<b class="fc"><i>71</i>&nbsp;        String dir = System.getProperty(&quot;user.dir&quot;) + &quot;/examples&quot;;</b>
+<b class="fc"><i>72</i>&nbsp;        test_ThatJSONExamplesRun(dir);</b>
+<b class="fc"><i>73</i>&nbsp;    }</b>
+<i>74</i>&nbsp;    
+<i>75</i>&nbsp;    public void test_ThatJSONExamplesRun(String dir) {
+<i>76</i>&nbsp;        try {
+<b class="fc"><i>77</i>&nbsp;            Logger.FILE_MODE = Logger.LogFileMode.overwrite;</b>
+<b class="fc"><i>78</i>&nbsp;            System.out.println(&quot;Test that JSON Examples run in &quot; + dir);</b>
+<b class="fc"><i>79</i>&nbsp;            File exampleDir = new File(dir);</b>
+<b class="fc"><i>80</i>&nbsp;            String[] exampleFiles = exampleDir.list(new FilenameFilter() {</b>
+<i>81</i>&nbsp;                @Override
+<i>82</i>&nbsp;				public boolean accept(File dir, String name) {
+<b class="fc"><i>83</i>&nbsp;                    return name.endsWith(&quot;.json&quot;);</b>
+<i>84</i>&nbsp;                }
+<i>85</i>&nbsp;            });
+<i>86</i>&nbsp;
+<b class="fc"><i>87</i>&nbsp;            List&lt;String&gt; failedFiles = new ArrayList&lt;String&gt;();</b>
+<b class="fc"><i>88</i>&nbsp;            int seed = 127;</b>
+<b class="fc"><i>89</i>&nbsp;            for (String fileName : exampleFiles) {</b>
+<b class="fc"><i>90</i>&nbsp;                Randomizer.setSeed(seed);</b>
+<b class="fc"><i>91</i>&nbsp;                seed += 10; // need more than one to prevent trouble with multiMCMC logs</b>
+<b class="fc"><i>92</i>&nbsp;                System.out.println(&quot;Processing &quot; + fileName);</b>
+<b class="fc"><i>93</i>&nbsp;                JSONParser parser = new JSONParser();</b>
+<i>94</i>&nbsp;                try {
+<b class="fc"><i>95</i>&nbsp;                    beast.core.Runnable runable = parser.parseFile(new File(dir + &quot;/&quot; + fileName));</b>
+<b class="fc"><i>96</i>&nbsp;                    if (runable instanceof MCMC) {</b>
+<b class="fc"><i>97</i>&nbsp;                        MCMC mcmc = (MCMC) runable;</b>
+<b class="fc"><i>98</i>&nbsp;                        mcmc.setInputValue(&quot;preBurnin&quot;, 0);</b>
+<b class="fc"><i>99</i>&nbsp;                        mcmc.setInputValue(&quot;chainLength&quot;, 1000);</b>
+<b class="fc"><i>100</i>&nbsp;                        mcmc.run();</b>
+<i>101</i>&nbsp;                    }
+<b class="nc"><i>102</i>&nbsp;                } catch (Exception e) {</b>
+<b class="nc"><i>103</i>&nbsp;                    System.out.println(&quot;ExampleJSONParsing::Failed for &quot; + fileName</b>
+<b class="nc"><i>104</i>&nbsp;                            + &quot;: &quot; + e.getMessage());</b>
+<b class="nc"><i>105</i>&nbsp;                    failedFiles.add(fileName);</b>
+<b class="fc"><i>106</i>&nbsp;                }</b>
+<b class="fc"><i>107</i>&nbsp;                System.out.println(&quot;Done &quot; + fileName);</b>
+<i>108</i>&nbsp;            }
+<b class="fc"><i>109</i>&nbsp;            if (failedFiles.size() &gt; 0) {</b>
+<b class="nc"><i>110</i>&nbsp;                System.out.println(&quot;\ntest_ThatJSONExamplesRun::Failed for : &quot; + failedFiles.toString());</b>
+<i>111</i>&nbsp;            } else {
+<b class="fc"><i>112</i>&nbsp;                System.out.println(&quot;SUCCESS!!!&quot;);</b>
+<i>113</i>&nbsp;            }
+<b class="fc"><i>114</i>&nbsp;            assertTrue(failedFiles.toString(), failedFiles.size() == 0);</b>
+<b class="nc"><i>115</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>116</i>&nbsp;            System.out.println(&quot;exception thrown &quot;);</b>
+<b class="nc"><i>117</i>&nbsp;            System.out.println(e.getMessage());</b>
+<i>118</i>&nbsp;            ;
+<b class="fc"><i>119</i>&nbsp;        }</b>
+<b class="fc"><i>120</i>&nbsp;    } // test_ThatXmlExamplesRun</b>
+<i>121</i>&nbsp;
+<i>122</i>&nbsp;
+<i>123</i>&nbsp;    public static void main(String args[]) {
+<b class="nc"><i>124</i>&nbsp;        org.junit.runner.JUnitCore.main(&quot;test.beast.integration.ExampleJSONParsingTest&quot;);</b>
+<b class="nc"><i>125</i>&nbsp;    }</b>
+<i>126</i>&nbsp;
+<i>127</i>&nbsp;} // ExampleJSONParsingTest
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-27 17:09</div>
+</div>
+</body>
+</html>

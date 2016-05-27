@@ -1,0 +1,140 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: ResumeTest</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">test.beast.integration</a> ]
+</div>
+
+<h1>Coverage Summary for Class: ResumeTest (test.beast.integration)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ResumeTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (29/ 29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package test.beast.integration;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.io.File;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import org.junit.Test;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import beast.core.Logger;
+<i>8</i>&nbsp;import beast.core.MCMC;
+<i>9</i>&nbsp;import beast.util.Randomizer;
+<i>10</i>&nbsp;import beast.util.XMLParser;
+<i>11</i>&nbsp;import junit.framework.TestCase;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;/**
+<i>14</i>&nbsp; * check that a chain can be resumed after termination *
+<i>15</i>&nbsp; */
+<b class="fc"><i>16</i>&nbsp;public class ResumeTest extends TestCase {</b>
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;    final static String XML_FILE = &quot;testHKY.xml&quot;;
+<i>19</i>&nbsp;	{
+<b class="fc"><i>20</i>&nbsp;		ExampleXmlParsingTest.setUpTestDir();</b>
+<b class="fc"><i>21</i>&nbsp;	}</b>
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;    
+<i>24</i>&nbsp;    @Test
+<i>25</i>&nbsp;    public void test_ThatXmlExampleResumes() throws Exception {
+<b class="fc"><i>26</i>&nbsp;        Randomizer.setSeed(127);</b>
+<b class="fc"><i>27</i>&nbsp;        Logger.FILE_MODE = Logger.LogFileMode.overwrite;</b>
+<b class="fc"><i>28</i>&nbsp;        String dir = System.getProperty(&quot;user.dir&quot;) + &quot;/examples&quot;;</b>
+<b class="fc"><i>29</i>&nbsp;        String fileName = dir + &quot;/&quot; + XML_FILE;</b>
+<i>30</i>&nbsp;
+<b class="fc"><i>31</i>&nbsp;        System.out.println(&quot;Processing &quot; + fileName);</b>
+<b class="fc"><i>32</i>&nbsp;        XMLParser parser = new XMLParser();</b>
+<b class="fc"><i>33</i>&nbsp;        beast.core.Runnable runable = parser.parseFile(new File(fileName));</b>
+<b class="fc"><i>34</i>&nbsp;        runable.setStateFile(&quot;tmp.state&quot;, false);</b>
+<b class="fc"><i>35</i>&nbsp;        if (runable instanceof MCMC) {</b>
+<b class="fc"><i>36</i>&nbsp;            MCMC mcmc = (MCMC) runable;</b>
+<b class="fc"><i>37</i>&nbsp;            mcmc.setInputValue(&quot;preBurnin&quot;, 0);</b>
+<b class="fc"><i>38</i>&nbsp;            mcmc.setInputValue(&quot;chainLength&quot;, 1000);</b>
+<b class="fc"><i>39</i>&nbsp;            mcmc.run();</b>
+<i>40</i>&nbsp;        }
+<b class="fc"><i>41</i>&nbsp;        System.out.println(&quot;Done &quot; + fileName);</b>
+<i>42</i>&nbsp;
+<b class="fc"><i>43</i>&nbsp;        System.out.println(&quot;Resuming &quot; + fileName);</b>
+<b class="fc"><i>44</i>&nbsp;        Logger.FILE_MODE = Logger.LogFileMode.resume;</b>
+<b class="fc"><i>45</i>&nbsp;        parser = new XMLParser();</b>
+<b class="fc"><i>46</i>&nbsp;        runable = parser.parseFile(new File(fileName));</b>
+<b class="fc"><i>47</i>&nbsp;        runable.setStateFile(&quot;tmp.state&quot;, true);</b>
+<b class="fc"><i>48</i>&nbsp;        if (runable instanceof MCMC) {</b>
+<b class="fc"><i>49</i>&nbsp;            MCMC mcmc = (MCMC) runable;</b>
+<b class="fc"><i>50</i>&nbsp;            mcmc.setInputValue(&quot;preBurnin&quot;, 0);</b>
+<b class="fc"><i>51</i>&nbsp;            mcmc.setInputValue(&quot;chainLength&quot;, 1000);</b>
+<b class="fc"><i>52</i>&nbsp;            mcmc.run();</b>
+<i>53</i>&nbsp;        }
+<b class="fc"><i>54</i>&nbsp;        System.out.println(&quot;Done &quot; + fileName);</b>
+<b class="fc"><i>55</i>&nbsp;    } // test_ThatXmlExampleResumes</b>
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;} // class ResumeTest
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-27 17:09</div>
+</div>
+</body>
+</html>

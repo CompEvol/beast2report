@@ -1,0 +1,191 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: UnorderedAlignmentsTest</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">test.beast.evolution.alignment</a> ]
+</div>
+
+<h1>Coverage Summary for Class: UnorderedAlignmentsTest (test.beast.evolution.alignment)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UnorderedAlignmentsTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/ 8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96%
+  </span>
+  <span class="absValue">
+    (48/ 50)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package test.beast.evolution.alignment;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import java.util.Collections;
+<i>5</i>&nbsp;import java.util.stream.Collectors;
+<i>6</i>&nbsp;import java.util.stream.IntStream;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import org.junit.Test;
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;import beast.app.seqgen.SimulatedAlignment;
+<i>11</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>12</i>&nbsp;import beast.evolution.alignment.Alignment;
+<i>13</i>&nbsp;import beast.evolution.alignment.Taxon;
+<i>14</i>&nbsp;import beast.evolution.alignment.TaxonSet;
+<i>15</i>&nbsp;import beast.evolution.likelihood.TreeLikelihood;
+<i>16</i>&nbsp;import beast.evolution.sitemodel.SiteModel;
+<i>17</i>&nbsp;import beast.evolution.substitutionmodel.Frequencies;
+<i>18</i>&nbsp;import beast.evolution.substitutionmodel.HKY;
+<i>19</i>&nbsp;import beast.evolution.tree.RandomTree;
+<i>20</i>&nbsp;import beast.evolution.tree.TraitSet;
+<i>21</i>&nbsp;import beast.evolution.tree.Tree;
+<i>22</i>&nbsp;import beast.evolution.tree.coalescent.ConstantPopulation;
+<i>23</i>&nbsp;import junit.framework.TestCase;
+<i>24</i>&nbsp;
+<b class="fc"><i>25</i>&nbsp;public class UnorderedAlignmentsTest extends TestCase {</b>
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;    static public TaxonSet getTaxa() throws Exception {
+<b class="fc"><i>28</i>&nbsp;        return new TaxonSet(IntStream.range(65, 81).mapToObj(i -&gt; ((Character) (char) i).toString()).map((java.util.function.Function&lt;String, Taxon&gt;) (id) -&gt; {</b>
+<i>29</i>&nbsp;            try {
+<b class="fc"><i>30</i>&nbsp;                return new Taxon(id);</b>
+<b class="nc"><i>31</i>&nbsp;            } catch (Exception e) {</b>
+<b class="nc"><i>32</i>&nbsp;                throw new RuntimeException(e);</b>
+<i>33</i>&nbsp;            }
+<b class="fc"><i>34</i>&nbsp;        }).collect(Collectors.toList()));</b>
+<i>35</i>&nbsp;    }
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;    static public TraitSet getDates(TaxonSet taxa) throws Exception {
+<b class="fc"><i>38</i>&nbsp;        TraitSet timeTrait = new TraitSet();</b>
+<b class="fc"><i>39</i>&nbsp;        String trait = String.join(&quot;,&quot;, (Iterable&lt;String&gt;) IntStream.range(0, 16).mapToObj(i -&gt; taxa.getTaxonId(i) + &quot;=&quot; + i / 3.0)::iterator);</b>
+<b class="fc"><i>40</i>&nbsp;        timeTrait.initByName(</b>
+<i>41</i>&nbsp;                &quot;traitname&quot;, &quot;date-forward&quot;,
+<i>42</i>&nbsp;                &quot;taxa&quot;, taxa,
+<i>43</i>&nbsp;                &quot;value&quot;, trait);
+<b class="fc"><i>44</i>&nbsp;        return timeTrait;</b>
+<i>45</i>&nbsp;    }
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;    static public Tree getTree(TaxonSet taxa) throws Exception {
+<b class="fc"><i>48</i>&nbsp;        Tree tree = new RandomTree();</b>
+<b class="fc"><i>49</i>&nbsp;        TraitSet dates = getDates(taxa);</b>
+<b class="fc"><i>50</i>&nbsp;        ConstantPopulation constant = new ConstantPopulation();</b>
+<b class="fc"><i>51</i>&nbsp;        constant.initByName(&quot;popSize&quot;, new RealParameter(&quot;5.0&quot;));</b>
+<b class="fc"><i>52</i>&nbsp;        tree.initByName(</b>
+<i>53</i>&nbsp;                &quot;taxonset&quot;, taxa,
+<i>54</i>&nbsp;                &quot;populationModel&quot;, constant,
+<i>55</i>&nbsp;                &quot;trait&quot;, dates);
+<b class="fc"><i>56</i>&nbsp;        return tree;</b>
+<i>57</i>&nbsp;    }
+<i>58</i>&nbsp;
+<i>59</i>&nbsp;    static public SiteModel getSiteModel() throws Exception {
+<b class="fc"><i>60</i>&nbsp;        Frequencies frequencies = new Frequencies();</b>
+<b class="fc"><i>61</i>&nbsp;        frequencies.initByName(&quot;frequencies&quot;, new RealParameter(&quot;0.25 0.25 0.25 0.25&quot;));</b>
+<b class="fc"><i>62</i>&nbsp;        HKY hky = new HKY();</b>
+<b class="fc"><i>63</i>&nbsp;        hky.initByName(&quot;kappa&quot;, new RealParameter(&quot;1.0&quot;), &quot;frequencies&quot;, frequencies);</b>
+<b class="fc"><i>64</i>&nbsp;        SiteModel siteModel = new SiteModel();</b>
+<b class="fc"><i>65</i>&nbsp;        siteModel.initByName(&quot;mutationRate&quot;, new RealParameter(&quot;0.005&quot;), &quot;substModel&quot;, hky);</b>
+<b class="fc"><i>66</i>&nbsp;        return siteModel;</b>
+<i>67</i>&nbsp;    }
+<i>68</i>&nbsp;
+<i>69</i>&nbsp;    static public Alignment getAlignment(TaxonSet taxa, Tree tree, SiteModel siteModel) throws Exception {
+<b class="fc"><i>70</i>&nbsp;        Alignment dummy = new Alignment();</b>
+<b class="fc"><i>71</i>&nbsp;        Object [] args = new String[2 * taxa.getTaxonCount() + 2];</b>
+<b class="fc"><i>72</i>&nbsp;        args[args.length - 2] = &quot;dataType&quot;;</b>
+<b class="fc"><i>73</i>&nbsp;        args[args.length - 1] = &quot;nucleotide&quot;;</b>
+<b class="fc"><i>74</i>&nbsp;        for (int i = 0; i &lt; taxa.getTaxonCount(); ++i) {</b>
+<b class="fc"><i>75</i>&nbsp;            args[2*i] = taxa.getTaxonId(i);</b>
+<b class="fc"><i>76</i>&nbsp;            args[2*i+1] = &quot;N&quot;;</b>
+<i>77</i>&nbsp;        }
+<b class="fc"><i>78</i>&nbsp;        dummy.initByName(args);</b>
+<b class="fc"><i>79</i>&nbsp;        SimulatedAlignment data = new SimulatedAlignment();</b>
+<b class="fc"><i>80</i>&nbsp;        data.initByName(&quot;data&quot;, dummy, &quot;tree&quot;, tree, &quot;siteModel&quot;, siteModel);</b>
+<b class="fc"><i>81</i>&nbsp;        return data;</b>
+<i>82</i>&nbsp;    }
+<i>83</i>&nbsp;
+<i>84</i>&nbsp;    @Test
+<i>85</i>&nbsp;    public void testUnorderedAlignment() throws Exception {
+<b class="fc"><i>86</i>&nbsp;        TaxonSet taxa = getTaxa();</b>
+<b class="fc"><i>87</i>&nbsp;        Tree tree = getTree(taxa);</b>
+<b class="fc"><i>88</i>&nbsp;        SiteModel siteModel = getSiteModel();</b>
+<b class="fc"><i>89</i>&nbsp;        double logP = 0.0;</b>
+<b class="fc"><i>90</i>&nbsp;        double shuffledLogP = 0.0;</b>
+<b class="fc"><i>91</i>&nbsp;        for (int i = 0; i &lt; 3; ++i) {</b>
+<b class="fc"><i>92</i>&nbsp;            Alignment data = getAlignment(taxa, tree, siteModel);</b>
+<i>93</i>&nbsp;
+<i>94</i>&nbsp;            // First calculate in order
+<b class="fc"><i>95</i>&nbsp;            TreeLikelihood likelihood = new TreeLikelihood();</b>
+<b class="fc"><i>96</i>&nbsp;            likelihood.initByName(&quot;data&quot;, data, &quot;tree&quot;, tree, &quot;siteModel&quot;, siteModel);</b>
+<b class="fc"><i>97</i>&nbsp;            logP += likelihood.calculateLogP();</b>
+<i>98</i>&nbsp;
+<i>99</i>&nbsp;            // Now calculate again, with shuffled taxon order
+<b class="fc"><i>100</i>&nbsp;            Collections.shuffle(data.sequenceInput.get());</b>
+<b class="fc"><i>101</i>&nbsp;            likelihood = new TreeLikelihood();</b>
+<b class="fc"><i>102</i>&nbsp;            likelihood.initByName(&quot;data&quot;, data, &quot;tree&quot;, tree, &quot;siteModel&quot;, siteModel);</b>
+<b class="fc"><i>103</i>&nbsp;            shuffledLogP += likelihood.calculateLogP();</b>
+<i>104</i>&nbsp;        }
+<b class="fc"><i>105</i>&nbsp;        assertEquals(logP, shuffledLogP, 1E-9);</b>
+<b class="fc"><i>106</i>&nbsp;    }</b>
+<i>107</i>&nbsp;
+<i>108</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-27 17:09</div>
+</div>
+</body>
+</html>

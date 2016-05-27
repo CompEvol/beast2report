@@ -1,0 +1,213 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: MeanOfParametricDistributionTest</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">test.beast.math.distributions</a> ]
+</div>
+
+<h1>Coverage Summary for Class: MeanOfParametricDistributionTest (test.beast.math.distributions)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MeanOfParametricDistributionTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/ 7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.7%
+  </span>
+  <span class="absValue">
+    (75/ 76)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package test.beast.math.distributions;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import org.junit.Test;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import beast.core.BEASTInterface;
+<i>8</i>&nbsp;import beast.math.distributions.Exponential;
+<i>9</i>&nbsp;import beast.math.distributions.Gamma;
+<i>10</i>&nbsp;import beast.math.distributions.LogNormalDistributionModel;
+<i>11</i>&nbsp;import beast.math.distributions.Normal;
+<i>12</i>&nbsp;import beast.math.distributions.Uniform;
+<i>13</i>&nbsp;import beast.util.XMLParser;
+<i>14</i>&nbsp;import junit.framework.TestCase;
+<i>15</i>&nbsp;
+<b class="fc"><i>16</i>&nbsp;public class MeanOfParametricDistributionTest extends TestCase {</b>
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;	@Test
+<i>19</i>&nbsp;    public void testMeanOfNormal() throws Exception {
+<b class="fc"><i>20</i>&nbsp;		Normal normal = new Normal();</b>
+<b class="fc"><i>21</i>&nbsp;		normal.initByName(&quot;mean&quot;,&quot;123.0&quot;,&quot;sigma&quot;,&quot;3.0&quot;);</b>
+<b class="fc"><i>22</i>&nbsp;		double mean = normal.getMean();</b>
+<b class="fc"><i>23</i>&nbsp;        assertEquals(mean, 123, 1e-10);</b>
+<i>24</i>&nbsp;
+<b class="fc"><i>25</i>&nbsp;        normal = new Normal();</b>
+<b class="fc"><i>26</i>&nbsp;		normal.initByName(&quot;mean&quot;,&quot;123.0&quot;,&quot;sigma&quot;,&quot;30.0&quot;);</b>
+<b class="fc"><i>27</i>&nbsp;		mean = normal.getMean();</b>
+<b class="fc"><i>28</i>&nbsp;        assertEquals(mean, 123, 1e-10);</b>
+<i>29</i>&nbsp;
+<b class="fc"><i>30</i>&nbsp;        normal = new Normal();</b>
+<b class="fc"><i>31</i>&nbsp;		normal.initByName(&quot;mean&quot;,&quot;123.0&quot;,&quot;sigma&quot;,&quot;3.0&quot;,&quot;offset&quot;,&quot;3.0&quot;);</b>
+<b class="fc"><i>32</i>&nbsp;		mean = normal.getMean();</b>
+<b class="fc"><i>33</i>&nbsp;        assertEquals(mean, 126, 1e-10);</b>
+<b class="fc"><i>34</i>&nbsp;	}</b>
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;	@Test
+<i>37</i>&nbsp;    public void testMeanOfGamma() throws Exception {
+<b class="fc"><i>38</i>&nbsp;		Gamma gamma = new Gamma();</b>
+<b class="fc"><i>39</i>&nbsp;		gamma.initByName(&quot;alpha&quot;, &quot;100&quot;, &quot;beta&quot;, &quot;10&quot;);</b>
+<b class="fc"><i>40</i>&nbsp;		double mean = gamma.getMean();</b>
+<b class="fc"><i>41</i>&nbsp;        assertEquals(mean, 1000, 1e-10);</b>
+<i>42</i>&nbsp;
+<b class="fc"><i>43</i>&nbsp;        gamma = new Gamma();</b>
+<b class="fc"><i>44</i>&nbsp;		gamma.initByName(&quot;alpha&quot;, &quot;100&quot;, &quot;beta&quot;, &quot;100&quot;);</b>
+<b class="fc"><i>45</i>&nbsp;		mean = gamma.getMean();</b>
+<b class="fc"><i>46</i>&nbsp;        assertEquals(mean, 10000, 1e-10);</b>
+<i>47</i>&nbsp;
+<b class="fc"><i>48</i>&nbsp;        gamma = new Gamma();</b>
+<b class="fc"><i>49</i>&nbsp;		gamma.initByName(&quot;alpha&quot;, &quot;100&quot;, &quot;beta&quot;, &quot;10&quot;, &quot;offset&quot;, &quot;3&quot;);</b>
+<b class="fc"><i>50</i>&nbsp;		mean = gamma.getMean();</b>
+<b class="fc"><i>51</i>&nbsp;        assertEquals(mean, 1003, 1e-10);</b>
+<b class="fc"><i>52</i>&nbsp;	}</b>
+<i>53</i>&nbsp;
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;	@Test
+<i>56</i>&nbsp;    public void testMeanOfExponential() throws Exception {
+<b class="fc"><i>57</i>&nbsp;		Exponential exp = new Exponential();</b>
+<b class="fc"><i>58</i>&nbsp;		exp.initByName(&quot;mean&quot;, &quot;10&quot;);</b>
+<b class="fc"><i>59</i>&nbsp;		double mean = exp.getMean();</b>
+<b class="fc"><i>60</i>&nbsp;        assertEquals(mean, 10, 1e-10);</b>
+<i>61</i>&nbsp;
+<b class="fc"><i>62</i>&nbsp;        exp = new Exponential();</b>
+<b class="fc"><i>63</i>&nbsp;		exp.initByName(&quot;mean&quot;, &quot;1&quot;);</b>
+<b class="fc"><i>64</i>&nbsp;		mean = exp.getMean();</b>
+<b class="fc"><i>65</i>&nbsp;        assertEquals(mean, 1, 1e-10);</b>
+<i>66</i>&nbsp;
+<b class="fc"><i>67</i>&nbsp;        exp = new Exponential();</b>
+<b class="fc"><i>68</i>&nbsp;		exp.initByName(&quot;mean&quot;, &quot;1&quot;, &quot;offset&quot;, &quot;3&quot;);</b>
+<b class="fc"><i>69</i>&nbsp;		mean = exp.getMean();</b>
+<b class="fc"><i>70</i>&nbsp;        assertEquals(mean, 4, 1e-10);</b>
+<b class="fc"><i>71</i>&nbsp;	}</b>
+<i>72</i>&nbsp;
+<i>73</i>&nbsp;	@Test
+<i>74</i>&nbsp;    public void testMeanOfLogNormal() throws Exception {
+<b class="fc"><i>75</i>&nbsp;		LogNormalDistributionModel exp = new LogNormalDistributionModel();</b>
+<b class="fc"><i>76</i>&nbsp;		exp.initByName(&quot;M&quot;, &quot;10&quot; , &quot;S&quot;, &quot;1&quot;, &quot;meanInRealSpace&quot;, true);</b>
+<b class="fc"><i>77</i>&nbsp;		double mean = exp.getMean();</b>
+<b class="fc"><i>78</i>&nbsp;        assertEquals(mean, 10, 1e-10);</b>
+<i>79</i>&nbsp;
+<b class="fc"><i>80</i>&nbsp;        exp = new LogNormalDistributionModel();</b>
+<b class="fc"><i>81</i>&nbsp;		exp.initByName(&quot;M&quot;, &quot;1&quot;, &quot;S&quot;, &quot;1&quot;, &quot;meanInRealSpace&quot;, true);</b>
+<b class="fc"><i>82</i>&nbsp;		mean = exp.getMean();</b>
+<b class="fc"><i>83</i>&nbsp;        assertEquals(mean, 1, 1e-10);</b>
+<i>84</i>&nbsp;
+<b class="fc"><i>85</i>&nbsp;        exp = new LogNormalDistributionModel();</b>
+<b class="fc"><i>86</i>&nbsp;		exp.initByName(&quot;M&quot;, &quot;1&quot;, &quot;S&quot;, &quot;1&quot;, &quot;meanInRealSpace&quot;, true, &quot;offset&quot;, &quot;3&quot;);</b>
+<b class="fc"><i>87</i>&nbsp;		mean = exp.getMean();</b>
+<b class="fc"><i>88</i>&nbsp;        assertEquals(mean, 4, 1e-10);</b>
+<i>89</i>&nbsp;
+<i>90</i>&nbsp;        try {
+<b class="fc"><i>91</i>&nbsp;            exp = new LogNormalDistributionModel();</b>
+<b class="fc"><i>92</i>&nbsp;    		exp.initByName(&quot;M&quot;, &quot;1&quot;, &quot;S&quot;, &quot;1&quot;, &quot;meanInRealSpace&quot;, false, &quot;offset&quot;, &quot;3&quot;);</b>
+<b class="fc"><i>93</i>&nbsp;    		mean = exp.getMean();</b>
+<b class="fc"><i>94</i>&nbsp;            assertEquals(mean, 4.4816890703380645, 1e-10);</b>
+<b class="nc"><i>95</i>&nbsp;        } catch (RuntimeException e) {</b>
+<i>96</i>&nbsp;        	// we are fine here
+<b class="fc"><i>97</i>&nbsp;        }</b>
+<b class="fc"><i>98</i>&nbsp;	}</b>
+<i>99</i>&nbsp;	
+<i>100</i>&nbsp;	@Test
+<i>101</i>&nbsp;	public void testMeanOfUniform() throws Exception {
+<b class="fc"><i>102</i>&nbsp;        Uniform dist = (Uniform) fromXML(&quot;&lt;input spec=&#39;beast.math.distributions.Uniform&#39; lower=&#39;0&#39; upper=&#39;1.0&#39; offset=&#39;0&#39;/&gt;&quot;);</b>
+<b class="fc"><i>103</i>&nbsp;        assertEquals(0.5, dist.getMean(), 1e-10);</b>
+<i>104</i>&nbsp;        
+<b class="fc"><i>105</i>&nbsp;        dist = (Uniform) fromXML(&quot;&lt;input spec=&#39;beast.math.distributions.Uniform&#39;/&gt;&quot;);</b>
+<b class="fc"><i>106</i>&nbsp;        assertEquals(0.5, dist.getMean(), 1e-10);</b>
+<i>107</i>&nbsp;
+<b class="fc"><i>108</i>&nbsp;        dist = (Uniform) fromXML(&quot;&lt;input spec=&#39;beast.math.distributions.Uniform&#39; lower=&#39;0&#39; upper=&#39;1.0&#39; offset=&#39;10&#39;/&gt;&quot;);</b>
+<b class="fc"><i>109</i>&nbsp;        assertEquals(10.5, dist.getMean(), 1e-10);</b>
+<i>110</i>&nbsp;
+<b class="fc"><i>111</i>&nbsp;        dist = (Uniform) fromXML(&quot;&lt;input spec=&#39;beast.math.distributions.Uniform&#39; upper=&#39;Infinity&#39;/&gt;&quot;);</b>
+<b class="fc"><i>112</i>&nbsp;        assertEquals(Double.NaN, dist.getMean(), 1e-10);</b>
+<i>113</i>&nbsp;
+<b class="fc"><i>114</i>&nbsp;        dist = (Uniform) fromXML(&quot;&lt;input spec=&#39;beast.math.distributions.Uniform&#39; lower=&#39;-Infinity&#39; offset=&#39;10&#39;/&gt;&quot;);</b>
+<b class="fc"><i>115</i>&nbsp;        assertEquals(Double.NaN, dist.getMean(), 1e-10);</b>
+<i>116</i>&nbsp;
+<b class="fc"><i>117</i>&nbsp;        dist = (Uniform) fromXML(&quot;&lt;input spec=&#39;beast.math.distributions.Uniform&#39; lower=&#39;-10&#39; upper=&#39;10.0&#39; offset=&#39;10&#39;/&gt;&quot;);</b>
+<b class="fc"><i>118</i>&nbsp;        assertEquals(10, dist.getMean(), 1e-10);</b>
+<i>119</i>&nbsp;        
+<b class="fc"><i>120</i>&nbsp;        dist = new Uniform();</b>
+<b class="fc"><i>121</i>&nbsp;        dist.initByName(&quot;lower&quot;, &quot;-1.0&quot;, &quot;upper&quot;, &quot;0.0&quot;);</b>
+<b class="fc"><i>122</i>&nbsp;        assertEquals(-0.5, dist.getMean(), 1e-10);</b>
+<i>123</i>&nbsp;        
+<b class="fc"><i>124</i>&nbsp;	}</b>
+<i>125</i>&nbsp;	
+<i>126</i>&nbsp;	BEASTInterface fromXML(String xml) throws Exception {
+<b class="fc"><i>127</i>&nbsp;		return (new XMLParser()).parseBareFragment(xml, true);</b>
+<i>128</i>&nbsp;	}
+<i>129</i>&nbsp;
+<i>130</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-27 17:09</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,148 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: BirthDeathGernhard08ModelTest</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">test.beast.evolution.speciation</a> ]
+</div>
+
+<h1>Coverage Summary for Class: BirthDeathGernhard08ModelTest (test.beast.evolution.speciation)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BirthDeathGernhard08ModelTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (24/ 24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package test.beast.evolution.speciation;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.junit.Test;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>6</i>&nbsp;import beast.evolution.alignment.Alignment;
+<i>7</i>&nbsp;import beast.evolution.speciation.BirthDeathGernhard08Model;
+<i>8</i>&nbsp;import beast.evolution.tree.Tree;
+<i>9</i>&nbsp;import junit.framework.TestCase;
+<i>10</i>&nbsp;import test.beast.BEASTTestCase;
+<i>11</i>&nbsp;
+<b class="fc"><i>12</i>&nbsp;public class BirthDeathGernhard08ModelTest extends TestCase {</b>
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;    @Test
+<i>16</i>&nbsp;    public void testJC69Likelihood() throws Exception {
+<i>17</i>&nbsp;        // Set up JC69 model: uniform freqs, kappa = 1, 0 gamma categories
+<b class="fc"><i>18</i>&nbsp;        Alignment data = BEASTTestCase.getAlignment();</b>
+<b class="fc"><i>19</i>&nbsp;        Tree tree = BEASTTestCase.getTree(data);</b>
+<i>20</i>&nbsp;
+<b class="fc"><i>21</i>&nbsp;        RealParameter birthDiffRate = new RealParameter(&quot;1.0&quot;);</b>
+<b class="fc"><i>22</i>&nbsp;        RealParameter relativeDeathRate = new RealParameter(&quot;0.5&quot;);</b>
+<b class="fc"><i>23</i>&nbsp;        RealParameter originHeight = new RealParameter(&quot;0.1&quot;);</b>
+<b class="fc"><i>24</i>&nbsp;        BirthDeathGernhard08Model likelihood = new BirthDeathGernhard08Model();</b>
+<b class="fc"><i>25</i>&nbsp;        likelihood.initByName(&quot;type&quot;, &quot;unscaled&quot;,</b>
+<i>26</i>&nbsp;                &quot;tree&quot;, tree,
+<i>27</i>&nbsp;                &quot;birthDiffRate&quot;, birthDiffRate,
+<i>28</i>&nbsp;                &quot;relativeDeathRate&quot;, relativeDeathRate);
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;
+<b class="fc"><i>31</i>&nbsp;        double logP = 0;</b>
+<b class="fc"><i>32</i>&nbsp;        logP = likelihood.calculateLogP(); // -3.520936119641363</b>
+<b class="fc"><i>33</i>&nbsp;        assertEquals(logP, 2.5878899503981287, BEASTTestCase.PRECISION);</b>
+<i>34</i>&nbsp;
+<b class="fc"><i>35</i>&nbsp;        likelihood.initByName(&quot;type&quot;, &quot;timesonly&quot;,</b>
+<i>36</i>&nbsp;                &quot;tree&quot;, tree,
+<i>37</i>&nbsp;                &quot;birthDiffRate&quot;, birthDiffRate,
+<i>38</i>&nbsp;                &quot;relativeDeathRate&quot;, relativeDeathRate);
+<b class="fc"><i>39</i>&nbsp;        logP = likelihood.calculateLogP();</b>
+<b class="fc"><i>40</i>&nbsp;        assertEquals(logP, 9.16714116240823, BEASTTestCase.PRECISION);</b>
+<i>41</i>&nbsp;
+<b class="fc"><i>42</i>&nbsp;        likelihood.initByName(&quot;type&quot;, &quot;oriented&quot;,</b>
+<i>43</i>&nbsp;                &quot;tree&quot;, tree,
+<i>44</i>&nbsp;                &quot;birthDiffRate&quot;, birthDiffRate,
+<i>45</i>&nbsp;                &quot;relativeDeathRate&quot;, relativeDeathRate);
+<b class="fc"><i>46</i>&nbsp;        logP = likelihood.calculateLogP();</b>
+<b class="fc"><i>47</i>&nbsp;        assertEquals(logP, 4.379649419626184, BEASTTestCase.PRECISION);</b>
+<i>48</i>&nbsp;
+<b class="fc"><i>49</i>&nbsp;        likelihood.initByName(&quot;type&quot;, &quot;labeled&quot;,</b>
+<i>50</i>&nbsp;                &quot;tree&quot;, tree,
+<i>51</i>&nbsp;                &quot;birthDiffRate&quot;, birthDiffRate,
+<i>52</i>&nbsp;                &quot;relativeDeathRate&quot;, relativeDeathRate);
+<b class="fc"><i>53</i>&nbsp;        logP = likelihood.calculateLogP();</b>
+<b class="fc"><i>54</i>&nbsp;        assertEquals(logP, 1.2661341104158121, BEASTTestCase.PRECISION);</b>
+<i>55</i>&nbsp;        
+<b class="fc"><i>56</i>&nbsp;        likelihood.initByName(&quot;type&quot;, &quot;labeled&quot;,</b>
+<i>57</i>&nbsp;        		&quot;tree&quot;, tree,
+<i>58</i>&nbsp;        		&quot;birthDiffRate&quot;, birthDiffRate,
+<i>59</i>&nbsp;        		&quot;relativeDeathRate&quot;, relativeDeathRate,
+<i>60</i>&nbsp;        		&quot;originHeight&quot;, originHeight);
+<b class="fc"><i>61</i>&nbsp;        logP = likelihood.calculateLogP();</b>
+<b class="fc"><i>62</i>&nbsp;        assertEquals(logP, 8.41413452832378, BEASTTestCase.PRECISION);</b>
+<b class="fc"><i>63</i>&nbsp;    }</b>
+<i>64</i>&nbsp;
+<i>65</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-27 17:09</div>
+</div>
+</body>
+</html>

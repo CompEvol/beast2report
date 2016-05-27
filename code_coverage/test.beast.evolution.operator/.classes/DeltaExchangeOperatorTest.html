@@ -1,0 +1,147 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: DeltaExchangeOperatorTest</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">test.beast.evolution.operator</a> ]
+</div>
+
+<h1>Coverage Summary for Class: DeltaExchangeOperatorTest (test.beast.evolution.operator)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DeltaExchangeOperatorTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.1%
+  </span>
+  <span class="absValue">
+    (27/ 29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; * 
+<i>3</i>&nbsp; */
+<i>4</i>&nbsp;package test.beast.evolution.operator;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;import org.junit.Test;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import beast.core.State;
+<i>9</i>&nbsp;import beast.core.parameter.IntegerParameter;
+<i>10</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>11</i>&nbsp;import beast.evolution.operators.DeltaExchangeOperator;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;/**
+<i>14</i>&nbsp; * @author gereon
+<i>15</i>&nbsp; *
+<i>16</i>&nbsp; */
+<b class="fc"><i>17</i>&nbsp;public class DeltaExchangeOperatorTest extends TestOperator {</b>
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;	@Test
+<i>20</i>&nbsp;	public void testKeepsSum() {
+<b class="fc"><i>21</i>&nbsp;		DeltaExchangeOperator operator = new DeltaExchangeOperator(); </b>
+<b class="fc"><i>22</i>&nbsp;		RealParameter parameter = new RealParameter(new Double[] {1., 1., 1., 1.});</b>
+<b class="fc"><i>23</i>&nbsp;		register(operator,</b>
+<i>24</i>&nbsp;				&quot;parameter&quot;, parameter);
+<b class="fc"><i>25</i>&nbsp;		for (int i=0; i&lt;100; ++i) {</b>
+<b class="fc"><i>26</i>&nbsp;			operator.proposal();</b>
+<i>27</i>&nbsp;		}
+<b class="fc"><i>28</i>&nbsp;		double i = 0;</b>
+<b class="fc"><i>29</i>&nbsp;		for (Double p : parameter.getValues()) {</b>
+<b class="fc"><i>30</i>&nbsp;			i += p;</b>
+<i>31</i>&nbsp;		}
+<b class="fc"><i>32</i>&nbsp;		assertEquals(&quot;The DeltaExchangeOperator should not change the sum of a parameter&quot;, i, 4, 0.00001);</b>
+<b class="fc"><i>33</i>&nbsp;	}</b>
+<i>34</i>&nbsp;	
+<i>35</i>&nbsp;	@Test
+<i>36</i>&nbsp;	public void testKeepsWeightedSum() {
+<b class="fc"><i>37</i>&nbsp;		RealParameter parameter = new RealParameter(new Double[] {1., 1., 1., 1.});</b>
+<b class="fc"><i>38</i>&nbsp;		register(new DeltaExchangeOperator(),</b>
+<b class="fc"><i>39</i>&nbsp;				&quot;weightvector&quot;, new IntegerParameter(new Integer[] {0, 1, 2, 1}),</b>
+<i>40</i>&nbsp;				&quot;parameter&quot;, parameter);
+<b class="fc"><i>41</i>&nbsp;		Double[] p = parameter.getValues();</b>
+<b class="fc"><i>42</i>&nbsp;		assertEquals(&quot;The DeltaExchangeOperator should not change the sum of a parameter&quot;,</b>
+<b class="fc"><i>43</i>&nbsp;				0*p[1]+1*p[1]+2*p[2]+1*p[3], 4, 0.00001);</b>
+<b class="fc"><i>44</i>&nbsp;	}</b>
+<i>45</i>&nbsp;	
+<i>46</i>&nbsp;	@Test
+<i>47</i>&nbsp;	public void testCanOperate() {
+<i>48</i>&nbsp;		// Test whether a validly initialised operator may make proposals
+<b class="fc"><i>49</i>&nbsp;		State state = new State();</b>
+<b class="fc"><i>50</i>&nbsp;		RealParameter parameter = new RealParameter(new Double[] { 1., 1., 1., 1. });</b>
+<b class="fc"><i>51</i>&nbsp;		state.initByName(&quot;stateNode&quot;, parameter);</b>
+<b class="fc"><i>52</i>&nbsp;		state.initialise();</b>
+<b class="fc"><i>53</i>&nbsp;		DeltaExchangeOperator d = new DeltaExchangeOperator();</b>
+<i>54</i>&nbsp;		// An invalid operator should either fail in initByName or make valid
+<i>55</i>&nbsp;		// proposals
+<i>56</i>&nbsp;		try {
+<b class="fc"><i>57</i>&nbsp;			d.initByName(&quot;parameter&quot;, parameter);</b>
+<b class="nc"><i>58</i>&nbsp;		} catch (RuntimeException e) {</b>
+<b class="nc"><i>59</i>&nbsp;			return;</b>
+<b class="fc"><i>60</i>&nbsp;		}</b>
+<b class="fc"><i>61</i>&nbsp;		d.proposal();</b>
+<b class="fc"><i>62</i>&nbsp;	}</b>
+<i>63</i>&nbsp;
+<i>64</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-27 17:09</div>
+</div>
+</body>
+</html>

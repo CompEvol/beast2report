@@ -1,0 +1,656 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: LinkUnlinkTest</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">test.beast.app.beauti</a> ]
+</div>
+
+<h1>Coverage Summary for Class: LinkUnlinkTest (test.beast.app.beauti)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LinkUnlinkTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (17/ 17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.7%
+  </span>
+  <span class="absValue">
+    (385/ 390)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package test.beast.app.beauti;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;import java.io.File;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import org.fest.assertions.Assertions;
+<i>9</i>&nbsp;import org.fest.swing.data.TableCell;
+<i>10</i>&nbsp;import org.fest.swing.fixture.JComboBoxFixture;
+<i>11</i>&nbsp;import org.fest.swing.fixture.JTabbedPaneFixture;
+<i>12</i>&nbsp;import org.fest.swing.fixture.JTableFixture;
+<i>13</i>&nbsp;import org.junit.Test;
+<i>14</i>&nbsp;
+<b class="fc"><i>15</i>&nbsp;public class LinkUnlinkTest extends BeautiBase {</b>
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;	/** robustly select rows -- don&#39;t give up after first attempt **/
+<i>18</i>&nbsp;	private void selectRows(int ... rows) {
+<b class="fc"><i>19</i>&nbsp;		JTableFixture t = beautiFrame.table();</b>
+<b class="fc"><i>20</i>&nbsp;		for (int attempt = 0; attempt &lt; 5; attempt++) {</b>
+<b class="fc"><i>21</i>&nbsp;			t.selectRows(rows);</b>
+<b class="fc"><i>22</i>&nbsp;			if (t.target.getSelectedRowCount() == rows.length) {</b>
+<b class="fc"><i>23</i>&nbsp;				return;</b>
+<i>24</i>&nbsp;			}
+<i>25</i>&nbsp;			try {
+<b class="fc"><i>26</i>&nbsp;				Thread.sleep(500);</b>
+<b class="nc"><i>27</i>&nbsp;			} catch (Exception e) {</b>
+<i>28</i>&nbsp;				
+<b class="fc"><i>29</i>&nbsp;			}</b>
+<i>30</i>&nbsp;		}
+<b class="nc"><i>31</i>&nbsp;	}</b>
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;	
+<i>34</i>&nbsp;	@Test
+<i>35</i>&nbsp;	public void simpleLinkUnlinkTwoAlignmentTest() throws Exception {
+<b class="fc"><i>36</i>&nbsp;		warning(&quot;Load gopher data 26.nex, 47.nex&quot;);</b>
+<b class="fc"><i>37</i>&nbsp;		importAlignment(&quot;examples/nexus&quot;, new File(&quot;26.nex&quot;), new File(&quot;47.nex&quot;));</b>
+<i>38</i>&nbsp;		
+<b class="fc"><i>39</i>&nbsp;		JTabbedPaneFixture f = beautiFrame.tabbedPane();</b>
+<b class="fc"><i>40</i>&nbsp;		printBeautiState(f);</b>
+<i>41</i>&nbsp;
+<b class="fc"><i>42</i>&nbsp;		selectRows(0, 1);</b>
+<i>43</i>&nbsp;		
+<b class="fc"><i>44</i>&nbsp;		warning(&quot;Link site models&quot;);</b>
+<b class="fc"><i>45</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>46</i>&nbsp;		beautiFrame.button(&quot;Link Site Models&quot;).click();</b>
+<b class="fc"><i>47</i>&nbsp;		printBeautiState(f);</b>
+<i>48</i>&nbsp;
+<b class="fc"><i>49</i>&nbsp;		warning(&quot;Unlink site models&quot;);</b>
+<b class="fc"><i>50</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>51</i>&nbsp;		beautiFrame.button(&quot;Unlink Site Models&quot;).click();</b>
+<b class="fc"><i>52</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>53</i>&nbsp;		assertStateEquals(&quot;Tree.t:26&quot;, &quot;birthRate.t:26&quot;, &quot;Tree.t:47&quot;, &quot;clockRate.c:47&quot;, &quot;birthRate.t:47&quot;);</b>
+<b class="fc"><i>54</i>&nbsp;		assertOperatorsEqual(&quot;YuleBirthRateScaler.t:26&quot;, &quot;YuleModelTreeScaler.t:26&quot;, &quot;YuleModelTreeRootScaler.t:26&quot;, &quot;YuleModelUniformOperator.t:26&quot;, &quot;YuleModelSubtreeSlide.t:26&quot;, &quot;YuleModelNarrow.t:26&quot;, &quot;YuleModelWide.t:26&quot;, &quot;YuleModelWilsonBalding.t:26&quot;, &quot;StrictClockRateScaler.c:47&quot;, &quot;YuleBirthRateScaler.t:47&quot;, &quot;YuleModelTreeScaler.t:47&quot;, &quot;YuleModelTreeRootScaler.t:47&quot;, &quot;YuleModelUniformOperator.t:47&quot;, &quot;YuleModelSubtreeSlide.t:47&quot;, &quot;YuleModelNarrow.t:47&quot;, &quot;YuleModelWide.t:47&quot;, &quot;YuleModelWilsonBalding.t:47&quot;, &quot;strictClockUpDownOperator.c:47&quot;);</b>
+<b class="fc"><i>55</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:26&quot;, &quot;YuleBirthRatePrior.t:26&quot;, &quot;YuleModel.t:47&quot;, &quot;ClockPrior.c:47&quot;, &quot;YuleBirthRatePrior.t:47&quot;);</b>
+<b class="fc"><i>56</i>&nbsp;		assertTraceLogEqual(&quot;posterior&quot;, &quot;likelihood&quot;, &quot;prior&quot;, &quot;treeLikelihood.26&quot;, &quot;TreeHeight.t:26&quot;, &quot;YuleModel.t:26&quot;, &quot;birthRate.t:26&quot;, &quot;treeLikelihood.47&quot;, &quot;TreeHeight.t:47&quot;, &quot;clockRate.c:47&quot;, &quot;YuleModel.t:47&quot;, &quot;birthRate.t:47&quot;);</b>
+<i>57</i>&nbsp;		
+<b class="fc"><i>58</i>&nbsp;		warning(&quot;Link clock models&quot;);</b>
+<b class="fc"><i>59</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>60</i>&nbsp;		beautiFrame.button(&quot;Link Clock Models&quot;).click();</b>
+<b class="fc"><i>61</i>&nbsp;		printBeautiState(f);</b>
+<i>62</i>&nbsp;
+<b class="fc"><i>63</i>&nbsp;		warning(&quot;Unlink clock models&quot;);</b>
+<b class="fc"><i>64</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>65</i>&nbsp;		beautiFrame.button(&quot;Unlink Clock Models&quot;).click();</b>
+<b class="fc"><i>66</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>67</i>&nbsp;		assertStateEquals(&quot;Tree.t:26&quot;, &quot;birthRate.t:26&quot;, &quot;Tree.t:47&quot;, &quot;clockRate.c:47&quot;, &quot;birthRate.t:47&quot;);</b>
+<b class="fc"><i>68</i>&nbsp;		assertOperatorsEqual(&quot;YuleBirthRateScaler.t:26&quot;, &quot;YuleModelTreeScaler.t:26&quot;, &quot;YuleModelTreeRootScaler.t:26&quot;, &quot;YuleModelUniformOperator.t:26&quot;, &quot;YuleModelSubtreeSlide.t:26&quot;, &quot;YuleModelNarrow.t:26&quot;, &quot;YuleModelWide.t:26&quot;, &quot;YuleModelWilsonBalding.t:26&quot;, &quot;StrictClockRateScaler.c:47&quot;, &quot;YuleBirthRateScaler.t:47&quot;, &quot;YuleModelTreeScaler.t:47&quot;, &quot;YuleModelTreeRootScaler.t:47&quot;, &quot;YuleModelUniformOperator.t:47&quot;, &quot;YuleModelSubtreeSlide.t:47&quot;, &quot;YuleModelNarrow.t:47&quot;, &quot;YuleModelWide.t:47&quot;, &quot;YuleModelWilsonBalding.t:47&quot;, &quot;strictClockUpDownOperator.c:47&quot;);</b>
+<b class="fc"><i>69</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:26&quot;, &quot;YuleBirthRatePrior.t:26&quot;, &quot;YuleModel.t:47&quot;, &quot;ClockPrior.c:47&quot;, &quot;YuleBirthRatePrior.t:47&quot;);</b>
+<b class="fc"><i>70</i>&nbsp;		assertTraceLogEqual(&quot;posterior&quot;, &quot;likelihood&quot;, &quot;prior&quot;, &quot;treeLikelihood.26&quot;, &quot;TreeHeight.t:26&quot;, &quot;YuleModel.t:26&quot;, &quot;birthRate.t:26&quot;, &quot;treeLikelihood.47&quot;, &quot;TreeHeight.t:47&quot;, &quot;clockRate.c:47&quot;, &quot;YuleModel.t:47&quot;, &quot;birthRate.t:47&quot;);</b>
+<i>71</i>&nbsp;
+<b class="fc"><i>72</i>&nbsp;		warning(&quot;Link trees&quot;);</b>
+<b class="fc"><i>73</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>74</i>&nbsp;		beautiFrame.button(&quot;Link Trees&quot;).click();</b>
+<b class="fc"><i>75</i>&nbsp;		printBeautiState(f);</b>
+<i>76</i>&nbsp;
+<b class="fc"><i>77</i>&nbsp;		warning(&quot;Unlink trees&quot;);</b>
+<b class="fc"><i>78</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>79</i>&nbsp;		beautiFrame.button(&quot;Unlink Trees&quot;).click();</b>
+<b class="fc"><i>80</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>81</i>&nbsp;		assertStateEquals(&quot;Tree.t:26&quot;, &quot;birthRate.t:26&quot;, &quot;Tree.t:47&quot;, &quot;clockRate.c:47&quot;, &quot;birthRate.t:47&quot;);</b>
+<b class="fc"><i>82</i>&nbsp;		assertOperatorsEqual(&quot;YuleBirthRateScaler.t:26&quot;, &quot;YuleModelTreeScaler.t:26&quot;, &quot;YuleModelTreeRootScaler.t:26&quot;, &quot;YuleModelUniformOperator.t:26&quot;, &quot;YuleModelSubtreeSlide.t:26&quot;, &quot;YuleModelNarrow.t:26&quot;, &quot;YuleModelWide.t:26&quot;, &quot;YuleModelWilsonBalding.t:26&quot;, &quot;StrictClockRateScaler.c:47&quot;, &quot;YuleBirthRateScaler.t:47&quot;, &quot;YuleModelTreeScaler.t:47&quot;, &quot;YuleModelTreeRootScaler.t:47&quot;, &quot;YuleModelUniformOperator.t:47&quot;, &quot;YuleModelSubtreeSlide.t:47&quot;, &quot;YuleModelNarrow.t:47&quot;, &quot;YuleModelWide.t:47&quot;, &quot;YuleModelWilsonBalding.t:47&quot;, &quot;strictClockUpDownOperator.c:47&quot;);</b>
+<b class="fc"><i>83</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:26&quot;, &quot;YuleBirthRatePrior.t:26&quot;, &quot;YuleModel.t:47&quot;, &quot;ClockPrior.c:47&quot;, &quot;YuleBirthRatePrior.t:47&quot;);</b>
+<b class="fc"><i>84</i>&nbsp;		assertTraceLogEqual(&quot;posterior&quot;, &quot;likelihood&quot;, &quot;prior&quot;, &quot;treeLikelihood.26&quot;, &quot;TreeHeight.t:26&quot;, &quot;YuleModel.t:26&quot;, &quot;birthRate.t:26&quot;, &quot;treeLikelihood.47&quot;, &quot;TreeHeight.t:47&quot;, &quot;clockRate.c:47&quot;, &quot;YuleModel.t:47&quot;, &quot;birthRate.t:47&quot;);</b>
+<i>85</i>&nbsp;
+<b class="fc"><i>86</i>&nbsp;		makeSureXMLParses();</b>
+<b class="fc"><i>87</i>&nbsp;	}</b>
+<i>88</i>&nbsp;
+<i>89</i>&nbsp;	@Test
+<i>90</i>&nbsp;	public void simpleLinkUnlinkThreeAlignmentsTest() throws Exception {
+<b class="fc"><i>91</i>&nbsp;		warning(&quot;Load gopher data 26.nex, 47.nex, 59.nex&quot;);</b>
+<b class="fc"><i>92</i>&nbsp;		importAlignment(&quot;examples/nexus&quot;, new File(&quot;26.nex&quot;), new File(&quot;47.nex&quot;), new File(&quot;59.nex&quot;));</b>
+<i>93</i>&nbsp;
+<b class="fc"><i>94</i>&nbsp;		JTabbedPaneFixture f = beautiFrame.tabbedPane();</b>
+<b class="fc"><i>95</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>96</i>&nbsp;		assertStateEquals(&quot;Tree.t:26&quot;, &quot;birthRate.t:26&quot;, &quot;Tree.t:47&quot;, &quot;clockRate.c:47&quot;, &quot;birthRate.t:47&quot;, &quot;Tree.t:59&quot;, &quot;clockRate.c:59&quot;, &quot;birthRate.t:59&quot;);</b>
+<b class="fc"><i>97</i>&nbsp;		assertOperatorsEqual(&quot;YuleBirthRateScaler.t:26&quot;, &quot;YuleModelTreeScaler.t:26&quot;, &quot;YuleModelTreeRootScaler.t:26&quot;, &quot;YuleModelUniformOperator.t:26&quot;, &quot;YuleModelSubtreeSlide.t:26&quot;, &quot;YuleModelNarrow.t:26&quot;, &quot;YuleModelWide.t:26&quot;, &quot;YuleModelWilsonBalding.t:26&quot;, &quot;StrictClockRateScaler.c:47&quot;, &quot;YuleBirthRateScaler.t:47&quot;, &quot;YuleModelTreeScaler.t:47&quot;, &quot;YuleModelTreeRootScaler.t:47&quot;, &quot;YuleModelUniformOperator.t:47&quot;, &quot;YuleModelSubtreeSlide.t:47&quot;, &quot;YuleModelNarrow.t:47&quot;, &quot;YuleModelWide.t:47&quot;, &quot;YuleModelWilsonBalding.t:47&quot;, &quot;strictClockUpDownOperator.c:47&quot;, &quot;StrictClockRateScaler.c:59&quot;, &quot;YuleBirthRateScaler.t:59&quot;, &quot;YuleModelTreeScaler.t:59&quot;, &quot;YuleModelTreeRootScaler.t:59&quot;, &quot;YuleModelUniformOperator.t:59&quot;, &quot;YuleModelSubtreeSlide.t:59&quot;, &quot;YuleModelNarrow.t:59&quot;, &quot;YuleModelWide.t:59&quot;, &quot;YuleModelWilsonBalding.t:59&quot;, &quot;strictClockUpDownOperator.c:59&quot;);</b>
+<b class="fc"><i>98</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:26&quot;, &quot;YuleBirthRatePrior.t:26&quot;, &quot;YuleModel.t:47&quot;, &quot;ClockPrior.c:47&quot;, &quot;YuleBirthRatePrior.t:47&quot;, &quot;YuleModel.t:59&quot;, &quot;ClockPrior.c:59&quot;, &quot;YuleBirthRatePrior.t:59&quot;);</b>
+<b class="fc"><i>99</i>&nbsp;		assertTraceLogEqual(&quot;posterior&quot;, &quot;likelihood&quot;, &quot;prior&quot;, &quot;treeLikelihood.26&quot;, &quot;TreeHeight.t:26&quot;, &quot;YuleModel.t:26&quot;, &quot;birthRate.t:26&quot;, &quot;treeLikelihood.47&quot;, &quot;TreeHeight.t:47&quot;, &quot;clockRate.c:47&quot;, &quot;YuleModel.t:47&quot;, &quot;birthRate.t:47&quot;, &quot;treeLikelihood.59&quot;, &quot;TreeHeight.t:59&quot;, &quot;clockRate.c:59&quot;, &quot;YuleModel.t:59&quot;, &quot;birthRate.t:59&quot;);</b>
+<i>100</i>&nbsp;
+<b class="fc"><i>101</i>&nbsp;		selectRows(0, 1, 2);</b>
+<i>102</i>&nbsp;
+<b class="fc"><i>103</i>&nbsp;		warning(&quot;Link site models&quot;);</b>
+<b class="fc"><i>104</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>105</i>&nbsp;		beautiFrame.button(&quot;Link Site Models&quot;).click();</b>
+<b class="fc"><i>106</i>&nbsp;		printBeautiState(f);</b>
+<i>107</i>&nbsp;
+<b class="fc"><i>108</i>&nbsp;		warning(&quot;Unlink site models&quot;);</b>
+<b class="fc"><i>109</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>110</i>&nbsp;		beautiFrame.button(&quot;Unlink Site Models&quot;).click();</b>
+<b class="fc"><i>111</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>112</i>&nbsp;		assertStateEquals(&quot;Tree.t:26&quot;, &quot;birthRate.t:26&quot;, &quot;Tree.t:47&quot;, &quot;clockRate.c:47&quot;, &quot;birthRate.t:47&quot;, &quot;Tree.t:59&quot;, &quot;clockRate.c:59&quot;, &quot;birthRate.t:59&quot;);</b>
+<b class="fc"><i>113</i>&nbsp;		assertOperatorsEqual(&quot;YuleBirthRateScaler.t:26&quot;, &quot;YuleModelTreeScaler.t:26&quot;, &quot;YuleModelTreeRootScaler.t:26&quot;, &quot;YuleModelUniformOperator.t:26&quot;, &quot;YuleModelSubtreeSlide.t:26&quot;, &quot;YuleModelNarrow.t:26&quot;, &quot;YuleModelWide.t:26&quot;, &quot;YuleModelWilsonBalding.t:26&quot;, &quot;StrictClockRateScaler.c:47&quot;, &quot;YuleBirthRateScaler.t:47&quot;, &quot;YuleModelTreeScaler.t:47&quot;, &quot;YuleModelTreeRootScaler.t:47&quot;, &quot;YuleModelUniformOperator.t:47&quot;, &quot;YuleModelSubtreeSlide.t:47&quot;, &quot;YuleModelNarrow.t:47&quot;, &quot;YuleModelWide.t:47&quot;, &quot;YuleModelWilsonBalding.t:47&quot;, &quot;strictClockUpDownOperator.c:47&quot;, &quot;StrictClockRateScaler.c:59&quot;, &quot;YuleBirthRateScaler.t:59&quot;, &quot;YuleModelTreeScaler.t:59&quot;, &quot;YuleModelTreeRootScaler.t:59&quot;, &quot;YuleModelUniformOperator.t:59&quot;, &quot;YuleModelSubtreeSlide.t:59&quot;, &quot;YuleModelNarrow.t:59&quot;, &quot;YuleModelWide.t:59&quot;, &quot;YuleModelWilsonBalding.t:59&quot;, &quot;strictClockUpDownOperator.c:59&quot;);</b>
+<b class="fc"><i>114</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:26&quot;, &quot;YuleBirthRatePrior.t:26&quot;, &quot;YuleModel.t:47&quot;, &quot;ClockPrior.c:47&quot;, &quot;YuleBirthRatePrior.t:47&quot;, &quot;YuleModel.t:59&quot;, &quot;ClockPrior.c:59&quot;, &quot;YuleBirthRatePrior.t:59&quot;);</b>
+<b class="fc"><i>115</i>&nbsp;		assertTraceLogEqual(&quot;posterior&quot;, &quot;likelihood&quot;, &quot;prior&quot;, &quot;treeLikelihood.26&quot;, &quot;TreeHeight.t:26&quot;, &quot;YuleModel.t:26&quot;, &quot;birthRate.t:26&quot;, &quot;treeLikelihood.47&quot;, &quot;TreeHeight.t:47&quot;, &quot;clockRate.c:47&quot;, &quot;YuleModel.t:47&quot;, &quot;birthRate.t:47&quot;, &quot;treeLikelihood.59&quot;, &quot;TreeHeight.t:59&quot;, &quot;clockRate.c:59&quot;, &quot;YuleModel.t:59&quot;, &quot;birthRate.t:59&quot;);</b>
+<i>116</i>&nbsp;		
+<b class="fc"><i>117</i>&nbsp;		warning(&quot;Link clock models&quot;);</b>
+<b class="fc"><i>118</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>119</i>&nbsp;		beautiFrame.button(&quot;Link Clock Models&quot;).click();</b>
+<b class="fc"><i>120</i>&nbsp;		printBeautiState(f);</b>
+<i>121</i>&nbsp;
+<b class="fc"><i>122</i>&nbsp;		warning(&quot;Unlink clock models&quot;);</b>
+<b class="fc"><i>123</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>124</i>&nbsp;		beautiFrame.button(&quot;Unlink Clock Models&quot;).click();</b>
+<b class="fc"><i>125</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>126</i>&nbsp;		assertStateEquals(&quot;Tree.t:26&quot;, &quot;birthRate.t:26&quot;, &quot;Tree.t:47&quot;, &quot;clockRate.c:47&quot;, &quot;birthRate.t:47&quot;, &quot;Tree.t:59&quot;, &quot;clockRate.c:59&quot;, &quot;birthRate.t:59&quot;);</b>
+<b class="fc"><i>127</i>&nbsp;		assertOperatorsEqual(&quot;YuleBirthRateScaler.t:26&quot;, &quot;YuleModelTreeScaler.t:26&quot;, &quot;YuleModelTreeRootScaler.t:26&quot;, &quot;YuleModelUniformOperator.t:26&quot;, &quot;YuleModelSubtreeSlide.t:26&quot;, &quot;YuleModelNarrow.t:26&quot;, &quot;YuleModelWide.t:26&quot;, &quot;YuleModelWilsonBalding.t:26&quot;, &quot;StrictClockRateScaler.c:47&quot;, &quot;YuleBirthRateScaler.t:47&quot;, &quot;YuleModelTreeScaler.t:47&quot;, &quot;YuleModelTreeRootScaler.t:47&quot;, &quot;YuleModelUniformOperator.t:47&quot;, &quot;YuleModelSubtreeSlide.t:47&quot;, &quot;YuleModelNarrow.t:47&quot;, &quot;YuleModelWide.t:47&quot;, &quot;YuleModelWilsonBalding.t:47&quot;, &quot;strictClockUpDownOperator.c:47&quot;, &quot;StrictClockRateScaler.c:59&quot;, &quot;YuleBirthRateScaler.t:59&quot;, &quot;YuleModelTreeScaler.t:59&quot;, &quot;YuleModelTreeRootScaler.t:59&quot;, &quot;YuleModelUniformOperator.t:59&quot;, &quot;YuleModelSubtreeSlide.t:59&quot;, &quot;YuleModelNarrow.t:59&quot;, &quot;YuleModelWide.t:59&quot;, &quot;YuleModelWilsonBalding.t:59&quot;, &quot;strictClockUpDownOperator.c:59&quot;);</b>
+<b class="fc"><i>128</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:26&quot;, &quot;YuleBirthRatePrior.t:26&quot;, &quot;YuleModel.t:47&quot;, &quot;ClockPrior.c:47&quot;, &quot;YuleBirthRatePrior.t:47&quot;, &quot;YuleModel.t:59&quot;, &quot;ClockPrior.c:59&quot;, &quot;YuleBirthRatePrior.t:59&quot;);</b>
+<b class="fc"><i>129</i>&nbsp;		assertTraceLogEqual(&quot;posterior&quot;, &quot;likelihood&quot;, &quot;prior&quot;, &quot;treeLikelihood.26&quot;, &quot;TreeHeight.t:26&quot;, &quot;YuleModel.t:26&quot;, &quot;birthRate.t:26&quot;, &quot;treeLikelihood.47&quot;, &quot;TreeHeight.t:47&quot;, &quot;clockRate.c:47&quot;, &quot;YuleModel.t:47&quot;, &quot;birthRate.t:47&quot;, &quot;treeLikelihood.59&quot;, &quot;TreeHeight.t:59&quot;, &quot;clockRate.c:59&quot;, &quot;YuleModel.t:59&quot;, &quot;birthRate.t:59&quot;);</b>
+<i>130</i>&nbsp;
+<b class="fc"><i>131</i>&nbsp;		warning(&quot;Link trees&quot;);</b>
+<b class="fc"><i>132</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>133</i>&nbsp;		beautiFrame.button(&quot;Link Trees&quot;).click();</b>
+<b class="fc"><i>134</i>&nbsp;		printBeautiState(f);</b>
+<i>135</i>&nbsp;
+<b class="fc"><i>136</i>&nbsp;		warning(&quot;Unlink trees&quot;);</b>
+<b class="fc"><i>137</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>138</i>&nbsp;		beautiFrame.button(&quot;Unlink Trees&quot;).click();</b>
+<b class="fc"><i>139</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>140</i>&nbsp;		assertStateEquals(&quot;Tree.t:26&quot;, &quot;birthRate.t:26&quot;, &quot;Tree.t:47&quot;, &quot;clockRate.c:47&quot;, &quot;birthRate.t:47&quot;, &quot;Tree.t:59&quot;, &quot;clockRate.c:59&quot;, &quot;birthRate.t:59&quot;);</b>
+<b class="fc"><i>141</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:26&quot;, &quot;YuleBirthRatePrior.t:26&quot;, &quot;YuleModel.t:47&quot;, &quot;ClockPrior.c:47&quot;, &quot;YuleBirthRatePrior.t:47&quot;, &quot;YuleModel.t:59&quot;, &quot;ClockPrior.c:59&quot;, &quot;YuleBirthRatePrior.t:59&quot;);</b>
+<b class="fc"><i>142</i>&nbsp;		assertOperatorsEqual(&quot;YuleBirthRateScaler.t:26&quot;, &quot;YuleModelTreeScaler.t:26&quot;, &quot;YuleModelTreeRootScaler.t:26&quot;, &quot;YuleModelUniformOperator.t:26&quot;, &quot;YuleModelSubtreeSlide.t:26&quot;, &quot;YuleModelNarrow.t:26&quot;, &quot;YuleModelWide.t:26&quot;, &quot;YuleModelWilsonBalding.t:26&quot;, &quot;StrictClockRateScaler.c:47&quot;, &quot;YuleBirthRateScaler.t:47&quot;, &quot;YuleModelTreeScaler.t:47&quot;, &quot;YuleModelTreeRootScaler.t:47&quot;, &quot;YuleModelUniformOperator.t:47&quot;, &quot;YuleModelSubtreeSlide.t:47&quot;, &quot;YuleModelNarrow.t:47&quot;, &quot;YuleModelWide.t:47&quot;, &quot;YuleModelWilsonBalding.t:47&quot;, &quot;strictClockUpDownOperator.c:47&quot;, &quot;StrictClockRateScaler.c:59&quot;, &quot;YuleBirthRateScaler.t:59&quot;, &quot;YuleModelTreeScaler.t:59&quot;, &quot;YuleModelTreeRootScaler.t:59&quot;, &quot;YuleModelUniformOperator.t:59&quot;, &quot;YuleModelSubtreeSlide.t:59&quot;, &quot;YuleModelNarrow.t:59&quot;, &quot;YuleModelWide.t:59&quot;, &quot;YuleModelWilsonBalding.t:59&quot;, &quot;strictClockUpDownOperator.c:59&quot;);</b>
+<b class="fc"><i>143</i>&nbsp;		assertTraceLogEqual(&quot;posterior&quot;, &quot;likelihood&quot;, &quot;prior&quot;, &quot;treeLikelihood.26&quot;, &quot;TreeHeight.t:26&quot;, &quot;YuleModel.t:26&quot;, &quot;birthRate.t:26&quot;, &quot;treeLikelihood.47&quot;, &quot;TreeHeight.t:47&quot;, &quot;clockRate.c:47&quot;, &quot;YuleModel.t:47&quot;, &quot;birthRate.t:47&quot;, &quot;treeLikelihood.59&quot;, &quot;TreeHeight.t:59&quot;, &quot;clockRate.c:59&quot;, &quot;YuleModel.t:59&quot;, &quot;birthRate.t:59&quot;);</b>
+<i>144</i>&nbsp;
+<b class="fc"><i>145</i>&nbsp;		makeSureXMLParses();</b>
+<b class="fc"><i>146</i>&nbsp;	}</b>
+<i>147</i>&nbsp;
+<i>148</i>&nbsp;	
+<i>149</i>&nbsp;	@Test
+<i>150</i>&nbsp;	public void linkTreesAndDeleteTest2a() throws Exception {
+<b class="fc"><i>151</i>&nbsp;		warning(&quot;Load gopher data 26.nex, 47.nex&quot;);</b>
+<b class="fc"><i>152</i>&nbsp;		importAlignment(&quot;examples/nexus&quot;, new File(&quot;26.nex&quot;), new File(&quot;47.nex&quot;));</b>
+<i>153</i>&nbsp;
+<b class="fc"><i>154</i>&nbsp;		JTabbedPaneFixture f = beautiFrame.tabbedPane();</b>
+<b class="fc"><i>155</i>&nbsp;		printBeautiState(f);</b>
+<i>156</i>&nbsp;
+<b class="fc"><i>157</i>&nbsp;		selectRows(0, 1);</b>
+<i>158</i>&nbsp;
+<b class="fc"><i>159</i>&nbsp;		warning(&quot;Link trees&quot;);</b>
+<b class="fc"><i>160</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>161</i>&nbsp;		beautiFrame.button(&quot;Link Trees&quot;).click();</b>
+<b class="fc"><i>162</i>&nbsp;		printBeautiState(f);</b>
+<i>163</i>&nbsp;
+<b class="fc"><i>164</i>&nbsp;		warning(&quot;Delete second partition&quot;);</b>
+<b class="fc"><i>165</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>166</i>&nbsp;		selectRows(1);</b>
+<b class="fc"><i>167</i>&nbsp;		beautiFrame.button(&quot;-&quot;).click();</b>
+<b class="fc"><i>168</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>169</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:26&quot;, &quot;YuleBirthRatePrior.t:26&quot;);</b>
+<i>170</i>&nbsp;		
+<b class="fc"><i>171</i>&nbsp;		makeSureXMLParses();</b>
+<b class="fc"><i>172</i>&nbsp;	}</b>
+<i>173</i>&nbsp;	
+<i>174</i>&nbsp;	@Test
+<i>175</i>&nbsp;	public void linkTreesAndDeleteTest2b() throws Exception {
+<b class="fc"><i>176</i>&nbsp;		warning(&quot;Load gopher data 26.nex, 47.nex&quot;);</b>
+<b class="fc"><i>177</i>&nbsp;		importAlignment(&quot;examples/nexus&quot;, new File(&quot;26.nex&quot;), new File(&quot;47.nex&quot;));</b>
+<i>178</i>&nbsp;
+<b class="fc"><i>179</i>&nbsp;		JTabbedPaneFixture f = beautiFrame.tabbedPane();</b>
+<b class="fc"><i>180</i>&nbsp;		printBeautiState(f);</b>
+<i>181</i>&nbsp;
+<b class="fc"><i>182</i>&nbsp;		selectRows(1, 0);</b>
+<i>183</i>&nbsp;
+<b class="fc"><i>184</i>&nbsp;		warning(&quot;Link trees&quot;);</b>
+<b class="fc"><i>185</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>186</i>&nbsp;		beautiFrame.button(&quot;Link Trees&quot;).click();</b>
+<b class="fc"><i>187</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>188</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:26&quot;, &quot;YuleBirthRatePrior.t:26&quot;, &quot;ClockPrior.c:47&quot;);</b>
+<i>189</i>&nbsp;
+<b class="fc"><i>190</i>&nbsp;		warning(&quot;Delete first partition&quot;);</b>
+<b class="fc"><i>191</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>192</i>&nbsp;		beautiFrame.table().selectCell(TableCell.row(0).column(1));</b>
+<b class="fc"><i>193</i>&nbsp;		beautiFrame.button(&quot;-&quot;).click();</b>
+<b class="fc"><i>194</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>195</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:26&quot;, &quot;YuleBirthRatePrior.t:26&quot;);</b>
+<i>196</i>&nbsp;		
+<b class="fc"><i>197</i>&nbsp;		makeSureXMLParses();</b>
+<b class="fc"><i>198</i>&nbsp;	}</b>
+<i>199</i>&nbsp;	
+<i>200</i>&nbsp;	@Test
+<i>201</i>&nbsp;	public void linkTreesAndDeleteTest3() throws Exception {
+<b class="fc"><i>202</i>&nbsp;		warning(&quot;Load gopher data 26.nex, 47.nex, 59.nex&quot;);</b>
+<b class="fc"><i>203</i>&nbsp;		importAlignment(&quot;examples/nexus&quot;, new File(&quot;26.nex&quot;), new File(&quot;47.nex&quot;), new File(&quot;59.nex&quot;));</b>
+<i>204</i>&nbsp;
+<b class="fc"><i>205</i>&nbsp;		JTabbedPaneFixture f = beautiFrame.tabbedPane();</b>
+<b class="fc"><i>206</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>207</i>&nbsp;		assertStateEquals(&quot;Tree.t:26&quot;, &quot;birthRate.t:26&quot;, &quot;Tree.t:47&quot;, &quot;clockRate.c:47&quot;, &quot;birthRate.t:47&quot;, &quot;Tree.t:59&quot;, &quot;clockRate.c:59&quot;, &quot;birthRate.t:59&quot;);</b>
+<b class="fc"><i>208</i>&nbsp;		assertOperatorsEqual(&quot;YuleBirthRateScaler.t:26&quot;, &quot;YuleModelTreeScaler.t:26&quot;, &quot;YuleModelTreeRootScaler.t:26&quot;, &quot;YuleModelUniformOperator.t:26&quot;, &quot;YuleModelSubtreeSlide.t:26&quot;, &quot;YuleModelNarrow.t:26&quot;, &quot;YuleModelWide.t:26&quot;, &quot;YuleModelWilsonBalding.t:26&quot;, &quot;StrictClockRateScaler.c:47&quot;, &quot;YuleBirthRateScaler.t:47&quot;, &quot;YuleModelTreeScaler.t:47&quot;, &quot;YuleModelTreeRootScaler.t:47&quot;, &quot;YuleModelUniformOperator.t:47&quot;, &quot;YuleModelSubtreeSlide.t:47&quot;, &quot;YuleModelNarrow.t:47&quot;, &quot;YuleModelWide.t:47&quot;, &quot;YuleModelWilsonBalding.t:47&quot;, &quot;strictClockUpDownOperator.c:47&quot;, &quot;StrictClockRateScaler.c:59&quot;, &quot;YuleBirthRateScaler.t:59&quot;, &quot;YuleModelTreeScaler.t:59&quot;, &quot;YuleModelTreeRootScaler.t:59&quot;, &quot;YuleModelUniformOperator.t:59&quot;, &quot;YuleModelSubtreeSlide.t:59&quot;, &quot;YuleModelNarrow.t:59&quot;, &quot;YuleModelWide.t:59&quot;, &quot;YuleModelWilsonBalding.t:59&quot;, &quot;strictClockUpDownOperator.c:59&quot;);</b>
+<b class="fc"><i>209</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:26&quot;, &quot;YuleBirthRatePrior.t:26&quot;, &quot;YuleModel.t:47&quot;, &quot;ClockPrior.c:47&quot;, &quot;YuleBirthRatePrior.t:47&quot;, &quot;YuleModel.t:59&quot;, &quot;ClockPrior.c:59&quot;, &quot;YuleBirthRatePrior.t:59&quot;);</b>
+<b class="fc"><i>210</i>&nbsp;		assertTraceLogEqual(&quot;posterior&quot;, &quot;likelihood&quot;, &quot;prior&quot;, &quot;treeLikelihood.26&quot;, &quot;TreeHeight.t:26&quot;, &quot;YuleModel.t:26&quot;, &quot;birthRate.t:26&quot;, &quot;treeLikelihood.47&quot;, &quot;TreeHeight.t:47&quot;, &quot;clockRate.c:47&quot;, &quot;YuleModel.t:47&quot;, &quot;birthRate.t:47&quot;, &quot;treeLikelihood.59&quot;, &quot;TreeHeight.t:59&quot;, &quot;clockRate.c:59&quot;, &quot;YuleModel.t:59&quot;, &quot;birthRate.t:59&quot;);</b>
+<i>211</i>&nbsp;
+<b class="fc"><i>212</i>&nbsp;		selectRows(2, 1, 0);</b>
+<i>213</i>&nbsp;
+<b class="fc"><i>214</i>&nbsp;		warning(&quot;Link trees&quot;);</b>
+<b class="fc"><i>215</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>216</i>&nbsp;		beautiFrame.button(&quot;Link Trees&quot;).click();</b>
+<b class="fc"><i>217</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>218</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:26&quot;, &quot;YuleBirthRatePrior.t:26&quot;, &quot;ClockPrior.c:47&quot;, &quot;ClockPrior.c:59&quot;);</b>
+<b class="fc"><i>219</i>&nbsp;		makeSureXMLParses();</b>
+<i>220</i>&nbsp;
+<b class="fc"><i>221</i>&nbsp;		warning(&quot;Delete second partition (47)&quot;);</b>
+<b class="fc"><i>222</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>223</i>&nbsp;		selectRows(1);</b>
+<b class="fc"><i>224</i>&nbsp;		beautiFrame.button(&quot;-&quot;).click();</b>
+<b class="fc"><i>225</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>226</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:26&quot;, &quot;YuleBirthRatePrior.t:26&quot;, &quot;ClockPrior.c:59&quot;);</b>
+<b class="fc"><i>227</i>&nbsp;		makeSureXMLParses();</b>
+<i>228</i>&nbsp;
+<b class="fc"><i>229</i>&nbsp;		warning(&quot;Delete first partition (26)&quot;);</b>
+<b class="fc"><i>230</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>231</i>&nbsp;		selectRows(0);</b>
+<b class="fc"><i>232</i>&nbsp;		beautiFrame.button(&quot;-&quot;).click();</b>
+<b class="fc"><i>233</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>234</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:26&quot;, &quot;YuleBirthRatePrior.t:26&quot;);</b>
+<i>235</i>&nbsp;
+<b class="fc"><i>236</i>&nbsp;		makeSureXMLParses();</b>
+<b class="fc"><i>237</i>&nbsp;	}</b>
+<i>238</i>&nbsp;
+<i>239</i>&nbsp;
+<i>240</i>&nbsp;	@Test
+<i>241</i>&nbsp;	public void linkTreesAndClocksAndDeleteTest() throws Exception {
+<b class="fc"><i>242</i>&nbsp;		warning(&quot;Load gopher data 26.nex, 47.nex, 59.nex&quot;);</b>
+<b class="fc"><i>243</i>&nbsp;		importAlignment(&quot;examples/nexus&quot;, new File(&quot;26.nex&quot;), new File(&quot;47.nex&quot;), new File(&quot;59.nex&quot;));</b>
+<i>244</i>&nbsp;
+<b class="fc"><i>245</i>&nbsp;		JTabbedPaneFixture f = beautiFrame.tabbedPane();</b>
+<b class="fc"><i>246</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>247</i>&nbsp;		assertStateEquals(&quot;Tree.t:26&quot;, &quot;birthRate.t:26&quot;, &quot;Tree.t:47&quot;, &quot;clockRate.c:47&quot;, &quot;birthRate.t:47&quot;, &quot;Tree.t:59&quot;, &quot;clockRate.c:59&quot;, &quot;birthRate.t:59&quot;);</b>
+<b class="fc"><i>248</i>&nbsp;		assertOperatorsEqual(&quot;YuleBirthRateScaler.t:26&quot;, &quot;YuleModelTreeScaler.t:26&quot;, &quot;YuleModelTreeRootScaler.t:26&quot;, &quot;YuleModelUniformOperator.t:26&quot;, &quot;YuleModelSubtreeSlide.t:26&quot;, &quot;YuleModelNarrow.t:26&quot;, &quot;YuleModelWide.t:26&quot;, &quot;YuleModelWilsonBalding.t:26&quot;, &quot;StrictClockRateScaler.c:47&quot;, &quot;YuleBirthRateScaler.t:47&quot;, &quot;YuleModelTreeScaler.t:47&quot;, &quot;YuleModelTreeRootScaler.t:47&quot;, &quot;YuleModelUniformOperator.t:47&quot;, &quot;YuleModelSubtreeSlide.t:47&quot;, &quot;YuleModelNarrow.t:47&quot;, &quot;YuleModelWide.t:47&quot;, &quot;YuleModelWilsonBalding.t:47&quot;, &quot;strictClockUpDownOperator.c:47&quot;, &quot;StrictClockRateScaler.c:59&quot;, &quot;YuleBirthRateScaler.t:59&quot;, &quot;YuleModelTreeScaler.t:59&quot;, &quot;YuleModelTreeRootScaler.t:59&quot;, &quot;YuleModelUniformOperator.t:59&quot;, &quot;YuleModelSubtreeSlide.t:59&quot;, &quot;YuleModelNarrow.t:59&quot;, &quot;YuleModelWide.t:59&quot;, &quot;YuleModelWilsonBalding.t:59&quot;, &quot;strictClockUpDownOperator.c:59&quot;);</b>
+<b class="fc"><i>249</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:26&quot;, &quot;YuleBirthRatePrior.t:26&quot;, &quot;YuleModel.t:47&quot;, &quot;ClockPrior.c:47&quot;, &quot;YuleBirthRatePrior.t:47&quot;, &quot;YuleModel.t:59&quot;, &quot;ClockPrior.c:59&quot;, &quot;YuleBirthRatePrior.t:59&quot;);</b>
+<b class="fc"><i>250</i>&nbsp;		assertTraceLogEqual(&quot;posterior&quot;, &quot;likelihood&quot;, &quot;prior&quot;, &quot;treeLikelihood.26&quot;, &quot;TreeHeight.t:26&quot;, &quot;YuleModel.t:26&quot;, &quot;birthRate.t:26&quot;, &quot;treeLikelihood.47&quot;, &quot;TreeHeight.t:47&quot;, &quot;clockRate.c:47&quot;, &quot;YuleModel.t:47&quot;, &quot;birthRate.t:47&quot;, &quot;treeLikelihood.59&quot;, &quot;TreeHeight.t:59&quot;, &quot;clockRate.c:59&quot;, &quot;YuleModel.t:59&quot;, &quot;birthRate.t:59&quot;);</b>
+<i>251</i>&nbsp;
+<b class="fc"><i>252</i>&nbsp;		selectRows(0, 1, 2);</b>
+<i>253</i>&nbsp;
+<b class="fc"><i>254</i>&nbsp;		warning(&quot;Link trees&quot;);</b>
+<b class="fc"><i>255</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>256</i>&nbsp;		beautiFrame.button(&quot;Link Trees&quot;).click();</b>
+<b class="fc"><i>257</i>&nbsp;		printBeautiState(f);</b>
+<i>258</i>&nbsp;
+<b class="fc"><i>259</i>&nbsp;		warning(&quot;Link clocks&quot;);</b>
+<b class="fc"><i>260</i>&nbsp;		selectRows(0, 1, 2);</b>
+<b class="fc"><i>261</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>262</i>&nbsp;		beautiFrame.button(&quot;Link Clock Models&quot;).click();</b>
+<b class="fc"><i>263</i>&nbsp;		printBeautiState(f);</b>
+<i>264</i>&nbsp;
+<b class="fc"><i>265</i>&nbsp;		warning(&quot;Delete second partition&quot;);</b>
+<b class="fc"><i>266</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>267</i>&nbsp;		selectRows(1);</b>
+<b class="fc"><i>268</i>&nbsp;		beautiFrame.button(&quot;-&quot;).click();</b>
+<b class="fc"><i>269</i>&nbsp;		printBeautiState(f);</b>
+<i>270</i>&nbsp;
+<b class="fc"><i>271</i>&nbsp;		warning(&quot;Delete first partition&quot;);</b>
+<b class="fc"><i>272</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>273</i>&nbsp;		selectRows(0, 1);</b>
+<b class="fc"><i>274</i>&nbsp;		beautiFrame.button(&quot;Link Clock Models&quot;).click();</b>
+<b class="fc"><i>275</i>&nbsp;		selectRows(0);</b>
+<b class="fc"><i>276</i>&nbsp;		beautiFrame.button(&quot;-&quot;).click();</b>
+<b class="fc"><i>277</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>278</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:26&quot;, &quot;YuleBirthRatePrior.t:26&quot;);</b>
+<i>279</i>&nbsp;
+<b class="fc"><i>280</i>&nbsp;		makeSureXMLParses();</b>
+<b class="fc"><i>281</i>&nbsp;	}</b>
+<i>282</i>&nbsp;
+<i>283</i>&nbsp;	@Test
+<i>284</i>&nbsp;	public void linkSiteModelsAndDeleteTest() throws Exception {
+<b class="fc"><i>285</i>&nbsp;		warning(&quot;Load gopher data 26.nex, 47.nex, 59.nex&quot;);</b>
+<b class="fc"><i>286</i>&nbsp;		importAlignment(&quot;examples/nexus&quot;, new File(&quot;26.nex&quot;), new File(&quot;47.nex&quot;), new File(&quot;59.nex&quot;));</b>
+<i>287</i>&nbsp;
+<b class="fc"><i>288</i>&nbsp;		JTabbedPaneFixture f = beautiFrame.tabbedPane();</b>
+<b class="fc"><i>289</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>290</i>&nbsp;		assertStateEquals(&quot;Tree.t:26&quot;, &quot;birthRate.t:26&quot;, &quot;Tree.t:47&quot;, &quot;clockRate.c:47&quot;, &quot;birthRate.t:47&quot;, &quot;Tree.t:59&quot;, &quot;clockRate.c:59&quot;, &quot;birthRate.t:59&quot;);</b>
+<b class="fc"><i>291</i>&nbsp;		assertOperatorsEqual(&quot;YuleBirthRateScaler.t:26&quot;, &quot;YuleModelTreeScaler.t:26&quot;, &quot;YuleModelTreeRootScaler.t:26&quot;, &quot;YuleModelUniformOperator.t:26&quot;, &quot;YuleModelSubtreeSlide.t:26&quot;, &quot;YuleModelNarrow.t:26&quot;, &quot;YuleModelWide.t:26&quot;, &quot;YuleModelWilsonBalding.t:26&quot;, &quot;StrictClockRateScaler.c:47&quot;, &quot;YuleBirthRateScaler.t:47&quot;, &quot;YuleModelTreeScaler.t:47&quot;, &quot;YuleModelTreeRootScaler.t:47&quot;, &quot;YuleModelUniformOperator.t:47&quot;, &quot;YuleModelSubtreeSlide.t:47&quot;, &quot;YuleModelNarrow.t:47&quot;, &quot;YuleModelWide.t:47&quot;, &quot;YuleModelWilsonBalding.t:47&quot;, &quot;strictClockUpDownOperator.c:47&quot;, &quot;StrictClockRateScaler.c:59&quot;, &quot;YuleBirthRateScaler.t:59&quot;, &quot;YuleModelTreeScaler.t:59&quot;, &quot;YuleModelTreeRootScaler.t:59&quot;, &quot;YuleModelUniformOperator.t:59&quot;, &quot;YuleModelSubtreeSlide.t:59&quot;, &quot;YuleModelNarrow.t:59&quot;, &quot;YuleModelWide.t:59&quot;, &quot;YuleModelWilsonBalding.t:59&quot;, &quot;strictClockUpDownOperator.c:59&quot;);</b>
+<b class="fc"><i>292</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:26&quot;, &quot;YuleBirthRatePrior.t:26&quot;, &quot;YuleModel.t:47&quot;, &quot;ClockPrior.c:47&quot;, &quot;YuleBirthRatePrior.t:47&quot;, &quot;YuleModel.t:59&quot;, &quot;ClockPrior.c:59&quot;, &quot;YuleBirthRatePrior.t:59&quot;);</b>
+<b class="fc"><i>293</i>&nbsp;		assertTraceLogEqual(&quot;posterior&quot;, &quot;likelihood&quot;, &quot;prior&quot;, &quot;treeLikelihood.26&quot;, &quot;TreeHeight.t:26&quot;, &quot;YuleModel.t:26&quot;, &quot;birthRate.t:26&quot;, &quot;treeLikelihood.47&quot;, &quot;TreeHeight.t:47&quot;, &quot;clockRate.c:47&quot;, &quot;YuleModel.t:47&quot;, &quot;birthRate.t:47&quot;, &quot;treeLikelihood.59&quot;, &quot;TreeHeight.t:59&quot;, &quot;clockRate.c:59&quot;, &quot;YuleModel.t:59&quot;, &quot;birthRate.t:59&quot;);</b>
+<i>294</i>&nbsp;
+<b class="fc"><i>295</i>&nbsp;		selectRows(0, 1, 2);</b>
+<i>296</i>&nbsp;
+<b class="fc"><i>297</i>&nbsp;		warning(&quot;Link trees&quot;);</b>
+<b class="fc"><i>298</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>299</i>&nbsp;		beautiFrame.button(&quot;Link Trees&quot;).click();</b>
+<b class="fc"><i>300</i>&nbsp;		printBeautiState(f);</b>
+<i>301</i>&nbsp;
+<b class="fc"><i>302</i>&nbsp;		warning(&quot;Link clocks&quot;);</b>
+<b class="fc"><i>303</i>&nbsp;		selectRows(0, 1, 2);</b>
+<b class="fc"><i>304</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>305</i>&nbsp;		beautiFrame.button(&quot;Link Clock Models&quot;).click();</b>
+<b class="fc"><i>306</i>&nbsp;		printBeautiState(f);</b>
+<i>307</i>&nbsp;
+<b class="fc"><i>308</i>&nbsp;		warning(&quot;Delete second partition&quot;);</b>
+<b class="fc"><i>309</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>310</i>&nbsp;		selectRows(1);</b>
+<b class="fc"><i>311</i>&nbsp;		beautiFrame.button(&quot;-&quot;).click();</b>
+<b class="fc"><i>312</i>&nbsp;		printBeautiState(f);</b>
+<i>313</i>&nbsp;
+<b class="fc"><i>314</i>&nbsp;		warning(&quot;Delete first partition&quot;);</b>
+<b class="fc"><i>315</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>316</i>&nbsp;		selectRows(0, 1);</b>
+<b class="fc"><i>317</i>&nbsp;		beautiFrame.button(&quot;Link Clock Models&quot;).click();</b>
+<b class="fc"><i>318</i>&nbsp;		beautiFrame.table().selectCell(TableCell.row(0).column(1));</b>
+<b class="fc"><i>319</i>&nbsp;		beautiFrame.button(&quot;-&quot;).click();</b>
+<b class="fc"><i>320</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>321</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:26&quot;, &quot;YuleBirthRatePrior.t:26&quot;);</b>
+<i>322</i>&nbsp;
+<b class="fc"><i>323</i>&nbsp;		makeSureXMLParses();</b>
+<b class="fc"><i>324</i>&nbsp;	}</b>
+<i>325</i>&nbsp;	
+<i>326</i>&nbsp;	@Test
+<i>327</i>&nbsp;	public void linkUnlinkTreesAndSetTreePriorTest1() throws Exception {
+<b class="fc"><i>328</i>&nbsp;		warning(&quot;Load gopher data 26.nex, 47.nex&quot;);</b>
+<b class="fc"><i>329</i>&nbsp;		importAlignment(&quot;examples/nexus&quot;, new File(&quot;26.nex&quot;));</b>
+<i>330</i>&nbsp;
+<b class="fc"><i>331</i>&nbsp;		JTabbedPaneFixture f = beautiFrame.tabbedPane();</b>
+<b class="fc"><i>332</i>&nbsp;		printBeautiState(f);</b>
+<i>333</i>&nbsp;
+<b class="fc"><i>334</i>&nbsp;		f.selectTab(&quot;Priors&quot;);</b>
+<i>335</i>&nbsp;		
+<b class="fc"><i>336</i>&nbsp;		warning(&quot;Change to Coalescent - constant population&quot;);</b>
+<b class="fc"><i>337</i>&nbsp;		beautiFrame.comboBox(&quot;TreeDistribution&quot;).selectItem(&quot;Coalescent Constant Population&quot;);</b>
+<b class="fc"><i>338</i>&nbsp;		importAlignment(&quot;examples/nexus&quot;, new File(&quot;47.nex&quot;));</b>
+<i>339</i>&nbsp;
+<b class="fc"><i>340</i>&nbsp;		warning(&quot;Link trees&quot;);</b>
+<b class="fc"><i>341</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>342</i>&nbsp;		selectRows(1, 0);</b>
+<b class="fc"><i>343</i>&nbsp;		beautiFrame.button(&quot;Link Trees&quot;).click();</b>
+<b class="fc"><i>344</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>345</i>&nbsp;		assertPriorsEqual(&quot;CoalescentConstant.t:26&quot;, &quot;ClockPrior.c:47&quot;, &quot;PopSizePrior.t:26&quot;);</b>
+<i>346</i>&nbsp;
+<b class="fc"><i>347</i>&nbsp;		warning(&quot;Unlink trees&quot;);</b>
+<b class="fc"><i>348</i>&nbsp;		beautiFrame.button(&quot;Unlink Trees&quot;).click();</b>
+<i>349</i>&nbsp;		// should have PopSizePrior.t:47 as well?
+<b class="fc"><i>350</i>&nbsp;		assertPriorsEqual(&quot;CoalescentConstant.t:26&quot;, &quot;CoalescentConstant.t:47&quot;, &quot;ClockPrior.c:47&quot;, &quot;PopSizePrior.t:26&quot;, &quot;PopSizePrior.t:47&quot;);</b>
+<i>351</i>&nbsp;		
+<i>352</i>&nbsp;//		warning(&quot;Delete partition&quot;);
+<i>353</i>&nbsp;//		f.selectTab(&quot;Partitions&quot;);
+<i>354</i>&nbsp;//		selectRows(1);
+<i>355</i>&nbsp;//		beautiFrame.button(&quot;-&quot;).click();
+<i>356</i>&nbsp;//		printBeautiState(f);
+<i>357</i>&nbsp;//		assertPriorsEqual(&quot;CoalescentConstant.t:26&quot;, &quot;PopSizePrior.t:26&quot;);
+<i>358</i>&nbsp;
+<b class="fc"><i>359</i>&nbsp;		warning(&quot;Delete partition&quot;);</b>
+<b class="fc"><i>360</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>361</i>&nbsp;		selectRows(0);</b>
+<b class="fc"><i>362</i>&nbsp;		beautiFrame.button(&quot;-&quot;).click();</b>
+<b class="fc"><i>363</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>364</i>&nbsp;		assertPriorsEqual(&quot;CoalescentConstant.t:47&quot;, &quot;PopSizePrior.t:47&quot;);</b>
+<i>365</i>&nbsp;
+<b class="nc"><i>366</i>&nbsp;		makeSureXMLParses();</b>
+<b class="nc"><i>367</i>&nbsp;	}</b>
+<i>368</i>&nbsp;
+<i>369</i>&nbsp;	
+<i>370</i>&nbsp;	@Test
+<i>371</i>&nbsp;	public void linkClocksAndDeleteTest() throws Exception {
+<b class="fc"><i>372</i>&nbsp;		warning(&quot;Load gopher data 26.nex, 47.nex, 59.nex&quot;);</b>
+<b class="fc"><i>373</i>&nbsp;		importAlignment(&quot;examples/nexus&quot;, new File(&quot;26.nex&quot;), new File(&quot;47.nex&quot;), new File(&quot;59.nex&quot;));</b>
+<i>374</i>&nbsp;
+<b class="fc"><i>375</i>&nbsp;		JTabbedPaneFixture f = beautiFrame.tabbedPane();</b>
+<b class="fc"><i>376</i>&nbsp;		printBeautiState(f);</b>
+<i>377</i>&nbsp;
+<b class="fc"><i>378</i>&nbsp;		selectRows(0, 1, 2);</b>
+<i>379</i>&nbsp;
+<b class="fc"><i>380</i>&nbsp;		warning(&quot;Link clocks&quot;);</b>
+<b class="fc"><i>381</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>382</i>&nbsp;		beautiFrame.button(&quot;Link Clock Models&quot;).click();</b>
+<b class="fc"><i>383</i>&nbsp;		printBeautiState(f);</b>
+<i>384</i>&nbsp;
+<b class="fc"><i>385</i>&nbsp;		warning(&quot;Delete second partition&quot;);</b>
+<b class="fc"><i>386</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>387</i>&nbsp;		selectRows(1);</b>
+<b class="fc"><i>388</i>&nbsp;		beautiFrame.button(&quot;-&quot;).click();</b>
+<b class="fc"><i>389</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>390</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:26&quot;, &quot;YuleBirthRatePrior.t:26&quot;, &quot;YuleModel.t:59&quot;, &quot;YuleBirthRatePrior.t:59&quot;);</b>
+<i>391</i>&nbsp;
+<b class="fc"><i>392</i>&nbsp;		JTableFixture t = beautiFrame.table();</b>
+<b class="fc"><i>393</i>&nbsp;		Assertions.assertThat(t.target.getRowCount()).isEqualTo(2);</b>
+<i>394</i>&nbsp;		
+<b class="fc"><i>395</i>&nbsp;		makeSureXMLParses();</b>
+<b class="fc"><i>396</i>&nbsp;	}</b>
+<i>397</i>&nbsp;
+<i>398</i>&nbsp;	@Test
+<i>399</i>&nbsp;	public void linkSiteModelssAndDeleteTest() throws Exception {
+<b class="fc"><i>400</i>&nbsp;		warning(&quot;Load gopher data 26.nex, 47.nex, 59.nex&quot;);</b>
+<b class="fc"><i>401</i>&nbsp;		importAlignment(&quot;examples/nexus&quot;, new File(&quot;26.nex&quot;), new File(&quot;47.nex&quot;), new File(&quot;59.nex&quot;));</b>
+<i>402</i>&nbsp;
+<b class="fc"><i>403</i>&nbsp;		JTabbedPaneFixture f = beautiFrame.tabbedPane();</b>
+<b class="fc"><i>404</i>&nbsp;		printBeautiState(f);</b>
+<i>405</i>&nbsp;
+<b class="fc"><i>406</i>&nbsp;		selectRows(0, 1, 2);</b>
+<i>407</i>&nbsp;
+<b class="fc"><i>408</i>&nbsp;		warning(&quot;Link clocks&quot;);</b>
+<b class="fc"><i>409</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>410</i>&nbsp;		beautiFrame.button(&quot;Link Site Models&quot;).click();</b>
+<b class="fc"><i>411</i>&nbsp;		printBeautiState(f);</b>
+<i>412</i>&nbsp;
+<b class="fc"><i>413</i>&nbsp;		warning(&quot;Delete second partition&quot;);</b>
+<b class="fc"><i>414</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>415</i>&nbsp;		selectRows(1);</b>
+<b class="fc"><i>416</i>&nbsp;		beautiFrame.button(&quot;-&quot;).click();</b>
+<b class="fc"><i>417</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>418</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:26&quot;, &quot;YuleBirthRatePrior.t:26&quot;, &quot;YuleModel.t:59&quot;, &quot;ClockPrior.c:59&quot;, &quot;YuleBirthRatePrior.t:59&quot;);</b>
+<i>419</i>&nbsp;
+<b class="fc"><i>420</i>&nbsp;		JTableFixture t = beautiFrame.table();</b>
+<b class="fc"><i>421</i>&nbsp;		Assertions.assertThat(t.target.getRowCount()).isEqualTo(2);</b>
+<i>422</i>&nbsp;		
+<b class="fc"><i>423</i>&nbsp;		makeSureXMLParses();</b>
+<b class="fc"><i>424</i>&nbsp;	}</b>
+<i>425</i>&nbsp;
+<i>426</i>&nbsp;	@Test
+<i>427</i>&nbsp;	public void linkClocksSitesAndDeleteTest() throws Exception {
+<b class="fc"><i>428</i>&nbsp;		warning(&quot;Load gopher data 26.nex, 47.nex, 59.nex&quot;);</b>
+<b class="fc"><i>429</i>&nbsp;		importAlignment(&quot;examples/nexus&quot;, new File(&quot;26.nex&quot;), new File(&quot;47.nex&quot;), new File(&quot;59.nex&quot;));</b>
+<i>430</i>&nbsp;
+<b class="fc"><i>431</i>&nbsp;		JTabbedPaneFixture f = beautiFrame.tabbedPane();</b>
+<b class="fc"><i>432</i>&nbsp;		printBeautiState(f);</b>
+<i>433</i>&nbsp;
+<b class="fc"><i>434</i>&nbsp;		selectRows(0, 1, 2);</b>
+<i>435</i>&nbsp;
+<b class="fc"><i>436</i>&nbsp;		warning(&quot;Link clocks&quot;);</b>
+<b class="fc"><i>437</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>438</i>&nbsp;		beautiFrame.button(&quot;Link Clock Models&quot;).click();</b>
+<i>439</i>&nbsp;
+<b class="fc"><i>440</i>&nbsp;		warning(&quot;Link site models&quot;);</b>
+<b class="fc"><i>441</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>442</i>&nbsp;		beautiFrame.button(&quot;Link Site Models&quot;).click();</b>
+<b class="fc"><i>443</i>&nbsp;		printBeautiState(f);</b>
+<i>444</i>&nbsp;
+<b class="fc"><i>445</i>&nbsp;		warning(&quot;Delete second partition&quot;);</b>
+<b class="fc"><i>446</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>447</i>&nbsp;		selectRows(1);</b>
+<b class="fc"><i>448</i>&nbsp;		beautiFrame.button(&quot;-&quot;).click();</b>
+<b class="fc"><i>449</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>450</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:26&quot;, &quot;YuleBirthRatePrior.t:26&quot;, &quot;YuleModel.t:59&quot;, &quot;YuleBirthRatePrior.t:59&quot;);</b>
+<i>451</i>&nbsp;
+<b class="fc"><i>452</i>&nbsp;		JTableFixture t = beautiFrame.table();</b>
+<b class="fc"><i>453</i>&nbsp;		Assertions.assertThat(t.target.getRowCount()).isEqualTo(2);</b>
+<i>454</i>&nbsp;		
+<b class="fc"><i>455</i>&nbsp;		makeSureXMLParses();</b>
+<b class="fc"><i>456</i>&nbsp;	}</b>
+<i>457</i>&nbsp;
+<i>458</i>&nbsp;	@Test
+<i>459</i>&nbsp;	public void linkClocksSitesTreesAndDeleteTest() throws Exception {
+<b class="fc"><i>460</i>&nbsp;		warning(&quot;Load gopher data 26.nex, 47.nex, 59.nex&quot;);</b>
+<b class="fc"><i>461</i>&nbsp;		importAlignment(&quot;examples/nexus&quot;, new File(&quot;26.nex&quot;), new File(&quot;47.nex&quot;), new File(&quot;59.nex&quot;));</b>
+<i>462</i>&nbsp;
+<b class="fc"><i>463</i>&nbsp;		JTabbedPaneFixture f = beautiFrame.tabbedPane();</b>
+<b class="fc"><i>464</i>&nbsp;		printBeautiState(f);</b>
+<i>465</i>&nbsp;
+<b class="fc"><i>466</i>&nbsp;		selectRows(0, 1, 2);</b>
+<i>467</i>&nbsp;
+<b class="fc"><i>468</i>&nbsp;		warning(&quot;Link clocks&quot;);</b>
+<b class="fc"><i>469</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>470</i>&nbsp;		beautiFrame.button(&quot;Link Clock Models&quot;).click();</b>
+<i>471</i>&nbsp;
+<b class="fc"><i>472</i>&nbsp;		warning(&quot;Link site models&quot;);</b>
+<b class="fc"><i>473</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>474</i>&nbsp;		beautiFrame.button(&quot;Link Site Models&quot;).click();</b>
+<b class="fc"><i>475</i>&nbsp;		printBeautiState(f);</b>
+<i>476</i>&nbsp;
+<b class="fc"><i>477</i>&nbsp;		warning(&quot;Link trees&quot;);</b>
+<b class="fc"><i>478</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>479</i>&nbsp;		beautiFrame.button(&quot;Link Trees&quot;).click();</b>
+<b class="fc"><i>480</i>&nbsp;		printBeautiState(f);</b>
+<i>481</i>&nbsp;
+<b class="fc"><i>482</i>&nbsp;		warning(&quot;Delete second partition&quot;);</b>
+<b class="fc"><i>483</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>484</i>&nbsp;		selectRows(1);</b>
+<b class="fc"><i>485</i>&nbsp;		beautiFrame.button(&quot;-&quot;).click();</b>
+<b class="fc"><i>486</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>487</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:26&quot;, &quot;YuleBirthRatePrior.t:26&quot;);</b>
+<i>488</i>&nbsp;
+<b class="fc"><i>489</i>&nbsp;		JTableFixture t = beautiFrame.table();</b>
+<b class="fc"><i>490</i>&nbsp;		Assertions.assertThat(t.target.getRowCount()).isEqualTo(2);</b>
+<i>491</i>&nbsp;		
+<b class="fc"><i>492</i>&nbsp;		makeSureXMLParses();</b>
+<b class="fc"><i>493</i>&nbsp;	}</b>
+<i>494</i>&nbsp;	
+<i>495</i>&nbsp;	
+<i>496</i>&nbsp;	@Test // issue #413
+<i>497</i>&nbsp;	public void starBeastLinkTreesAndDeleteTest() throws Exception {
+<b class="fc"><i>498</i>&nbsp;		warning(&quot;Select StarBeast template&quot;);</b>
+<b class="fc"><i>499</i>&nbsp;		beautiFrame.menuItemWithPath(&quot;File&quot;, &quot;Template&quot;, &quot;StarBeast&quot;).click();</b>
+<i>500</i>&nbsp;
+<b class="fc"><i>501</i>&nbsp;		warning(&quot;Load gopher data 26.nex, 47.nex&quot;);</b>
+<b class="fc"><i>502</i>&nbsp;		importAlignment(&quot;examples/nexus&quot;, new File(&quot;26.nex&quot;), new File(&quot;47.nex&quot;));</b>
+<i>503</i>&nbsp;
+<b class="fc"><i>504</i>&nbsp;		JTabbedPaneFixture f = beautiFrame.tabbedPane();</b>
+<b class="fc"><i>505</i>&nbsp;		printBeautiState(f);</b>
+<i>506</i>&nbsp;
+<b class="fc"><i>507</i>&nbsp;		selectRows(0, 1);</b>
+<i>508</i>&nbsp;
+<b class="fc"><i>509</i>&nbsp;		warning(&quot;Link trees&quot;);</b>
+<b class="fc"><i>510</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>511</i>&nbsp;		beautiFrame.button(&quot;Link Trees&quot;).click();</b>
+<b class="fc"><i>512</i>&nbsp;		printBeautiState(f);</b>
+<i>513</i>&nbsp;
+<b class="fc"><i>514</i>&nbsp;		warning(&quot;Delete second partition&quot;);</b>
+<b class="fc"><i>515</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>516</i>&nbsp;		selectRows(1);</b>
+<b class="fc"><i>517</i>&nbsp;		beautiFrame.button(&quot;-&quot;).click();</b>
+<b class="fc"><i>518</i>&nbsp;		printBeautiState(f);</b>
+<i>519</i>&nbsp;//		assertPriorsEqual(&quot;YuleModel.t:26&quot;, &quot;YuleBirthRatePrior.t:26&quot;);
+<i>520</i>&nbsp;		
+<b class="fc"><i>521</i>&nbsp;		JTableFixture t = beautiFrame.table();</b>
+<b class="fc"><i>522</i>&nbsp;		Assertions.assertThat(t.target.getRowCount()).isEqualTo(1);</b>
+<i>523</i>&nbsp;
+<i>524</i>&nbsp;		// does not parse unless taxon set is specified
+<i>525</i>&nbsp;		//makeSureXMLParses();
+<b class="fc"><i>526</i>&nbsp;	}	</b>
+<i>527</i>&nbsp;	
+<i>528</i>&nbsp;	@Test // issue #414
+<i>529</i>&nbsp;	public void linkClocksDeleteAllTest() throws Exception {
+<b class="fc"><i>530</i>&nbsp;		warning(&quot;Load gopher data 26.nex, 47.nex, 59.nex&quot;);</b>
+<b class="fc"><i>531</i>&nbsp;		importAlignment(&quot;examples/nexus&quot;, new File(&quot;26.nex&quot;), new File(&quot;47.nex&quot;), new File(&quot;59.nex&quot;));</b>
+<i>532</i>&nbsp;
+<b class="fc"><i>533</i>&nbsp;		JTabbedPaneFixture f = beautiFrame.tabbedPane();</b>
+<b class="fc"><i>534</i>&nbsp;		printBeautiState(f);</b>
+<i>535</i>&nbsp;
+<b class="fc"><i>536</i>&nbsp;		selectRows(0, 1, 2);</b>
+<i>537</i>&nbsp;
+<b class="fc"><i>538</i>&nbsp;		warning(&quot;Link clocks&quot;);</b>
+<b class="fc"><i>539</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>540</i>&nbsp;		beautiFrame.button(&quot;Link Clock Models&quot;).click();</b>
+<i>541</i>&nbsp;		
+<b class="fc"><i>542</i>&nbsp;		beautiFrame.button(&quot;-&quot;).click();</b>
+<i>543</i>&nbsp;
+<b class="fc"><i>544</i>&nbsp;		JTableFixture t = beautiFrame.table();</b>
+<b class="fc"><i>545</i>&nbsp;		Assertions.assertThat(t.target.getRowCount()).isEqualTo(0);</b>
+<b class="fc"><i>546</i>&nbsp;	}</b>
+<i>547</i>&nbsp;
+<i>548</i>&nbsp;	@Test
+<i>549</i>&nbsp;	public void linkSiteModelsChangeUnlinkTest() throws Exception {
+<b class="fc"><i>550</i>&nbsp;		warning(&quot;Load gopher data 26.nex, 47.nex, 59.nex&quot;);</b>
+<b class="fc"><i>551</i>&nbsp;		importAlignment(&quot;examples/nexus&quot;, new File(&quot;26.nex&quot;), new File(&quot;47.nex&quot;), new File(&quot;59.nex&quot;));</b>
+<i>552</i>&nbsp;
+<b class="fc"><i>553</i>&nbsp;		JTabbedPaneFixture f = beautiFrame.tabbedPane();</b>
+<b class="fc"><i>554</i>&nbsp;		printBeautiState(f);</b>
+<i>555</i>&nbsp;
+<b class="fc"><i>556</i>&nbsp;		selectRows(0, 1, 2);</b>
+<i>557</i>&nbsp;
+<b class="fc"><i>558</i>&nbsp;		warning(&quot;Link site models&quot;);</b>
+<b class="fc"><i>559</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>560</i>&nbsp;		beautiFrame.button(&quot;Link Site Models&quot;).click();</b>
+<i>561</i>&nbsp;
+<b class="fc"><i>562</i>&nbsp;		f.selectTab(&quot;Site Model&quot;);</b>
+<b class="fc"><i>563</i>&nbsp;		JComboBoxFixture substModel = beautiFrame.comboBox(&quot;substModel&quot;);</b>
+<b class="fc"><i>564</i>&nbsp;		substModel.selectItem(&quot;HKY&quot;);</b>
+<i>565</i>&nbsp;
+<b class="fc"><i>566</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>567</i>&nbsp;		selectRows(0, 1, 2);</b>
+<b class="fc"><i>568</i>&nbsp;		beautiFrame.button(&quot;Unlink Site Models&quot;).click();</b>
+<i>569</i>&nbsp;
+<b class="fc"><i>570</i>&nbsp;		JTableFixture t = beautiFrame.table();</b>
+<b class="fc"><i>571</i>&nbsp;		Assertions.assertThat(t.target.getRowCount()).isEqualTo(0);</b>
+<b class="nc"><i>572</i>&nbsp;	}</b>
+<i>573</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-27 17:09</div>
+</div>
+</body>
+</html>

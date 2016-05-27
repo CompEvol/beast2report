@@ -1,0 +1,179 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: FixedMeanRateTest</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">test.beast.app.beauti</a> ]
+</div>
+
+<h1>Coverage Summary for Class: FixedMeanRateTest (test.beast.app.beauti)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FixedMeanRateTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94%
+  </span>
+  <span class="absValue">
+    (47/ 50)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package test.beast.app.beauti;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import java.io.File;
+<i>5</i>&nbsp;import java.util.List;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import org.fest.swing.data.TableCell;
+<i>8</i>&nbsp;import org.fest.swing.fixture.JTabbedPaneFixture;
+<i>9</i>&nbsp;import org.junit.Test;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;import beast.evolution.operators.DeltaExchangeOperator;
+<i>12</i>&nbsp;import junit.framework.Assert;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;/** test how the FixedMeanRate flag interact with link/unlink **/
+<b class="fc"><i>15</i>&nbsp;public class FixedMeanRateTest extends BeautiBase {</b>
+<i>16</i>&nbsp;	
+<i>17</i>&nbsp;	@Test
+<i>18</i>&nbsp;	public void testFixedMeanRate() throws Exception {
+<i>19</i>&nbsp;
+<b class="fc"><i>20</i>&nbsp;		importAlignment(&quot;examples/nexus&quot;, new File(&quot;26.nex&quot;), new File(&quot;29.nex&quot;));</b>
+<i>21</i>&nbsp;		
+<b class="fc"><i>22</i>&nbsp;		beautiFrame.menuItemWithPath(&quot;Mode&quot;, &quot;Automatic set fix mean substitution rate flag&quot;).click();</b>
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;		
+<b class="fc"><i>25</i>&nbsp;		warning(&quot;Setting fixed mean rates&quot;);</b>
+<b class="fc"><i>26</i>&nbsp;		JTabbedPaneFixture f = beautiFrame.tabbedPane();</b>
+<b class="fc"><i>27</i>&nbsp;		f = f.selectTab(&quot;Site Model&quot;);		</b>
+<b class="fc"><i>28</i>&nbsp;		beautiFrame.checkBox(&quot;mutationRate.isEstimated&quot;).check();</b>
+<b class="fc"><i>29</i>&nbsp;		beautiFrame.checkBox(&quot;FixMeanMutationRate&quot;).check();</b>
+<i>30</i>&nbsp;
+<b class="fc"><i>31</i>&nbsp;		warning(&quot;link/unlink site models&quot;);</b>
+<b class="fc"><i>32</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>33</i>&nbsp;		beautiFrame.table().selectCells(TableCell.row(0).column(0), TableCell.row(1).column(0));</b>
+<b class="fc"><i>34</i>&nbsp;		beautiFrame.button(&quot;Link Site Models&quot;).click();</b>
+<b class="fc"><i>35</i>&nbsp;		beautiFrame.button(&quot;Unlink Site Models&quot;).click();</b>
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;		//saveFile(&quot;/Users/remcobouckaert/tmp&quot;, &quot;x.xml&quot;);
+<b class="fc"><i>38</i>&nbsp;		makeSureXMLParses();</b>
+<i>39</i>&nbsp;		
+<i>40</i>&nbsp;
+<i>41</i>&nbsp;		
+<b class="fc"><i>42</i>&nbsp;		DeltaExchangeOperator operator = (DeltaExchangeOperator) beauti.doc.pluginmap.get(&quot;FixMeanMutationRatesOperator&quot;);</b>
+<b class="fc"><i>43</i>&nbsp;		int nrOfParameters = operator.parameterInput.get().size();</b>
+<b class="fc"><i>44</i>&nbsp;		if(nrOfParameters != 2) {</b>
+<b class="nc"><i>45</i>&nbsp;			throw new IllegalArgumentException(&quot;Expected 2 parameters for deltaExchangeOperator, not &quot; + nrOfParameters);</b>
+<i>46</i>&nbsp;		}
+<b class="fc"><i>47</i>&nbsp;	}</b>
+<i>48</i>&nbsp;	
+<i>49</i>&nbsp;	@Test
+<i>50</i>&nbsp;	public void testFixedMeanRateSharedSiteModel() throws Exception {
+<i>51</i>&nbsp;
+<b class="fc"><i>52</i>&nbsp;		importAlignment(&quot;examples/nexus&quot;, new File(&quot;26.nex&quot;), new File(&quot;29.nex&quot;), new File(&quot;47.nex&quot;));</b>
+<i>53</i>&nbsp;		
+<b class="fc"><i>54</i>&nbsp;		warning(&quot;Setting fixed mean rates&quot;);</b>
+<b class="fc"><i>55</i>&nbsp;		JTabbedPaneFixture f = beautiFrame.tabbedPane();</b>
+<b class="fc"><i>56</i>&nbsp;		f = f.selectTab(&quot;Site Model&quot;);		</b>
+<b class="fc"><i>57</i>&nbsp;		beautiFrame.checkBox(&quot;mutationRate.isEstimated&quot;).check();</b>
+<i>58</i>&nbsp;		//beautiFrame.checkBox(&quot;FixMeanMutationRate&quot;).check();
+<i>59</i>&nbsp;
+<b class="fc"><i>60</i>&nbsp;		warning(&quot;link/unlink site models&quot;);</b>
+<b class="fc"><i>61</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>62</i>&nbsp;		beautiFrame.table().selectCells(TableCell.row(0).column(1), TableCell.row(1).column(1), TableCell.row(2).column(1));</b>
+<b class="fc"><i>63</i>&nbsp;		beautiFrame.button(&quot;Link Site Models&quot;).click();</b>
+<b class="fc"><i>64</i>&nbsp;		beautiFrame.button(&quot;Unlink Site Models&quot;).click();</b>
+<i>65</i>&nbsp;		
+<b class="fc"><i>66</i>&nbsp;		DeltaExchangeOperator operator = (DeltaExchangeOperator) beauti.doc.pluginmap.get(&quot;FixMeanMutationRatesOperator&quot;);</b>
+<b class="fc"><i>67</i>&nbsp;		int nrOfParameters = operator.parameterInput.get().size();</b>
+<b class="fc"><i>68</i>&nbsp;		if (nrOfParameters != 3) {</b>
+<b class="nc"><i>69</i>&nbsp;			throw new IllegalArgumentException(&quot;Expected 3 parameters for deltaExchangeOperator, not &quot; + nrOfParameters);</b>
+<i>70</i>&nbsp;		}
+<i>71</i>&nbsp;
+<b class="fc"><i>72</i>&nbsp;		List&lt;Integer&gt; weights = operator.parameterWeightsInput.get().valuesInput.get();</b>
+<b class="fc"><i>73</i>&nbsp;		Assert.assertEquals(weights.size(), 3);</b>
+<b class="fc"><i>74</i>&nbsp;		Assert.assertEquals(weights.get(0), (Integer)614);</b>
+<b class="fc"><i>75</i>&nbsp;		Assert.assertEquals(weights.get(1), (Integer)601);</b>
+<b class="fc"><i>76</i>&nbsp;		Assert.assertEquals(weights.get(2), (Integer)819);</b>
+<i>77</i>&nbsp;
+<b class="fc"><i>78</i>&nbsp;		beautiFrame.table().selectCells(TableCell.row(0).column(1), TableCell.row(2).column(1));</b>
+<b class="fc"><i>79</i>&nbsp;		beautiFrame.button(&quot;Link Site Models&quot;).click();</b>
+<b class="fc"><i>80</i>&nbsp;		operator = (DeltaExchangeOperator) beauti.doc.pluginmap.get(&quot;FixMeanMutationRatesOperator&quot;);</b>
+<b class="fc"><i>81</i>&nbsp;		nrOfParameters = operator.parameterInput.get().size();</b>
+<i>82</i>&nbsp;		
+<i>83</i>&nbsp;		//SiteModelInputEditor.customConnector(doc);
+<i>84</i>&nbsp;		
+<b class="fc"><i>85</i>&nbsp;		if (nrOfParameters != 2) {</b>
+<b class="nc"><i>86</i>&nbsp;			throw new IllegalArgumentException(&quot;Expected 2 parameters for deltaExchangeOperator, not &quot; + nrOfParameters);</b>
+<i>87</i>&nbsp;		}
+<b class="fc"><i>88</i>&nbsp;		weights = operator.parameterWeightsInput.get().valuesInput.get();</b>
+<b class="fc"><i>89</i>&nbsp;		Assert.assertEquals(weights.size(), 2);</b>
+<b class="fc"><i>90</i>&nbsp;		Assert.assertEquals(weights.get(0), (Integer)(614 + 819));</b>
+<b class="fc"><i>91</i>&nbsp;		Assert.assertEquals(weights.get(1), (Integer)601);</b>
+<i>92</i>&nbsp;
+<b class="fc"><i>93</i>&nbsp;		makeSureXMLParses();</b>
+<b class="fc"><i>94</i>&nbsp;	}</b>
+<i>95</i>&nbsp;
+<i>96</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-27 17:09</div>
+</div>
+</body>
+</html>

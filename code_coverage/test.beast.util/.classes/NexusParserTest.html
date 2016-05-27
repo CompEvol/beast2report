@@ -1,0 +1,275 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: NexusParserTest</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">test.beast.util</a> ]
+</div>
+
+<h1>Coverage Summary for Class: NexusParserTest (test.beast.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NexusParserTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.7%
+  </span>
+  <span class="absValue">
+    (56/ 73)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">NexusParserTest$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/ 7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    77.3%
+  </span>
+  <span class="absValue">
+    (58/ 75)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package test.beast.util;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.io.File;
+<i>4</i>&nbsp;import java.io.FilenameFilter;
+<i>5</i>&nbsp;import java.io.StringReader;
+<i>6</i>&nbsp;import java.util.ArrayList;
+<i>7</i>&nbsp;import java.util.Arrays;
+<i>8</i>&nbsp;import java.util.List;
+<i>9</i>&nbsp;import java.util.Set;
+<i>10</i>&nbsp;import java.util.TreeSet;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;import org.junit.Test;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;import beast.util.NexusParser;
+<i>15</i>&nbsp;import junit.framework.TestCase;
+<i>16</i>&nbsp;
+<b class="fc"><i>17</i>&nbsp;public class NexusParserTest extends TestCase {</b>
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;    @Test
+<i>20</i>&nbsp;    public void testThatNexusExamplesParse() {
+<i>21</i>&nbsp;        try {
+<b class="fc"><i>22</i>&nbsp;            String dirName = System.getProperty(&quot;user.dir&quot;) + &quot;/examples/nexus&quot;;</b>
+<b class="fc"><i>23</i>&nbsp;            System.out.println(&quot;Test Nexus Examples in &quot; + dirName);</b>
+<b class="fc"><i>24</i>&nbsp;            File exampleDir = new File(dirName);</b>
+<b class="fc"><i>25</i>&nbsp;            String[] exampleFiles = exampleDir.list(new FilenameFilter() {</b>
+<i>26</i>&nbsp;                @Override
+<i>27</i>&nbsp;				public boolean accept(File dir, String name) {
+<b class="fc"><i>28</i>&nbsp;                    return name.endsWith(&quot;.nex&quot;) || name.endsWith(&quot;.nxs&quot;) ;</b>
+<i>29</i>&nbsp;                }
+<i>30</i>&nbsp;            });
+<i>31</i>&nbsp;
+<b class="fc"><i>32</i>&nbsp;            List&lt;String&gt; failedFiles = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>33</i>&nbsp;            for (String fileName : exampleFiles) {</b>
+<b class="fc"><i>34</i>&nbsp;                System.out.println(&quot;Processing &quot; + fileName);</b>
+<b class="fc"><i>35</i>&nbsp;                NexusParser parser = new NexusParser();</b>
+<i>36</i>&nbsp;                try {
+<b class="fc"><i>37</i>&nbsp;                    parser.parseFile(new File(dirName + &quot;/&quot; + fileName));</b>
+<b class="nc"><i>38</i>&nbsp;                } catch (Exception e) {</b>
+<b class="nc"><i>39</i>&nbsp;                    System.out.println(&quot;ExampleNexusParsing::Failed for &quot; + fileName</b>
+<b class="nc"><i>40</i>&nbsp;                            + &quot;: &quot; + e.getMessage());</b>
+<b class="nc"><i>41</i>&nbsp;                    failedFiles.add(fileName);</b>
+<b class="fc"><i>42</i>&nbsp;                }</b>
+<b class="fc"><i>43</i>&nbsp;                System.out.println(&quot;Done &quot; + fileName);</b>
+<i>44</i>&nbsp;            }
+<b class="fc"><i>45</i>&nbsp;            if (failedFiles.size() &gt; 0) {</b>
+<b class="nc"><i>46</i>&nbsp;                System.out.println(&quot;\ntest_ThatNexusExamplesParse::Failed for : &quot; + failedFiles.toString());</b>
+<i>47</i>&nbsp;            } else {
+<b class="fc"><i>48</i>&nbsp;                System.out.println(&quot;\ntest_ThatNexusExamplesParse::Success&quot;);</b>
+<i>49</i>&nbsp;            }
+<b class="fc"><i>50</i>&nbsp;            assertTrue(failedFiles.toString(), failedFiles.size() == 0);</b>
+<b class="nc"><i>51</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>52</i>&nbsp;            System.out.println(&quot;exception thrown &quot;);</b>
+<b class="nc"><i>53</i>&nbsp;            System.out.println(e.getMessage());</b>
+<b class="fc"><i>54</i>&nbsp;        }</b>
+<b class="fc"><i>55</i>&nbsp;    }</b>
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;    @Test
+<i>58</i>&nbsp;    public void testTranslateBlock() {
+<i>59</i>&nbsp;
+<b class="fc"><i>60</i>&nbsp;        String nexusTreeWithTranslateBlock  = &quot;#NEXUS\n&quot; +</b>
+<i>61</i>&nbsp;                &quot;\n&quot; +
+<i>62</i>&nbsp;                &quot;Begin trees;\n&quot; +
+<i>63</i>&nbsp;                &quot;\tTranslate\n&quot; +
+<i>64</i>&nbsp;                &quot;\t\t1 ID1,\n&quot; +
+<i>65</i>&nbsp;                &quot;\t\t2 ID0,\n&quot; +
+<i>66</i>&nbsp;                &quot;\t\t3 ID4,\n&quot; +
+<i>67</i>&nbsp;                &quot;\t\t4 ID2,\n&quot; +
+<i>68</i>&nbsp;                &quot;\t\t5 ID3,\n&quot; +
+<i>69</i>&nbsp;                &quot;\t\t6 ID5,\n&quot; +
+<i>70</i>&nbsp;                &quot;\t\t7 ID6\n&quot; +
+<i>71</i>&nbsp;                &quot;\t\t;\n&quot; +
+<i>72</i>&nbsp;                &quot;tree TREE1  = [&amp;R] (((1[&amp;height_95%_HPD={0.0,2.220446049250313E-16},height_median=0.0,height=3.885354014841496E-17,height_range={0.0,8.881784197001252E-16}]:0.3500782084890231,2[&amp;height_95%_HPD={0.0,2.220446049250313E-16},height_median=0.0,height=3.885336674542856E-17,height_range={0.0,8.881784197001252E-16}]:0.3500782084890231)[&amp;height_95%_HPD={0.07176417767165222,0.32897302210795143},height_median=0.1721780016900536,height=0.18167779468916231,posterior=0.9992003198720512,height_range={0.019500497296338903,0.472878180264112}]:0.9248218821607495,(3[&amp;height_95%_HPD={0.0,2.220446049250313E-16},height_median=0.0,height=3.9830145767837334E-17,height_range={0.0,4.440892098500626E-16}]:0.9953937953591572,(4[&amp;height_95%_HPD={0.0,2.220446049250313E-16},height_median=0.0,height=4.332577657073782E-17,height_range={0.0,8.881784197001252E-16}]:0.2885313407858645,5[&amp;height_95%_HPD={0.0,2.220446049250313E-16},height_median=0.0,height=4.332594997372422E-17,height_range={0.0,8.881784197001252E-16}]:0.2885313407858645)[&amp;height_95%_HPD={0.03428997737185302,0.29384644242980307},height_median=0.13917660355071027,height=0.15063132242919447,posterior=0.9992003198720512,height_range={0.012135234424637736,0.43470259067266337}]:0.7068624545732927)[&amp;height_95%_HPD={0.4703860181701143,1.2401041356897795},height_median=0.8841915264598103,height=0.8799641568544527,posterior=0.9668132746901239,height_range={0.2376833426394811,1.5008735971013971}]:0.2795062952906153)[&amp;height_95%_HPD={0.871170115451148,1.736574411464855},height_median=1.3388341576137588,height=1.3419155689487607,posterior=0.8912435025989605,height_range={0.609339147487161,2.0082114277758554}]:0.1115505866359714,(6[&amp;height_95%_HPD={0.0,2.220446049250313E-16},height_median=0.0,height=3.805449918706939E-17,height_range={0.0,4.440892098500626E-16}]:0.1143648180955704,7[&amp;height_95%_HPD={0.0,2.220446049250313E-16},height_median=0.0,height=3.805449918706939E-17,height_range={0.0,4.440892098500626E-16}]:0.1143648180955704)[&amp;height_95%_HPD={0.07189918035503462,0.3145415291508802},height_median=0.1807116511737813,height=0.18641149700061227,posterior=0.9996001599360256,height_range={0.0042543872372436675,0.4254547656747345}]:1.2720858591901736)[&amp;height_95%_HPD={1.2498874674331548,2.2880779508436415},height_median=1.7581890486365315,height=1.7391129102773757,posterior=1.0,height_range={0.003684245207410762,2.42575160443681}];\n&quot; +
+<i>73</i>&nbsp;                &quot;End;\n&quot;;
+<i>74</i>&nbsp;
+<i>75</i>&nbsp;
+<b class="fc"><i>76</i>&nbsp;        NexusParser parser = new NexusParser();</b>
+<i>77</i>&nbsp;        try {
+<i>78</i>&nbsp;
+<b class="fc"><i>79</i>&nbsp;            Set&lt;String&gt; taxa = new TreeSet&lt;&gt;();</b>
+<b class="fc"><i>80</i>&nbsp;            taxa.add(&quot;ID0&quot;);</b>
+<b class="fc"><i>81</i>&nbsp;            taxa.add(&quot;ID1&quot;);</b>
+<b class="fc"><i>82</i>&nbsp;            taxa.add(&quot;ID2&quot;);</b>
+<b class="fc"><i>83</i>&nbsp;            taxa.add(&quot;ID3&quot;);</b>
+<b class="fc"><i>84</i>&nbsp;            taxa.add(&quot;ID4&quot;);</b>
+<b class="fc"><i>85</i>&nbsp;            taxa.add(&quot;ID5&quot;);</b>
+<b class="fc"><i>86</i>&nbsp;            taxa.add(&quot;ID6&quot;);</b>
+<i>87</i>&nbsp;
+<b class="fc"><i>88</i>&nbsp;            parser.parseFile(&quot;testTranslateBlock&quot;, new StringReader(nexusTreeWithTranslateBlock));</b>
+<i>89</i>&nbsp;
+<b class="fc"><i>90</i>&nbsp;            assertEquals(1, parser.trees.size());</b>
+<i>91</i>&nbsp;
+<b class="fc"><i>92</i>&nbsp;            assertNotNull(parser.trees.get(0));</b>
+<i>93</i>&nbsp;
+<b class="fc"><i>94</i>&nbsp;            assertEquals(7, parser.trees.get(0).getTaxaNames().length);</b>
+<i>95</i>&nbsp;
+<b class="fc"><i>96</i>&nbsp;            for (String taxaName : parser.trees.get(0).getTaxaNames()) {</b>
+<b class="fc"><i>97</i>&nbsp;                assertNotNull(taxaName);</b>
+<i>98</i>&nbsp;            }
+<i>99</i>&nbsp;
+<b class="fc"><i>100</i>&nbsp;            assertTrue(taxa.containsAll(Arrays.asList(parser.trees.get(0).getTaxaNames())));</b>
+<i>101</i>&nbsp;
+<b class="nc"><i>102</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>103</i>&nbsp;            e.printStackTrace();</b>
+<i>104</i>&nbsp;
+<b class="nc"><i>105</i>&nbsp;            assertTrue(false);</b>
+<b class="fc"><i>106</i>&nbsp;        }</b>
+<b class="fc"><i>107</i>&nbsp;    }</b>
+<i>108</i>&nbsp;
+<i>109</i>&nbsp;
+<i>110</i>&nbsp;    
+<i>111</i>&nbsp;    @Test
+<i>112</i>&nbsp;    public void testTranslateBlock2() {
+<i>113</i>&nbsp;
+<b class="fc"><i>114</i>&nbsp;        String nexusTreeWithTranslateBlock  = &quot;#NEXUS\n&quot; +</b>
+<i>115</i>&nbsp;                &quot;\n&quot; +
+<i>116</i>&nbsp;                &quot;Begin trees;\n&quot; +
+<i>117</i>&nbsp;                &quot;\tTranslate\n&quot; +
+<i>118</i>&nbsp;                &quot;\t\t1 C,\n&quot; +
+<i>119</i>&nbsp;                &quot;\t\t2 B,\n&quot; +
+<i>120</i>&nbsp;                &quot;\t\t3 A\n&quot; +
+<i>121</i>&nbsp;                &quot;\t\t;\n&quot; +
+<i>122</i>&nbsp;                &quot;tree TREE1  = [&amp;R] (1:10,(3:30,2:20):10);\n&quot; +
+<i>123</i>&nbsp;                &quot;End;\n&quot;;
+<i>124</i>&nbsp;
+<i>125</i>&nbsp;
+<b class="fc"><i>126</i>&nbsp;        NexusParser parser = new NexusParser();</b>
+<i>127</i>&nbsp;        try {
+<i>128</i>&nbsp;
+<b class="fc"><i>129</i>&nbsp;            List&lt;String&gt; taxa = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>130</i>&nbsp;            taxa.add(&quot;2&quot;);</b>
+<b class="fc"><i>131</i>&nbsp;            taxa.add(&quot;0&quot;);</b>
+<b class="fc"><i>132</i>&nbsp;            taxa.add(&quot;1&quot;);</b>
+<i>133</i>&nbsp;
+<b class="fc"><i>134</i>&nbsp;            parser.parseFile(&quot;testTranslateBlock&quot;, new StringReader(nexusTreeWithTranslateBlock));</b>
+<i>135</i>&nbsp;
+<b class="fc"><i>136</i>&nbsp;            assertEquals(1, parser.trees.size());</b>
+<i>137</i>&nbsp;
+<b class="fc"><i>138</i>&nbsp;            assertNotNull(parser.trees.get(0));</b>
+<i>139</i>&nbsp;            
+<b class="fc"><i>140</i>&nbsp;            String t = parser.trees.get(0).getRoot().toNewick();</b>
+<b class="fc"><i>141</i>&nbsp;            System.out.println(t);</b>
+<b class="fc"><i>142</i>&nbsp;            assertEquals(&quot;(C:10.0,(B:20.0,A:30.0):10.0):0.0&quot;, t);</b>
+<i>143</i>&nbsp;            
+<i>144</i>&nbsp;
+<i>145</i>&nbsp;
+<b class="nc"><i>146</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>147</i>&nbsp;            e.printStackTrace();</b>
+<i>148</i>&nbsp;
+<b class="nc"><i>149</i>&nbsp;            assertTrue(false);</b>
+<b class="fc"><i>150</i>&nbsp;        }</b>
+<b class="fc"><i>151</i>&nbsp;    }</b>
+<i>152</i>&nbsp;    
+<i>153</i>&nbsp;    
+<i>154</i>&nbsp;    @Test
+<i>155</i>&nbsp;    public void testAssumptionsParse() {
+<i>156</i>&nbsp;        try {
+<b class="fc"><i>157</i>&nbsp;            String fileName = System.getProperty(&quot;user.dir&quot;) + &quot;/examples/nexus/Primates.nex&quot;;</b>
+<b class="fc"><i>158</i>&nbsp;            NexusParser parser = new NexusParser();</b>
+<b class="fc"><i>159</i>&nbsp;            parser.parseFile(new File(fileName));</b>
+<b class="fc"><i>160</i>&nbsp;            assertEquals(2, parser.filteredAlignments.size());</b>
+<b class="nc"><i>161</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>162</i>&nbsp;            System.out.println(&quot;exception thrown &quot;);</b>
+<b class="nc"><i>163</i>&nbsp;            System.out.println(e.getMessage());</b>
+<b class="fc"><i>164</i>&nbsp;        }</b>
+<b class="fc"><i>165</i>&nbsp;    }</b>
+<i>166</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-27 17:09</div>
+</div>
+</body>
+</html>

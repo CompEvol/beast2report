@@ -1,0 +1,166 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: LogNormalDistributionModelTest</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">test.beast.math.distributions</a> ]
+</div>
+
+<h1>Coverage Summary for Class: LogNormalDistributionModelTest (test.beast.math.distributions)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LogNormalDistributionModelTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (41/ 41)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package test.beast.math.distributions;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import org.junit.Test;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>7</i>&nbsp;import beast.math.distributions.LogNormalDistributionModel;
+<i>8</i>&nbsp;import beast.util.XMLParser;
+<i>9</i>&nbsp;import junit.framework.TestCase;
+<i>10</i>&nbsp;
+<b class="fc"><i>11</i>&nbsp;public class LogNormalDistributionModelTest extends TestCase {</b>
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;    @Test
+<i>14</i>&nbsp;    public void testPDF() throws Exception {
+<b class="fc"><i>15</i>&nbsp;        System.out.println(&quot;Testing 10000 random pdf calls&quot;);</b>
+<b class="fc"><i>16</i>&nbsp;        LogNormalDistributionModel logNormal = new LogNormalDistributionModel();</b>
+<b class="fc"><i>17</i>&nbsp;        logNormal.init(&quot;1.0&quot;, &quot;2.0&quot;);</b>
+<i>18</i>&nbsp;
+<b class="fc"><i>19</i>&nbsp;        for (int i = 0; i &lt; 10000; i++) {</b>
+<b class="fc"><i>20</i>&nbsp;            double M = Math.random() * 10.0 - 5.0;</b>
+<b class="fc"><i>21</i>&nbsp;            double S = Math.random() * 10;</b>
+<i>22</i>&nbsp;
+<b class="fc"><i>23</i>&nbsp;            double x = -1;</b>
+<b class="fc"><i>24</i>&nbsp;            while( x &lt; 0 ) {</b>
+<b class="fc"><i>25</i>&nbsp;                x = Math.log(Math.random() * 10);</b>
+<i>26</i>&nbsp;            }
+<i>27</i>&nbsp;
+<b class="fc"><i>28</i>&nbsp;            logNormal.MParameterInput.setValue(M + &quot;&quot;, logNormal);</b>
+<b class="fc"><i>29</i>&nbsp;            logNormal.SParameterInput.setValue(S + &quot;&quot;, logNormal);</b>
+<b class="fc"><i>30</i>&nbsp;            logNormal.initAndValidate();</b>
+<i>31</i>&nbsp;
+<b class="fc"><i>32</i>&nbsp;            double pdf = 1.0 / (x * S * Math.sqrt(2 * Math.PI)) * Math.exp(-Math.pow(Math.log(x) - M, 2) / (2 * S * S));</b>
+<i>33</i>&nbsp;
+<b class="fc"><i>34</i>&nbsp;            System.out.println(&quot;Testing logNormal[M=&quot; + M + &quot; S=&quot; + S + &quot;].pdf(&quot; + x + &quot;)&quot;);</b>
+<b class="fc"><i>35</i>&nbsp;            double f = logNormal.density(x);</b>
+<i>36</i>&nbsp;
+<b class="fc"><i>37</i>&nbsp;            assertEquals(pdf, f, 1e-10);</b>
+<i>38</i>&nbsp;        }
+<b class="fc"><i>39</i>&nbsp;    }</b>
+<i>40</i>&nbsp;
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;    @Test
+<i>43</i>&nbsp;    public void testCalcLogP() throws Exception {
+<b class="fc"><i>44</i>&nbsp;        LogNormalDistributionModel logNormal = new LogNormalDistributionModel();</b>
+<b class="fc"><i>45</i>&nbsp;        logNormal.hasMeanInRealSpaceInput.setValue(&quot;true&quot;, logNormal);</b>
+<b class="fc"><i>46</i>&nbsp;        logNormal.offsetInput.setValue(&quot;1200&quot;, logNormal);</b>
+<b class="fc"><i>47</i>&nbsp;        logNormal.MParameterInput.setValue(&quot;2000&quot;, logNormal);</b>
+<b class="fc"><i>48</i>&nbsp;        logNormal.SParameterInput.setValue(&quot;0.6&quot;, logNormal);</b>
+<b class="fc"><i>49</i>&nbsp;        logNormal.initAndValidate();</b>
+<b class="fc"><i>50</i>&nbsp;        RealParameter p = new RealParameter(new Double[]{2952.6747000000014});</b>
+<i>51</i>&nbsp;
+<b class="fc"><i>52</i>&nbsp;        double f0 = logNormal.calcLogP(p);</b>
+<b class="fc"><i>53</i>&nbsp;        assertEquals(-7.880210654973873, f0, 1e-10);</b>
+<b class="fc"><i>54</i>&nbsp;    }</b>
+<i>55</i>&nbsp;
+<i>56</i>&nbsp;    @Test
+<i>57</i>&nbsp;    public void testCalcLogP2() throws Exception {
+<i>58</i>&nbsp;        // does the same as testCalcLogP(), but with by constructing object through XML
+<b class="fc"><i>59</i>&nbsp;        String xml = &quot;&lt;input spec=&#39;beast.math.distributions.LogNormalDistributionModel&#39; &quot; +</b>
+<i>60</i>&nbsp;                &quot;offset=&#39;1200&#39; &quot; +
+<i>61</i>&nbsp;                &quot;M=&#39;2000&#39; &quot; +
+<i>62</i>&nbsp;                &quot;S=&#39;0.6&#39; &quot; +
+<i>63</i>&nbsp;                &quot;meanInRealSpace=&#39;true&#39;/&gt;&quot;;
+<b class="fc"><i>64</i>&nbsp;        RealParameter p = new RealParameter(new Double[]{2952.6747000000014});</b>
+<b class="fc"><i>65</i>&nbsp;        XMLParser parser = new XMLParser();</b>
+<b class="fc"><i>66</i>&nbsp;        LogNormalDistributionModel logNormal = (LogNormalDistributionModel) parser.parseBareFragment(xml, true);</b>
+<i>67</i>&nbsp;
+<b class="fc"><i>68</i>&nbsp;        double f0 = logNormal.calcLogP(p);</b>
+<b class="fc"><i>69</i>&nbsp;        assertEquals(-7.880210654973873, f0, 1e-10);</b>
+<b class="fc"><i>70</i>&nbsp;    }</b>
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;    @Test
+<i>73</i>&nbsp;    public void testCalcLogP3() throws Exception {
+<i>74</i>&nbsp;        // does the same as testCalcLogP(), but with by constructing object through init
+<b class="fc"><i>75</i>&nbsp;        LogNormalDistributionModel logNormal = new LogNormalDistributionModel();</b>
+<b class="fc"><i>76</i>&nbsp;        logNormal.init(&quot;2000&quot;, &quot;0.6&quot;, true, &quot;1200&quot;);</b>
+<b class="fc"><i>77</i>&nbsp;        RealParameter p = new RealParameter(new Double[]{2952.6747000000014});</b>
+<i>78</i>&nbsp;
+<b class="fc"><i>79</i>&nbsp;        double f0 = logNormal.calcLogP(p);</b>
+<b class="fc"><i>80</i>&nbsp;        assertEquals(-7.880210654973873, f0, 1e-10);</b>
+<b class="fc"><i>81</i>&nbsp;    }</b>
+<i>82</i>&nbsp;}
+<i>83</i>&nbsp;
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-27 17:09</div>
+</div>
+</body>
+</html>

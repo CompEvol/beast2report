@@ -1,0 +1,198 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: BeautiSimpleTest</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">test.beast.app.beauti</a> ]
+</div>
+
+<h1>Coverage Summary for Class: BeautiSimpleTest (test.beast.app.beauti)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BeautiSimpleTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.1%
+  </span>
+  <span class="absValue">
+    (59/ 67)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package test.beast.app.beauti;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import static org.fest.assertions.Assertions.assertThat;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;import java.awt.Component;
+<i>7</i>&nbsp;import java.io.File;
+<i>8</i>&nbsp;import java.util.Arrays;
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;import javax.swing.JComboBox;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;import org.fest.swing.data.Index;
+<i>13</i>&nbsp;import org.fest.swing.data.TableCell;
+<i>14</i>&nbsp;import org.fest.swing.fixture.JCheckBoxFixture;
+<i>15</i>&nbsp;import org.fest.swing.fixture.JComboBoxFixture;
+<i>16</i>&nbsp;import org.fest.swing.fixture.JTabbedPaneFixture;
+<i>17</i>&nbsp;import org.fest.swing.fixture.JTableCellFixture;
+<i>18</i>&nbsp;import org.fest.swing.fixture.JTableFixture;
+<i>19</i>&nbsp;import org.fest.swing.fixture.JTextComponentFixture;
+<i>20</i>&nbsp;import org.fest.swing.image.ScreenshotTaker;
+<i>21</i>&nbsp;import org.junit.Test;
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;
+<b class="fc"><i>25</i>&nbsp;public class BeautiSimpleTest extends BeautiBase {</b>
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;	
+<i>28</i>&nbsp;	@Test
+<i>29</i>&nbsp;	public void simpleTest() throws Exception {
+<i>30</i>&nbsp;		
+<b class="fc"><i>31</i>&nbsp;		importAlignment(&quot;examples/nexus&quot;, new File(&quot;anolis.nex&quot;));</b>
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;		// load anolis.nex
+<b class="fc"><i>34</i>&nbsp;		JTabbedPaneFixture f = beautiFrame.tabbedPane();</b>
+<b class="fc"><i>35</i>&nbsp;		f.requireVisible();</b>
+<b class="fc"><i>36</i>&nbsp;		f.requireTitle(&quot;Partitions&quot;, Index.atIndex(0));</b>
+<b class="fc"><i>37</i>&nbsp;		String[] titles = f.tabTitles();</b>
+<b class="fc"><i>38</i>&nbsp;		assertArrayEquals(titles,&quot;[Partitions, Tip Dates, Site Model, Clock Model, Priors, MCMC]&quot;);</b>
+<b class="fc"><i>39</i>&nbsp;		System.err.println(Arrays.toString(titles));</b>
+<b class="fc"><i>40</i>&nbsp;		f = f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>41</i>&nbsp;		JTableFixture t = beautiFrame.table();</b>
+<b class="fc"><i>42</i>&nbsp;		String[][] tc = t.contents();</b>
+<b class="fc"><i>43</i>&nbsp;		System.err.println(Arrays.toString(tc[0]));</b>
+<b class="fc"><i>44</i>&nbsp;		assertArrayEquals(tc[0],&quot;[anolis, anolis, 29, 1456, nucleotide, anolis, anolis, anolis, false]&quot;);</b>
+<b class="fc"><i>45</i>&nbsp;		assertThat(f).isNotNull();</b>
+<b class="fc"><i>46</i>&nbsp;		assertStateEquals(&quot;Tree.t:anolis&quot;, &quot;birthRate.t:anolis&quot;);</b>
+<b class="fc"><i>47</i>&nbsp;		assertOperatorsEqual(&quot;YuleBirthRateScaler.t:anolis&quot;, &quot;YuleModelTreeScaler.t:anolis&quot;, &quot;YuleModelTreeRootScaler.t:anolis&quot;, &quot;YuleModelUniformOperator.t:anolis&quot;, &quot;YuleModelSubtreeSlide.t:anolis&quot;, &quot;YuleModelNarrow.t:anolis&quot;, &quot;YuleModelWide.t:anolis&quot;, &quot;YuleModelWilsonBalding.t:anolis&quot;);</b>
+<b class="fc"><i>48</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:anolis&quot;, &quot;YuleBirthRatePrior.t:anolis&quot;);</b>
+<b class="fc"><i>49</i>&nbsp;		assertTraceLogEqual(&quot;posterior&quot;, &quot;likelihood&quot;, &quot;prior&quot;, &quot;treeLikelihood.anolis&quot;, &quot;TreeHeight.t:anolis&quot;, &quot;YuleModel.t:anolis&quot;, &quot;birthRate.t:anolis&quot;);</b>
+<i>50</i>&nbsp;		
+<i>51</i>&nbsp;		
+<b class="fc"><i>52</i>&nbsp;		ScreenshotTaker screenshotTaker = new ScreenshotTaker();</b>
+<b class="fc"><i>53</i>&nbsp;		(new File(&quot;/tmp/simpleTest1.png&quot;)).delete();</b>
+<b class="fc"><i>54</i>&nbsp;		(new File(&quot;/tmp/simpleTest2.png&quot;)).delete();</b>
+<b class="fc"><i>55</i>&nbsp;		(new File(&quot;/tmp/simpleTest3.png&quot;)).delete();</b>
+<b class="fc"><i>56</i>&nbsp;		(new File(&quot;/tmp/simpleTest4.png&quot;)).delete();</b>
+<b class="fc"><i>57</i>&nbsp;		screenshotTaker.saveComponentAsPng(beauti.frame, &quot;/tmp/simpleTest1.png&quot;);		</b>
+<i>58</i>&nbsp;		
+<i>59</i>&nbsp;		
+<i>60</i>&nbsp;		// Set the site model to HKY (estimated)
+<b class="fc"><i>61</i>&nbsp;		f.selectTab(&quot;Site Model&quot;);</b>
+<b class="fc"><i>62</i>&nbsp;		JComboBoxFixture substModel = beautiFrame.comboBox(&quot;substModel&quot;);</b>
+<b class="fc"><i>63</i>&nbsp;		substModel.selectItem(&quot;HKY&quot;);</b>
+<b class="fc"><i>64</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>65</i>&nbsp;		assertStateEquals(&quot;Tree.t:anolis&quot;, &quot;birthRate.t:anolis&quot;, &quot;kappa.s:anolis&quot;, &quot;freqParameter.s:anolis&quot;);</b>
+<b class="fc"><i>66</i>&nbsp;		assertOperatorsEqual(&quot;YuleBirthRateScaler.t:anolis&quot;, &quot;YuleModelTreeScaler.t:anolis&quot;, &quot;YuleModelTreeRootScaler.t:anolis&quot;, &quot;YuleModelUniformOperator.t:anolis&quot;, &quot;YuleModelSubtreeSlide.t:anolis&quot;, &quot;YuleModelNarrow.t:anolis&quot;, &quot;YuleModelWide.t:anolis&quot;, &quot;YuleModelWilsonBalding.t:anolis&quot;, &quot;KappaScaler.s:anolis&quot;, &quot;FrequenciesExchanger.s:anolis&quot;);</b>
+<b class="fc"><i>67</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:anolis&quot;, &quot;YuleBirthRatePrior.t:anolis&quot;, &quot;KappaPrior.s:anolis&quot;);</b>
+<b class="fc"><i>68</i>&nbsp;		assertTraceLogEqual(&quot;posterior&quot;, &quot;likelihood&quot;, &quot;prior&quot;, &quot;treeLikelihood.anolis&quot;, &quot;TreeHeight.t:anolis&quot;, &quot;YuleModel.t:anolis&quot;, &quot;birthRate.t:anolis&quot;, &quot;kappa.s:anolis&quot;, &quot;freqParameter.s:anolis&quot;);</b>
+<i>69</i>&nbsp;
+<i>70</i>&nbsp;		
+<i>71</i>&nbsp;		// Set the site model to HKY (G4) (estimated)
+<b class="fc"><i>72</i>&nbsp;		f.selectTab(&quot;Site Model&quot;);</b>
+<b class="fc"><i>73</i>&nbsp;		JTextComponentFixture categoryCount = beautiFrame.textBox(&quot;gammaCategoryCount&quot;);</b>
+<b class="fc"><i>74</i>&nbsp;		categoryCount.setText(&quot;4&quot;);</b>
+<b class="fc"><i>75</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>76</i>&nbsp;		assertStateEquals(&quot;Tree.t:anolis&quot;, &quot;birthRate.t:anolis&quot;, &quot;kappa.s:anolis&quot;, &quot;freqParameter.s:anolis&quot;);</b>
+<b class="fc"><i>77</i>&nbsp;		assertOperatorsEqual(&quot;YuleBirthRateScaler.t:anolis&quot;, &quot;YuleModelTreeScaler.t:anolis&quot;, &quot;YuleModelTreeRootScaler.t:anolis&quot;, &quot;YuleModelUniformOperator.t:anolis&quot;, &quot;YuleModelSubtreeSlide.t:anolis&quot;, &quot;YuleModelNarrow.t:anolis&quot;, &quot;YuleModelWide.t:anolis&quot;, &quot;YuleModelWilsonBalding.t:anolis&quot;, &quot;KappaScaler.s:anolis&quot;, &quot;FrequenciesExchanger.s:anolis&quot;);</b>
+<b class="fc"><i>78</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:anolis&quot;, &quot;YuleBirthRatePrior.t:anolis&quot;, &quot;KappaPrior.s:anolis&quot;);</b>
+<b class="fc"><i>79</i>&nbsp;		assertTraceLogEqual(&quot;posterior&quot;, &quot;likelihood&quot;, &quot;prior&quot;, &quot;treeLikelihood.anolis&quot;, &quot;TreeHeight.t:anolis&quot;, &quot;YuleModel.t:anolis&quot;, &quot;birthRate.t:anolis&quot;, &quot;kappa.s:anolis&quot;, &quot;freqParameter.s:anolis&quot;);</b>
+<i>80</i>&nbsp;
+<b class="fc"><i>81</i>&nbsp;		f.selectTab(&quot;Site Model&quot;);</b>
+<b class="fc"><i>82</i>&nbsp;		JCheckBoxFixture shapeIsEstimated = beautiFrame.checkBox(&quot;shape.isEstimated&quot;);</b>
+<b class="fc"><i>83</i>&nbsp;		shapeIsEstimated.check();</b>
+<b class="fc"><i>84</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>85</i>&nbsp;		assertStateEquals(&quot;Tree.t:anolis&quot;, &quot;birthRate.t:anolis&quot;, &quot;kappa.s:anolis&quot;, &quot;gammaShape.s:anolis&quot;, &quot;freqParameter.s:anolis&quot;);</b>
+<b class="fc"><i>86</i>&nbsp;		assertOperatorsEqual(&quot;YuleBirthRateScaler.t:anolis&quot;, &quot;YuleModelTreeScaler.t:anolis&quot;, &quot;YuleModelTreeRootScaler.t:anolis&quot;, &quot;YuleModelUniformOperator.t:anolis&quot;, &quot;YuleModelSubtreeSlide.t:anolis&quot;, &quot;YuleModelNarrow.t:anolis&quot;, &quot;YuleModelWide.t:anolis&quot;, &quot;YuleModelWilsonBalding.t:anolis&quot;, &quot;KappaScaler.s:anolis&quot;, &quot;gammaShapeScaler.s:anolis&quot;, &quot;FrequenciesExchanger.s:anolis&quot;);</b>
+<b class="fc"><i>87</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:anolis&quot;, &quot;YuleBirthRatePrior.t:anolis&quot;, &quot;KappaPrior.s:anolis&quot;, &quot;GammaShapePrior.s:anolis&quot;);</b>
+<b class="fc"><i>88</i>&nbsp;		assertTraceLogEqual(&quot;posterior&quot;, &quot;likelihood&quot;, &quot;prior&quot;, &quot;treeLikelihood.anolis&quot;, &quot;TreeHeight.t:anolis&quot;, &quot;YuleModel.t:anolis&quot;, &quot;birthRate.t:anolis&quot;, &quot;kappa.s:anolis&quot;, &quot;gammaShape.s:anolis&quot;, &quot;freqParameter.s:anolis&quot;);</b>
+<i>89</i>&nbsp;
+<b class="fc"><i>90</i>&nbsp;		screenshotTaker.saveComponentAsPng(beauti.frame, &quot;/tmp/simpleTest2.png&quot;);		</b>
+<i>91</i>&nbsp;		// rename tree from &#39;anolis&#39; to &#39;tree&#39;
+<b class="fc"><i>92</i>&nbsp;		f.selectTab(&quot;Partitions&quot;);</b>
+<b class="fc"><i>93</i>&nbsp;		JTableCellFixture cell = beautiFrame.table().cell(TableCell.row(0).column(7));</b>
+<b class="fc"><i>94</i>&nbsp;		Component editor = cell.editor();</b>
+<b class="fc"><i>95</i>&nbsp;		JComboBoxFixture comboBox = new JComboBoxFixture(robot(), (JComboBox&lt;?&gt;) editor);</b>
+<b class="fc"><i>96</i>&nbsp;		cell.startEditing();</b>
+<b class="fc"><i>97</i>&nbsp;		comboBox.selectAllText();</b>
+<b class="fc"><i>98</i>&nbsp;		comboBox.enterText(&quot;tree&quot;);</b>
+<b class="fc"><i>99</i>&nbsp;		cell.stopEditing();</b>
+<b class="fc"><i>100</i>&nbsp;		printBeautiState(f);</b>
+<b class="fc"><i>101</i>&nbsp;		assertStateEquals(&quot;Tree.t:tree&quot;, &quot;birthRate.t:tree&quot;, &quot;kappa.s:anolis&quot;, &quot;gammaShape.s:anolis&quot;, &quot;freqParameter.s:anolis&quot;);</b>
+<b class="nc"><i>102</i>&nbsp;		assertOperatorsEqual(&quot;YuleBirthRateScaler.t:tree&quot;, &quot;YuleModelTreeScaler.t:tree&quot;, &quot;YuleModelTreeRootScaler.t:tree&quot;, &quot;YuleModelUniformOperator.t:tree&quot;, &quot;YuleModelSubtreeSlide.t:tree&quot;, &quot;YuleModelNarrow.t:tree&quot;, &quot;YuleModelWide.t:tree&quot;, &quot;YuleModelWilsonBalding.t:tree&quot;, &quot;KappaScaler.s:anolis&quot;, &quot;gammaShapeScaler.s:anolis&quot;, &quot;FrequenciesExchanger.s:anolis&quot;);</b>
+<b class="nc"><i>103</i>&nbsp;		assertPriorsEqual(&quot;YuleModel.t:tree&quot;, &quot;YuleBirthRatePrior.t:tree&quot;, &quot;GammaShapePrior.s:anolis&quot;, &quot;KappaPrior.s:anolis&quot;);</b>
+<b class="nc"><i>104</i>&nbsp;		assertTraceLogEqual(&quot;posterior&quot;, &quot;likelihood&quot;, &quot;prior&quot;, &quot;treeLikelihood.anolis&quot;, &quot;TreeHeight.t:tree&quot;, &quot;YuleModel.t:tree&quot;, &quot;birthRate.t:tree&quot;, &quot;kappa.s:anolis&quot;, &quot;gammaShape.s:anolis&quot;, &quot;freqParameter.s:anolis&quot;);</b>
+<i>105</i>&nbsp;		
+<b class="nc"><i>106</i>&nbsp;		screenshotTaker.saveComponentAsPng(beauti.frame, &quot;/tmp/simpleTest3.png&quot;);		</b>
+<i>107</i>&nbsp;		// Create a Normal calibration prior and monophyletic constraint on Human-Chimp split of 6 +/- 0.5.
+<b class="nc"><i>108</i>&nbsp;		f.selectTab(&quot;Priors&quot;);</b>
+<i>109</i>&nbsp;
+<b class="nc"><i>110</i>&nbsp;		screenshotTaker.saveComponentAsPng(beauti.frame, &quot;/tmp/simpleTest4.png&quot;);		</b>
+<i>111</i>&nbsp;
+<b class="nc"><i>112</i>&nbsp;		makeSureXMLParses();</b>
+<b class="nc"><i>113</i>&nbsp;	}</b>
+<i>114</i>&nbsp;
+<i>115</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-27 17:09</div>
+</div>
+</body>
+</html>

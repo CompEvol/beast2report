@@ -1,0 +1,244 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: BEASTInterfaceTest</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">test.beast.core</a> ]
+</div>
+
+<h1>Coverage Summary for Class: BEASTInterfaceTest (test.beast.core)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BEASTInterfaceTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96%
+  </span>
+  <span class="absValue">
+    (48/ 50)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BEASTInterfaceTest$BEASTi</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (4/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    78.6%
+  </span>
+  <span class="absValue">
+    (11/ 14)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (6/ 8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.2%
+  </span>
+  <span class="absValue">
+    (59/ 64)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package test.beast.core;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.util.ArrayList;
+<i>4</i>&nbsp;import java.util.HashMap;
+<i>5</i>&nbsp;import java.util.HashSet;
+<i>6</i>&nbsp;import java.util.List;
+<i>7</i>&nbsp;import java.util.Map;
+<i>8</i>&nbsp;import java.util.Set;
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;import org.junit.Test;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;import beast.core.BEASTInterface;
+<i>13</i>&nbsp;import beast.core.Citation;
+<i>14</i>&nbsp;import beast.core.Description;
+<i>15</i>&nbsp;import beast.core.Input;
+<i>16</i>&nbsp;import beast.core.Input.Validate;
+<i>17</i>&nbsp;import junit.framework.TestCase;
+<i>18</i>&nbsp;
+<b class="fc"><i>19</i>&nbsp;public class BEASTInterfaceTest extends TestCase {</b>
+<i>20</i>&nbsp;
+<b class="fc"><i>21</i>&nbsp;	@Description(&quot;class that impements BEASTInterface but is not a BEASTObject&quot;)</b>
+<i>22</i>&nbsp;	@Citation(&quot;this is a dummy citation&quot;)
+<b class="fc"><i>23</i>&nbsp;	public class BEASTi implements BEASTInterface {</b>
+<b class="fc"><i>24</i>&nbsp;		final public Input&lt;String&gt; msgInput = new Input&lt;&gt;(&quot;value&quot;, &quot;message for this BEASTi object&quot;, Validate.REQUIRED);</b>
+<b class="fc"><i>25</i>&nbsp;		final public Input&lt;BEASTi&gt; beastiInput = new Input&lt;&gt;(&quot;other&quot;, &quot;link to another BEASTi object&quot;);</b>
+<i>26</i>&nbsp;		String ID;
+<b class="fc"><i>27</i>&nbsp;		Set&lt;BEASTInterface&gt; outputs = new HashSet&lt;BEASTInterface&gt;();</b>
+<i>28</i>&nbsp;		Map&lt;String, Input&lt;?&gt;&gt; inputs;
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;		@Override
+<i>31</i>&nbsp;		public String getID() {
+<b class="nc"><i>32</i>&nbsp;			return ID;</b>
+<i>33</i>&nbsp;		}
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;		@Override
+<i>36</i>&nbsp;		public void setID(String ID) {
+<b class="nc"><i>37</i>&nbsp;			this.ID = ID;</b>
+<b class="nc"><i>38</i>&nbsp;		}</b>
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;		@Override
+<i>41</i>&nbsp;		public Set&lt;BEASTInterface&gt; getOutputs() {
+<b class="fc"><i>42</i>&nbsp;			return outputs;</b>
+<i>43</i>&nbsp;		}
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;		@Override
+<i>46</i>&nbsp;		public void initAndValidate() {
+<i>47</i>&nbsp;			// nothing to do;
+<b class="fc"><i>48</i>&nbsp;		}</b>
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;		@Override
+<i>51</i>&nbsp;		public Map&lt;String, Input&lt;?&gt;&gt; getInputs() {
+<b class="fc"><i>52</i>&nbsp;			if (inputs == null) {</b>
+<b class="fc"><i>53</i>&nbsp;				inputs = new HashMap&lt;&gt;();</b>
+<b class="fc"><i>54</i>&nbsp;				inputs.put(&quot;value&quot;, msgInput);</b>
+<b class="fc"><i>55</i>&nbsp;				inputs.put(&quot;other&quot;, beastiInput);</b>
+<i>56</i>&nbsp;			}
+<b class="fc"><i>57</i>&nbsp;			return inputs;</b>
+<i>58</i>&nbsp;		}
+<i>59</i>&nbsp;	}
+<i>60</i>&nbsp;	
+<i>61</i>&nbsp;	
+<i>62</i>&nbsp;	@Test
+<i>63</i>&nbsp;	public void testBEASTi() throws Exception {
+<b class="fc"><i>64</i>&nbsp;		BEASTi beasti = new BEASTi();</b>
+<i>65</i>&nbsp;		
+<b class="fc"><i>66</i>&nbsp;		System.err.println(&quot;test getCitation&quot;);</b>
+<b class="fc"><i>67</i>&nbsp;		Citation citation = beasti.getCitation();</b>
+<b class="fc"><i>68</i>&nbsp;		assertEquals(&quot;this is a dummy citation&quot;, citation.value());</b>
+<i>69</i>&nbsp;
+<b class="fc"><i>70</i>&nbsp;		System.err.println(&quot;test initByName&quot;);</b>
+<b class="fc"><i>71</i>&nbsp;		beasti.initByName(&quot;value&quot;, &quot;hello world&quot;);</b>
+<b class="fc"><i>72</i>&nbsp;		Input&lt;?&gt; input = beasti.getInput(&quot;value&quot;);</b>
+<b class="fc"><i>73</i>&nbsp;		assertEquals(&quot;hello world&quot;, input.get());</b>
+<i>74</i>&nbsp;		
+<b class="fc"><i>75</i>&nbsp;		System.err.println(&quot;test listInputs&quot;);</b>
+<b class="fc"><i>76</i>&nbsp;		List&lt;?&gt; list = beasti.listInputs();</b>
+<b class="fc"><i>77</i>&nbsp;		assertEquals(2, list.size());</b>
+<i>78</i>&nbsp;
+<b class="fc"><i>79</i>&nbsp;		System.err.println(&quot;test initByName&quot;);</b>
+<b class="fc"><i>80</i>&nbsp;		BEASTi beasti2 = new BEASTi();</b>
+<b class="fc"><i>81</i>&nbsp;		beasti.initByName(&quot;value&quot;, &quot;hello world&quot;,</b>
+<i>82</i>&nbsp;				&quot;other&quot;, beasti2);
+<i>83</i>&nbsp;		
+<b class="fc"><i>84</i>&nbsp;		System.err.println(&quot;test getInputValue&quot;);</b>
+<b class="fc"><i>85</i>&nbsp;		BEASTi beasti3 = (BEASTi) beasti.getInputValue(&quot;other&quot;);</b>
+<b class="fc"><i>86</i>&nbsp;		assertEquals(beasti2, beasti3);</b>
+<i>87</i>&nbsp;		
+<b class="fc"><i>88</i>&nbsp;		System.err.println(&quot;test getOutputs&quot;);</b>
+<b class="fc"><i>89</i>&nbsp;		assertEquals(1, beasti2.getOutputs().size());</b>
+<i>90</i>&nbsp;		
+<b class="fc"><i>91</i>&nbsp;		String description = beasti.getDescription();</b>
+<b class="fc"><i>92</i>&nbsp;		assertEquals(&quot;class that impements BEASTInterface but is not a BEASTObject&quot;, description);</b>
+<i>93</i>&nbsp;		
+<b class="fc"><i>94</i>&nbsp;		List&lt;BEASTInterface&gt; predecessors = new ArrayList&lt;BEASTInterface&gt;();</b>
+<b class="fc"><i>95</i>&nbsp;		beasti2.getPredecessors(predecessors);</b>
+<b class="fc"><i>96</i>&nbsp;		assertEquals(1, predecessors.size());</b>
+<b class="fc"><i>97</i>&nbsp;		beasti.getPredecessors(predecessors);</b>
+<b class="fc"><i>98</i>&nbsp;		assertEquals(2, predecessors.size());</b>
+<b class="fc"><i>99</i>&nbsp;		assertEquals(beasti, predecessors.get(1));</b>
+<b class="fc"><i>100</i>&nbsp;		assertEquals(beasti2, predecessors.get(0));</b>
+<i>101</i>&nbsp;		
+<b class="fc"><i>102</i>&nbsp;		description = beasti.getTipText(&quot;other&quot;);</b>
+<b class="fc"><i>103</i>&nbsp;		assertEquals(&quot;link to another BEASTi object&quot;, description);</b>
+<i>104</i>&nbsp;		
+<b class="fc"><i>105</i>&nbsp;		boolean b = beasti.isPrimitive(&quot;value&quot;);</b>
+<b class="fc"><i>106</i>&nbsp;		assertEquals(true, b);</b>
+<b class="fc"><i>107</i>&nbsp;		b = beasti.isPrimitive(&quot;other&quot;);</b>
+<b class="fc"><i>108</i>&nbsp;		assertEquals(false, b);</b>
+<i>109</i>&nbsp;		
+<b class="fc"><i>110</i>&nbsp;		List&lt;BEASTInterface&gt; beastObjbects = beasti.listActiveBEASTObjects();</b>
+<b class="fc"><i>111</i>&nbsp;		assertEquals(1, beastObjbects.size());</b>
+<b class="fc"><i>112</i>&nbsp;		assertEquals(beasti2, beastObjbects.get(0));</b>
+<b class="fc"><i>113</i>&nbsp;		beastObjbects = beasti2.listActiveBEASTObjects();</b>
+<b class="fc"><i>114</i>&nbsp;		assertEquals(0, beastObjbects.size());</b>
+<i>115</i>&nbsp;		
+<i>116</i>&nbsp;		
+<b class="fc"><i>117</i>&nbsp;		beasti.validateInputs();</b>
+<i>118</i>&nbsp;
+<i>119</i>&nbsp;		try {
+<b class="fc"><i>120</i>&nbsp;			beasti2.validateInputs();</b>
+<b class="nc"><i>121</i>&nbsp;			assertEquals(true, false); // should never get here</b>
+<b class="fc"><i>122</i>&nbsp;		} catch (Throwable t) {</b>
+<i>123</i>&nbsp;			// lucky to be here
+<b class="nc"><i>124</i>&nbsp;		}</b>
+<i>125</i>&nbsp;		
+<i>126</i>&nbsp;		
+<b class="fc"><i>127</i>&nbsp;		beasti2.setInputValue(&quot;value&quot;, &quot;Goodbye!&quot;);</b>
+<b class="fc"><i>128</i>&nbsp;		String msg = (String) beasti2.getInputValue(&quot;value&quot;);</b>
+<b class="fc"><i>129</i>&nbsp;		assertEquals(&quot;Goodbye!&quot;, msg);</b>
+<i>130</i>&nbsp;		
+<b class="fc"><i>131</i>&nbsp;	}</b>
+<i>132</i>&nbsp;	
+<i>133</i>&nbsp;	
+<i>134</i>&nbsp;	
+<i>135</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-27 17:09</div>
+</div>
+</body>
+</html>

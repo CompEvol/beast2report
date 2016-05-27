@@ -1,0 +1,298 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: HKYTest</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">test.beast.evolution.substmodel</a> ]
+</div>
+
+<h1>Coverage Summary for Class: HKYTest (test.beast.evolution.substmodel)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HKYTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (19/ 19)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">HKYTest$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">HKYTest$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">HKYTest$3</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">HKYTest$Instance</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (17/ 17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (34/ 34)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package test.beast.evolution.substmodel;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import beast.core.Description;
+<i>4</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>5</i>&nbsp;import beast.evolution.substitutionmodel.Frequencies;
+<i>6</i>&nbsp;import beast.evolution.substitutionmodel.HKY;
+<i>7</i>&nbsp;import junit.framework.TestCase;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;/**
+<i>10</i>&nbsp; * Test HKY matrix exponentiation
+<i>11</i>&nbsp; *
+<i>12</i>&nbsp; * @author Joseph Heled
+<i>13</i>&nbsp; *         Date: 7/11/2007
+<i>14</i>&nbsp; *         imported by Walter Xie from BEAST 1
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;@Description(&quot;Test HKY matrix exponentiation&quot;)
+<b class="fc"><i>17</i>&nbsp;public class HKYTest extends TestCase {</b>
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;    public interface Instance {
+<i>20</i>&nbsp;        Double[] getPi();
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;        Double getKappa();
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;        double getDistance();
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;        double[] getExpectedResult();
+<i>27</i>&nbsp;    }
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;    /*
+<i>30</i>&nbsp;     * Results obtained by running the following scilab code,
+<i>31</i>&nbsp;     *
+<i>32</i>&nbsp;     * k = 5 ; piQ = diag([.2, .3, .25, .25]) ; d = 0.1 ;
+<i>33</i>&nbsp;     * % Q matrix with zeroed diagonal
+<i>34</i>&nbsp;     * XQ = [0 1 k 1; 1 0 1 k; k 1 0 1; 1 k 1 0];
+<i>35</i>&nbsp;     *
+<i>36</i>&nbsp;     * xx = XQ * piQ ;
+<i>37</i>&nbsp;     *
+<i>38</i>&nbsp;     * % fill diagonal and normalize by total substitution rate
+<i>39</i>&nbsp;     * q0 = (xx + diag(-sum(xx,2))) / sum(piQ * sum(xx,2)) ;
+<i>40</i>&nbsp;     * expm(q0 * d)
+<i>41</i>&nbsp;     */
+<b class="fc"><i>42</i>&nbsp;    protected Instance test0 = new Instance() {</b>
+<i>43</i>&nbsp;        @Override
+<i>44</i>&nbsp;		public Double[] getPi() {
+<b class="fc"><i>45</i>&nbsp;            return new Double[]{0.25, 0.25, 0.25, 0.25};</b>
+<i>46</i>&nbsp;        }
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;        @Override
+<i>49</i>&nbsp;		public Double getKappa() {
+<b class="fc"><i>50</i>&nbsp;            return 2.0;</b>
+<i>51</i>&nbsp;        }
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;        @Override
+<i>54</i>&nbsp;		public double getDistance() {
+<b class="fc"><i>55</i>&nbsp;            return 0.1;</b>
+<i>56</i>&nbsp;        }
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;        @Override
+<i>59</i>&nbsp;		public double[] getExpectedResult() {
+<b class="fc"><i>60</i>&nbsp;            return new double[]{</b>
+<i>61</i>&nbsp;                    0.906563342722, 0.023790645491, 0.045855366296, 0.023790645491,
+<i>62</i>&nbsp;                    0.023790645491, 0.906563342722, 0.023790645491, 0.045855366296,
+<i>63</i>&nbsp;                    0.045855366296, 0.023790645491, 0.906563342722, 0.023790645491,
+<i>64</i>&nbsp;                    0.023790645491, 0.045855366296, 0.023790645491, 0.906563342722
+<i>65</i>&nbsp;            };
+<i>66</i>&nbsp;        }
+<i>67</i>&nbsp;    };
+<i>68</i>&nbsp;
+<b class="fc"><i>69</i>&nbsp;    protected Instance test1 = new Instance() {</b>
+<i>70</i>&nbsp;        @Override
+<i>71</i>&nbsp;		public Double[] getPi() {
+<b class="fc"><i>72</i>&nbsp;            return new Double[]{0.50, 0.20, 0.2, 0.1};</b>
+<i>73</i>&nbsp;        }
+<i>74</i>&nbsp;
+<i>75</i>&nbsp;        @Override
+<i>76</i>&nbsp;		public Double getKappa() {
+<b class="fc"><i>77</i>&nbsp;            return 2.0;</b>
+<i>78</i>&nbsp;        }
+<i>79</i>&nbsp;
+<i>80</i>&nbsp;        @Override
+<i>81</i>&nbsp;		public double getDistance() {
+<b class="fc"><i>82</i>&nbsp;            return 0.1;</b>
+<i>83</i>&nbsp;        }
+<i>84</i>&nbsp;
+<i>85</i>&nbsp;        @Override
+<i>86</i>&nbsp;		public double[] getExpectedResult() {
+<b class="fc"><i>87</i>&nbsp;            return new double[]{</b>
+<i>88</i>&nbsp;                    0.928287993055, 0.021032136637, 0.040163801989, 0.010516068319,
+<i>89</i>&nbsp;                    0.052580341593, 0.906092679369, 0.021032136637, 0.020294842401,
+<i>90</i>&nbsp;                    0.100409504972, 0.021032136637, 0.868042290072, 0.010516068319,
+<i>91</i>&nbsp;                    0.052580341593, 0.040589684802, 0.021032136637, 0.885797836968
+<i>92</i>&nbsp;            };
+<i>93</i>&nbsp;        }
+<i>94</i>&nbsp;    };
+<i>95</i>&nbsp;
+<b class="fc"><i>96</i>&nbsp;    protected Instance test2 = new Instance() {</b>
+<i>97</i>&nbsp;        @Override
+<i>98</i>&nbsp;		public Double[] getPi() {
+<b class="fc"><i>99</i>&nbsp;            return new Double[]{0.20, 0.30, 0.25, 0.25};</b>
+<i>100</i>&nbsp;        }
+<i>101</i>&nbsp;
+<i>102</i>&nbsp;        @Override
+<i>103</i>&nbsp;		public Double getKappa() {
+<b class="fc"><i>104</i>&nbsp;            return 5.0;</b>
+<i>105</i>&nbsp;        }
+<i>106</i>&nbsp;
+<i>107</i>&nbsp;        @Override
+<i>108</i>&nbsp;		public double getDistance() {
+<b class="fc"><i>109</i>&nbsp;            return 0.1;</b>
+<i>110</i>&nbsp;        }
+<i>111</i>&nbsp;
+<i>112</i>&nbsp;        @Override
+<i>113</i>&nbsp;		public double[] getExpectedResult() {
+<b class="fc"><i>114</i>&nbsp;            return new double[]{</b>
+<i>115</i>&nbsp;                    0.904026219693, 0.016708646875, 0.065341261036, 0.013923872396,
+<i>116</i>&nbsp;                    0.011139097917, 0.910170587813, 0.013923872396, 0.064766441875,
+<i>117</i>&nbsp;                    0.052273008829, 0.016708646875, 0.917094471901, 0.013923872396,
+<i>118</i>&nbsp;                    0.011139097917, 0.077719730250, 0.013923872396, 0.897217299437
+<i>119</i>&nbsp;            };
+<i>120</i>&nbsp;        }
+<i>121</i>&nbsp;    };
+<i>122</i>&nbsp;
+<b class="fc"><i>123</i>&nbsp;    Instance[] all = {test2, test1, test0};</b>
+<i>124</i>&nbsp;
+<i>125</i>&nbsp;    public void testHKY() throws Exception {
+<b class="fc"><i>126</i>&nbsp;        for (Instance test : all) {</b>
+<i>127</i>&nbsp;
+<b class="fc"><i>128</i>&nbsp;            RealParameter f = new RealParameter(test.getPi());</b>
+<i>129</i>&nbsp;
+<b class="fc"><i>130</i>&nbsp;            Frequencies freqs = new Frequencies();</b>
+<b class="fc"><i>131</i>&nbsp;            freqs.initByName(&quot;frequencies&quot;, f, &quot;estimate&quot;, false);</b>
+<i>132</i>&nbsp;
+<b class="fc"><i>133</i>&nbsp;            HKY hky = new HKY();</b>
+<b class="fc"><i>134</i>&nbsp;            hky.initByName(&quot;kappa&quot;, test.getKappa().toString(), &quot;frequencies&quot;, freqs);</b>
+<i>135</i>&nbsp;
+<b class="fc"><i>136</i>&nbsp;            double distance = test.getDistance();</b>
+<i>137</i>&nbsp;
+<b class="fc"><i>138</i>&nbsp;            double[] mat = new double[4 * 4];</b>
+<b class="fc"><i>139</i>&nbsp;            hky.getTransitionProbabilities(null, distance, 0, 1, mat);</b>
+<b class="fc"><i>140</i>&nbsp;            final double[] result = test.getExpectedResult();</b>
+<i>141</i>&nbsp;
+<b class="fc"><i>142</i>&nbsp;            for (int k = 0; k &lt; mat.length; ++k) {</b>
+<b class="fc"><i>143</i>&nbsp;                assertEquals(mat[k], result[k], 1e-10);</b>
+<b class="fc"><i>144</i>&nbsp;                System.out.println(k + &quot; : &quot; + (mat[k] - result[k]));</b>
+<i>145</i>&nbsp;            }
+<i>146</i>&nbsp;        }
+<b class="fc"><i>147</i>&nbsp;    }</b>
+<i>148</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-27 17:09</div>
+</div>
+</body>
+</html>
