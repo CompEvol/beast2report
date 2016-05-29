@@ -11,5 +11,5 @@ git log --all -M -C --name-only --format='format:' "$@" | sort | grep -v '^$' | 
 
 ## The frequency of classes associated to unique issues
 
-Run the [script](https://github.com/CompEvol/beast2report/blob/master/genIssueDist.sh) 
-below in terminal to get *issue_dist.text*, which contains the number of __unique issues__ associated with each file.
+Run the script [genIssueDist.sh](https://github.com/CompEvol/beast2report/blob/master/genIssueDist.sh) 
+in terminal to get *issue_dist.text*, which contains the number of __unique issues__ associated with each file.
