@@ -1,0 +1,466 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: HeapSort</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.util</a> ]
+</div>
+
+<h1>Coverage Summary for Class: HeapSort (beast.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HeapSort</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    30.8%
+  </span>
+  <span class="absValue">
+    (4/ 13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    31.3%
+  </span>
+  <span class="absValue">
+    (41/ 131)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.util;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.util.Comparator;
+<i>4</i>&nbsp;import java.util.List;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;/**
+<i>7</i>&nbsp; * sorts numbers and comparable objects by treating contents of array as a binary beast.tree.
+<i>8</i>&nbsp; * KNOWN BUGS: There is a horrible amount of code duplication here!
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; * @author Alexei Drummond
+<i>11</i>&nbsp; * @author Korbinian Strimmer
+<i>12</i>&nbsp; * @version $Id: HeapSort.java,v 1.7 2006/02/20 17:36:23 rambaut Exp $
+<i>13</i>&nbsp; */
+<b class="nc"><i>14</i>&nbsp;public class HeapSort {</b>
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;    //
+<i>17</i>&nbsp;    // Public stuff
+<i>18</i>&nbsp;    //
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;    /**
+<i>21</i>&nbsp;     * Sorts an array of indices refering to a list of comparable objects
+<i>22</i>&nbsp;     * into increasing order.
+<i>23</i>&nbsp;     *
+<i>24</i>&nbsp;     * @param list    the list of comparable objects
+<i>25</i>&nbsp;     * @param indices an array of indices describing an ascending order of the comparable object in the list
+<i>26</i>&nbsp;     */
+<i>27</i>&nbsp;    public static void sort(@SuppressWarnings(&quot;rawtypes&quot;) List&lt;? extends Comparable&gt; list, int[] indices) {
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;        // ensures we are starting with valid indices
+<b class="fc"><i>30</i>&nbsp;        for (int i = 0; i &lt; indices.length; i++) {</b>
+<b class="fc"><i>31</i>&nbsp;            indices[i] = i;</b>
+<i>32</i>&nbsp;        }
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;        int temp;
+<b class="fc"><i>35</i>&nbsp;        int j, n = list.size();</b>
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;        // turn input array into a heap
+<b class="fc"><i>38</i>&nbsp;        for (j = n / 2; j &gt; 0; j--) {</b>
+<b class="fc"><i>39</i>&nbsp;            adjust(list, indices, j, n);</b>
+<i>40</i>&nbsp;        }
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;        // remove largest elements and put them at the end
+<i>43</i>&nbsp;        // of the unsorted region until you are finished
+<b class="fc"><i>44</i>&nbsp;        for (j = n - 1; j &gt; 0; j--) {</b>
+<b class="fc"><i>45</i>&nbsp;            temp = indices[0];</b>
+<b class="fc"><i>46</i>&nbsp;            indices[0] = indices[j];</b>
+<b class="fc"><i>47</i>&nbsp;            indices[j] = temp;</b>
+<b class="fc"><i>48</i>&nbsp;            adjust(list, indices, 1, j);</b>
+<i>49</i>&nbsp;        }
+<b class="fc"><i>50</i>&nbsp;    }</b>
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;    /**
+<i>53</i>&nbsp;     * Sorts an array of comparable objects into increasing order.
+<i>54</i>&nbsp;     *
+<i>55</i>&nbsp;     * @param array an array of Comparables to be sorted into ascending order
+<i>56</i>&nbsp;     */
+<i>57</i>&nbsp;    public static void sort(Comparable&lt;?&gt;[] array) {
+<i>58</i>&nbsp;
+<i>59</i>&nbsp;        Comparable&lt;?&gt; temp;
+<b class="nc"><i>60</i>&nbsp;        int j, n = array.length;</b>
+<i>61</i>&nbsp;
+<i>62</i>&nbsp;        // turn input array into a heap
+<b class="nc"><i>63</i>&nbsp;        for (j = n / 2; j &gt; 0; j--) {</b>
+<b class="nc"><i>64</i>&nbsp;            adjust(array, j, n);</b>
+<i>65</i>&nbsp;        }
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;        // remove largest elements and put them at the end
+<i>68</i>&nbsp;        // of the unsorted region until you are finished
+<b class="nc"><i>69</i>&nbsp;        for (j = n - 1; j &gt; 0; j--) {</b>
+<b class="nc"><i>70</i>&nbsp;            temp = array[0];</b>
+<b class="nc"><i>71</i>&nbsp;            array[0] = array[j];</b>
+<b class="nc"><i>72</i>&nbsp;            array[j] = temp;</b>
+<b class="nc"><i>73</i>&nbsp;            adjust(array, 1, j);</b>
+<i>74</i>&nbsp;        }
+<b class="nc"><i>75</i>&nbsp;    }</b>
+<i>76</i>&nbsp;
+<i>77</i>&nbsp;    /**
+<i>78</i>&nbsp;     * Sorts an array of objects into increasing order given a comparator.
+<i>79</i>&nbsp;     *
+<i>80</i>&nbsp;     * @param array      and array of objects to be sorted
+<i>81</i>&nbsp;     * @param comparator a comparator used to defined the ordering of the objects
+<i>82</i>&nbsp;     */
+<i>83</i>&nbsp;    public static void sort(Object[] array, Comparator&lt;?&gt; comparator) {
+<i>84</i>&nbsp;
+<i>85</i>&nbsp;        Object temp;
+<b class="nc"><i>86</i>&nbsp;        int j, n = array.length;</b>
+<i>87</i>&nbsp;
+<i>88</i>&nbsp;        // turn input array into a heap
+<b class="nc"><i>89</i>&nbsp;        for (j = n / 2; j &gt; 0; j--) {</b>
+<b class="nc"><i>90</i>&nbsp;            adjust(array, comparator, j, n);</b>
+<i>91</i>&nbsp;        }
+<i>92</i>&nbsp;
+<i>93</i>&nbsp;        // remove largest elements and put them at the end
+<i>94</i>&nbsp;        // of the unsorted region until you are finished
+<b class="nc"><i>95</i>&nbsp;        for (j = n - 1; j &gt; 0; j--) {</b>
+<b class="nc"><i>96</i>&nbsp;            temp = array[0];</b>
+<b class="nc"><i>97</i>&nbsp;            array[0] = array[j];</b>
+<b class="nc"><i>98</i>&nbsp;            array[j] = temp;</b>
+<b class="nc"><i>99</i>&nbsp;            adjust(array, comparator, 1, j);</b>
+<i>100</i>&nbsp;        }
+<b class="nc"><i>101</i>&nbsp;    }</b>
+<i>102</i>&nbsp;
+<i>103</i>&nbsp;    /**
+<i>104</i>&nbsp;     * Sorts an array of doubles into increasing order.
+<i>105</i>&nbsp;     *
+<i>106</i>&nbsp;     * @param array an array of doubles to be sorted in ascending order.
+<i>107</i>&nbsp;     */
+<i>108</i>&nbsp;    public static void sort(double[] array) {
+<i>109</i>&nbsp;
+<i>110</i>&nbsp;        double temp;
+<b class="nc"><i>111</i>&nbsp;        int j, n = array.length;</b>
+<i>112</i>&nbsp;
+<i>113</i>&nbsp;        // turn input array into a heap
+<b class="nc"><i>114</i>&nbsp;        for (j = n / 2; j &gt; 0; j--) {</b>
+<b class="nc"><i>115</i>&nbsp;            adjust(array, j, n);</b>
+<i>116</i>&nbsp;        }
+<i>117</i>&nbsp;
+<i>118</i>&nbsp;        // remove largest elements and put them at the end
+<i>119</i>&nbsp;        // of the unsorted region until you are finished
+<b class="nc"><i>120</i>&nbsp;        for (j = n - 1; j &gt; 0; j--) {</b>
+<b class="nc"><i>121</i>&nbsp;            temp = array[0];</b>
+<b class="nc"><i>122</i>&nbsp;            array[0] = array[j];</b>
+<b class="nc"><i>123</i>&nbsp;            array[j] = temp;</b>
+<b class="nc"><i>124</i>&nbsp;            adjust(array, 1, j);</b>
+<i>125</i>&nbsp;        }
+<b class="nc"><i>126</i>&nbsp;    }</b>
+<i>127</i>&nbsp;
+<i>128</i>&nbsp;    /**
+<i>129</i>&nbsp;     * Sorts an array of doubles into increasing order, ingoring sign.
+<i>130</i>&nbsp;     *
+<i>131</i>&nbsp;     * @param array and array of doubles to be sorted into increasing order, ignoring sign
+<i>132</i>&nbsp;     */
+<i>133</i>&nbsp;    public static void sortAbs(double[] array) {
+<i>134</i>&nbsp;
+<i>135</i>&nbsp;        double temp;
+<b class="nc"><i>136</i>&nbsp;        int j, n = array.length;</b>
+<i>137</i>&nbsp;
+<i>138</i>&nbsp;        // turn input array into a heap
+<b class="nc"><i>139</i>&nbsp;        for (j = n / 2; j &gt; 0; j--) {</b>
+<b class="nc"><i>140</i>&nbsp;            adjustAbs(array, j, n);</b>
+<i>141</i>&nbsp;        }
+<i>142</i>&nbsp;
+<i>143</i>&nbsp;        // remove largest elements and put them at the end
+<i>144</i>&nbsp;        // of the unsorted region until you are finished
+<b class="nc"><i>145</i>&nbsp;        for (j = n - 1; j &gt; 0; j--) {</b>
+<b class="nc"><i>146</i>&nbsp;            temp = array[0];</b>
+<b class="nc"><i>147</i>&nbsp;            array[0] = array[j];</b>
+<b class="nc"><i>148</i>&nbsp;            array[j] = temp;</b>
+<b class="nc"><i>149</i>&nbsp;            adjustAbs(array, 1, j);</b>
+<i>150</i>&nbsp;        }
+<b class="nc"><i>151</i>&nbsp;    }</b>
+<i>152</i>&nbsp;
+<i>153</i>&nbsp;    /**
+<i>154</i>&nbsp;     * Sorts an array of indices into an array of doubles
+<i>155</i>&nbsp;     * into increasing order.
+<i>156</i>&nbsp;     *
+<i>157</i>&nbsp;     * @param array   an array of doubles
+<i>158</i>&nbsp;     * @param indices an array of indices to be sorted so that they describe an ascending order of values in array
+<i>159</i>&nbsp;     */
+<i>160</i>&nbsp;    public static void sort(double[] array, int[] indices) {
+<i>161</i>&nbsp;
+<i>162</i>&nbsp;        // ensures we are starting with valid indices
+<b class="fc"><i>163</i>&nbsp;        for (int i = 0; i &lt; indices.length; i++) {</b>
+<b class="fc"><i>164</i>&nbsp;            indices[i] = i;</b>
+<i>165</i>&nbsp;        }
+<i>166</i>&nbsp;
+<i>167</i>&nbsp;        int temp;
+<b class="fc"><i>168</i>&nbsp;        int j, n = indices.length;</b>
+<i>169</i>&nbsp;
+<i>170</i>&nbsp;        // turn input array into a heap
+<b class="fc"><i>171</i>&nbsp;        for (j = n / 2; j &gt; 0; j--) {</b>
+<b class="fc"><i>172</i>&nbsp;            adjust(array, indices, j, n);</b>
+<i>173</i>&nbsp;        }
+<i>174</i>&nbsp;
+<i>175</i>&nbsp;        // remove largest elements and put them at the end
+<i>176</i>&nbsp;        // of the unsorted region until you are finished
+<b class="fc"><i>177</i>&nbsp;        for (j = n - 1; j &gt; 0; j--) {</b>
+<b class="fc"><i>178</i>&nbsp;            temp = indices[0];</b>
+<b class="fc"><i>179</i>&nbsp;            indices[0] = indices[j];</b>
+<b class="fc"><i>180</i>&nbsp;            indices[j] = temp;</b>
+<b class="fc"><i>181</i>&nbsp;            adjust(array, indices, 1, j);</b>
+<i>182</i>&nbsp;        }
+<b class="fc"><i>183</i>&nbsp;    }</b>
+<i>184</i>&nbsp;
+<i>185</i>&nbsp;    // PRIVATE STUFF
+<i>186</i>&nbsp;
+<i>187</i>&nbsp;    /**
+<i>188</i>&nbsp;     * helps sort an array of indices pointing into a list of comparable objects.
+<i>189</i>&nbsp;     * Assumes that indices[lower+1] through to indices[upper] is
+<i>190</i>&nbsp;     * already in heap form and then puts indices[lower] to
+<i>191</i>&nbsp;     * indices[upper] in heap form.
+<i>192</i>&nbsp;     *
+<i>193</i>&nbsp;     * @param list    a list of comparables
+<i>194</i>&nbsp;     * @param indices an array of indices pointing into list
+<i>195</i>&nbsp;     * @param lower   starting index in array to heapify
+<i>196</i>&nbsp;     * @param upper   end index in array to heapify
+<i>197</i>&nbsp;     */
+<i>198</i>&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+<i>199</i>&nbsp;    private static void adjust(@SuppressWarnings(&quot;rawtypes&quot;) List&lt;? extends Comparable&gt; list, int[] indices, int lower, int upper) {
+<i>200</i>&nbsp;
+<i>201</i>&nbsp;        int j, k;
+<i>202</i>&nbsp;        int temp;
+<i>203</i>&nbsp;
+<b class="fc"><i>204</i>&nbsp;        j = lower;</b>
+<b class="fc"><i>205</i>&nbsp;        k = lower * 2;</b>
+<i>206</i>&nbsp;
+<b class="fc"><i>207</i>&nbsp;        while (k &lt;= upper) {</b>
+<b class="fc"><i>208</i>&nbsp;            if ((k &lt; upper) &amp;&amp; (list.get(indices[k - 1]).compareTo(list.get(indices[k])) &lt; 0)) {</b>
+<b class="nc"><i>209</i>&nbsp;                k += 1;</b>
+<i>210</i>&nbsp;            }
+<b class="fc"><i>211</i>&nbsp;            if (list.get(indices[j - 1]).compareTo(list.get(indices[k - 1])) &lt; 0) {</b>
+<b class="fc"><i>212</i>&nbsp;                temp = indices[j - 1];</b>
+<b class="fc"><i>213</i>&nbsp;                indices[j - 1] = indices[k - 1];</b>
+<b class="fc"><i>214</i>&nbsp;                indices[k - 1] = temp;</b>
+<i>215</i>&nbsp;            }
+<b class="fc"><i>216</i>&nbsp;            j = k;</b>
+<b class="fc"><i>217</i>&nbsp;            k *= 2;</b>
+<i>218</i>&nbsp;        }
+<b class="fc"><i>219</i>&nbsp;    }</b>
+<i>220</i>&nbsp;
+<i>221</i>&nbsp;    /**
+<i>222</i>&nbsp;     * Assumes that array[lower+1] through to array[upper] is
+<i>223</i>&nbsp;     * already in heap form and then puts array[lower] to
+<i>224</i>&nbsp;     * array[upper] in heap form.
+<i>225</i>&nbsp;     *
+<i>226</i>&nbsp;     * @param array array to sort
+<i>227</i>&nbsp;     * @param lower lower index of heapify
+<i>228</i>&nbsp;     * @param upper upper index of heapify
+<i>229</i>&nbsp;     */
+<i>230</i>&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+<i>231</i>&nbsp;    private static void adjust(@SuppressWarnings(&quot;rawtypes&quot;) Comparable[] array, int lower, int upper) {
+<i>232</i>&nbsp;
+<i>233</i>&nbsp;        int j, k;
+<i>234</i>&nbsp;        Comparable&lt;?&gt; temp;
+<i>235</i>&nbsp;
+<b class="nc"><i>236</i>&nbsp;        j = lower;</b>
+<b class="nc"><i>237</i>&nbsp;        k = lower * 2;</b>
+<i>238</i>&nbsp;
+<b class="nc"><i>239</i>&nbsp;        while (k &lt;= upper) {</b>
+<b class="nc"><i>240</i>&nbsp;            if ((k &lt; upper) &amp;&amp; (array[k - 1].compareTo(array[k]) &lt; 0)) {</b>
+<b class="nc"><i>241</i>&nbsp;                k += 1;</b>
+<i>242</i>&nbsp;            }
+<b class="nc"><i>243</i>&nbsp;            if (array[j - 1].compareTo(array[k - 1]) &lt; 0) {</b>
+<b class="nc"><i>244</i>&nbsp;                temp = array[j - 1];</b>
+<b class="nc"><i>245</i>&nbsp;                array[j - 1] = array[k - 1];</b>
+<b class="nc"><i>246</i>&nbsp;                array[k - 1] = temp;</b>
+<i>247</i>&nbsp;            }
+<b class="nc"><i>248</i>&nbsp;            j = k;</b>
+<b class="nc"><i>249</i>&nbsp;            k *= 2;</b>
+<i>250</i>&nbsp;        }
+<b class="nc"><i>251</i>&nbsp;    }</b>
+<i>252</i>&nbsp;
+<i>253</i>&nbsp;    /**
+<i>254</i>&nbsp;     * Assumes that array[lower+1] through to array[upper] is
+<i>255</i>&nbsp;     * already in heap form and then puts array[lower] to
+<i>256</i>&nbsp;     * array[upper] in heap form.
+<i>257</i>&nbsp;     *
+<i>258</i>&nbsp;     * @param array      array of objects to sort
+<i>259</i>&nbsp;     * @param comparator comparator to provide ordering
+<i>260</i>&nbsp;     * @param lower      lower index of heapify
+<i>261</i>&nbsp;     * @param upper      upper index of heapify
+<i>262</i>&nbsp;     */
+<i>263</i>&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+<i>264</i>&nbsp;    private static void adjust(Object[] array, @SuppressWarnings(&quot;rawtypes&quot;) Comparator comparator, int lower, int upper) {
+<i>265</i>&nbsp;
+<i>266</i>&nbsp;        int j, k;
+<i>267</i>&nbsp;        Object temp;
+<i>268</i>&nbsp;
+<b class="nc"><i>269</i>&nbsp;        j = lower;</b>
+<b class="nc"><i>270</i>&nbsp;        k = lower * 2;</b>
+<i>271</i>&nbsp;
+<b class="nc"><i>272</i>&nbsp;        while (k &lt;= upper) {</b>
+<b class="nc"><i>273</i>&nbsp;            if ((k &lt; upper) &amp;&amp; (comparator.compare(array[k - 1], array[k]) &lt; 0)) {</b>
+<b class="nc"><i>274</i>&nbsp;                k += 1;</b>
+<i>275</i>&nbsp;            }
+<b class="nc"><i>276</i>&nbsp;            if (comparator.compare(array[j - 1], array[k - 1]) &lt; 0) {</b>
+<b class="nc"><i>277</i>&nbsp;                temp = array[j - 1];</b>
+<b class="nc"><i>278</i>&nbsp;                array[j - 1] = array[k - 1];</b>
+<b class="nc"><i>279</i>&nbsp;                array[k - 1] = temp;</b>
+<i>280</i>&nbsp;            }
+<b class="nc"><i>281</i>&nbsp;            j = k;</b>
+<b class="nc"><i>282</i>&nbsp;            k *= 2;</b>
+<i>283</i>&nbsp;        }
+<b class="nc"><i>284</i>&nbsp;    }</b>
+<i>285</i>&nbsp;
+<i>286</i>&nbsp;    /**
+<i>287</i>&nbsp;     * helps sort an array of doubles.
+<i>288</i>&nbsp;     * Assumes that array[lower+1] through to array[upper] is
+<i>289</i>&nbsp;     * already in heap form and then puts array[lower] to
+<i>290</i>&nbsp;     * array[upper] in heap form.
+<i>291</i>&nbsp;     *
+<i>292</i>&nbsp;     * @param array array of doubles to sort
+<i>293</i>&nbsp;     * @param lower lower index of heapify
+<i>294</i>&nbsp;     * @param upper upper index of heapify
+<i>295</i>&nbsp;     */
+<i>296</i>&nbsp;    private static void adjust(double[] array, int lower, int upper) {
+<i>297</i>&nbsp;
+<i>298</i>&nbsp;        int j, k;
+<i>299</i>&nbsp;        double temp;
+<i>300</i>&nbsp;
+<b class="nc"><i>301</i>&nbsp;        j = lower;</b>
+<b class="nc"><i>302</i>&nbsp;        k = lower * 2;</b>
+<i>303</i>&nbsp;
+<b class="nc"><i>304</i>&nbsp;        while (k &lt;= upper) {</b>
+<b class="nc"><i>305</i>&nbsp;            if ((k &lt; upper) &amp;&amp; (array[k - 1] &lt; array[k])) {</b>
+<b class="nc"><i>306</i>&nbsp;                k += 1;</b>
+<i>307</i>&nbsp;            }
+<b class="nc"><i>308</i>&nbsp;            if (array[j - 1] &lt; array[k - 1]) {</b>
+<b class="nc"><i>309</i>&nbsp;                temp = array[j - 1];</b>
+<b class="nc"><i>310</i>&nbsp;                array[j - 1] = array[k - 1];</b>
+<b class="nc"><i>311</i>&nbsp;                array[k - 1] = temp;</b>
+<i>312</i>&nbsp;            }
+<b class="nc"><i>313</i>&nbsp;            j = k;</b>
+<b class="nc"><i>314</i>&nbsp;            k *= 2;</b>
+<i>315</i>&nbsp;        }
+<b class="nc"><i>316</i>&nbsp;    }</b>
+<i>317</i>&nbsp;
+<i>318</i>&nbsp;    /**
+<i>319</i>&nbsp;     * helps sort an array of doubles.
+<i>320</i>&nbsp;     * Assumes that array[lower+1] through to array[upper] is
+<i>321</i>&nbsp;     * already in heap form and then puts array[lower] to
+<i>322</i>&nbsp;     * array[upper] in heap form.
+<i>323</i>&nbsp;     *
+<i>324</i>&nbsp;     * @param array array of doubles to sort ignoring sign
+<i>325</i>&nbsp;     * @param lower lower index of heapify
+<i>326</i>&nbsp;     * @param upper upper index of heapify
+<i>327</i>&nbsp;     */
+<i>328</i>&nbsp;    private static void adjustAbs(double[] array, int lower, int upper) {
+<i>329</i>&nbsp;
+<i>330</i>&nbsp;        int j, k;
+<i>331</i>&nbsp;        double temp;
+<i>332</i>&nbsp;
+<b class="nc"><i>333</i>&nbsp;        j = lower;</b>
+<b class="nc"><i>334</i>&nbsp;        k = lower * 2;</b>
+<i>335</i>&nbsp;
+<b class="nc"><i>336</i>&nbsp;        while (k &lt;= upper) {</b>
+<b class="nc"><i>337</i>&nbsp;            if ((k &lt; upper) &amp;&amp; (Math.abs(array[k - 1]) &lt; Math.abs(array[k]))) {</b>
+<b class="nc"><i>338</i>&nbsp;                k += 1;</b>
+<i>339</i>&nbsp;            }
+<b class="nc"><i>340</i>&nbsp;            if (Math.abs(array[j - 1]) &lt; Math.abs(array[k - 1])) {</b>
+<b class="nc"><i>341</i>&nbsp;                temp = array[j - 1];</b>
+<b class="nc"><i>342</i>&nbsp;                array[j - 1] = array[k - 1];</b>
+<b class="nc"><i>343</i>&nbsp;                array[k - 1] = temp;</b>
+<i>344</i>&nbsp;            }
+<b class="nc"><i>345</i>&nbsp;            j = k;</b>
+<b class="nc"><i>346</i>&nbsp;            k *= 2;</b>
+<i>347</i>&nbsp;        }
+<b class="nc"><i>348</i>&nbsp;    }</b>
+<i>349</i>&nbsp;
+<i>350</i>&nbsp;    /**
+<i>351</i>&nbsp;     * helps sort an array of indices into an array of doubles.
+<i>352</i>&nbsp;     * Assumes that array[lower+1] through to array[upper] is
+<i>353</i>&nbsp;     * already in heap form and then puts array[lower] to
+<i>354</i>&nbsp;     * array[upper] in heap form.
+<i>355</i>&nbsp;     *
+<i>356</i>&nbsp;     * @param array   array of doubles
+<i>357</i>&nbsp;     * @param indices array of indices into double array to sort
+<i>358</i>&nbsp;     * @param lower   lower index of heapify
+<i>359</i>&nbsp;     * @param upper   upper index of heapify
+<i>360</i>&nbsp;     */
+<i>361</i>&nbsp;    private static void adjust(double[] array, int[] indices, int lower, int upper) {
+<i>362</i>&nbsp;
+<i>363</i>&nbsp;        int j, k;
+<i>364</i>&nbsp;        int temp;
+<i>365</i>&nbsp;
+<b class="fc"><i>366</i>&nbsp;        j = lower;</b>
+<b class="fc"><i>367</i>&nbsp;        k = lower * 2;</b>
+<i>368</i>&nbsp;
+<b class="fc"><i>369</i>&nbsp;        while (k &lt;= upper) {</b>
+<b class="fc"><i>370</i>&nbsp;            if ((k &lt; upper) &amp;&amp; (array[indices[k - 1]] &lt; array[indices[k]])) {</b>
+<b class="nc"><i>371</i>&nbsp;                k += 1;</b>
+<i>372</i>&nbsp;            }
+<b class="fc"><i>373</i>&nbsp;            if (array[indices[j - 1]] &lt; array[indices[k - 1]]) {</b>
+<b class="nc"><i>374</i>&nbsp;                temp = indices[j - 1];</b>
+<b class="nc"><i>375</i>&nbsp;                indices[j - 1] = indices[k - 1];</b>
+<b class="nc"><i>376</i>&nbsp;                indices[k - 1] = temp;</b>
+<i>377</i>&nbsp;            }
+<b class="fc"><i>378</i>&nbsp;            j = k;</b>
+<b class="fc"><i>379</i>&nbsp;            k *= 2;</b>
+<i>380</i>&nbsp;        }
+<b class="fc"><i>381</i>&nbsp;    }</b>
+<i>382</i>&nbsp;}
+<i>383</i>&nbsp;
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

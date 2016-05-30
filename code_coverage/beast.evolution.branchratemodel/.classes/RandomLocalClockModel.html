@@ -1,0 +1,256 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: RandomLocalClockModel</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.branchratemodel</a> ]
+</div>
+
+<h1>Coverage Summary for Class: RandomLocalClockModel (beast.evolution.branchratemodel)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RandomLocalClockModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 66)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.branchratemodel;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import beast.core.Description;
+<i>5</i>&nbsp;import beast.core.Input;
+<i>6</i>&nbsp;import beast.core.parameter.BooleanParameter;
+<i>7</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>8</i>&nbsp;import beast.core.util.Log;
+<i>9</i>&nbsp;import beast.evolution.tree.Node;
+<i>10</i>&nbsp;import beast.evolution.tree.Tree;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;/**
+<i>13</i>&nbsp; * @author Alexei Drummond
+<i>14</i>&nbsp; */
+<i>15</i>&nbsp;@Description(&quot;Random Local Clock Model, whatever that is....&quot;)
+<b class="nc"><i>16</i>&nbsp;public class RandomLocalClockModel extends BranchRateModel.Base {</b>
+<i>17</i>&nbsp;
+<b class="nc"><i>18</i>&nbsp;    final public Input&lt;BooleanParameter&gt; indicatorParamInput =</b>
+<i>19</i>&nbsp;            new Input&lt;&gt;(&quot;indicators&quot;,
+<i>20</i>&nbsp;                    &quot;the indicators associated with nodes in the tree for sampling of individual rate changes among branches.&quot;,
+<i>21</i>&nbsp;                    Input.Validate.REQUIRED);
+<b class="nc"><i>22</i>&nbsp;    final public Input&lt;RealParameter&gt; rateParamInput =</b>
+<i>23</i>&nbsp;            new Input&lt;&gt;(&quot;rates&quot;,
+<i>24</i>&nbsp;                    &quot;the rate parameters associated with nodes in the tree for sampling of individual rates among branches.&quot;,
+<i>25</i>&nbsp;                    Input.Validate.REQUIRED);
+<i>26</i>&nbsp;    //    public Input&lt;RealParameter&gt; meanRateInput =
+<i>27</i>&nbsp;//            new Input&lt;&gt;(&quot;meanRate&quot;,
+<i>28</i>&nbsp;//                    &quot;an optional parameter to set the mean rate across the whole tree&quot;);
+<b class="nc"><i>29</i>&nbsp;    final public Input&lt;Tree&gt; treeInput =</b>
+<i>30</i>&nbsp;            new Input&lt;&gt;(&quot;tree&quot;, &quot;the tree this relaxed clock is associated with.&quot;, Input.Validate.REQUIRED);
+<b class="nc"><i>31</i>&nbsp;    final public Input&lt;Boolean&gt; ratesAreMultipliersInput =</b>
+<b class="nc"><i>32</i>&nbsp;            new Input&lt;&gt;(&quot;ratesAreMultipliers&quot;, &quot;true if the rates should be treated as multipliers (default false).&quot;, false);</b>
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;    Tree m_tree;
+<i>35</i>&nbsp;    RealParameter meanRate;
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;    @Override
+<i>38</i>&nbsp;    public void initAndValidate() {
+<b class="nc"><i>39</i>&nbsp;        m_tree = treeInput.get();</b>
+<i>40</i>&nbsp;
+<b class="nc"><i>41</i>&nbsp;        BooleanParameter indicators = indicatorParamInput.get();</b>
+<i>42</i>&nbsp;
+<b class="nc"><i>43</i>&nbsp;        if (indicators.getDimension() != m_tree.getNodeCount() - 1) {</b>
+<b class="nc"><i>44</i>&nbsp;            Log.warning.println(&quot;RandomLocalClockModel::Setting dimension of indicators to &quot; + (m_tree.getNodeCount() - 1));</b>
+<b class="nc"><i>45</i>&nbsp;            indicators.setDimension(m_tree.getNodeCount() - 1);</b>
+<i>46</i>&nbsp;        }
+<i>47</i>&nbsp;
+<b class="nc"><i>48</i>&nbsp;        unscaledBranchRates = new double[m_tree.getNodeCount()];</b>
+<i>49</i>&nbsp;
+<b class="nc"><i>50</i>&nbsp;        RealParameter rates = rateParamInput.get();</b>
+<b class="nc"><i>51</i>&nbsp;        if (rates.lowerValueInput.get() == null || rates.lowerValueInput.get() &lt; 0.0) {</b>
+<b class="nc"><i>52</i>&nbsp;            rates.setLower(0.0);</b>
+<i>53</i>&nbsp;        }
+<b class="nc"><i>54</i>&nbsp;        if (rates.upperValueInput.get() == null || rates.upperValueInput.get() &lt; 0.0) {</b>
+<b class="nc"><i>55</i>&nbsp;            rates.setUpper(Double.MAX_VALUE);</b>
+<i>56</i>&nbsp;        }
+<b class="nc"><i>57</i>&nbsp;        if (rates.getDimension() != m_tree.getNodeCount() - 1) {</b>
+<b class="nc"><i>58</i>&nbsp;        	Log.warning.println(&quot;RandomLocalClockModel::Setting dimension of rates to &quot; + (m_tree.getNodeCount() - 1));</b>
+<b class="nc"><i>59</i>&nbsp;            rates.setDimension(m_tree.getNodeCount() - 1);</b>
+<i>60</i>&nbsp;        }
+<i>61</i>&nbsp;
+<i>62</i>&nbsp;
+<b class="nc"><i>63</i>&nbsp;        ratesAreMultipliers = ratesAreMultipliersInput.get();</b>
+<i>64</i>&nbsp;
+<b class="nc"><i>65</i>&nbsp;        meanRate = meanRateInput.get();</b>
+<b class="nc"><i>66</i>&nbsp;        if (meanRate == null) {</b>
+<b class="nc"><i>67</i>&nbsp;            meanRate = new RealParameter(&quot;1.0&quot;);</b>
+<i>68</i>&nbsp;        }
+<i>69</i>&nbsp;    }
+<i>70</i>&nbsp;
+<i>71</i>&nbsp;    /**
+<i>72</i>&nbsp;     * This is a recursive function that does the work of
+<i>73</i>&nbsp;     * calculating the unscaled branch rates across the tree
+<i>74</i>&nbsp;     * taking into account the indicator variables.
+<i>75</i>&nbsp;     *
+<i>76</i>&nbsp;     * @param node the node
+<i>77</i>&nbsp;     * @param rate the rate of the parent node
+<i>78</i>&nbsp;     */
+<i>79</i>&nbsp;    private void calculateUnscaledBranchRates(Node node, double rate, BooleanParameter indicators, RealParameter rates) {
+<i>80</i>&nbsp;
+<b class="nc"><i>81</i>&nbsp;        int nodeNumber = getNr(node);</b>
+<i>82</i>&nbsp;
+<b class="nc"><i>83</i>&nbsp;        if (!node.isRoot()) {</b>
+<b class="nc"><i>84</i>&nbsp;            if (indicators.getValue(nodeNumber)) {</b>
+<b class="nc"><i>85</i>&nbsp;                if (ratesAreMultipliers) {</b>
+<b class="nc"><i>86</i>&nbsp;                    rate *= rates.getValue(nodeNumber);</b>
+<i>87</i>&nbsp;                } else {
+<b class="nc"><i>88</i>&nbsp;                    rate = rates.getValue(nodeNumber);</b>
+<i>89</i>&nbsp;                }
+<i>90</i>&nbsp;            }
+<i>91</i>&nbsp;        }
+<b class="nc"><i>92</i>&nbsp;        unscaledBranchRates[nodeNumber] = rate;</b>
+<i>93</i>&nbsp;
+<b class="nc"><i>94</i>&nbsp;        if (!node.isLeaf()) {</b>
+<b class="nc"><i>95</i>&nbsp;            calculateUnscaledBranchRates(node.getLeft(), rate, indicators, rates);</b>
+<b class="nc"><i>96</i>&nbsp;            calculateUnscaledBranchRates(node.getRight(), rate, indicators, rates);</b>
+<i>97</i>&nbsp;        }
+<i>98</i>&nbsp;    }
+<i>99</i>&nbsp;
+<i>100</i>&nbsp;    private void recalculateScaleFactor() {
+<i>101</i>&nbsp;
+<b class="nc"><i>102</i>&nbsp;        BooleanParameter indicators = indicatorParamInput.get();</b>
+<b class="nc"><i>103</i>&nbsp;        RealParameter rates = rateParamInput.get();</b>
+<i>104</i>&nbsp;
+<b class="nc"><i>105</i>&nbsp;        calculateUnscaledBranchRates(m_tree.getRoot(), 1.0, indicators, rates);</b>
+<i>106</i>&nbsp;
+<b class="nc"><i>107</i>&nbsp;        double timeTotal = 0.0;</b>
+<b class="nc"><i>108</i>&nbsp;        double branchTotal = 0.0;</b>
+<i>109</i>&nbsp;
+<b class="nc"><i>110</i>&nbsp;        for (int i = 0; i &lt; m_tree.getNodeCount(); i++) {</b>
+<b class="nc"><i>111</i>&nbsp;            Node node = m_tree.getNode(i);</b>
+<b class="nc"><i>112</i>&nbsp;            if (!node.isRoot()) {</b>
+<i>113</i>&nbsp;
+<b class="nc"><i>114</i>&nbsp;                double branchInTime = node.getParent().getHeight() - node.getHeight();</b>
+<i>115</i>&nbsp;
+<b class="nc"><i>116</i>&nbsp;                double branchLength = branchInTime * unscaledBranchRates[node.getNr()];</b>
+<i>117</i>&nbsp;
+<b class="nc"><i>118</i>&nbsp;                timeTotal += branchInTime;</b>
+<b class="nc"><i>119</i>&nbsp;                branchTotal += branchLength;</b>
+<i>120</i>&nbsp;            }
+<i>121</i>&nbsp;        }
+<i>122</i>&nbsp;
+<b class="nc"><i>123</i>&nbsp;        scaleFactor = timeTotal / branchTotal;</b>
+<i>124</i>&nbsp;
+<b class="nc"><i>125</i>&nbsp;        scaleFactor *= meanRate.getValue();</b>
+<i>126</i>&nbsp;    }
+<i>127</i>&nbsp;
+<i>128</i>&nbsp;    @Override
+<i>129</i>&nbsp;    public double getRateForBranch(Node node) {
+<i>130</i>&nbsp;        // this must be synchronized to avoid being called simultaneously by
+<i>131</i>&nbsp;        // two different likelihood threads
+<b class="nc"><i>132</i>&nbsp;    	synchronized (this) {</b>
+<b class="nc"><i>133</i>&nbsp;    		if (recompute) {</b>
+<b class="nc"><i>134</i>&nbsp;                recalculateScaleFactor();</b>
+<b class="nc"><i>135</i>&nbsp;                recompute = false;</b>
+<i>136</i>&nbsp;			}
+<b class="nc"><i>137</i>&nbsp;        }</b>
+<i>138</i>&nbsp;
+<b class="nc"><i>139</i>&nbsp;        return unscaledBranchRates[getNr(node)] * scaleFactor;</b>
+<i>140</i>&nbsp;    }
+<i>141</i>&nbsp;
+<i>142</i>&nbsp;    private int getNr(Node node) {
+<b class="nc"><i>143</i>&nbsp;        int nodeNr = node.getNr();</b>
+<b class="nc"><i>144</i>&nbsp;        if (nodeNr &gt; m_tree.getRoot().getNr()) {</b>
+<b class="nc"><i>145</i>&nbsp;            nodeNr--;</b>
+<i>146</i>&nbsp;        }
+<b class="nc"><i>147</i>&nbsp;        return nodeNr;</b>
+<i>148</i>&nbsp;    }
+<i>149</i>&nbsp;
+<i>150</i>&nbsp;    @Override
+<i>151</i>&nbsp;    protected boolean requiresRecalculation() {
+<i>152</i>&nbsp;        // this is only called if any of its inputs is dirty, hence we need to recompute
+<b class="nc"><i>153</i>&nbsp;        recompute = true;</b>
+<b class="nc"><i>154</i>&nbsp;        return true;</b>
+<i>155</i>&nbsp;    }
+<i>156</i>&nbsp;
+<i>157</i>&nbsp;    @Override
+<i>158</i>&nbsp;    protected void store() {
+<b class="nc"><i>159</i>&nbsp;        recompute = true;</b>
+<b class="nc"><i>160</i>&nbsp;        super.store();</b>
+<i>161</i>&nbsp;    }
+<i>162</i>&nbsp;
+<i>163</i>&nbsp;    @Override
+<i>164</i>&nbsp;    protected void restore() {
+<b class="nc"><i>165</i>&nbsp;        recompute = true;</b>
+<b class="nc"><i>166</i>&nbsp;        super.restore();</b>
+<i>167</i>&nbsp;    }
+<i>168</i>&nbsp;
+<b class="nc"><i>169</i>&nbsp;    private boolean recompute = true;</b>
+<i>170</i>&nbsp;    double[] unscaledBranchRates;
+<i>171</i>&nbsp;    double scaleFactor;
+<b class="nc"><i>172</i>&nbsp;    boolean ratesAreMultipliers = false;</b>
+<i>173</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

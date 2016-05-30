@@ -1,0 +1,511 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: GeneTreeForSpeciesTreeDistribution</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.speciation</a> ]
+</div>
+
+<h1>Coverage Summary for Class: GeneTreeForSpeciesTreeDistribution (beast.evolution.speciation)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GeneTreeForSpeciesTreeDistribution</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 160)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GeneTreeForSpeciesTreeDistribution$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 161)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.speciation;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import java.util.Arrays;
+<i>6</i>&nbsp;import java.util.List;
+<i>7</i>&nbsp;import java.util.PriorityQueue;
+<i>8</i>&nbsp;import java.util.Random;
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;import beast.core.Description;
+<i>11</i>&nbsp;import beast.core.Input;
+<i>12</i>&nbsp;import beast.core.Input.Validate;
+<i>13</i>&nbsp;import beast.core.State;
+<i>14</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>15</i>&nbsp;import beast.core.util.Log;
+<i>16</i>&nbsp;import beast.evolution.alignment.Taxon;
+<i>17</i>&nbsp;import beast.evolution.alignment.TaxonSet;
+<i>18</i>&nbsp;import beast.evolution.speciation.SpeciesTreePrior.TreePopSizeFunction;
+<i>19</i>&nbsp;import beast.evolution.tree.Node;
+<i>20</i>&nbsp;import beast.evolution.tree.TreeDistribution;
+<i>21</i>&nbsp;import beast.evolution.tree.TreeInterface;
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;
+<b class="nc"><i>25</i>&nbsp;@Description(&quot;Calculates probability of gene tree conditioned on a species tree (multi-species coalescent)&quot;)</b>
+<i>26</i>&nbsp;public class GeneTreeForSpeciesTreeDistribution extends TreeDistribution {
+<b class="nc"><i>27</i>&nbsp;    final public Input&lt;TreeInterface&gt; speciesTreeInput =</b>
+<i>28</i>&nbsp;            new Input&lt;&gt;(&quot;speciesTree&quot;, &quot;species tree containing the associated gene tree&quot;, Validate.REQUIRED);
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;//    public enum PLOIDY {autosomal_nuclear, X, Y, mitrochondrial};
+<i>31</i>&nbsp;    
+<b class="nc"><i>32</i>&nbsp;    final public Input&lt;Double&gt; ploidyInput =</b>
+<b class="nc"><i>33</i>&nbsp;            new Input&lt;&gt;(&quot;ploidy&quot;, &quot;ploidy (copy number) for this gene, typically a whole number or half (default 2 for autosomal_nuclear)&quot;, 2.0);</b>
+<i>34</i>&nbsp;//    public Input&lt;PLOIDY&gt; m_ploidy =
+<i>35</i>&nbsp;//        new Input&lt;&gt;(&quot;ploidy&quot;, &quot;ploidy for this gene (default X, Possible values: &quot; + PLOIDY.values(), PLOIDY.X, PLOIDY.values());
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;    
+<b class="nc"><i>38</i>&nbsp;    final public Input&lt;SpeciesTreePrior&gt; speciesTreePriorInput =</b>
+<i>39</i>&nbsp;            new Input&lt;&gt;(&quot;speciesTreePrior&quot;, &quot;defines population function and its parameters&quot;, Validate.REQUIRED);
+<i>40</i>&nbsp;
+<b class="nc"><i>41</i>&nbsp;    final public Input&lt;TreeTopFinder&gt; treeTopFinderInput =</b>
+<i>42</i>&nbsp;            new Input&lt;&gt;(&quot;treetop&quot;, &quot;calculates height of species tree, required only for linear *beast analysis&quot;);
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;    // intervals for each of the species tree branches
+<i>45</i>&nbsp;    private PriorityQueue&lt;Double&gt;[] intervalsInput;
+<i>46</i>&nbsp;    // count nr of lineages at the bottom of species tree branches
+<i>47</i>&nbsp;    private int[] nrOfLineages;
+<i>48</i>&nbsp;    // maps gene tree leaf nodes to species tree leaf nodes. Indexed by node number.
+<i>49</i>&nbsp;    protected int[] nrOfLineageToSpeciesMap;
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;    beast.evolution.speciation.SpeciesTreePrior.TreePopSizeFunction isConstantPopFunction;
+<i>52</i>&nbsp;    RealParameter popSizesBottom;
+<i>53</i>&nbsp;    RealParameter popSizesTop;
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;    // Ploidy is a constant - cache value of input here
+<i>56</i>&nbsp;    private double ploidy;
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;    //???
+<b class="nc"><i>59</i>&nbsp;    public GeneTreeForSpeciesTreeDistribution() {</b>
+<b class="nc"><i>60</i>&nbsp;        treeInput.setRule(Validate.REQUIRED);</b>
+<i>61</i>&nbsp;    }
+<i>62</i>&nbsp;
+<i>63</i>&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+<i>64</i>&nbsp;	@Override
+<i>65</i>&nbsp;    public void initAndValidate() {
+<b class="nc"><i>66</i>&nbsp;    	ploidy = ploidyInput.get();</b>
+<i>67</i>&nbsp;//    	switch (m_ploidy.get()) {
+<i>68</i>&nbsp;//			case autosomal_nuclear: m_fPloidy = 2.0; break;
+<i>69</i>&nbsp;//			case X: m_fPloidy = 1.5; break;
+<i>70</i>&nbsp;//			case Y: m_fPloidy = 0.5; break;
+<i>71</i>&nbsp;//			case mitrochondrial: m_fPloidy = 0.5; break;
+<i>72</i>&nbsp;//			default: throw new Exception(&quot;Unknown value for ploidy&quot;);
+<i>73</i>&nbsp;//		}
+<b class="nc"><i>74</i>&nbsp;        final Node[] gtNodes = treeInput.get().getNodesAsArray();</b>
+<b class="nc"><i>75</i>&nbsp;        final int gtLineages = treeInput.get().getLeafNodeCount();</b>
+<b class="nc"><i>76</i>&nbsp;        final Node[] sptNodes = speciesTreeInput.get().getNodesAsArray();</b>
+<b class="nc"><i>77</i>&nbsp;        final int speciesCount = speciesTreeInput.get().getNodeCount();</b>
+<i>78</i>&nbsp;
+<i>79</i>&nbsp;
+<b class="nc"><i>80</i>&nbsp;        if (speciesCount &lt;= 1 &amp;&amp; sptNodes[0].getID().equals(&quot;Beauti2DummyTaxonSet&quot;)) {</b>
+<i>81</i>&nbsp;            // we are in Beauti, don&#39;t initialise
+<i>82</i>&nbsp;            return;
+<i>83</i>&nbsp;        }
+<i>84</i>&nbsp;
+<i>85</i>&nbsp;
+<i>86</i>&nbsp;        // reserve memory for priority queues
+<b class="nc"><i>87</i>&nbsp;        intervalsInput = new PriorityQueue[speciesCount];</b>
+<b class="nc"><i>88</i>&nbsp;        for (int i = 0; i &lt; speciesCount; i++) {</b>
+<b class="nc"><i>89</i>&nbsp;            intervalsInput[i] = new PriorityQueue&lt;&gt;();</b>
+<i>90</i>&nbsp;        }
+<i>91</i>&nbsp;
+<i>92</i>&nbsp;        // sanity check lineage nodes are all at height=0
+<b class="nc"><i>93</i>&nbsp;        for (int i = 0; i &lt; gtLineages; i++) {</b>
+<b class="nc"><i>94</i>&nbsp;            if (gtNodes[i].getHeight() != 0) {</b>
+<b class="nc"><i>95</i>&nbsp;                throw new IllegalArgumentException(&quot;Cannot deal with taxon &quot; + gtNodes[i].getID() +</b>
+<b class="nc"><i>96</i>&nbsp;                        &quot;, which has non-zero height + &quot; + gtNodes[i].getHeight());</b>
+<i>97</i>&nbsp;            }
+<i>98</i>&nbsp;        }
+<i>99</i>&nbsp;        // set up m_nLineageToSpeciesMap
+<b class="nc"><i>100</i>&nbsp;        nrOfLineageToSpeciesMap = new int[gtLineages];</b>
+<i>101</i>&nbsp;
+<b class="nc"><i>102</i>&nbsp;        Arrays.fill(nrOfLineageToSpeciesMap, -1);</b>
+<b class="nc"><i>103</i>&nbsp;        for (int i = 0; i &lt; gtLineages; i++) {</b>
+<b class="nc"><i>104</i>&nbsp;            final String speciesID = getSetID(gtNodes[i].getID());</b>
+<i>105</i>&nbsp;            // ??? can this be a startup check? can this happen during run due to tree change?
+<b class="nc"><i>106</i>&nbsp;            if (speciesID == null) {</b>
+<b class="nc"><i>107</i>&nbsp;                throw new IllegalArgumentException(&quot;Cannot find species for lineage &quot; + gtNodes[i].getID());</b>
+<i>108</i>&nbsp;            }
+<b class="nc"><i>109</i>&nbsp;            for (int species = 0; species &lt; speciesCount; species++) {</b>
+<b class="nc"><i>110</i>&nbsp;                if (speciesID.equals(sptNodes[species].getID())) {</b>
+<b class="nc"><i>111</i>&nbsp;                    nrOfLineageToSpeciesMap[i] = species;</b>
+<b class="nc"><i>112</i>&nbsp;                    break;</b>
+<i>113</i>&nbsp;                }
+<i>114</i>&nbsp;            }
+<b class="nc"><i>115</i>&nbsp;            if (nrOfLineageToSpeciesMap[i] &lt; 0) {</b>
+<b class="nc"><i>116</i>&nbsp;                throw new IllegalArgumentException(&quot;Cannot find species with name &quot; + speciesID + &quot; in species tree&quot;);</b>
+<i>117</i>&nbsp;            }
+<i>118</i>&nbsp;        }
+<i>119</i>&nbsp;
+<i>120</i>&nbsp;        // calculate nr of lineages per species
+<b class="nc"><i>121</i>&nbsp;        nrOfLineages = new int[speciesCount];</b>
+<i>122</i>&nbsp;//        for (final Node node : gtNodes) {
+<i>123</i>&nbsp;//            if (node.isLeaf()) {
+<i>124</i>&nbsp;//                final int species = m_nLineageToSpeciesMap[node.getNr()];
+<i>125</i>&nbsp;//                m_nLineages[species]++;
+<i>126</i>&nbsp;//            }
+<i>127</i>&nbsp;//        }
+<i>128</i>&nbsp;
+<b class="nc"><i>129</i>&nbsp;        final SpeciesTreePrior popInfo = speciesTreePriorInput.get();</b>
+<b class="nc"><i>130</i>&nbsp;        isConstantPopFunction = popInfo.popFunctionInput.get();</b>
+<b class="nc"><i>131</i>&nbsp;        popSizesBottom = popInfo.popSizesBottomInput.get();</b>
+<b class="nc"><i>132</i>&nbsp;        popSizesTop = popInfo.popSizesTopInput.get();</b>
+<i>133</i>&nbsp;
+<b class="nc"><i>134</i>&nbsp;        assert( ! (isConstantPopFunction == TreePopSizeFunction.linear &amp;&amp; treeTopFinderInput.get() == null ) );</b>
+<i>135</i>&nbsp;    }
+<i>136</i>&nbsp;
+<i>137</i>&nbsp;    /**
+<i>138</i>&nbsp;     * @param lineageID
+<i>139</i>&nbsp;     * @return species ID to which the lineage ID belongs according to the TaxonSets
+<i>140</i>&nbsp;     */
+<i>141</i>&nbsp;    String getSetID(final String lineageID) {
+<b class="nc"><i>142</i>&nbsp;        final TaxonSet taxonSuperset = speciesTreePriorInput.get().taxonSetInput.get();</b>
+<b class="nc"><i>143</i>&nbsp;        final List&lt;Taxon&gt; taxonSets = taxonSuperset.taxonsetInput.get();</b>
+<b class="nc"><i>144</i>&nbsp;        for (final Taxon taxonSet : taxonSets) {</b>
+<b class="nc"><i>145</i>&nbsp;            final List&lt;Taxon&gt; taxa = ((TaxonSet) taxonSet).taxonsetInput.get();</b>
+<b class="nc"><i>146</i>&nbsp;            for (final Taxon aTaxa : taxa) {</b>
+<b class="nc"><i>147</i>&nbsp;                if (aTaxa.getID().equals(lineageID)) {</b>
+<b class="nc"><i>148</i>&nbsp;                    return taxonSet.getID();</b>
+<i>149</i>&nbsp;                }
+<b class="nc"><i>150</i>&nbsp;            }</b>
+<b class="nc"><i>151</i>&nbsp;        }</b>
+<b class="nc"><i>152</i>&nbsp;        return null;</b>
+<i>153</i>&nbsp;    }
+<i>154</i>&nbsp;
+<i>155</i>&nbsp;    @Override
+<i>156</i>&nbsp;    public double calculateLogP() {
+<b class="nc"><i>157</i>&nbsp;        logP = 0;</b>
+<b class="nc"><i>158</i>&nbsp;        for (final PriorityQueue&lt;Double&gt; m_interval : intervalsInput) {</b>
+<b class="nc"><i>159</i>&nbsp;            m_interval.clear();</b>
+<i>160</i>&nbsp;        }
+<i>161</i>&nbsp;
+<b class="nc"><i>162</i>&nbsp;        Arrays.fill(nrOfLineages, 0);</b>
+<i>163</i>&nbsp;
+<b class="nc"><i>164</i>&nbsp;        final TreeInterface stree = speciesTreeInput.get();</b>
+<b class="nc"><i>165</i>&nbsp;        final Node[] speciesNodes = stree.getNodesAsArray();</b>
+<i>166</i>&nbsp;
+<b class="nc"><i>167</i>&nbsp;        traverseLineageTree(speciesNodes, treeInput.get().getRoot());</b>
+<i>168</i>&nbsp;//		System.err.println(getID());
+<i>169</i>&nbsp;//		for (int i = 0; i &lt; m_intervals.length; i++) {
+<i>170</i>&nbsp;//			System.err.println(m_intervals[i]);
+<i>171</i>&nbsp;//		}
+<i>172</i>&nbsp;        // if the gene tree does not fit the species tree, logP = -infinity by now
+<b class="nc"><i>173</i>&nbsp;        if (logP == 0) {</b>
+<b class="nc"><i>174</i>&nbsp;            traverseSpeciesTree(stree.getRoot());</b>
+<i>175</i>&nbsp;        }
+<i>176</i>&nbsp;//		System.err.println(&quot;logp=&quot; + logP);
+<b class="nc"><i>177</i>&nbsp;        return logP;</b>
+<i>178</i>&nbsp;    }
+<i>179</i>&nbsp;
+<i>180</i>&nbsp;    /**
+<i>181</i>&nbsp;     * calculate contribution to logP for each of the branches of the species tree
+<i>182</i>&nbsp;     *
+<i>183</i>&nbsp;     * @param node*
+<i>184</i>&nbsp;     */
+<i>185</i>&nbsp;    private void traverseSpeciesTree(final Node node) {
+<b class="nc"><i>186</i>&nbsp;        if (!node.isLeaf()) {</b>
+<b class="nc"><i>187</i>&nbsp;            traverseSpeciesTree(node.getLeft());</b>
+<b class="nc"><i>188</i>&nbsp;            traverseSpeciesTree(node.getRight());</b>
+<i>189</i>&nbsp;        }
+<i>190</i>&nbsp;        // calculate contribution of a branch in the species tree to the log probability
+<b class="nc"><i>191</i>&nbsp;        final int nodeIndex = node.getNr();</b>
+<i>192</i>&nbsp;
+<i>193</i>&nbsp;        // k, as defined in the paper
+<i>194</i>&nbsp;        //System.err.println(Arrays.toString(m_nLineages));
+<b class="nc"><i>195</i>&nbsp;        final int k = intervalsInput[nodeIndex].size();</b>
+<b class="nc"><i>196</i>&nbsp;        final double[] times = new double[k + 2];</b>
+<b class="nc"><i>197</i>&nbsp;        times[0] = node.getHeight();</b>
+<b class="nc"><i>198</i>&nbsp;        for (int i = 1; i &lt;= k; i++) {</b>
+<b class="nc"><i>199</i>&nbsp;            times[i] = intervalsInput[nodeIndex].poll();</b>
+<i>200</i>&nbsp;        }
+<b class="nc"><i>201</i>&nbsp;        if (!node.isRoot()) {</b>
+<b class="nc"><i>202</i>&nbsp;            times[k + 1] = node.getParent().getHeight();</b>
+<i>203</i>&nbsp;        } else {
+<b class="nc"><i>204</i>&nbsp;            if (isConstantPopFunction == TreePopSizeFunction.linear) {</b>
+<b class="nc"><i>205</i>&nbsp;                times[k + 1] = treeTopFinderInput.get().getHighestTreeHeight();</b>
+<i>206</i>&nbsp;            } else {
+<b class="nc"><i>207</i>&nbsp;                times[k + 1] = Math.max(node.getHeight(), treeInput.get().getRoot().getHeight());</b>
+<i>208</i>&nbsp;            }
+<i>209</i>&nbsp;        }
+<i>210</i>&nbsp;        // sanity check
+<b class="nc"><i>211</i>&nbsp;        for (int i = 0; i &lt;= k; i++) {</b>
+<b class="nc"><i>212</i>&nbsp;            if (times[i] &gt; times[i + 1]) {</b>
+<b class="nc"><i>213</i>&nbsp;            	Log.warning.println(&quot;invalid times&quot;);</b>
+<b class="nc"><i>214</i>&nbsp;                calculateLogP();</b>
+<i>215</i>&nbsp;            }
+<i>216</i>&nbsp;        }
+<i>217</i>&nbsp;
+<b class="nc"><i>218</i>&nbsp;        final int lineagesBottom = nrOfLineages[nodeIndex];</b>
+<i>219</i>&nbsp;
+<b class="nc"><i>220</i>&nbsp;        switch (isConstantPopFunction) {</b>
+<i>221</i>&nbsp;            case constant:
+<b class="nc"><i>222</i>&nbsp;                calcConstantPopSizeContribution(lineagesBottom, popSizesBottom.getValue(nodeIndex), times, k);</b>
+<b class="nc"><i>223</i>&nbsp;                break;</b>
+<i>224</i>&nbsp;            case linear:
+<b class="nc"><i>225</i>&nbsp;                logP += calcLinearPopSizeContributionJH(lineagesBottom, nodeIndex, times, k, node);</b>
+<b class="nc"><i>226</i>&nbsp;                break;</b>
+<i>227</i>&nbsp;            case linear_with_constant_root:
+<b class="nc"><i>228</i>&nbsp;                if (node.isRoot()) {</b>
+<b class="nc"><i>229</i>&nbsp;                    final double popSize = getTopPopSize(node.getLeft().getNr()) + getTopPopSize(node.getRight().getNr());</b>
+<b class="nc"><i>230</i>&nbsp;                    calcConstantPopSizeContribution(lineagesBottom, popSize, times, k);</b>
+<b class="nc"><i>231</i>&nbsp;                } else {</b>
+<b class="nc"><i>232</i>&nbsp;                    logP += calcLinearPopSizeContribution(lineagesBottom, nodeIndex, times, k, node);</b>
+<i>233</i>&nbsp;                }
+<i>234</i>&nbsp;                break;
+<i>235</i>&nbsp;        }
+<i>236</i>&nbsp;    }
+<i>237</i>&nbsp;
+<i>238</i>&nbsp;    /* the contribution of a branch in the species tree to
+<i>239</i>&nbsp;      * the log probability, for constant population function.
+<i>240</i>&nbsp;      */
+<i>241</i>&nbsp;    private void calcConstantPopSizeContribution(final int lineagesBottom, final double popSize2,
+<i>242</i>&nbsp;                                                 final double[] times, final int k) {
+<b class="nc"><i>243</i>&nbsp;        final double popSize = popSize2 * ploidy;</b>
+<b class="nc"><i>244</i>&nbsp;        logP += -k * Math.log(popSize);</b>
+<i>245</i>&nbsp;//		System.err.print(logP);
+<b class="nc"><i>246</i>&nbsp;        for (int i = 0; i &lt;= k; i++) {</b>
+<b class="nc"><i>247</i>&nbsp;            logP += -((lineagesBottom - i) * (lineagesBottom - i - 1.0) / 2.0) * (times[i + 1] - times[i]) / popSize;</b>
+<i>248</i>&nbsp;        }
+<i>249</i>&nbsp;//		System.err.println(&quot; &quot; + logP + &quot; &quot; + Arrays.toString(times) + &quot; &quot; + nodeIndex + &quot; &quot; + k);
+<i>250</i>&nbsp;    }
+<i>251</i>&nbsp;
+<i>252</i>&nbsp;    /* the contribution of a branch in the species tree to
+<i>253</i>&nbsp;      * the log probability, for linear population function.
+<i>254</i>&nbsp;      */
+<i>255</i>&nbsp;    private double calcLinearPopSizeContribution(final int lineagesBottom, final int nodeIndex, final double[] times,
+<i>256</i>&nbsp;                                                 final int k, final Node node) {
+<b class="nc"><i>257</i>&nbsp;        double lp = 0.0;</b>
+<i>258</i>&nbsp;        final double popSizeBottom;
+<b class="nc"><i>259</i>&nbsp;        if (node.isLeaf()) {</b>
+<b class="nc"><i>260</i>&nbsp;            popSizeBottom = popSizesBottom.getValue(nodeIndex) * ploidy;</b>
+<i>261</i>&nbsp;        } else {
+<i>262</i>&nbsp;            // use sum of left and right child branches for internal nodes
+<b class="nc"><i>263</i>&nbsp;            popSizeBottom = (getTopPopSize(node.getLeft().getNr()) + getTopPopSize(node.getRight().getNr())) * ploidy;</b>
+<i>264</i>&nbsp;        }
+<b class="nc"><i>265</i>&nbsp;        final double popSizeTop = getTopPopSize(nodeIndex) * ploidy;</b>
+<b class="nc"><i>266</i>&nbsp;        final double a = (popSizeTop - popSizeBottom) / (times[k + 1] - times[0]);</b>
+<b class="nc"><i>267</i>&nbsp;        final double b = popSizeBottom;</b>
+<b class="nc"><i>268</i>&nbsp;        for (int i = 0; i &lt; k; i++) {</b>
+<i>269</i>&nbsp;            //double popSize = popSizeBottom + (popSizeTop-popSizeBottom) * times[i+1]/(times[k]-times[0]);
+<b class="nc"><i>270</i>&nbsp;            final double popSize = a * (times[i + 1] - times[0]) + b;</b>
+<b class="nc"><i>271</i>&nbsp;            lp += -Math.log(popSize);</b>
+<i>272</i>&nbsp;        }
+<b class="nc"><i>273</i>&nbsp;        for (int i = 0; i &lt;= k; i++) {</b>
+<b class="nc"><i>274</i>&nbsp;            if (Math.abs(popSizeTop - popSizeBottom) &lt; 1e-10) {</b>
+<i>275</i>&nbsp;                // slope = 0, so population function is constant
+<b class="nc"><i>276</i>&nbsp;                final double popSize = a * (times[i + 1] - times[0]) + b;</b>
+<b class="nc"><i>277</i>&nbsp;                lp += -((lineagesBottom - i) * (lineagesBottom - i - 1.0) / 2.0) * (times[i + 1] - times[i]) / popSize;</b>
+<b class="nc"><i>278</i>&nbsp;            } else {</b>
+<b class="nc"><i>279</i>&nbsp;                final double f = (a * (times[i + 1] - times[0]) + b) / (a * (times[i] - times[0]) + b);</b>
+<b class="nc"><i>280</i>&nbsp;                lp += -((lineagesBottom - i) * (lineagesBottom - i - 1.0) / 2.0) * Math.log(f) / a;</b>
+<i>281</i>&nbsp;            }
+<i>282</i>&nbsp;        }
+<b class="nc"><i>283</i>&nbsp;        return lp;</b>
+<i>284</i>&nbsp;    }
+<i>285</i>&nbsp;
+<i>286</i>&nbsp;    private double calcLinearPopSizeContributionJH(final int lineagesBottom, final int nodeIndex, final double[] times,
+<i>287</i>&nbsp;                                                   final int k, final Node node) {
+<b class="nc"><i>288</i>&nbsp;        double lp = 0.0;</b>
+<i>289</i>&nbsp;        double popSizeBottom;
+<b class="nc"><i>290</i>&nbsp;        if (node.isLeaf()) {</b>
+<b class="nc"><i>291</i>&nbsp;            popSizeBottom = popSizesBottom.getValue(nodeIndex);</b>
+<i>292</i>&nbsp;        } else {
+<i>293</i>&nbsp;            // use sum of left and right child branches for internal nodes
+<b class="nc"><i>294</i>&nbsp;            popSizeBottom = (getTopPopSize(node.getLeft().getNr()) + getTopPopSize(node.getRight().getNr()));</b>
+<i>295</i>&nbsp;        }
+<b class="nc"><i>296</i>&nbsp;        popSizeBottom *= ploidy;</b>
+<i>297</i>&nbsp;
+<b class="nc"><i>298</i>&nbsp;        final double popSizeTop = getTopPopSize(nodeIndex) * ploidy;</b>
+<b class="nc"><i>299</i>&nbsp;        final double d5 = popSizeTop - popSizeBottom;</b>
+<b class="nc"><i>300</i>&nbsp;        final double time0 = times[0];</b>
+<b class="nc"><i>301</i>&nbsp;        final double a = d5 / (times[k + 1] - time0);</b>
+<b class="nc"><i>302</i>&nbsp;        final double b = popSizeBottom;</b>
+<i>303</i>&nbsp;
+<b class="nc"><i>304</i>&nbsp;        if (Math.abs(d5) &lt; 1e-10) {</b>
+<i>305</i>&nbsp;            // use approximation for small values to bypass numerical instability
+<b class="nc"><i>306</i>&nbsp;            for (int i = 0; i &lt;= k; i++) {</b>
+<b class="nc"><i>307</i>&nbsp;                final double timeip1 = times[i + 1];</b>
+<b class="nc"><i>308</i>&nbsp;                final double popSize = a * (timeip1 - time0) + b;</b>
+<b class="nc"><i>309</i>&nbsp;                if( i &lt; k ) {</b>
+<b class="nc"><i>310</i>&nbsp;                  lp += -Math.log(popSize);</b>
+<i>311</i>&nbsp;                }
+<i>312</i>&nbsp;                // slope = 0, so population function is constant
+<i>313</i>&nbsp;
+<b class="nc"><i>314</i>&nbsp;                final int i1 = lineagesBottom - i;</b>
+<b class="nc"><i>315</i>&nbsp;                lp -= (i1 * (i1 - 1.0) / 2.0) * (timeip1 - times[i]) / popSize;</b>
+<i>316</i>&nbsp;            }
+<i>317</i>&nbsp;        } else {
+<b class="nc"><i>318</i>&nbsp;            final double vv = b - a * time0;</b>
+<b class="nc"><i>319</i>&nbsp;            for (int i = 0; i &lt;= k; i++) {</b>
+<b class="nc"><i>320</i>&nbsp;                final double popSize = a * times[i + 1] + vv;</b>
+<b class="nc"><i>321</i>&nbsp;                if( i &lt; k ) {</b>
+<b class="nc"><i>322</i>&nbsp;                  lp += -Math.log(popSize);</b>
+<i>323</i>&nbsp;                }
+<b class="nc"><i>324</i>&nbsp;                final double f = popSize / (a * times[i] + vv);</b>
+<i>325</i>&nbsp;
+<b class="nc"><i>326</i>&nbsp;                final int i1 = lineagesBottom - i;</b>
+<b class="nc"><i>327</i>&nbsp;                lp += -(i1 * (i1 - 1.0) / 2.0) * Math.log(f) / a;</b>
+<i>328</i>&nbsp;            }
+<i>329</i>&nbsp;        }
+<b class="nc"><i>330</i>&nbsp;        return lp;</b>
+<i>331</i>&nbsp;    }
+<i>332</i>&nbsp;
+<i>333</i>&nbsp;    /**
+<i>334</i>&nbsp;     * collect intervals for each of the branches of the species tree
+<i>335</i>&nbsp;     * as defined by the lineage tree.
+<i>336</i>&nbsp;     *
+<i>337</i>&nbsp;     * @param speciesNodes
+<i>338</i>&nbsp;     * @param node
+<i>339</i>&nbsp;     * @return
+<i>340</i>&nbsp;     */
+<i>341</i>&nbsp;    private int traverseLineageTree(final Node[] speciesNodes, final Node node) {
+<b class="nc"><i>342</i>&nbsp;        if (node.isLeaf()) {</b>
+<b class="nc"><i>343</i>&nbsp;            final int species = nrOfLineageToSpeciesMap[node.getNr()];</b>
+<b class="nc"><i>344</i>&nbsp;            nrOfLineages[species]++;</b>
+<b class="nc"><i>345</i>&nbsp;            return species;</b>
+<i>346</i>&nbsp;        } else {
+<b class="nc"><i>347</i>&nbsp;            int speciesLeft = traverseLineageTree(speciesNodes, node.getLeft());</b>
+<b class="nc"><i>348</i>&nbsp;            int speciesRight = traverseLineageTree(speciesNodes, node.getRight());</b>
+<b class="nc"><i>349</i>&nbsp;            final double height = node.getHeight();</b>
+<i>350</i>&nbsp;
+<b class="nc"><i>351</i>&nbsp;            while (!speciesNodes[speciesLeft].isRoot() &amp;&amp; height &gt; speciesNodes[speciesLeft].getParent().getHeight()) {</b>
+<b class="nc"><i>352</i>&nbsp;                speciesLeft = speciesNodes[speciesLeft].getParent().getNr();</b>
+<b class="nc"><i>353</i>&nbsp;                nrOfLineages[speciesLeft]++;</b>
+<i>354</i>&nbsp;            }
+<b class="nc"><i>355</i>&nbsp;            while (!speciesNodes[speciesRight].isRoot() &amp;&amp; height &gt; speciesNodes[speciesRight].getParent().getHeight()) {</b>
+<b class="nc"><i>356</i>&nbsp;                speciesRight = speciesNodes[speciesRight].getParent().getNr();</b>
+<b class="nc"><i>357</i>&nbsp;                nrOfLineages[speciesRight]++;</b>
+<i>358</i>&nbsp;            }
+<i>359</i>&nbsp;            // validity check
+<b class="nc"><i>360</i>&nbsp;            if (speciesLeft != speciesRight) {</b>
+<i>361</i>&nbsp;                // if we got here, it means the gene tree does
+<i>362</i>&nbsp;                // not fit in the species tree
+<b class="nc"><i>363</i>&nbsp;                logP = Double.NEGATIVE_INFINITY;</b>
+<i>364</i>&nbsp;            }
+<b class="nc"><i>365</i>&nbsp;            intervalsInput[speciesRight].add(height);</b>
+<b class="nc"><i>366</i>&nbsp;            return speciesRight;</b>
+<i>367</i>&nbsp;        }
+<i>368</i>&nbsp;    }
+<i>369</i>&nbsp;
+<i>370</i>&nbsp;    /* return population size at top. For linear with constant root, there is no
+<i>371</i>&nbsp;      * entry for the root. An internal node can have the number equal to dimension
+<i>372</i>&nbsp;      * of m_fPopSizesTop, then the root node can be numbered with a lower number
+<i>373</i>&nbsp;      * and we can use that entry in m_fPopSizesTop for the rogue internal node.
+<i>374</i>&nbsp;      */
+<i>375</i>&nbsp;    private double getTopPopSize(final int nodeIndex) {
+<b class="nc"><i>376</i>&nbsp;        if (nodeIndex &lt; popSizesTop.getDimension()) {</b>
+<b class="nc"><i>377</i>&nbsp;            return popSizesTop.getArrayValue(nodeIndex);</b>
+<i>378</i>&nbsp;        }
+<b class="nc"><i>379</i>&nbsp;        return popSizesTop.getArrayValue(speciesTreeInput.get().getRoot().getNr());</b>
+<i>380</i>&nbsp;    }
+<i>381</i>&nbsp;
+<i>382</i>&nbsp;
+<i>383</i>&nbsp;    @Override
+<i>384</i>&nbsp;    public boolean requiresRecalculation() {
+<i>385</i>&nbsp;        // TODO: check whether this is worth optimising?
+<b class="nc"><i>386</i>&nbsp;        return true;</b>
+<i>387</i>&nbsp;    }
+<i>388</i>&nbsp;
+<i>389</i>&nbsp;    @Override
+<i>390</i>&nbsp;    public List&lt;String&gt; getArguments() {
+<b class="nc"><i>391</i>&nbsp;        return null;</b>
+<i>392</i>&nbsp;    }
+<i>393</i>&nbsp;
+<i>394</i>&nbsp;    @Override
+<i>395</i>&nbsp;    public List&lt;String&gt; getConditions() {
+<b class="nc"><i>396</i>&nbsp;        return null;</b>
+<i>397</i>&nbsp;    }
+<i>398</i>&nbsp;
+<i>399</i>&nbsp;    @Override
+<i>400</i>&nbsp;    public void sample(final State state, final Random random) {
+<i>401</i>&nbsp;    }
+<i>402</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,719 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: LogCombiner</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.tools</a> ]
+</div>
+
+<h1>Coverage Summary for Class: LogCombiner (beast.app.tools)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LogCombiner</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 366)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LogCombiner$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    8.3%
+  </span>
+  <span class="absValue">
+    (1/ 12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0.3%
+  </span>
+  <span class="absValue">
+    (1/ 367)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.tools;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import java.io.BufferedReader;
+<i>5</i>&nbsp;import java.io.File;
+<i>6</i>&nbsp;import java.io.FileNotFoundException;
+<i>7</i>&nbsp;import java.io.FileReader;
+<i>8</i>&nbsp;import java.io.IOException;
+<i>9</i>&nbsp;import java.io.PrintStream;
+<i>10</i>&nbsp;import java.text.DecimalFormat;
+<i>11</i>&nbsp;import java.text.DecimalFormatSymbols;
+<i>12</i>&nbsp;import java.util.ArrayList;
+<i>13</i>&nbsp;import java.util.Arrays;
+<i>14</i>&nbsp;import java.util.List;
+<i>15</i>&nbsp;import java.util.Locale;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;import javax.swing.JFrame;
+<i>18</i>&nbsp;import javax.swing.table.TableCellEditor;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;import beast.app.BEASTVersion2;
+<i>21</i>&nbsp;import beast.app.util.Utils;
+<i>22</i>&nbsp;import beast.core.util.Log;
+<i>23</i>&nbsp;import beast.util.LogAnalyser;
+<i>24</i>&nbsp;import jam.console.ConsoleApplication;
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;/**
+<i>28</i>&nbsp; * combines log files produced by a ParticleFilter for
+<i>29</i>&nbsp; * combined analysis*
+<i>30</i>&nbsp; */
+<b class="nc"><i>31</i>&nbsp;public class LogCombiner extends LogAnalyser {</b>
+<i>32</i>&nbsp;
+<b class="nc"><i>33</i>&nbsp;    List&lt;String&gt; m_sLogFileName = new ArrayList&lt;&gt;();</b>
+<i>34</i>&nbsp;    String m_sParticleDir;
+<b class="nc"><i>35</i>&nbsp;    int m_nParticles = -1;</b>
+<i>36</i>&nbsp;    String m_sFileOut;
+<b class="nc"><i>37</i>&nbsp;    PrintStream m_out = System.out;</b>
+<b class="nc"><i>38</i>&nbsp;    int m_nBurninPercentage = 10;</b>
+<i>39</i>&nbsp;
+<b class="nc"><i>40</i>&nbsp;    private boolean preAmpleIsPrinted = false;</b>
+<b class="nc"><i>41</i>&nbsp;    private int columnCount = -1;</b>
+<i>42</i>&nbsp;
+<b class="nc"><i>43</i>&nbsp;    boolean m_bIsTreeLog = false;</b>
+<i>44</i>&nbsp;    List&lt;String&gt; m_sTrees;
+<i>45</i>&nbsp;    // Sample interval as it appears in the combined log file.
+<i>46</i>&nbsp;    // To use the interval of the log files, use the -renumber option
+<b class="nc"><i>47</i>&nbsp;    int m_nSampleInterval = 1;</b>
+<i>48</i>&nbsp;    // whether to use decimal or scientific format to print doubles
+<b class="nc"><i>49</i>&nbsp;    boolean m_bUseDecimalFormat = false;</b>
+<b class="nc"><i>50</i>&nbsp;    DecimalFormat format = new DecimalFormat(&quot;#.############E0&quot;, new DecimalFormatSymbols(Locale.US));</b>
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;    // resample the log files to this frequency (the original sampling frequency must be a factor of this value)
+<b class="nc"><i>53</i>&nbsp;    int m_nResample = 1;</b>
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;    private void parseArgs(String[] args) {
+<b class="nc"><i>56</i>&nbsp;        int i = 0;</b>
+<b class="nc"><i>57</i>&nbsp;        format = new DecimalFormat(&quot;#.############E0&quot;, new DecimalFormatSymbols(Locale.US));</b>
+<b class="nc"><i>58</i>&nbsp;        m_sLogFileName = new ArrayList&lt;&gt;();</b>
+<i>59</i>&nbsp;        try {
+<b class="nc"><i>60</i>&nbsp;            while (i &lt; args.length) {</b>
+<b class="nc"><i>61</i>&nbsp;                int old = i;</b>
+<b class="nc"><i>62</i>&nbsp;                if (i &lt; args.length) {</b>
+<b class="nc"><i>63</i>&nbsp;                    if (args[i].equals(&quot;&quot;)) {</b>
+<b class="nc"><i>64</i>&nbsp;                        i += 1;</b>
+<b class="nc"><i>65</i>&nbsp;                    } else if (args[i].equals(&quot;-help&quot;) || args[i].equals(&quot;-h&quot;) || args[i].equals(&quot;--help&quot;)) {</b>
+<b class="nc"><i>66</i>&nbsp;                        Log.info.println(getUsage());</b>
+<b class="nc"><i>67</i>&nbsp;                        System.exit(0);</b>
+<b class="nc"><i>68</i>&nbsp;                    } else if (args[i].equals(&quot;-o&quot;)) {</b>
+<b class="nc"><i>69</i>&nbsp;                        m_sFileOut = args[i + 1];</b>
+<b class="nc"><i>70</i>&nbsp;                        m_out = new PrintStream(m_sFileOut);</b>
+<b class="nc"><i>71</i>&nbsp;                        i += 2;</b>
+<b class="nc"><i>72</i>&nbsp;                    } else if (args[i].equals(&quot;-b&quot;) || args[i].equals(&quot;-burnin&quot;) || args[i].equals(&quot;--burnin&quot;)) {</b>
+<b class="nc"><i>73</i>&nbsp;                        m_nBurninPercentage = Integer.parseInt(args[i + 1]);</b>
+<b class="nc"><i>74</i>&nbsp;                        if (m_nBurninPercentage &lt; 0 || m_nBurninPercentage &gt; 100) {</b>
+<b class="nc"><i>75</i>&nbsp;                        	Log.err.println(&quot;Error: Burn-in percentage must be between 0 and 100.&quot;);</b>
+<b class="nc"><i>76</i>&nbsp;                            System.exit(1);</b>
+<i>77</i>&nbsp;                        }
+<b class="nc"><i>78</i>&nbsp;                        i += 2;</b>
+<b class="nc"><i>79</i>&nbsp;                    } else if (args[i].equals(&quot;-n&quot;)) {</b>
+<b class="nc"><i>80</i>&nbsp;                        m_nParticles = Integer.parseInt(args[i + 1]);</b>
+<b class="nc"><i>81</i>&nbsp;                        i += 2;</b>
+<b class="nc"><i>82</i>&nbsp;                    } else if (args[i].equals(&quot;-log&quot;)) {</b>
+<b class="nc"><i>83</i>&nbsp;                        m_sLogFileName.add(args[i + 1]);</b>
+<b class="nc"><i>84</i>&nbsp;                        i += 2;</b>
+<b class="nc"><i>85</i>&nbsp;                        while (i &lt; args.length &amp;&amp; !args[i].startsWith(&quot;-&quot;)) {</b>
+<b class="nc"><i>86</i>&nbsp;                            m_sLogFileName.add(args[i++]);</b>
+<i>87</i>&nbsp;                        }
+<b class="nc"><i>88</i>&nbsp;                    } else if (args[i].equals(&quot;-dir&quot;)) {</b>
+<b class="nc"><i>89</i>&nbsp;                        m_sParticleDir = args[i + 1];</b>
+<b class="nc"><i>90</i>&nbsp;                        i += 2;</b>
+<b class="nc"><i>91</i>&nbsp;                    } else if (args[i].equals(&quot;-decimal&quot;)) {</b>
+<b class="nc"><i>92</i>&nbsp;                        m_bUseDecimalFormat = true;</b>
+<b class="nc"><i>93</i>&nbsp;                        format = new DecimalFormat(&quot;#.############&quot;, new DecimalFormatSymbols(Locale.US));</b>
+<b class="nc"><i>94</i>&nbsp;                        i++;</b>
+<b class="nc"><i>95</i>&nbsp;                    } else if (args[i].equals(&quot;-resample&quot;)) {</b>
+<b class="nc"><i>96</i>&nbsp;                        m_nResample = Integer.parseInt(args[i + 1]);</b>
+<b class="nc"><i>97</i>&nbsp;                        i += 2;</b>
+<b class="nc"><i>98</i>&nbsp;                    } else if (args[i].equals(&quot;-renumber&quot;)) {</b>
+<b class="nc"><i>99</i>&nbsp;                        m_nSampleInterval = -1;</b>
+<b class="nc"><i>100</i>&nbsp;                        i++;</b>
+<i>101</i>&nbsp;                    }
+<b class="nc"><i>102</i>&nbsp;                    if (i == old) {</b>
+<b class="nc"><i>103</i>&nbsp;                        throw new IllegalArgumentException(&quot;Unrecognised argument&quot;);</b>
+<i>104</i>&nbsp;                    }
+<i>105</i>&nbsp;                }
+<b class="nc"><i>106</i>&nbsp;            }</b>
+<b class="nc"><i>107</i>&nbsp;        } catch (IllegalArgumentException e) {</b>
+<b class="nc"><i>108</i>&nbsp;        	throw e;</b>
+<b class="nc"><i>109</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>110</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>111</i>&nbsp;            throw new IllegalArgumentException(&quot;Error parsing command line arguments: &quot; + Arrays.toString(args) + &quot;\nArguments ignored\n\n&quot; + getUsage());</b>
+<b class="nc"><i>112</i>&nbsp;        }</b>
+<b class="nc"><i>113</i>&nbsp;    }</b>
+<i>114</i>&nbsp;
+<i>115</i>&nbsp;
+<i>116</i>&nbsp;    /**
+<i>117</i>&nbsp;     * data from log file with burn-in removed *
+<i>118</i>&nbsp;     */
+<i>119</i>&nbsp;    Double[][] m_fCombinedTraces;
+<i>120</i>&nbsp;
+<i>121</i>&nbsp;    private void combineParticleLogs() {
+<b class="nc"><i>122</i>&nbsp;        List&lt;String&gt; logs = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>123</i>&nbsp;        for (int i = 0; i &lt; m_nParticles; i++) {</b>
+<b class="nc"><i>124</i>&nbsp;            String dirName = m_sParticleDir + &quot;/particle&quot; + i;</b>
+<b class="nc"><i>125</i>&nbsp;            File dir = new File(dirName);</b>
+<b class="nc"><i>126</i>&nbsp;            if (!dir.exists() || !dir.isDirectory()) {</b>
+<b class="nc"><i>127</i>&nbsp;                throw new IllegalArgumentException(&quot;Could not process particle &quot; + i + &quot;. Expected &quot; + dirName + &quot; to be a directory, but it is not.&quot;);</b>
+<i>128</i>&nbsp;            }
+<b class="nc"><i>129</i>&nbsp;            logs.add(dirName + &quot;/&quot; + m_sLogFileName.get(0));</b>
+<i>130</i>&nbsp;        }
+<b class="nc"><i>131</i>&nbsp;        int[] burnIns = new int[logs.size()];</b>
+<b class="nc"><i>132</i>&nbsp;        Arrays.fill(burnIns, m_nBurninPercentage);</b>
+<i>133</i>&nbsp;        try {
+<b class="nc"><i>134</i>&nbsp;			combineLogs(logs.toArray(new String[0]), burnIns);</b>
+<b class="nc"><i>135</i>&nbsp;		} catch (IOException e) {</b>
+<b class="nc"><i>136</i>&nbsp;			e.printStackTrace();</b>
+<b class="nc"><i>137</i>&nbsp;			throw new IllegalArgumentException(e.getMessage());</b>
+<b class="nc"><i>138</i>&nbsp;		}</b>
+<b class="nc"><i>139</i>&nbsp;    }</b>
+<i>140</i>&nbsp;
+<i>141</i>&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+<i>142</i>&nbsp;	protected long readLogFile(String fileName, int burnInPercentage, long state) throws IOException {
+<b class="nc"><i>143</i>&nbsp;        log(&quot;\nLoading &quot; + fileName);</b>
+<b class="nc"><i>144</i>&nbsp;        BufferedReader fin = new BufferedReader(new FileReader(fileName));</b>
+<i>145</i>&nbsp;        String str;
+<b class="nc"><i>146</i>&nbsp;        m_sPreAmble = &quot;&quot;;</b>
+<b class="nc"><i>147</i>&nbsp;        m_sLabels = null;</b>
+<b class="nc"><i>148</i>&nbsp;        int data = 0;</b>
+<i>149</i>&nbsp;        // first, sweep through the log file to determine size of the log
+<b class="nc"><i>150</i>&nbsp;        while (fin.ready()) {</b>
+<b class="nc"><i>151</i>&nbsp;            str = fin.readLine();</b>
+<b class="nc"><i>152</i>&nbsp;            if (str.indexOf(&#39;#&#39;) &lt; 0 &amp;&amp; str.matches(&quot;.*[0-9a-zA-Z].*&quot;)) {</b>
+<b class="nc"><i>153</i>&nbsp;                if (m_sLabels == null)</b>
+<b class="nc"><i>154</i>&nbsp;                    m_sLabels = str.split(&quot;\\s&quot;);</b>
+<i>155</i>&nbsp;                else
+<b class="nc"><i>156</i>&nbsp;                    data++;</b>
+<i>157</i>&nbsp;            } else {
+<b class="nc"><i>158</i>&nbsp;                m_sPreAmble += str + &quot;\n&quot;;</b>
+<i>159</i>&nbsp;            }
+<i>160</i>&nbsp;        }
+<b class="nc"><i>161</i>&nbsp;        if (!preAmpleIsPrinted) {</b>
+<b class="nc"><i>162</i>&nbsp;        	m_out.print(m_sPreAmble);</b>
+<i>163</i>&nbsp;            // header
+<b class="nc"><i>164</i>&nbsp;            for (int i = 0; i &lt; m_sLabels.length; i++) {</b>
+<b class="nc"><i>165</i>&nbsp;                m_out.print(m_sLabels[i] + &quot;\t&quot;);</b>
+<i>166</i>&nbsp;            }
+<b class="nc"><i>167</i>&nbsp;            m_out.println();</b>
+<b class="nc"><i>168</i>&nbsp;        	preAmpleIsPrinted = true;</b>
+<i>169</i>&nbsp;        }
+<i>170</i>&nbsp;        
+<b class="nc"><i>171</i>&nbsp;        int lines = Math.max(1, data / 80);</b>
+<i>172</i>&nbsp;        // reserve memory
+<b class="nc"><i>173</i>&nbsp;        int items = m_sLabels.length;</b>
+<b class="nc"><i>174</i>&nbsp;        m_ranges = new List[items];</b>
+<b class="nc"><i>175</i>&nbsp;        int burnIn = data * burnInPercentage / 100;</b>
+<b class="nc"><i>176</i>&nbsp;        m_fTraces = new Double[items][data - burnIn];</b>
+<b class="nc"><i>177</i>&nbsp;        fin.close();</b>
+<b class="nc"><i>178</i>&nbsp;        fin = new BufferedReader(new FileReader(fileName));</b>
+<b class="nc"><i>179</i>&nbsp;        data = -burnIn - 1;</b>
+<b class="nc"><i>180</i>&nbsp;        logln(&quot;, burnin &quot; + burnInPercentage + &quot;%, skipping &quot; + burnIn + &quot; log lines\n\n&quot; + BAR);</b>
+<i>181</i>&nbsp;        // grab data from the log, ignoring burn in samples
+<b class="nc"><i>182</i>&nbsp;        long prevLogState = -1;</b>
+<b class="nc"><i>183</i>&nbsp;        while (fin.ready()) {</b>
+<b class="nc"><i>184</i>&nbsp;            str = fin.readLine();</b>
+<b class="nc"><i>185</i>&nbsp;            if (str.indexOf(&#39;#&#39;) &lt; 0 &amp;&amp; str.matches(&quot;[0-9].*&quot;)) {</b>
+<b class="nc"><i>186</i>&nbsp;                data++;</b>
+<b class="nc"><i>187</i>&nbsp;                if (data &gt;= 0) {</b>
+<b class="nc"><i>188</i>&nbsp;                	String [] strs = str.split(&quot;\\s&quot;);</b>
+<b class="nc"><i>189</i>&nbsp;                	long logState = Long.parseLong(strs[0]);</b>
+<b class="nc"><i>190</i>&nbsp;                    if (m_nSampleInterval &lt; 0 &amp;&amp; prevLogState &gt;= 0) {</b>
+<i>191</i>&nbsp;                        // need to renumber
+<b class="nc"><i>192</i>&nbsp;                        m_nSampleInterval = (int) (logState - prevLogState);</b>
+<i>193</i>&nbsp;                    }
+<b class="nc"><i>194</i>&nbsp;                    prevLogState = logState;</b>
+<b class="nc"><i>195</i>&nbsp;                    if (columnCount != strs.length) {</b>
+<b class="nc"><i>196</i>&nbsp;                    	if (columnCount &lt; 0) {</b>
+<b class="nc"><i>197</i>&nbsp;                    		columnCount = strs.length;</b>
+<i>198</i>&nbsp;                    	} else {
+<b class="nc"><i>199</i>&nbsp;                            fin.close();</b>
+<b class="nc"><i>200</i>&nbsp;                            throw new IllegalArgumentException(&quot;ERROR: The number of columns in file &quot; + fileName + &quot; does not match that of the first file&quot;);</b>
+<i>201</i>&nbsp;                    	}
+<i>202</i>&nbsp;                    }
+<i>203</i>&nbsp;                	
+<b class="nc"><i>204</i>&nbsp;                	if (logState % m_nSampleInterval == 0 || m_nSampleInterval &lt; 0) {</b>
+<b class="nc"><i>205</i>&nbsp;	                	if (state &lt; 0) {</b>
+<b class="nc"><i>206</i>&nbsp;	                		state = 0;</b>
+<i>207</i>&nbsp;	                	} else {
+<b class="nc"><i>208</i>&nbsp;	                		state += m_nSampleInterval;</b>
+<i>209</i>&nbsp;	                	}
+<b class="nc"><i>210</i>&nbsp;	                	m_out.print(state + &quot;\t&quot;);</b>
+<b class="nc"><i>211</i>&nbsp;	                	for (int k = 1; k &lt; strs.length; k++) {</b>
+<b class="nc"><i>212</i>&nbsp;		                	if (m_bUseDecimalFormat &amp;&amp; strs[k].indexOf(&#39;.&#39;) &gt; 0) {</b>
+<b class="nc"><i>213</i>&nbsp;		                		double d = Double.parseDouble(strs[k]);</b>
+<b class="nc"><i>214</i>&nbsp;		                		m_out.print(format.format(d));</b>
+<b class="nc"><i>215</i>&nbsp;		                	} else {</b>
+<b class="nc"><i>216</i>&nbsp;		                		m_out.print(strs[k]);</b>
+<i>217</i>&nbsp;		                	}
+<b class="nc"><i>218</i>&nbsp;	                		m_out.print(&#39;\t&#39;);</b>
+<i>219</i>&nbsp;	                	}
+<b class="nc"><i>220</i>&nbsp;	                	m_out.println();</b>
+<i>221</i>&nbsp;                	}
+<i>222</i>&nbsp;                }
+<i>223</i>&nbsp;        	}
+<b class="nc"><i>224</i>&nbsp;            if (data % lines == 0) {</b>
+<b class="nc"><i>225</i>&nbsp;                log(&quot;*&quot;);</b>
+<i>226</i>&nbsp;            }
+<i>227</i>&nbsp;        }
+<b class="nc"><i>228</i>&nbsp;        logln(&quot;&quot;);</b>
+<b class="nc"><i>229</i>&nbsp;        fin.close();</b>
+<b class="nc"><i>230</i>&nbsp;        return state;</b>
+<i>231</i>&nbsp;    } // readLogFile
+<i>232</i>&nbsp;
+<i>233</i>&nbsp;
+<i>234</i>&nbsp;    private void combineLogs(String[] logs, int[] burbIns) throws IOException {
+<b class="nc"><i>235</i>&nbsp;    	preAmpleIsPrinted = false;</b>
+<b class="nc"><i>236</i>&nbsp;        log(&quot;Writing to file &quot; + m_sFileOut);</b>
+<i>237</i>&nbsp;        try {
+<b class="nc"><i>238</i>&nbsp;            m_out = new PrintStream(new File(m_sFileOut));</b>
+<b class="nc"><i>239</i>&nbsp;        } catch (FileNotFoundException e) {</b>
+<b class="nc"><i>240</i>&nbsp;            log(&quot;Could not open file &quot; + m_sFileOut + &quot; for writing: &quot; + e.getMessage());</b>
+<b class="nc"><i>241</i>&nbsp;            return;</b>
+<b class="nc"><i>242</i>&nbsp;        }</b>
+<i>243</i>&nbsp;
+<b class="nc"><i>244</i>&nbsp;        m_fCombinedTraces = null;</b>
+<i>245</i>&nbsp;        // process logs
+<b class="nc"><i>246</i>&nbsp;        int k = 0;</b>
+<b class="nc"><i>247</i>&nbsp;        long state = -1;</b>
+<b class="nc"><i>248</i>&nbsp;        for (String fileName : logs) {</b>
+<b class="nc"><i>249</i>&nbsp;            BufferedReader fin = new BufferedReader(new FileReader(fileName));</b>
+<b class="nc"><i>250</i>&nbsp;            String str = fin.readLine();</b>
+<b class="nc"><i>251</i>&nbsp;            if (str.toUpperCase().startsWith(&quot;#NEXUS&quot;)) {</b>
+<b class="nc"><i>252</i>&nbsp;                m_bIsTreeLog = true;</b>
+<b class="nc"><i>253</i>&nbsp;                state = readTreeLogFile(fileName, burbIns[k], state);</b>
+<i>254</i>&nbsp;            } else {
+<b class="nc"><i>255</i>&nbsp;                state = readLogFile(fileName, burbIns[k], state);</b>
+<i>256</i>&nbsp;            }
+<b class="nc"><i>257</i>&nbsp;            k++;</b>
+<b class="nc"><i>258</i>&nbsp;            fin.close();</b>
+<i>259</i>&nbsp;        }
+<b class="nc"><i>260</i>&nbsp;        m_out.close();</b>
+<b class="nc"><i>261</i>&nbsp;        log(&quot;Wrote &quot; + (state/m_nSampleInterval + 1) + &quot; lines to &quot; + m_sFileOut);</b>
+<b class="nc"><i>262</i>&nbsp;    }</b>
+<i>263</i>&nbsp;
+<i>264</i>&nbsp;    protected long readTreeLogFile(String fileName, int burnInPercentage, long state) throws IOException {
+<b class="nc"><i>265</i>&nbsp;        log(&quot;\nLoading &quot; + fileName);</b>
+<b class="nc"><i>266</i>&nbsp;        BufferedReader fin = new BufferedReader(new FileReader(fileName));</b>
+<b class="nc"><i>267</i>&nbsp;        String str = null;</b>
+<b class="nc"><i>268</i>&nbsp;        m_sPreAmble = &quot;&quot;;</b>
+<b class="nc"><i>269</i>&nbsp;        int data = 0;</b>
+<i>270</i>&nbsp;        // first, sweep through the log file to determine size of the log
+<b class="nc"><i>271</i>&nbsp;        while (fin.ready()) {</b>
+<b class="nc"><i>272</i>&nbsp;            str = fin.readLine();</b>
+<b class="nc"><i>273</i>&nbsp;            if (str.matches(&quot;^tree STATE.*&quot;)) {</b>
+<b class="nc"><i>274</i>&nbsp;                data++;</b>
+<i>275</i>&nbsp;            } else {
+<b class="nc"><i>276</i>&nbsp;                if (data == 0) {</b>
+<b class="nc"><i>277</i>&nbsp;                    m_sPreAmble += str + &quot;\n&quot;;</b>
+<i>278</i>&nbsp;                }
+<i>279</i>&nbsp;            }
+<i>280</i>&nbsp;        }
+<b class="nc"><i>281</i>&nbsp;        if (!preAmpleIsPrinted) {</b>
+<b class="nc"><i>282</i>&nbsp;        	m_out.println(m_sPreAmble);</b>
+<b class="nc"><i>283</i>&nbsp;        	preAmpleIsPrinted = true;</b>
+<i>284</i>&nbsp;        }
+<b class="nc"><i>285</i>&nbsp;        int lines = data / 80;</b>
+<i>286</i>&nbsp;        // reserve memory
+<b class="nc"><i>287</i>&nbsp;        int burnIn = data * burnInPercentage / 100;</b>
+<b class="nc"><i>288</i>&nbsp;        logln(&quot; skipping &quot; + burnIn + &quot; trees\n\n&quot; + BAR);</b>
+<b class="nc"><i>289</i>&nbsp;        if (m_sTrees == null) {</b>
+<b class="nc"><i>290</i>&nbsp;            m_sTrees = new ArrayList&lt;&gt;();</b>
+<i>291</i>&nbsp;        }
+<b class="nc"><i>292</i>&nbsp;        fin.close();</b>
+<b class="nc"><i>293</i>&nbsp;        fin = new BufferedReader(new FileReader(fileName));</b>
+<b class="nc"><i>294</i>&nbsp;        data = -burnIn - 1;</b>
+<i>295</i>&nbsp;
+<i>296</i>&nbsp;        // grab data from the log, ignoring burn in samples
+<b class="nc"><i>297</i>&nbsp;        long prevLogState = -1;</b>
+<b class="nc"><i>298</i>&nbsp;        while (fin.ready()) {</b>
+<b class="nc"><i>299</i>&nbsp;            str = fin.readLine();</b>
+<b class="nc"><i>300</i>&nbsp;            if (str.matches(&quot;^tree STATE_.*&quot;)) {</b>
+<b class="nc"><i>301</i>&nbsp;                if (++data &gt;= 0) {</b>
+<b class="nc"><i>302</i>&nbsp;                    String str2 = str.substring(11, str.indexOf(&quot;=&quot;)).trim();</b>
+<b class="nc"><i>303</i>&nbsp;                    str2 = str2.split(&quot;\\s&quot;)[0];</b>
+<b class="nc"><i>304</i>&nbsp;                    long logState = Long.parseLong(str2);</b>
+<b class="nc"><i>305</i>&nbsp;                    if (m_nSampleInterval &lt; 0 &amp;&amp; prevLogState &gt;= 0) {</b>
+<i>306</i>&nbsp;                        // need to renumber
+<b class="nc"><i>307</i>&nbsp;                        m_nSampleInterval = (int) (logState - prevLogState);</b>
+<i>308</i>&nbsp;                    }
+<b class="nc"><i>309</i>&nbsp;                    prevLogState = logState;</b>
+<i>310</i>&nbsp;                	
+<b class="nc"><i>311</i>&nbsp;                	if (logState % m_nSampleInterval == 0 || m_nSampleInterval &lt; 0) {</b>
+<b class="nc"><i>312</i>&nbsp;	                	if (state &lt; 0) {</b>
+<b class="nc"><i>313</i>&nbsp;	                		state = 0;</b>
+<i>314</i>&nbsp;	                	} else {
+<b class="nc"><i>315</i>&nbsp;	                		state += m_nSampleInterval;</b>
+<i>316</i>&nbsp;	                	}
+<b class="nc"><i>317</i>&nbsp;	                    str = str.replaceAll(&quot;^tree STATE_[^\\s=]*&quot;, &quot;&quot;);</b>
+<b class="nc"><i>318</i>&nbsp;	                	m_out.print(&quot;tree STATE_&quot; + state + &quot; =&quot; + str);</b>
+<b class="nc"><i>319</i>&nbsp;	                	m_out.println();</b>
+<i>320</i>&nbsp;                	}
+<i>321</i>&nbsp;                }
+<i>322</i>&nbsp;            }
+<b class="nc"><i>323</i>&nbsp;            if (data % lines == 0) {</b>
+<b class="nc"><i>324</i>&nbsp;                log(&quot;*&quot;);</b>
+<i>325</i>&nbsp;            }
+<i>326</i>&nbsp;        }
+<b class="nc"><i>327</i>&nbsp;        logln(&quot;&quot;);</b>
+<b class="nc"><i>328</i>&nbsp;        return state;</b>
+<i>329</i>&nbsp;    } // readTreeLogFile
+<i>330</i>&nbsp;
+<i>331</i>&nbsp;    private void printCombinedLogs() {
+<b class="nc"><i>332</i>&nbsp;        int data = (m_bIsTreeLog ? m_sTrees.size() : m_fCombinedTraces[0].length);</b>
+<b class="nc"><i>333</i>&nbsp;        logln(&quot;Collected &quot; + data + &quot; lines in combined log&quot;);</b>
+<b class="nc"><i>334</i>&nbsp;        if (m_sFileOut != null) {</b>
+<b class="nc"><i>335</i>&nbsp;            log(&quot;Writing to file &quot; + m_sFileOut);</b>
+<i>336</i>&nbsp;            try {
+<b class="nc"><i>337</i>&nbsp;                m_out = new PrintStream(new File(m_sFileOut));</b>
+<b class="nc"><i>338</i>&nbsp;            } catch (FileNotFoundException e) {</b>
+<b class="nc"><i>339</i>&nbsp;                log(&quot;Could not open file &quot; + m_sFileOut + &quot; for writing: &quot; + e.getMessage());</b>
+<b class="nc"><i>340</i>&nbsp;                return;</b>
+<b class="nc"><i>341</i>&nbsp;            }</b>
+<i>342</i>&nbsp;        }
+<b class="nc"><i>343</i>&nbsp;        logln(&quot;\n\n&quot; + BAR);</b>
+<i>344</i>&nbsp;        // preamble
+<b class="nc"><i>345</i>&nbsp;        m_out.println(m_sPreAmble);</b>
+<i>346</i>&nbsp;
+<b class="nc"><i>347</i>&nbsp;        int lines = 0;</b>
+<b class="nc"><i>348</i>&nbsp;        if (m_bIsTreeLog) {</b>
+<b class="nc"><i>349</i>&nbsp;            for (int i = 0; i &lt; m_sTrees.size(); i++) {</b>
+<b class="nc"><i>350</i>&nbsp;                if ((m_nSampleInterval * i) % m_nResample == 0) {</b>
+<b class="nc"><i>351</i>&nbsp;                    String tree = m_sTrees.get(i);</b>
+<b class="nc"><i>352</i>&nbsp;                    tree = format(tree);</b>
+<b class="nc"><i>353</i>&nbsp;                    m_out.println(&quot;tree STATE_&quot; + (m_nSampleInterval * i) + (Character.isSpaceChar(tree.charAt(0)) ? &quot;&quot; : &quot; &quot;) + tree);</b>
+<b class="nc"><i>354</i>&nbsp;                    lines++;</b>
+<i>355</i>&nbsp;                }
+<b class="nc"><i>356</i>&nbsp;                if (i % (data / 80) == 0) {</b>
+<b class="nc"><i>357</i>&nbsp;                    log(&quot;*&quot;);</b>
+<i>358</i>&nbsp;                }
+<i>359</i>&nbsp;            }
+<b class="nc"><i>360</i>&nbsp;            m_out.println(&quot;End;&quot;);</b>
+<i>361</i>&nbsp;        } else {
+<i>362</i>&nbsp;            // header
+<b class="nc"><i>363</i>&nbsp;            for (int i = 0; i &lt; m_sLabels.length; i++) {</b>
+<b class="nc"><i>364</i>&nbsp;                m_out.print(m_sLabels[i] + &quot;\t&quot;);</b>
+<i>365</i>&nbsp;            }
+<b class="nc"><i>366</i>&nbsp;            m_out.println();</b>
+<b class="nc"><i>367</i>&nbsp;            for (int i = 0; i &lt; m_fCombinedTraces[0].length; i++) {</b>
+<b class="nc"><i>368</i>&nbsp;                if (((int) (double) m_fCombinedTraces[0][i]) % m_nResample == 0) {</b>
+<b class="nc"><i>369</i>&nbsp;                    for (int j = 0; j &lt; m_types.length; j++) {</b>
+<b class="pc"><i>370</i>&nbsp;                        switch (m_types[j]) {</b>
+<i>371</i>&nbsp;                            case INTEGER:
+<b class="nc"><i>372</i>&nbsp;                                m_out.print((int) (double) m_fCombinedTraces[j][i] + &quot;\t&quot;);</b>
+<b class="nc"><i>373</i>&nbsp;                                break;</b>
+<i>374</i>&nbsp;                            case REAL:
+<b class="nc"><i>375</i>&nbsp;                                m_out.print(format.format(m_fCombinedTraces[j][i]) + &quot;\t&quot;);</b>
+<b class="nc"><i>376</i>&nbsp;                                break;</b>
+<i>377</i>&nbsp;                            case NOMINAL:
+<i>378</i>&nbsp;                            case BOOL:
+<b class="nc"><i>379</i>&nbsp;                                m_out.print(m_ranges[(int) (double) m_fCombinedTraces[j][i]] + &quot;\t&quot;);</b>
+<i>380</i>&nbsp;                                break;
+<i>381</i>&nbsp;                        }
+<i>382</i>&nbsp;                    }
+<b class="nc"><i>383</i>&nbsp;                    m_out.print(&quot;\n&quot;);</b>
+<b class="nc"><i>384</i>&nbsp;                    lines++;</b>
+<i>385</i>&nbsp;                }
+<b class="nc"><i>386</i>&nbsp;                if ((data / 80 &gt; 0) &amp;&amp; i % (data / 80) == 0) {</b>
+<b class="nc"><i>387</i>&nbsp;                    log(&quot;*&quot;);</b>
+<i>388</i>&nbsp;                }
+<i>389</i>&nbsp;            }
+<i>390</i>&nbsp;        }
+<b class="nc"><i>391</i>&nbsp;        logln(&quot;\n&quot; + lines + &quot; lines in combined log&quot;);</b>
+<b class="nc"><i>392</i>&nbsp;    }</b>
+<i>393</i>&nbsp;
+<i>394</i>&nbsp;    protected String format(String tree) {
+<b class="nc"><i>395</i>&nbsp;        if (m_bUseDecimalFormat) {</b>
+<i>396</i>&nbsp;            // convert scientific to decimal format
+<b class="nc"><i>397</i>&nbsp;            if (tree.matches(&quot;.*[0-9]+\\.[0-9]+[0-9-]+E[0-9-]+.*&quot;)) {</b>
+<b class="nc"><i>398</i>&nbsp;                int k = 0;</b>
+<b class="nc"><i>399</i>&nbsp;                while (k &lt; tree.length()) {</b>
+<b class="nc"><i>400</i>&nbsp;                    char c = tree.charAt(k);</b>
+<b class="nc"><i>401</i>&nbsp;                    if (Character.isDigit(c)) {</b>
+<b class="nc"><i>402</i>&nbsp;                        int start = k;</b>
+<b class="nc"><i>403</i>&nbsp;                        while (++k &lt; tree.length() &amp;&amp; Character.isDigit(tree.charAt(k))) {</b>
+<i>404</i>&nbsp;                        }
+<b class="nc"><i>405</i>&nbsp;                        if (k &lt; tree.length() &amp;&amp; tree.charAt(k) == &#39;.&#39;) {</b>
+<b class="nc"><i>406</i>&nbsp;                            while (++k &lt; tree.length() &amp;&amp; Character.isDigit(tree.charAt(k))) {</b>
+<i>407</i>&nbsp;                            }
+<b class="nc"><i>408</i>&nbsp;                            if (k &lt; tree.length() &amp;&amp; (tree.charAt(k) == &#39;E&#39; || tree.charAt(k) == &#39;e&#39;)) {</b>
+<b class="nc"><i>409</i>&nbsp;                                k++;</b>
+<b class="nc"><i>410</i>&nbsp;                                if (k &lt; tree.length() &amp;&amp; tree.charAt(k) == &#39;-&#39;) {</b>
+<b class="nc"><i>411</i>&nbsp;                                    k++;</b>
+<i>412</i>&nbsp;                                }
+<b class="nc"><i>413</i>&nbsp;                                if (k &lt; tree.length() &amp;&amp; Character.isDigit(tree.charAt(k))) {</b>
+<b class="nc"><i>414</i>&nbsp;                                    while (++k &lt; tree.length() &amp;&amp; Character.isDigit(tree.charAt(k))) {</b>
+<i>415</i>&nbsp;                                    }
+<b class="nc"><i>416</i>&nbsp;                                    int end = k;</b>
+<b class="nc"><i>417</i>&nbsp;                                    String number = tree.substring(start, end);</b>
+<b class="nc"><i>418</i>&nbsp;                                    double d = Double.parseDouble(number);</b>
+<b class="nc"><i>419</i>&nbsp;                                    number = format.format(d);</b>
+<b class="nc"><i>420</i>&nbsp;                                    tree = tree.substring(0, start) + number + tree.substring(end);</b>
+<b class="nc"><i>421</i>&nbsp;                                    k = start + number.length();</b>
+<i>422</i>&nbsp;                                }
+<i>423</i>&nbsp;                            }
+<i>424</i>&nbsp;                        }
+<b class="nc"><i>425</i>&nbsp;                    } else {</b>
+<b class="nc"><i>426</i>&nbsp;                        k++;</b>
+<i>427</i>&nbsp;                    }
+<b class="nc"><i>428</i>&nbsp;                }</b>
+<b class="nc"><i>429</i>&nbsp;            }</b>
+<i>430</i>&nbsp;        } else {
+<i>431</i>&nbsp;            // convert decimal to scientific format
+<b class="nc"><i>432</i>&nbsp;            if (tree.matches(&quot;.*[0-9]+\\.[0-9]+[^E-].*&quot;)) {</b>
+<b class="nc"><i>433</i>&nbsp;                int k = 0;</b>
+<b class="nc"><i>434</i>&nbsp;                while (k &lt; tree.length()) {</b>
+<b class="nc"><i>435</i>&nbsp;                    char c = tree.charAt(k);</b>
+<b class="nc"><i>436</i>&nbsp;                    if (Character.isDigit(c)) {</b>
+<b class="nc"><i>437</i>&nbsp;                        int start = k;</b>
+<b class="nc"><i>438</i>&nbsp;                        while (++k &lt; tree.length() &amp;&amp; Character.isDigit(tree.charAt(k))) {</b>
+<i>439</i>&nbsp;                        }
+<b class="nc"><i>440</i>&nbsp;                        if (k &lt; tree.length() &amp;&amp; tree.charAt(k) == &#39;.&#39;) {</b>
+<b class="nc"><i>441</i>&nbsp;                            while (++k &lt; tree.length() &amp;&amp; Character.isDigit(tree.charAt(k))) {</b>
+<i>442</i>&nbsp;                            }
+<b class="nc"><i>443</i>&nbsp;                            if (k &lt; tree.length() &amp;&amp; tree.charAt(k) != &#39;-&#39; &amp;&amp; tree.charAt(k) != &#39;E&#39; &amp;&amp; tree.charAt(k) != &#39;e&#39;) {</b>
+<b class="nc"><i>444</i>&nbsp;                                int end = k;</b>
+<b class="nc"><i>445</i>&nbsp;                                String number = tree.substring(start, end);</b>
+<b class="nc"><i>446</i>&nbsp;                                double d = Double.parseDouble(number);</b>
+<b class="nc"><i>447</i>&nbsp;                                number = format.format(d);</b>
+<b class="nc"><i>448</i>&nbsp;                                tree = tree.substring(0, start) + number + tree.substring(end);</b>
+<b class="nc"><i>449</i>&nbsp;                                k = start + number.length();</b>
+<i>450</i>&nbsp;                            }
+<i>451</i>&nbsp;                        }
+<b class="nc"><i>452</i>&nbsp;                    } else {</b>
+<b class="nc"><i>453</i>&nbsp;                        k++;</b>
+<i>454</i>&nbsp;                    }
+<b class="nc"><i>455</i>&nbsp;                }</b>
+<i>456</i>&nbsp;            }
+<i>457</i>&nbsp;        }
+<b class="nc"><i>458</i>&nbsp;        return tree;</b>
+<i>459</i>&nbsp;    }
+<i>460</i>&nbsp;
+<i>461</i>&nbsp;    private static String getUsage() {
+<b class="nc"><i>462</i>&nbsp;        return &quot;Usage: LogCombiner -log &lt;file&gt; -n &lt;int&gt; [&lt;options&gt;]\n&quot; +</b>
+<i>463</i>&nbsp;                &quot;combines multiple (trace or tree) log files into a single log file.\n&quot; +
+<i>464</i>&nbsp;                &quot;options:\n&quot; +
+<i>465</i>&nbsp;                &quot;-log &lt;file&gt;      specify the name of the log file, each log file must be specified with separate -log option\n&quot; +
+<i>466</i>&nbsp;                &quot;-o &lt;output.log&gt;  specify log file to write into (default output is stdout)\n&quot; +
+<i>467</i>&nbsp;                &quot;-b &lt;burnin&gt;      specify the number PERCENTAGE of lines in the log file considered to be burnin (default 10)\n&quot; +
+<i>468</i>&nbsp;                &quot;-dir &lt;directory&gt; specify particle directory -- used for particle filtering in BEASTLabs only -- if defined only one log must be specified and the -n option specified\n&quot; +
+<i>469</i>&nbsp;                &quot;-n &lt;int&gt;         specify the number of particles, ignored if -dir is not defined\n&quot; +
+<i>470</i>&nbsp;                &quot;-resample &lt;int&gt;  specify number of states to resample\n&quot; +
+<i>471</i>&nbsp;                &quot;-decimal         flag to indicate numbers should converted from scientific into decimal format\n&quot; +
+<i>472</i>&nbsp;                &quot;-renumber        flag to indicate output states should be renumbered\n&quot; +
+<i>473</i>&nbsp;                &quot;-help            print this message\n&quot;;
+<i>474</i>&nbsp;    }
+<i>475</i>&nbsp;
+<i>476</i>&nbsp;    private void printTitle(String aboutString) {
+<b class="nc"><i>477</i>&nbsp;        aboutString = &quot;LogCombiner&quot; + aboutString.replaceAll(&quot;&lt;/p&gt;&quot;, &quot;\n\n&quot;);</b>
+<b class="nc"><i>478</i>&nbsp;        aboutString = aboutString.replaceAll(&quot;&lt;br&gt;&quot;, &quot;\n&quot;);</b>
+<b class="nc"><i>479</i>&nbsp;        aboutString = aboutString.replaceAll(&quot;&lt;[^&gt;]*&gt;&quot;, &quot; &quot;);</b>
+<b class="nc"><i>480</i>&nbsp;        String[] strs = aboutString.split(&quot;\n&quot;);</b>
+<b class="nc"><i>481</i>&nbsp;        for (String str : strs) {</b>
+<b class="nc"><i>482</i>&nbsp;            int n = 80 - str.length();</b>
+<b class="nc"><i>483</i>&nbsp;            int n1 = n / 2;</b>
+<b class="nc"><i>484</i>&nbsp;            for (int i = 0; i &lt; n1; i++) {</b>
+<b class="nc"><i>485</i>&nbsp;                log(&quot; &quot;);</b>
+<i>486</i>&nbsp;            }
+<b class="nc"><i>487</i>&nbsp;            logln(str);</b>
+<i>488</i>&nbsp;        }
+<b class="nc"><i>489</i>&nbsp;    }</b>
+<i>490</i>&nbsp;
+<i>491</i>&nbsp;
+<i>492</i>&nbsp;    /**
+<i>493</i>&nbsp;     * @param args
+<i>494</i>&nbsp;     */
+<i>495</i>&nbsp;    public static void main(String[] args) {
+<b class="nc"><i>496</i>&nbsp;        BEASTVersion2 version = new BEASTVersion2();</b>
+<b class="nc"><i>497</i>&nbsp;        final String versionString = version.getVersionString();</b>
+<b class="nc"><i>498</i>&nbsp;        String nameString = &quot;LogCombiner &quot; + versionString;</b>
+<b class="nc"><i>499</i>&nbsp;        String aboutString = &quot;&lt;html&gt;&lt;center&gt;&lt;p&gt;&quot; + versionString + &quot;, &quot; + version.getDateString() + &quot;&lt;/p&gt;&quot; +</b>
+<i>500</i>&nbsp;                &quot;&lt;p&gt;by&lt;br&gt;&quot; +
+<i>501</i>&nbsp;                &quot;&lt;p&gt;Andrew Rambaut and Alexei J. Drummond&lt;/p&gt;&quot; +
+<i>502</i>&nbsp;                &quot;&lt;p&gt;Institute of Evolutionary Biology, University of Edinburgh&lt;br&gt;&quot; +
+<i>503</i>&nbsp;                &quot;&lt;a href=\&quot;mailto:a.rambaut@ed.ac.uk\&quot;&gt;a.rambaut@ed.ac.uk&lt;/a&gt;&lt;/p&gt;&quot; +
+<i>504</i>&nbsp;                &quot;&lt;p&gt;Department of Computer Science, University of Auckland&lt;br&gt;&quot; +
+<i>505</i>&nbsp;                &quot;&lt;a href=\&quot;mailto:alexei@cs.auckland.ac.nz\&quot;&gt;alexei@cs.auckland.ac.nz&lt;/a&gt;&lt;/p&gt;&quot; +
+<i>506</i>&nbsp;                &quot;&lt;p&gt;Part of the BEAST 2 package:&lt;br&gt;&quot; +
+<i>507</i>&nbsp;                &quot;&lt;a href=\&quot;http://beast2.cs.auckland.ac.nz/\&quot;&gt;http://beast2.cs.auckland.ac.nz/&lt;/a&gt;&lt;/p&gt;&quot; +
+<i>508</i>&nbsp;                &quot;&lt;/center&gt;&lt;/html&gt;&quot;;
+<i>509</i>&nbsp;
+<i>510</i>&nbsp;
+<b class="nc"><i>511</i>&nbsp;        LogCombiner combiner = new LogCombiner();</b>
+<i>512</i>&nbsp;        try {
+<b class="nc"><i>513</i>&nbsp;            if (args.length == 0) {</b>
+<b class="nc"><i>514</i>&nbsp;            	Utils.loadUIManager();</b>
+<i>515</i>&nbsp;
+<b class="nc"><i>516</i>&nbsp;                System.setProperty(&quot;com.apple.macos.useScreenMenuBar&quot;, &quot;true&quot;);</b>
+<b class="nc"><i>517</i>&nbsp;                System.setProperty(&quot;apple.laf.useScreenMenuBar&quot;, &quot;true&quot;);</b>
+<b class="nc"><i>518</i>&nbsp;                System.setProperty(&quot;apple.awt.showGrowBox&quot;, &quot;true&quot;);</b>
+<i>519</i>&nbsp;
+<i>520</i>&nbsp;                // TODO: set up ICON
+<b class="nc"><i>521</i>&nbsp;                java.net.URL url = LogCombiner.class.getResource(&quot;images/logcombiner.png&quot;);</b>
+<b class="nc"><i>522</i>&nbsp;                javax.swing.Icon icon = null;</b>
+<i>523</i>&nbsp;
+<b class="nc"><i>524</i>&nbsp;                if (url != null) {</b>
+<b class="nc"><i>525</i>&nbsp;                    icon = new javax.swing.ImageIcon(url);</b>
+<i>526</i>&nbsp;                }
+<i>527</i>&nbsp;
+<b class="nc"><i>528</i>&nbsp;                String titleString = &quot;&lt;html&gt;&lt;center&gt;&lt;p&gt;LogCombiner&lt;br&gt;&quot; +</b>
+<b class="nc"><i>529</i>&nbsp;                        &quot;Version &quot; + version.getVersionString() + &quot;, &quot; + version.getDateString() + &quot;&lt;/p&gt;&lt;/center&gt;&lt;/html&gt;&quot;;</b>
+<i>530</i>&nbsp;
+<i>531</i>&nbsp;                //ConsoleApplication consoleApp =
+<b class="nc"><i>532</i>&nbsp;                new ConsoleApplication(nameString, aboutString, icon, true);</b>
+<i>533</i>&nbsp;
+<b class="nc"><i>534</i>&nbsp;                combiner.printTitle(aboutString);</b>
+<i>535</i>&nbsp;
+<b class="nc"><i>536</i>&nbsp;                LogCombinerDialog dialog = new LogCombinerDialog(new JFrame(), titleString, icon);</b>
+<i>537</i>&nbsp;
+<b class="nc"><i>538</i>&nbsp;                if (!dialog.showDialog(nameString)) {</b>
+<b class="nc"><i>539</i>&nbsp;                    return;</b>
+<i>540</i>&nbsp;                }
+<i>541</i>&nbsp;
+<i>542</i>&nbsp;                // issue #437: ensure the table editor finished.
+<i>543</i>&nbsp;                // this way, the latest entered burn-in is captured, otherwise 
+<i>544</i>&nbsp;                // the last editing action may be ignored
+<b class="nc"><i>545</i>&nbsp;                TableCellEditor editor = dialog.filesTable.getCellEditor();</b>
+<b class="nc"><i>546</i>&nbsp;                if (editor != null) {</b>
+<b class="nc"><i>547</i>&nbsp;                    editor.stopCellEditing();</b>
+<i>548</i>&nbsp;                }
+<i>549</i>&nbsp;
+<b class="nc"><i>550</i>&nbsp;                combiner.m_bIsTreeLog = dialog.isTreeFiles();</b>
+<b class="nc"><i>551</i>&nbsp;                combiner.m_bUseDecimalFormat = dialog.convertToDecimal();</b>
+<b class="nc"><i>552</i>&nbsp;                if (combiner.m_bUseDecimalFormat) {</b>
+<b class="nc"><i>553</i>&nbsp;                    combiner.format = new DecimalFormat(&quot;#.############&quot;, new DecimalFormatSymbols(Locale.US));</b>
+<i>554</i>&nbsp;                }
+<b class="nc"><i>555</i>&nbsp;                if (!dialog.renumberOutputStates()) {</b>
+<b class="nc"><i>556</i>&nbsp;                    combiner.m_nSampleInterval = -1;</b>
+<i>557</i>&nbsp;                }
+<b class="nc"><i>558</i>&nbsp;                if (dialog.isResampling()) {</b>
+<b class="nc"><i>559</i>&nbsp;                    combiner.m_nResample = dialog.getResampleFrequency();</b>
+<i>560</i>&nbsp;                }
+<i>561</i>&nbsp;
+<b class="nc"><i>562</i>&nbsp;                String[] inputFiles = dialog.getFileNames();</b>
+<b class="nc"><i>563</i>&nbsp;                int[] burnins = dialog.getBurnins();</b>
+<i>564</i>&nbsp;
+<b class="nc"><i>565</i>&nbsp;                combiner.m_sFileOut = dialog.getOutputFileName();</b>
+<i>566</i>&nbsp;
+<b class="nc"><i>567</i>&nbsp;                if (combiner.m_sFileOut == null) {</b>
+<b class="nc"><i>568</i>&nbsp;                	Log.warning.println(&quot;No output file specified&quot;);</b>
+<i>569</i>&nbsp;                }
+<i>570</i>&nbsp;
+<i>571</i>&nbsp;                try {
+<b class="nc"><i>572</i>&nbsp;                    combiner.combineLogs(inputFiles, burnins);</b>
+<i>573</i>&nbsp; 
+<b class="nc"><i>574</i>&nbsp;                } catch (Exception ex) {</b>
+<b class="nc"><i>575</i>&nbsp;                	Log.warning.println(&quot;Exception: &quot; + ex.getMessage());</b>
+<b class="nc"><i>576</i>&nbsp;                    ex.printStackTrace();</b>
+<b class="nc"><i>577</i>&nbsp;                }</b>
+<b class="nc"><i>578</i>&nbsp;                System.out.println(&quot;Finished - Quit program to exit.&quot;);</b>
+<i>579</i>&nbsp;                while (true) {
+<i>580</i>&nbsp;                    try {
+<b class="nc"><i>581</i>&nbsp;                        Thread.sleep(1000);</b>
+<b class="nc"><i>582</i>&nbsp;                    } catch (InterruptedException e) {</b>
+<b class="nc"><i>583</i>&nbsp;                        e.printStackTrace();</b>
+<b class="nc"><i>584</i>&nbsp;                    }</b>
+<i>585</i>&nbsp;                }
+<i>586</i>&nbsp;            } else {
+<b class="nc"><i>587</i>&nbsp;                combiner.printTitle(aboutString);</b>
+<i>588</i>&nbsp;
+<b class="nc"><i>589</i>&nbsp;                combiner.parseArgs(args);</b>
+<b class="nc"><i>590</i>&nbsp;                if (combiner.m_sParticleDir == null) {</b>
+<i>591</i>&nbsp;                    // classical log combiner
+<b class="nc"><i>592</i>&nbsp;                    String[] logFiles = combiner.m_sLogFileName.toArray(new String[0]);</b>
+<b class="nc"><i>593</i>&nbsp;                    int[] burnIns = new int[logFiles.length];</b>
+<b class="nc"><i>594</i>&nbsp;                    Arrays.fill(burnIns, combiner.m_nBurninPercentage);</b>
+<b class="nc"><i>595</i>&nbsp;                    combiner.combineLogs(logFiles, burnIns);</b>
+<i>596</i>&nbsp;
+<b class="nc"><i>597</i>&nbsp;                } else {</b>
+<i>598</i>&nbsp;                    // particle log combiner
+<b class="nc"><i>599</i>&nbsp;                    combiner.combineParticleLogs();</b>
+<b class="nc"><i>600</i>&nbsp;                    combiner.printCombinedLogs();</b>
+<i>601</i>&nbsp;                }
+<i>602</i>&nbsp;            }
+<b class="nc"><i>603</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>604</i>&nbsp;            System.out.println(getUsage());</b>
+<b class="nc"><i>605</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>606</i>&nbsp;        }</b>
+<b class="nc"><i>607</i>&nbsp;    } // main</b>
+<i>608</i>&nbsp;
+<i>609</i>&nbsp;
+<i>610</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

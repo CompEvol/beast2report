@@ -1,0 +1,280 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TreeDistributionInputEditor</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.beauti</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TreeDistributionInputEditor (beast.app.beauti)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TreeDistributionInputEditor</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.5%
+  </span>
+  <span class="absValue">
+    (53/ 62)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TreeDistributionInputEditor$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (12/ 14)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TreeDistributionInputEditor$1$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 12)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (8/ 10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    73.9%
+  </span>
+  <span class="absValue">
+    (65/ 88)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.beauti;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.awt.Color;
+<i>4</i>&nbsp;import java.awt.event.ActionEvent;
+<i>5</i>&nbsp;import java.util.List;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import javax.swing.Box;
+<i>8</i>&nbsp;import javax.swing.JComboBox;
+<i>9</i>&nbsp;import javax.swing.JLabel;
+<i>10</i>&nbsp;import javax.swing.SwingUtilities;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;import beast.app.draw.InputEditor;
+<i>13</i>&nbsp;import beast.app.draw.SmallLabel;
+<i>14</i>&nbsp;import beast.core.BEASTInterface;
+<i>15</i>&nbsp;import beast.core.Input;
+<i>16</i>&nbsp;import beast.evolution.tree.Tree;
+<i>17</i>&nbsp;import beast.evolution.tree.TreeDistribution;
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;//import beast.evolution.speciation.BirthDeathGernhard08Model;
+<i>20</i>&nbsp;//import beast.evolution.speciation.YuleModel;
+<b class="fc"><i>21</i>&nbsp;public class TreeDistributionInputEditor extends InputEditor.Base {</b>
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;    private static final long serialVersionUID = 1L;
+<i>24</i>&nbsp;
+<i>25</i>&nbsp;    public TreeDistributionInputEditor(BeautiDoc doc) {
+<b class="fc"><i>26</i>&nbsp;        super(doc);</b>
+<b class="fc"><i>27</i>&nbsp;    }</b>
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;    @Override
+<i>30</i>&nbsp;    public Class&lt;?&gt; type() {
+<b class="fc"><i>31</i>&nbsp;        return TreeDistribution.class;</b>
+<i>32</i>&nbsp;    }
+<i>33</i>&nbsp;//	@Override
+<i>34</i>&nbsp;//	public Class&lt;?&gt;[] types() {
+<i>35</i>&nbsp;//		ArrayList&lt;Class&gt; types = new ArrayList&lt;&gt;();
+<i>36</i>&nbsp;//		types.add(TreeDistribution.class);
+<i>37</i>&nbsp;//		types.add(BirthDeathGernhard08Model.class);
+<i>38</i>&nbsp;//		types.add(YuleModel.class);
+<i>39</i>&nbsp;//		types.add(Coalescent.class);
+<i>40</i>&nbsp;//		types.add(BayesianSkyline.class);
+<i>41</i>&nbsp;//		return types.toArray(new Class[0]);
+<i>42</i>&nbsp;//	}
+<i>43</i>&nbsp;    ActionEvent m_e;
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;    @Override
+<i>46</i>&nbsp;    public void init(Input&lt;?&gt; input, BEASTInterface beastObject, int listItemNr, ExpandOption isExpandOption, boolean addButtons) {
+<b class="fc"><i>47</i>&nbsp;        m_bAddButtons = addButtons;</b>
+<b class="fc"><i>48</i>&nbsp;        m_input = input;</b>
+<b class="fc"><i>49</i>&nbsp;        m_beastObject = beastObject;</b>
+<b class="fc"><i>50</i>&nbsp;        this.itemNr = listItemNr;</b>
+<i>51</i>&nbsp;
+<b class="fc"><i>52</i>&nbsp;        Box itemBox = Box.createHorizontalBox();</b>
+<i>53</i>&nbsp;
+<b class="fc"><i>54</i>&nbsp;        TreeDistribution distr = (TreeDistribution) beastObject;</b>
+<b class="fc"><i>55</i>&nbsp;        String text = &quot;&quot;/* beastObject.getID() + &quot;: &quot; */;</b>
+<b class="fc"><i>56</i>&nbsp;        if (distr.treeInput.get() != null) {</b>
+<b class="fc"><i>57</i>&nbsp;            text += distr.treeInput.get().getID();</b>
+<i>58</i>&nbsp;        } else {
+<b class="fc"><i>59</i>&nbsp;            text += distr.treeIntervalsInput.get().treeInput.get().getID();</b>
+<i>60</i>&nbsp;        }
+<b class="fc"><i>61</i>&nbsp;        JLabel label = new JLabel(text);</b>
+<b class="fc"><i>62</i>&nbsp;        label.setMinimumSize(Base.PREFERRED_SIZE);</b>
+<b class="fc"><i>63</i>&nbsp;        label.setPreferredSize(Base.PREFERRED_SIZE);</b>
+<b class="fc"><i>64</i>&nbsp;        itemBox.add(label);</b>
+<i>65</i>&nbsp;        // List&lt;String&gt; availableBEASTObjects =
+<i>66</i>&nbsp;        // PluginPanel.getAvailablePlugins(m_input, m_beastObject, null);
+<i>67</i>&nbsp;
+<b class="fc"><i>68</i>&nbsp;        List&lt;BeautiSubTemplate&gt; availableBEASTObjects = doc.getInputEditorFactory().getAvailableTemplates(m_input, m_beastObject,</b>
+<i>69</i>&nbsp;                null, doc); 
+<i>70</i>&nbsp;        // make sure we are dealing with a TreeDistribution
+<b class="fc"><i>71</i>&nbsp;        for (int i = availableBEASTObjects.size() - 1; i &gt;= 0; i--) {</b>
+<b class="fc"><i>72</i>&nbsp;        	BeautiSubTemplate t = availableBEASTObjects.get(i);</b>
+<b class="fc"><i>73</i>&nbsp;        	Class&lt;?&gt; c = t._class;</b>
+<b class="fc"><i>74</i>&nbsp;        	if (!(TreeDistribution.class.isAssignableFrom(c))) {</b>
+<b class="nc"><i>75</i>&nbsp;        		availableBEASTObjects.remove(i);</b>
+<i>76</i>&nbsp;        	}
+<i>77</i>&nbsp;        }
+<i>78</i>&nbsp;        
+<b class="fc"><i>79</i>&nbsp;        JComboBox&lt;BeautiSubTemplate&gt; comboBox = new JComboBox&lt;&gt;(availableBEASTObjects.toArray(new BeautiSubTemplate[]{}));</b>
+<b class="fc"><i>80</i>&nbsp;        comboBox.setName(&quot;TreeDistribution&quot;);</b>
+<i>81</i>&nbsp;
+<b class="fc"><i>82</i>&nbsp;        for (int i = availableBEASTObjects.size() - 1; i &gt;= 0; i--) {</b>
+<b class="fc"><i>83</i>&nbsp;            if (!TreeDistribution.class.isAssignableFrom(availableBEASTObjects.get(i)._class)) {</b>
+<b class="nc"><i>84</i>&nbsp;                availableBEASTObjects.remove(i);</b>
+<i>85</i>&nbsp;            }
+<i>86</i>&nbsp;        }
+<i>87</i>&nbsp;
+<b class="fc"><i>88</i>&nbsp;        String id = distr.getID();</b>
+<i>89</i>&nbsp;        try {
+<i>90</i>&nbsp;            // id = BeautiDoc.parsePartition(id);
+<b class="fc"><i>91</i>&nbsp;            id = id.substring(0, id.indexOf(&#39;.&#39;));</b>
+<b class="nc"><i>92</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>93</i>&nbsp;            throw new RuntimeException(&quot;Improperly formatted ID: &quot; + distr.getID());</b>
+<b class="fc"><i>94</i>&nbsp;        }</b>
+<b class="fc"><i>95</i>&nbsp;        for (BeautiSubTemplate template : availableBEASTObjects) {</b>
+<b class="fc"><i>96</i>&nbsp;            if (template.matchesName(id)) { // getMainID().replaceAll(&quot;.\\$\\(n\\)&quot;,</b>
+<i>97</i>&nbsp;                // &quot;&quot;).equals(id)) {
+<b class="fc"><i>98</i>&nbsp;                comboBox.setSelectedItem(template);</b>
+<i>99</i>&nbsp;            }
+<b class="fc"><i>100</i>&nbsp;        }</b>
+<i>101</i>&nbsp;
+<b class="fc"><i>102</i>&nbsp;        comboBox.addActionListener(e -&gt; {</b>
+<b class="fc"><i>103</i>&nbsp;                m_e = e;</b>
+<b class="fc"><i>104</i>&nbsp;                SwingUtilities.invokeLater(new Runnable() {</b>
+<i>105</i>&nbsp;					@Override
+<i>106</i>&nbsp;                    public void run() {
+<b class="pc"><i>107</i>&nbsp;						@SuppressWarnings(&quot;unchecked&quot;)</b>
+<b class="fc"><i>108</i>&nbsp;						JComboBox&lt;BeautiSubTemplate&gt; currentComboBox = (JComboBox&lt;BeautiSubTemplate&gt;) m_e.getSource();</b>
+<b class="fc"><i>109</i>&nbsp;                        @SuppressWarnings(&quot;unchecked&quot;)</b>
+<b class="pc"><i>110</i>&nbsp;						List&lt;BEASTInterface&gt; list = (List&lt;BEASTInterface&gt;) m_input.get();</b>
+<b class="fc"><i>111</i>&nbsp;                        BeautiSubTemplate template = (BeautiSubTemplate) currentComboBox.getSelectedItem();</b>
+<b class="pc"><i>112</i>&nbsp;                        PartitionContext partitionContext = doc.getContextFor(list.get(itemNr));</b>
+<b class="nc"><i>113</i>&nbsp;                        try {</b>
+<b class="pc"><i>114</i>&nbsp;                            template.createSubNet(partitionContext, list, itemNr, true);</b>
+<b class="nc"><i>115</i>&nbsp;                        } catch (Exception ex) {</b>
+<b class="nc"><i>116</i>&nbsp;                            ex.printStackTrace();</b>
+<b class="pc"><i>117</i>&nbsp;                        }</b>
+<b class="pc"><i>118</i>&nbsp;                        sync();</b>
+<b class="pc"><i>119</i>&nbsp;                        refreshPanel();</b>
+<b class="pc"><i>120</i>&nbsp;                    }</b>
+<b class="nc"><i>121</i>&nbsp;                });</b>
+<b class="pc"><i>122</i>&nbsp;            });</b>
+<b class="fc"><i>123</i>&nbsp;        itemBox.add(comboBox);</b>
+<b class="fc"><i>124</i>&nbsp;        itemBox.add(Box.createGlue());</b>
+<i>125</i>&nbsp;
+<b class="fc"><i>126</i>&nbsp;        m_validateLabel = new SmallLabel(&quot;x&quot;, new Color(200, 0, 0));</b>
+<b class="fc"><i>127</i>&nbsp;        m_validateLabel.setVisible(false);</b>
+<b class="fc"><i>128</i>&nbsp;        validateInput();</b>
+<b class="fc"><i>129</i>&nbsp;        itemBox.add(m_validateLabel);</b>
+<b class="fc"><i>130</i>&nbsp;        add(itemBox);</b>
+<b class="fc"><i>131</i>&nbsp;    }</b>
+<i>132</i>&nbsp;
+<i>133</i>&nbsp;    @Override
+<i>134</i>&nbsp;    public void validateInput() {
+<b class="fc"><i>135</i>&nbsp;        TreeDistribution distr = (TreeDistribution) m_beastObject;</b>
+<i>136</i>&nbsp;        // TODO: robustify for the case the tree is not a simple binary tree
+<b class="fc"><i>137</i>&nbsp;        Tree tree = (Tree) distr.treeInput.get();</b>
+<b class="fc"><i>138</i>&nbsp;        if (tree == null) {</b>
+<b class="fc"><i>139</i>&nbsp;            tree = distr.treeIntervalsInput.get().treeInput.get();</b>
+<i>140</i>&nbsp;        }
+<b class="fc"><i>141</i>&nbsp;        if (tree.hasDateTrait()) {</b>
+<b class="nc"><i>142</i>&nbsp;            if (!distr.canHandleTipDates()) {</b>
+<b class="nc"><i>143</i>&nbsp;                m_validateLabel.setToolTipText(&quot;This tree prior cannot handle dated tips. Choose another tree prior.&quot;);</b>
+<b class="nc"><i>144</i>&nbsp;                m_validateLabel.m_circleColor = Color.red;</b>
+<b class="nc"><i>145</i>&nbsp;                m_validateLabel.setVisible(true);</b>
+<b class="nc"><i>146</i>&nbsp;                return;</b>
+<i>147</i>&nbsp;            }
+<i>148</i>&nbsp;        }
+<i>149</i>&nbsp;
+<b class="fc"><i>150</i>&nbsp;        super.validateInput();</b>
+<b class="fc"><i>151</i>&nbsp;    }</b>
+<i>152</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

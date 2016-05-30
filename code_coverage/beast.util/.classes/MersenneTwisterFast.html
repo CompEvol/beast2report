@@ -1,0 +1,865 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: MersenneTwisterFast</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.util</a> ]
+</div>
+
+<h1>Coverage Summary for Class: MersenneTwisterFast (beast.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MersenneTwisterFast</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (9/ 27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    22.8%
+  </span>
+  <span class="absValue">
+    (66/ 289)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;* File MersenneTwisterFast.java
+<i>3</i>&nbsp;*
+<i>4</i>&nbsp;* Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>5</i>&nbsp;*
+<i>6</i>&nbsp;* This file is part of BEAST2.
+<i>7</i>&nbsp;* See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp;* information regarding copyright ownership and licensing.
+<i>9</i>&nbsp;*
+<i>10</i>&nbsp;* BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp;* it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp;* published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp;* of the License, or (at your option) any later version.
+<i>14</i>&nbsp;*
+<i>15</i>&nbsp;*  BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp;*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp;*  GNU Lesser General Public License for more details.
+<i>19</i>&nbsp;*
+<i>20</i>&nbsp;* You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp;* License along with BEAST; if not, write to the
+<i>22</i>&nbsp;* Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp;* Boston, MA  02110-1301  USA
+<i>24</i>&nbsp;*/
+<i>25</i>&nbsp;/*
+<i>26</i>&nbsp; * MersenneTwisterFast.java
+<i>27</i>&nbsp; *
+<i>28</i>&nbsp; * Copyright (C) 2002-2006 Alexei Drummond and Andrew Rambaut
+<i>29</i>&nbsp; *
+<i>30</i>&nbsp; * This file is part of BEAST.
+<i>31</i>&nbsp; * See the NOTICE file distributed with this work for additional
+<i>32</i>&nbsp; * information regarding copyright ownership and licensing.
+<i>33</i>&nbsp; *
+<i>34</i>&nbsp; * BEAST is free software; you can redistribute it and/or modify
+<i>35</i>&nbsp; * it under the terms of the GNU Lesser General Public License as
+<i>36</i>&nbsp; * published by the Free Software Foundation; either version 2
+<i>37</i>&nbsp; * of the License, or (at your option) any later version.
+<i>38</i>&nbsp; *
+<i>39</i>&nbsp; *  BEAST is distributed in the hope that it will be useful,
+<i>40</i>&nbsp; *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>41</i>&nbsp; *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>42</i>&nbsp; *  GNU Lesser General Public License for more details.
+<i>43</i>&nbsp; *
+<i>44</i>&nbsp; * You should have received a copy of the GNU Lesser General Public
+<i>45</i>&nbsp; * License along with BEAST; if not, write to the
+<i>46</i>&nbsp; * Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>47</i>&nbsp; * Boston, MA  02110-1301  USA
+<i>48</i>&nbsp; */
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;package beast.util;
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;import java.io.FileNotFoundException;
+<i>53</i>&nbsp;import java.io.Serializable;
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;import beast.math.GammaFunction;
+<i>56</i>&nbsp;import beast.math.statistic.DiscreteStatistics;
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;
+<i>59</i>&nbsp;
+<i>60</i>&nbsp;/**
+<i>61</i>&nbsp; * MersenneTwisterFast:
+<i>62</i>&nbsp; * &lt;p/&gt;
+<i>63</i>&nbsp; * A simulation quality fast random number generator (MT19937)
+<i>64</i>&nbsp; * with the  same public methods as java.beast.util.Random.
+<i>65</i>&nbsp; * &lt;p/&gt;
+<i>66</i>&nbsp; * &lt;p&gt;About the Mersenne Twister.
+<i>67</i>&nbsp; * This is a Java version of the C-program for MT19937: Integer version.
+<i>68</i>&nbsp; * next(32) generates one pseudorandom unsigned integer (32bit)
+<i>69</i>&nbsp; * which is uniformly distributed among 0 to 2^32-1  for each
+<i>70</i>&nbsp; * call.  next(int bits) &gt;&gt;&gt;&#39;s by (32-bits) to get a value ranging
+<i>71</i>&nbsp; * between 0 and 2^bits-1 long inclusive; hope that&#39;s correct.
+<i>72</i>&nbsp; * setSeed(seed) set initial values to the working area
+<i>73</i>&nbsp; * of 624 words. For setSeed(seed), seed is any 32-bit integer
+<i>74</i>&nbsp; * except for 0.
+<i>75</i>&nbsp; * &lt;p/&gt;
+<i>76</i>&nbsp; * Reference.
+<i>77</i>&nbsp; * M. Matsumoto and T. Nishimura,
+<i>78</i>&nbsp; * &quot;Mersenne Twister: A 623-Dimensionally Equidistributed Uniform
+<i>79</i>&nbsp; * Pseudo-Random Number Generator&quot;,
+<i>80</i>&nbsp; * &lt;i&gt;ACM Transactions on Modeling and Computer Simulation,&lt;/i&gt;
+<i>81</i>&nbsp; * Vol. 8, No. 1, January 1998, pp 3--30.
+<i>82</i>&nbsp; * &lt;p/&gt;
+<i>83</i>&nbsp; * &lt;p&gt;Bug Fixes. This implementation implements the bug fixes made
+<i>84</i>&nbsp; * in Java 1.2&#39;s version of Random, which means it can be used with
+<i>85</i>&nbsp; * earlier versions of Java.  See
+<i>86</i>&nbsp; * &lt;a href=&quot;http://www.javasoft.com/products/jdk/1.2/docs/api/java/beast.util/Random.html&quot;&gt;
+<i>87</i>&nbsp; * the JDK 1.2 java.beast.util.Random documentation&lt;/a&gt; for further documentation
+<i>88</i>&nbsp; * on the random-number generation contracts made.  Additionally, there&#39;s
+<i>89</i>&nbsp; * an undocumented bug in the JDK java.beast.util.Random.nextBytes() method,
+<i>90</i>&nbsp; * which this code fixes.
+<i>91</i>&nbsp; * &lt;p/&gt;
+<i>92</i>&nbsp; * &lt;p&gt; Important Note.  Just like java.beast.util.Random, this
+<i>93</i>&nbsp; * generator accepts a long seed but doesn&#39;t use all of it.  java.beast.util.Random
+<i>94</i>&nbsp; * uses 48 bits.  The Mersenne Twister instead uses 32 bits (int size).
+<i>95</i>&nbsp; * So it&#39;s best if your seed does not exceed the int range.
+<i>96</i>&nbsp; * &lt;p/&gt;
+<i>97</i>&nbsp; * &lt;p&gt;&lt;a href=&quot;http://www.cs.umd.edu/users/seanl/&quot;&gt;Sean Luke&#39;s web page&lt;/a&gt;
+<i>98</i>&nbsp; * &lt;p/&gt;
+<i>99</i>&nbsp; * &lt;p/&gt;
+<i>100</i>&nbsp; * - added shuffling method (Alexei Drummond)
+<i>101</i>&nbsp; * &lt;p/&gt;
+<i>102</i>&nbsp; * - added gamma RV method (Marc Suchard)
+<i>103</i>&nbsp; * &lt;p/&gt;
+<i>104</i>&nbsp; * - thread safety (Remco Bouckaert)
+<i>105</i>&nbsp; * &lt;p/&gt;
+<i>106</i>&nbsp; * This is now package private - it should be accessed using the instance in Randomizer
+<i>107</i>&nbsp; */
+<i>108</i>&nbsp;public class MersenneTwisterFast implements Serializable {
+<i>109</i>&nbsp;    /**
+<i>110</i>&nbsp;     *
+<i>111</i>&nbsp;     */
+<i>112</i>&nbsp;    private static final long serialVersionUID = 6185086957226269797L;
+<i>113</i>&nbsp;    // Period parameters
+<i>114</i>&nbsp;    private static final int N = 624;
+<i>115</i>&nbsp;    private static final int M = 397;
+<i>116</i>&nbsp;    private static final int MATRIX_A = 0x9908b0df;   //  private static final * constant vector a
+<i>117</i>&nbsp;    private static final int UPPER_MASK = 0x80000000; // most significant w-r bits
+<i>118</i>&nbsp;    private static final int LOWER_MASK = 0x7fffffff; // least significant r bits
+<i>119</i>&nbsp;
+<i>120</i>&nbsp;
+<i>121</i>&nbsp;    // Tempering parameters
+<i>122</i>&nbsp;    private static final int TEMPERING_MASK_B = 0x9d2c5680;
+<i>123</i>&nbsp;    private static final int TEMPERING_MASK_C = 0xefc60000;
+<i>124</i>&nbsp;
+<i>125</i>&nbsp;    // #define TEMPERING_SHIFT_U(y)  (y &gt;&gt;&gt; 11)
+<i>126</i>&nbsp;    // #define TEMPERING_SHIFT_S(y)  (y &lt;&lt; 7)
+<i>127</i>&nbsp;    // #define TEMPERING_SHIFT_T(y)  (y &lt;&lt; 15)
+<i>128</i>&nbsp;    // #define TEMPERING_SHIFT_L(y)  (y &gt;&gt;&gt; 18)
+<i>129</i>&nbsp;
+<i>130</i>&nbsp;    private int mt[]; // the array for the state vector
+<i>131</i>&nbsp;    private int mti; // mti==N+1 means mt[N] is not initialized
+<i>132</i>&nbsp;    private int mag01[];
+<i>133</i>&nbsp;
+<i>134</i>&nbsp;    // a good initial seed (of int size, though stored in a long)
+<i>135</i>&nbsp;    private static final long GOOD_SEED = 4357;
+<i>136</i>&nbsp;
+<i>137</i>&nbsp;    private double nextNextGaussian;
+<i>138</i>&nbsp;    private boolean haveNextNextGaussian;
+<i>139</i>&nbsp;
+<i>140</i>&nbsp;    // The following can be accessed externally by the static accessor methods which
+<i>141</i>&nbsp;    // inforce synchronization
+<b class="fc"><i>142</i>&nbsp;    public static final MersenneTwisterFast DEFAULT_INSTANCE = new MersenneTwisterFast();</b>
+<i>143</i>&nbsp;
+<i>144</i>&nbsp;    // Added to curernt time in default constructor, and then adjust to allow for programs that construct
+<i>145</i>&nbsp;    // multiple MersenneTwisterFast in a short amount of time.
+<b class="fc"><i>146</i>&nbsp;    private static long seedAdditive_ = 0;</b>
+<i>147</i>&nbsp;
+<i>148</i>&nbsp;    private long initializationSeed;
+<i>149</i>&nbsp;
+<i>150</i>&nbsp;    /**
+<i>151</i>&nbsp;     * Constructor using the time of day as default seed.
+<i>152</i>&nbsp;     */
+<i>153</i>&nbsp;    private MersenneTwisterFast() {
+<b class="fc"><i>154</i>&nbsp;        this(System.currentTimeMillis() + seedAdditive_);</b>
+<b class="fc"><i>155</i>&nbsp;        seedAdditive_ += nextInt();</b>
+<b class="fc"><i>156</i>&nbsp;    }</b>
+<i>157</i>&nbsp;
+<i>158</i>&nbsp;    /**
+<i>159</i>&nbsp;     * Constructor using a given seed.  Though you pass this seed in
+<i>160</i>&nbsp;     * as a long, it&#39;s best to make sure it&#39;s actually an integer.
+<i>161</i>&nbsp;     *
+<i>162</i>&nbsp;     * @param seed generator starting number, often the time of day.
+<i>163</i>&nbsp;     */
+<b class="fc"><i>164</i>&nbsp;    private MersenneTwisterFast(long seed) {</b>
+<b class="fc"><i>165</i>&nbsp;        if (seed == 0) {</b>
+<b class="nc"><i>166</i>&nbsp;            setSeed(GOOD_SEED);</b>
+<i>167</i>&nbsp;        } else {
+<b class="fc"><i>168</i>&nbsp;            setSeed(seed);</b>
+<i>169</i>&nbsp;        }
+<b class="fc"><i>170</i>&nbsp;    }</b>
+<i>171</i>&nbsp;
+<i>172</i>&nbsp;
+<i>173</i>&nbsp;    /**
+<i>174</i>&nbsp;     * Initalize the pseudo random number generator.
+<i>175</i>&nbsp;     * The Mersenne Twister only uses an integer for its seed;
+<i>176</i>&nbsp;     * It&#39;s best that you don&#39;t pass in a long that&#39;s bigger
+<i>177</i>&nbsp;     * than an int.
+<i>178</i>&nbsp;     *
+<i>179</i>&nbsp;     * @param seed from constructor
+<i>180</i>&nbsp;     */
+<i>181</i>&nbsp;    public final void setSeed(long seed) {
+<b class="fc"><i>182</i>&nbsp;        if (seed == 0) {</b>
+<b class="nc"><i>183</i>&nbsp;            throw new IllegalArgumentException(&quot;Non zero random seed required.&quot;);</b>
+<i>184</i>&nbsp;        }
+<b class="fc"><i>185</i>&nbsp;        initializationSeed = seed;</b>
+<b class="fc"><i>186</i>&nbsp;        haveNextNextGaussian = false;</b>
+<i>187</i>&nbsp;
+<b class="fc"><i>188</i>&nbsp;        mt = new int[N];</b>
+<i>189</i>&nbsp;
+<i>190</i>&nbsp;        // setting initial seeds to mt[N] using
+<i>191</i>&nbsp;        // the generator Line 25 of Table 1 in
+<i>192</i>&nbsp;        // [KNUTH 1981, The Art of Computer Programming
+<i>193</i>&nbsp;        //    Vol. 2 (2nd Ed.), pp102]
+<i>194</i>&nbsp;
+<i>195</i>&nbsp;        // the 0xffffffff is commented out because in Java
+<i>196</i>&nbsp;        // ints are always 32 bits; hence i &amp; 0xffffffff == i
+<i>197</i>&nbsp;
+<b class="fc"><i>198</i>&nbsp;        mt[0] = ((int) seed); // &amp; 0xffffffff;</b>
+<i>199</i>&nbsp;
+<b class="fc"><i>200</i>&nbsp;        for (mti = 1; mti &lt; N; mti++)</b>
+<b class="fc"><i>201</i>&nbsp;            mt[mti] = (69069 * mt[mti - 1]); //&amp; 0xffffffff;</b>
+<i>202</i>&nbsp;
+<i>203</i>&nbsp;        // mag01[x] = x * MATRIX_A  for x=0,1
+<b class="fc"><i>204</i>&nbsp;        mag01 = new int[2];</b>
+<b class="fc"><i>205</i>&nbsp;        mag01[0] = 0x0;</b>
+<b class="fc"><i>206</i>&nbsp;        mag01[1] = MATRIX_A;</b>
+<b class="fc"><i>207</i>&nbsp;    }</b>
+<i>208</i>&nbsp;
+<i>209</i>&nbsp;    public final long getSeed() {
+<b class="fc"><i>210</i>&nbsp;        return initializationSeed;</b>
+<i>211</i>&nbsp;    }
+<i>212</i>&nbsp;
+<i>213</i>&nbsp;    /**
+<i>214</i>&nbsp;     * grabbing the next int should be synchronized,
+<i>215</i>&nbsp;     * If 2 threads request, say, a double and a gaussian at the same time,
+<i>216</i>&nbsp;     * and mti = N - 1, the condition (mit &gt;= N) is false for both threads,
+<i>217</i>&nbsp;     * but the first increase mti before the second results in an out-of-bounds
+<i>218</i>&nbsp;     * exception when &#39;return mt[mti++] is called.
+<i>219</i>&nbsp;     * &lt;p/&gt;
+<i>220</i>&nbsp;     * To prevent this, this part of the code should be synchronized
+<i>221</i>&nbsp;     */
+<i>222</i>&nbsp;    synchronized private int next() {
+<i>223</i>&nbsp;        int y;
+<b class="fc"><i>224</i>&nbsp;        if (mti &gt;= N)   // generate N words at one time</b>
+<i>225</i>&nbsp;        {
+<i>226</i>&nbsp;            int kk;
+<i>227</i>&nbsp;
+<b class="fc"><i>228</i>&nbsp;            for (kk = 0; kk &lt; N - M; kk++) {</b>
+<b class="fc"><i>229</i>&nbsp;                y = (mt[kk] &amp; UPPER_MASK) | (mt[kk + 1] &amp; LOWER_MASK);</b>
+<b class="fc"><i>230</i>&nbsp;                mt[kk] = mt[kk + M] ^ (y &gt;&gt;&gt; 1) ^ mag01[y &amp; 0x1];</b>
+<i>231</i>&nbsp;            }
+<b class="fc"><i>232</i>&nbsp;            for (; kk &lt; N - 1; kk++) {</b>
+<b class="fc"><i>233</i>&nbsp;                y = (mt[kk] &amp; UPPER_MASK) | (mt[kk + 1] &amp; LOWER_MASK);</b>
+<b class="fc"><i>234</i>&nbsp;                mt[kk] = mt[kk + (M - N)] ^ (y &gt;&gt;&gt; 1) ^ mag01[y &amp; 0x1];</b>
+<i>235</i>&nbsp;            }
+<b class="fc"><i>236</i>&nbsp;            y = (mt[N - 1] &amp; UPPER_MASK) | (mt[0] &amp; LOWER_MASK);</b>
+<b class="fc"><i>237</i>&nbsp;            mt[N - 1] = mt[M - 1] ^ (y &gt;&gt;&gt; 1) ^ mag01[y &amp; 0x1];</b>
+<i>238</i>&nbsp;
+<b class="fc"><i>239</i>&nbsp;            mti = 0;</b>
+<i>240</i>&nbsp;        }
+<i>241</i>&nbsp;
+<b class="fc"><i>242</i>&nbsp;        return mt[mti++];</b>
+<i>243</i>&nbsp;    }
+<i>244</i>&nbsp;
+<i>245</i>&nbsp;    public final int nextInt() {
+<i>246</i>&nbsp;        int y;
+<i>247</i>&nbsp;
+<b class="fc"><i>248</i>&nbsp;        y = next();</b>
+<b class="fc"><i>249</i>&nbsp;        y ^= y &gt;&gt;&gt; 11;                          // TEMPERING_SHIFT_U(y)</b>
+<b class="fc"><i>250</i>&nbsp;        y ^= (y &lt;&lt; 7) &amp; TEMPERING_MASK_B;       // TEMPERING_SHIFT_S(y)</b>
+<b class="fc"><i>251</i>&nbsp;        y ^= (y &lt;&lt; 15) &amp; TEMPERING_MASK_C;      // TEMPERING_SHIFT_T(y)</b>
+<b class="fc"><i>252</i>&nbsp;        y ^= (y &gt;&gt;&gt; 18);                        // TEMPERING_SHIFT_L(y)</b>
+<i>253</i>&nbsp;
+<b class="fc"><i>254</i>&nbsp;        return y;</b>
+<i>255</i>&nbsp;    }
+<i>256</i>&nbsp;
+<i>257</i>&nbsp;
+<i>258</i>&nbsp;    public final short nextShort() {
+<i>259</i>&nbsp;        int y;
+<i>260</i>&nbsp;
+<b class="nc"><i>261</i>&nbsp;        y = next();</b>
+<b class="nc"><i>262</i>&nbsp;        y ^= y &gt;&gt;&gt; 11;                          // TEMPERING_SHIFT_U(y)</b>
+<b class="nc"><i>263</i>&nbsp;        y ^= (y &lt;&lt; 7) &amp; TEMPERING_MASK_B;       // TEMPERING_SHIFT_S(y)</b>
+<b class="nc"><i>264</i>&nbsp;        y ^= (y &lt;&lt; 15) &amp; TEMPERING_MASK_C;      // TEMPERING_SHIFT_T(y)</b>
+<b class="nc"><i>265</i>&nbsp;        y ^= (y &gt;&gt;&gt; 18);                        // TEMPERING_SHIFT_L(y)</b>
+<i>266</i>&nbsp;
+<b class="nc"><i>267</i>&nbsp;        return (short) (y &gt;&gt;&gt; 16);</b>
+<i>268</i>&nbsp;    }
+<i>269</i>&nbsp;
+<i>270</i>&nbsp;
+<i>271</i>&nbsp;    public final char nextChar() {
+<i>272</i>&nbsp;        int y;
+<i>273</i>&nbsp;
+<b class="nc"><i>274</i>&nbsp;        y = next();</b>
+<b class="nc"><i>275</i>&nbsp;        y ^= y &gt;&gt;&gt; 11;                          // TEMPERING_SHIFT_U(y)</b>
+<b class="nc"><i>276</i>&nbsp;        y ^= (y &lt;&lt; 7) &amp; TEMPERING_MASK_B;       // TEMPERING_SHIFT_S(y)</b>
+<b class="nc"><i>277</i>&nbsp;        y ^= (y &lt;&lt; 15) &amp; TEMPERING_MASK_C;      // TEMPERING_SHIFT_T(y)</b>
+<b class="nc"><i>278</i>&nbsp;        y ^= (y &gt;&gt;&gt; 18);                        // TEMPERING_SHIFT_L(y)</b>
+<i>279</i>&nbsp;
+<b class="nc"><i>280</i>&nbsp;        return (char) (y &gt;&gt;&gt; 16);</b>
+<i>281</i>&nbsp;    }
+<i>282</i>&nbsp;
+<i>283</i>&nbsp;
+<i>284</i>&nbsp;    public final boolean nextBoolean() {
+<i>285</i>&nbsp;        int y;
+<i>286</i>&nbsp;
+<b class="nc"><i>287</i>&nbsp;        y = next();</b>
+<b class="nc"><i>288</i>&nbsp;        y ^= y &gt;&gt;&gt; 11;                          // TEMPERING_SHIFT_U(y)</b>
+<b class="nc"><i>289</i>&nbsp;        y ^= (y &lt;&lt; 7) &amp; TEMPERING_MASK_B;       // TEMPERING_SHIFT_S(y)</b>
+<b class="nc"><i>290</i>&nbsp;        y ^= (y &lt;&lt; 15) &amp; TEMPERING_MASK_C;      // TEMPERING_SHIFT_T(y)</b>
+<b class="nc"><i>291</i>&nbsp;        y ^= (y &gt;&gt;&gt; 18);                        // TEMPERING_SHIFT_L(y)</b>
+<i>292</i>&nbsp;
+<b class="nc"><i>293</i>&nbsp;        return ((y &gt;&gt;&gt; 31) != 0);</b>
+<i>294</i>&nbsp;    }
+<i>295</i>&nbsp;
+<i>296</i>&nbsp;
+<i>297</i>&nbsp;    public final byte nextByte() {
+<i>298</i>&nbsp;        int y;
+<i>299</i>&nbsp;
+<b class="nc"><i>300</i>&nbsp;        y = next();</b>
+<b class="nc"><i>301</i>&nbsp;        y ^= y &gt;&gt;&gt; 11;                          // TEMPERING_SHIFT_U(y)</b>
+<b class="nc"><i>302</i>&nbsp;        y ^= (y &lt;&lt; 7) &amp; TEMPERING_MASK_B;       // TEMPERING_SHIFT_S(y)</b>
+<b class="nc"><i>303</i>&nbsp;        y ^= (y &lt;&lt; 15) &amp; TEMPERING_MASK_C;      // TEMPERING_SHIFT_T(y)</b>
+<b class="nc"><i>304</i>&nbsp;        y ^= (y &gt;&gt;&gt; 18);                        // TEMPERING_SHIFT_L(y)</b>
+<i>305</i>&nbsp;
+<b class="nc"><i>306</i>&nbsp;        return (byte) (y &gt;&gt;&gt; 24);</b>
+<i>307</i>&nbsp;    }
+<i>308</i>&nbsp;
+<i>309</i>&nbsp;
+<i>310</i>&nbsp;    public final void nextBytes(byte[] bytes) {
+<i>311</i>&nbsp;        int y;
+<i>312</i>&nbsp;
+<b class="nc"><i>313</i>&nbsp;        for (int x = 0; x &lt; bytes.length; x++) {</b>
+<b class="nc"><i>314</i>&nbsp;            y = next();</b>
+<b class="nc"><i>315</i>&nbsp;            y ^= y &gt;&gt;&gt; 11;                          // TEMPERING_SHIFT_U(y)</b>
+<b class="nc"><i>316</i>&nbsp;            y ^= (y &lt;&lt; 7) &amp; TEMPERING_MASK_B;       // TEMPERING_SHIFT_S(y)</b>
+<b class="nc"><i>317</i>&nbsp;            y ^= (y &lt;&lt; 15) &amp; TEMPERING_MASK_C;      // TEMPERING_SHIFT_T(y)</b>
+<b class="nc"><i>318</i>&nbsp;            y ^= (y &gt;&gt;&gt; 18);                        // TEMPERING_SHIFT_L(y)</b>
+<i>319</i>&nbsp;
+<b class="nc"><i>320</i>&nbsp;            bytes[x] = (byte) (y &gt;&gt;&gt; 24);</b>
+<i>321</i>&nbsp;        }
+<b class="nc"><i>322</i>&nbsp;    }</b>
+<i>323</i>&nbsp;
+<i>324</i>&nbsp;
+<i>325</i>&nbsp;    public final long nextLong() {
+<i>326</i>&nbsp;        int y;
+<i>327</i>&nbsp;        int z;
+<i>328</i>&nbsp;
+<b class="nc"><i>329</i>&nbsp;        y = next();</b>
+<b class="nc"><i>330</i>&nbsp;        y ^= y &gt;&gt;&gt; 11;                          // TEMPERING_SHIFT_U(y)</b>
+<b class="nc"><i>331</i>&nbsp;        y ^= (y &lt;&lt; 7) &amp; TEMPERING_MASK_B;       // TEMPERING_SHIFT_S(y)</b>
+<b class="nc"><i>332</i>&nbsp;        y ^= (y &lt;&lt; 15) &amp; TEMPERING_MASK_C;      // TEMPERING_SHIFT_T(y)</b>
+<b class="nc"><i>333</i>&nbsp;        y ^= (y &gt;&gt;&gt; 18);                        // TEMPERING_SHIFT_L(y)</b>
+<i>334</i>&nbsp;
+<b class="nc"><i>335</i>&nbsp;        z = next();</b>
+<b class="nc"><i>336</i>&nbsp;        z ^= z &gt;&gt;&gt; 11;                          // TEMPERING_SHIFT_U(z)</b>
+<b class="nc"><i>337</i>&nbsp;        z ^= (z &lt;&lt; 7) &amp; TEMPERING_MASK_B;       // TEMPERING_SHIFT_S(z)</b>
+<b class="nc"><i>338</i>&nbsp;        z ^= (z &lt;&lt; 15) &amp; TEMPERING_MASK_C;      // TEMPERING_SHIFT_T(z)</b>
+<b class="nc"><i>339</i>&nbsp;        z ^= (z &gt;&gt;&gt; 18);                        // TEMPERING_SHIFT_L(z)</b>
+<i>340</i>&nbsp;
+<b class="nc"><i>341</i>&nbsp;        return (((long) y) &lt;&lt; 32) + z;</b>
+<i>342</i>&nbsp;    }
+<i>343</i>&nbsp;
+<i>344</i>&nbsp;
+<i>345</i>&nbsp;    public final double nextDouble() {
+<i>346</i>&nbsp;        int y;
+<i>347</i>&nbsp;        int z;
+<i>348</i>&nbsp;
+<b class="fc"><i>349</i>&nbsp;        y = next();</b>
+<b class="fc"><i>350</i>&nbsp;        y ^= y &gt;&gt;&gt; 11;                          // TEMPERING_SHIFT_U(y)</b>
+<b class="fc"><i>351</i>&nbsp;        y ^= (y &lt;&lt; 7) &amp; TEMPERING_MASK_B;       // TEMPERING_SHIFT_S(y)</b>
+<b class="fc"><i>352</i>&nbsp;        y ^= (y &lt;&lt; 15) &amp; TEMPERING_MASK_C;      // TEMPERING_SHIFT_T(y)</b>
+<b class="fc"><i>353</i>&nbsp;        y ^= (y &gt;&gt;&gt; 18);                        // TEMPERING_SHIFT_L(y)</b>
+<i>354</i>&nbsp;
+<b class="fc"><i>355</i>&nbsp;        z = next();</b>
+<b class="fc"><i>356</i>&nbsp;        z ^= z &gt;&gt;&gt; 11;                          // TEMPERING_SHIFT_U(z)</b>
+<b class="fc"><i>357</i>&nbsp;        z ^= (z &lt;&lt; 7) &amp; TEMPERING_MASK_B;       // TEMPERING_SHIFT_S(z)</b>
+<b class="fc"><i>358</i>&nbsp;        z ^= (z &lt;&lt; 15) &amp; TEMPERING_MASK_C;      // TEMPERING_SHIFT_T(z)</b>
+<b class="fc"><i>359</i>&nbsp;        z ^= (z &gt;&gt;&gt; 18);                        // TEMPERING_SHIFT_L(z)</b>
+<i>360</i>&nbsp;
+<i>361</i>&nbsp;        /* derived from nextDouble documentation in jdk 1.2 docs, see top */
+<b class="fc"><i>362</i>&nbsp;        return ((((long) (y &gt;&gt;&gt; 6)) &lt;&lt; 27) + (z &gt;&gt;&gt; 5)) / (double) (1L &lt;&lt; 53);</b>
+<i>363</i>&nbsp;    }
+<i>364</i>&nbsp;
+<i>365</i>&nbsp;    public final double nextGaussian() {
+<b class="nc"><i>366</i>&nbsp;        if (haveNextNextGaussian) {</b>
+<b class="nc"><i>367</i>&nbsp;            haveNextNextGaussian = false;</b>
+<b class="nc"><i>368</i>&nbsp;            return nextNextGaussian;</b>
+<i>369</i>&nbsp;        } else {
+<i>370</i>&nbsp;            double v1, v2, s;
+<i>371</i>&nbsp;            do {
+<i>372</i>&nbsp;                int y;
+<i>373</i>&nbsp;                int z;
+<i>374</i>&nbsp;                int a;
+<i>375</i>&nbsp;                int b;
+<i>376</i>&nbsp;
+<b class="nc"><i>377</i>&nbsp;                y = next();</b>
+<b class="nc"><i>378</i>&nbsp;                y ^= y &gt;&gt;&gt; 11;                          // TEMPERING_SHIFT_U(y)</b>
+<b class="nc"><i>379</i>&nbsp;                y ^= (y &lt;&lt; 7) &amp; TEMPERING_MASK_B;       // TEMPERING_SHIFT_S(y)</b>
+<b class="nc"><i>380</i>&nbsp;                y ^= (y &lt;&lt; 15) &amp; TEMPERING_MASK_C;      // TEMPERING_SHIFT_T(y)</b>
+<b class="nc"><i>381</i>&nbsp;                y ^= (y &gt;&gt;&gt; 18);                        // TEMPERING_SHIFT_L(y)</b>
+<i>382</i>&nbsp;
+<b class="nc"><i>383</i>&nbsp;                z = next();</b>
+<b class="nc"><i>384</i>&nbsp;                z ^= z &gt;&gt;&gt; 11;                          // TEMPERING_SHIFT_U(z)</b>
+<b class="nc"><i>385</i>&nbsp;                z ^= (z &lt;&lt; 7) &amp; TEMPERING_MASK_B;       // TEMPERING_SHIFT_S(z)</b>
+<b class="nc"><i>386</i>&nbsp;                z ^= (z &lt;&lt; 15) &amp; TEMPERING_MASK_C;      // TEMPERING_SHIFT_T(z)</b>
+<b class="nc"><i>387</i>&nbsp;                z ^= (z &gt;&gt;&gt; 18);                        // TEMPERING_SHIFT_L(z)</b>
+<i>388</i>&nbsp;
+<b class="nc"><i>389</i>&nbsp;                a = next();</b>
+<b class="nc"><i>390</i>&nbsp;                a ^= a &gt;&gt;&gt; 11;                          // TEMPERING_SHIFT_U(a)</b>
+<b class="nc"><i>391</i>&nbsp;                a ^= (a &lt;&lt; 7) &amp; TEMPERING_MASK_B;       // TEMPERING_SHIFT_S(a)</b>
+<b class="nc"><i>392</i>&nbsp;                a ^= (a &lt;&lt; 15) &amp; TEMPERING_MASK_C;      // TEMPERING_SHIFT_T(a)</b>
+<b class="nc"><i>393</i>&nbsp;                a ^= (a &gt;&gt;&gt; 18);                        // TEMPERING_SHIFT_L(a)</b>
+<i>394</i>&nbsp;
+<b class="nc"><i>395</i>&nbsp;                b = next();</b>
+<b class="nc"><i>396</i>&nbsp;                b ^= b &gt;&gt;&gt; 11;                          // TEMPERING_SHIFT_U(b)</b>
+<b class="nc"><i>397</i>&nbsp;                b ^= (b &lt;&lt; 7) &amp; TEMPERING_MASK_B;       // TEMPERING_SHIFT_S(b)</b>
+<b class="nc"><i>398</i>&nbsp;                b ^= (b &lt;&lt; 15) &amp; TEMPERING_MASK_C;      // TEMPERING_SHIFT_T(b)</b>
+<b class="nc"><i>399</i>&nbsp;                b ^= (b &gt;&gt;&gt; 18);                        // TEMPERING_SHIFT_L(b)</b>
+<i>400</i>&nbsp;
+<i>401</i>&nbsp;                /* derived from nextDouble documentation in jdk 1.2 docs, see top */
+<b class="nc"><i>402</i>&nbsp;                v1 = 2 *</b>
+<i>403</i>&nbsp;                        (((((long) (y &gt;&gt;&gt; 6)) &lt;&lt; 27) + (z &gt;&gt;&gt; 5)) / (double) (1L &lt;&lt; 53))
+<i>404</i>&nbsp;                        - 1;
+<b class="nc"><i>405</i>&nbsp;                v2 = 2 * (((((long) (a &gt;&gt;&gt; 6)) &lt;&lt; 27) + (b &gt;&gt;&gt; 5)) / (double) (1L &lt;&lt; 53))</b>
+<i>406</i>&nbsp;                        - 1;
+<b class="nc"><i>407</i>&nbsp;                s = v1 * v1 + v2 * v2;</b>
+<b class="nc"><i>408</i>&nbsp;            } while (s &gt;= 1);</b>
+<b class="nc"><i>409</i>&nbsp;            double multiplier = Math.sqrt(-2 * Math.log(s) / s);</b>
+<b class="nc"><i>410</i>&nbsp;            nextNextGaussian = v2 * multiplier;</b>
+<b class="nc"><i>411</i>&nbsp;            haveNextNextGaussian = true;</b>
+<b class="nc"><i>412</i>&nbsp;            return v1 * multiplier;</b>
+<i>413</i>&nbsp;        }
+<i>414</i>&nbsp;    }
+<i>415</i>&nbsp;
+<i>416</i>&nbsp;    public final float nextFloat() {
+<i>417</i>&nbsp;        int y;
+<i>418</i>&nbsp;
+<b class="nc"><i>419</i>&nbsp;        y = next();</b>
+<b class="nc"><i>420</i>&nbsp;        y ^= y &gt;&gt;&gt; 11;                          // TEMPERING_SHIFT_U(y)</b>
+<b class="nc"><i>421</i>&nbsp;        y ^= (y &lt;&lt; 7) &amp; TEMPERING_MASK_B;       // TEMPERING_SHIFT_S(y)</b>
+<b class="nc"><i>422</i>&nbsp;        y ^= (y &lt;&lt; 15) &amp; TEMPERING_MASK_C;      // TEMPERING_SHIFT_T(y)</b>
+<b class="nc"><i>423</i>&nbsp;        y ^= (y &gt;&gt;&gt; 18);                        // TEMPERING_SHIFT_L(y)</b>
+<i>424</i>&nbsp;
+<b class="nc"><i>425</i>&nbsp;        return (y &gt;&gt;&gt; 8) / ((float) (1 &lt;&lt; 24));</b>
+<i>426</i>&nbsp;    }
+<i>427</i>&nbsp;
+<i>428</i>&nbsp;
+<i>429</i>&nbsp;    /**
+<i>430</i>&nbsp;     * Returns an integer drawn uniformly from 0 to n-1.  Suffice it to say,
+<i>431</i>&nbsp;     * n must be &gt; 0, or an IllegalArgumentException is raised.
+<i>432</i>&nbsp;     */
+<i>433</i>&nbsp;    public int nextInt(int n) {
+<b class="fc"><i>434</i>&nbsp;        if (n &lt;= 0)</b>
+<b class="nc"><i>435</i>&nbsp;            throw new IllegalArgumentException(&quot;n must be positive&quot;);</b>
+<i>436</i>&nbsp;
+<b class="fc"><i>437</i>&nbsp;        if ((n &amp; -n) == n)  // i.e., n is a power of 2</b>
+<i>438</i>&nbsp;        {
+<i>439</i>&nbsp;            int y;
+<i>440</i>&nbsp;
+<b class="fc"><i>441</i>&nbsp;            y = next();</b>
+<b class="fc"><i>442</i>&nbsp;            y ^= y &gt;&gt;&gt; 11;                          // TEMPERING_SHIFT_U(y)</b>
+<b class="fc"><i>443</i>&nbsp;            y ^= (y &lt;&lt; 7) &amp; TEMPERING_MASK_B;       // TEMPERING_SHIFT_S(y)</b>
+<b class="fc"><i>444</i>&nbsp;            y ^= (y &lt;&lt; 15) &amp; TEMPERING_MASK_C;      // TEMPERING_SHIFT_T(y)</b>
+<b class="fc"><i>445</i>&nbsp;            y ^= (y &gt;&gt;&gt; 18);                        // TEMPERING_SHIFT_L(y)</b>
+<i>446</i>&nbsp;
+<b class="fc"><i>447</i>&nbsp;            return (int) ((n * (long) (y &gt;&gt;&gt; 1)) &gt;&gt; 31);</b>
+<i>448</i>&nbsp;        }
+<i>449</i>&nbsp;
+<i>450</i>&nbsp;        int bits, val;
+<i>451</i>&nbsp;        do {
+<i>452</i>&nbsp;            int y;
+<i>453</i>&nbsp;
+<b class="fc"><i>454</i>&nbsp;            y = next();</b>
+<b class="fc"><i>455</i>&nbsp;            y ^= y &gt;&gt;&gt; 11;                          // TEMPERING_SHIFT_U(y)</b>
+<b class="fc"><i>456</i>&nbsp;            y ^= (y &lt;&lt; 7) &amp; TEMPERING_MASK_B;       // TEMPERING_SHIFT_S(y)</b>
+<b class="fc"><i>457</i>&nbsp;            y ^= (y &lt;&lt; 15) &amp; TEMPERING_MASK_C;      // TEMPERING_SHIFT_T(y)</b>
+<b class="fc"><i>458</i>&nbsp;            y ^= (y &gt;&gt;&gt; 18);                        // TEMPERING_SHIFT_L(y)</b>
+<i>459</i>&nbsp;
+<b class="fc"><i>460</i>&nbsp;            bits = (y &gt;&gt;&gt; 1);</b>
+<b class="fc"><i>461</i>&nbsp;            val = bits % n;</b>
+<b class="fc"><i>462</i>&nbsp;        } while (bits - val + (n - 1) &lt; 0);</b>
+<b class="fc"><i>463</i>&nbsp;        return val;</b>
+<i>464</i>&nbsp;    }
+<i>465</i>&nbsp;
+<i>466</i>&nbsp;    /**
+<i>467</i>&nbsp;     * Returns a uniform random permutation of int objects in array
+<i>468</i>&nbsp;     */
+<i>469</i>&nbsp;    public final void permute(int[] array) {
+<b class="nc"><i>470</i>&nbsp;        int l = array.length;</b>
+<b class="nc"><i>471</i>&nbsp;        for (int i = 0; i &lt; l; i++) {</b>
+<b class="nc"><i>472</i>&nbsp;            int index = nextInt(l - i) + i;</b>
+<b class="nc"><i>473</i>&nbsp;            int temp = array[index];</b>
+<b class="nc"><i>474</i>&nbsp;            array[index] = array[i];</b>
+<b class="nc"><i>475</i>&nbsp;            array[i] = temp;</b>
+<i>476</i>&nbsp;        }
+<b class="nc"><i>477</i>&nbsp;    }</b>
+<i>478</i>&nbsp;
+<i>479</i>&nbsp;
+<i>480</i>&nbsp;    /**
+<i>481</i>&nbsp;     * Shuffles an array.
+<i>482</i>&nbsp;     */
+<i>483</i>&nbsp;    public final void shuffle(int[] array) {
+<b class="nc"><i>484</i>&nbsp;        int l = array.length;</b>
+<b class="nc"><i>485</i>&nbsp;        for (int i = 0; i &lt; l; i++) {</b>
+<b class="nc"><i>486</i>&nbsp;            int index = nextInt(l - i) + i;</b>
+<b class="nc"><i>487</i>&nbsp;            int temp = array[index];</b>
+<b class="nc"><i>488</i>&nbsp;            array[index] = array[i];</b>
+<b class="nc"><i>489</i>&nbsp;            array[i] = temp;</b>
+<i>490</i>&nbsp;        }
+<b class="nc"><i>491</i>&nbsp;    }</b>
+<i>492</i>&nbsp;
+<i>493</i>&nbsp;    /**
+<i>494</i>&nbsp;     * Shuffles an array. Shuffles numberOfShuffles times
+<i>495</i>&nbsp;     */
+<i>496</i>&nbsp;    public final void shuffle(int[] array, int numberOfShuffles) {
+<b class="nc"><i>497</i>&nbsp;        int i, j, temp, l = array.length;</b>
+<b class="nc"><i>498</i>&nbsp;        for (int shuffle = 0; shuffle &lt; numberOfShuffles; shuffle++) {</b>
+<i>499</i>&nbsp;            do {
+<b class="nc"><i>500</i>&nbsp;                i = nextInt(l);</b>
+<b class="nc"><i>501</i>&nbsp;                j = nextInt(l);</b>
+<b class="nc"><i>502</i>&nbsp;            } while (i != j);</b>
+<b class="nc"><i>503</i>&nbsp;            temp = array[j];</b>
+<b class="nc"><i>504</i>&nbsp;            array[j] = array[i];</b>
+<b class="nc"><i>505</i>&nbsp;            array[i] = temp;</b>
+<i>506</i>&nbsp;        }
+<b class="nc"><i>507</i>&nbsp;    }</b>
+<i>508</i>&nbsp;
+<i>509</i>&nbsp;    /**
+<i>510</i>&nbsp;     * Returns an array of shuffled indices of length l.
+<i>511</i>&nbsp;     *
+<i>512</i>&nbsp;     * @param l length of the array required.
+<i>513</i>&nbsp;     */
+<i>514</i>&nbsp;    public int[] shuffled(int l) {
+<i>515</i>&nbsp;
+<b class="nc"><i>516</i>&nbsp;        int[] array = new int[l];</b>
+<i>517</i>&nbsp;
+<i>518</i>&nbsp;        // initialize array
+<b class="nc"><i>519</i>&nbsp;        for (int i = 0; i &lt; l; i++) {</b>
+<b class="nc"><i>520</i>&nbsp;            array[i] = i;</b>
+<i>521</i>&nbsp;        }
+<b class="nc"><i>522</i>&nbsp;        shuffle(array);</b>
+<i>523</i>&nbsp;
+<b class="nc"><i>524</i>&nbsp;        return array;</b>
+<i>525</i>&nbsp;    }
+<i>526</i>&nbsp;
+<i>527</i>&nbsp;    /**
+<i>528</i>&nbsp;     * Returns a uniform random permutation of ints 0,...,l-1
+<i>529</i>&nbsp;     *
+<i>530</i>&nbsp;     * @param l length of the array required.
+<i>531</i>&nbsp;     */
+<i>532</i>&nbsp;    public int[] permuted(int l) {
+<i>533</i>&nbsp;
+<b class="nc"><i>534</i>&nbsp;        int[] array = new int[l];</b>
+<i>535</i>&nbsp;
+<i>536</i>&nbsp;        // initialize array
+<b class="nc"><i>537</i>&nbsp;        for (int i = 0; i &lt; l; i++) {</b>
+<b class="nc"><i>538</i>&nbsp;            array[i] = i;</b>
+<i>539</i>&nbsp;        }
+<b class="nc"><i>540</i>&nbsp;        permute(array);</b>
+<i>541</i>&nbsp;
+<b class="nc"><i>542</i>&nbsp;        return array;</b>
+<i>543</i>&nbsp;    }
+<i>544</i>&nbsp;
+<i>545</i>&nbsp;
+<i>546</i>&nbsp;    public double nextGamma(double alpha, double lambda) {
+<i>547</i>&nbsp;        /******************************************************************
+<i>548</i>&nbsp;         *                                                                *
+<i>549</i>&nbsp;         *    Gamma Distribution - Acceptance Rejection combined with     *
+<i>550</i>&nbsp;         *                         Acceptance Complement                  *
+<i>551</i>&nbsp;         *                                                                *
+<i>552</i>&nbsp;         ******************************************************************
+<i>553</i>&nbsp;         *                                                                *
+<i>554</i>&nbsp;         * FUNCTION:    - gds samples a random number from the standard   *
+<i>555</i>&nbsp;         *                gamma distribution with parameter  a &gt; 0.       *
+<i>556</i>&nbsp;         *                Acceptance Rejection  gs  for  a &lt; 1 ,          *
+<i>557</i>&nbsp;         *                Acceptance Complement gd  for  a &gt;= 1 .         *
+<i>558</i>&nbsp;         * REFERENCES:  - J.H. Ahrens, U. Dieter (1974): Computer methods *
+<i>559</i>&nbsp;         *                for sampling from gamma, beta, Poisson and      *
+<i>560</i>&nbsp;         *                binomial distributions, Computing 12, 223-246.  *
+<i>561</i>&nbsp;         *              - J.H. Ahrens, U. Dieter (1982): Generating gamma *
+<i>562</i>&nbsp;         *                variates by a modified rejection technique,     *
+<i>563</i>&nbsp;         *                Communications of the ACM 25, 47-54.            *
+<i>564</i>&nbsp;         * SUBPROGRAMS: - drand(seed) ... (0,1)-Uniform generator with    *
+<i>565</i>&nbsp;         *                unsigned long integer *seed                     *
+<i>566</i>&nbsp;         *              - NORMAL(seed) ... Normal generator N(0,1).       *
+<i>567</i>&nbsp;         *                                                                *
+<i>568</i>&nbsp;         ******************************************************************/
+<b class="nc"><i>569</i>&nbsp;        double a = alpha;</b>
+<b class="nc"><i>570</i>&nbsp;        double aa = -1.0, aaa = -1.0,</b>
+<b class="nc"><i>571</i>&nbsp;                b = 0.0, c = 0.0, d = 0.0, e, r, s = 0.0, si = 0.0, ss = 0.0, q0 = 0.0,</b>
+<b class="nc"><i>572</i>&nbsp;                q1 = 0.0416666664, q2 = 0.0208333723, q3 = 0.0079849875,</b>
+<b class="nc"><i>573</i>&nbsp;                q4 = 0.0015746717, q5 = -0.0003349403, q6 = 0.0003340332,</b>
+<b class="nc"><i>574</i>&nbsp;                q7 = 0.0006053049, q8 = -0.0004701849, q9 = 0.0001710320,</b>
+<b class="nc"><i>575</i>&nbsp;                a1 = 0.333333333, a2 = -0.249999949, a3 = 0.199999867,</b>
+<b class="nc"><i>576</i>&nbsp;                a4 = -0.166677482, a5 = 0.142873973, a6 = -0.124385581,</b>
+<b class="nc"><i>577</i>&nbsp;                a7 = 0.110368310, a8 = -0.112750886, a9 = 0.104089866,</b>
+<b class="nc"><i>578</i>&nbsp;                e1 = 1.000000000, e2 = 0.499999994, e3 = 0.166666848,</b>
+<b class="nc"><i>579</i>&nbsp;                e4 = 0.041664508, e5 = 0.008345522, e6 = 0.001353826,</b>
+<b class="nc"><i>580</i>&nbsp;                e7 = 0.000247453;</b>
+<i>581</i>&nbsp;
+<i>582</i>&nbsp;        double gds, p, q, t, sign_u, u, v, w, x;
+<i>583</i>&nbsp;        double v1, v2, v12;
+<i>584</i>&nbsp;
+<i>585</i>&nbsp;        // Check for invalid input values
+<i>586</i>&nbsp;
+<b class="nc"><i>587</i>&nbsp;        if (a &lt;= 0.0) throw new IllegalArgumentException();</b>
+<b class="nc"><i>588</i>&nbsp;        if (lambda &lt;= 0.0) throw new IllegalArgumentException();</b>
+<i>589</i>&nbsp;
+<b class="nc"><i>590</i>&nbsp;        if (a &lt; 1.0) { // CASE A: Acceptance rejection algorithm gs</b>
+<b class="nc"><i>591</i>&nbsp;            b = 1.0 + 0.36788794412 * a;              // Step 1</b>
+<i>592</i>&nbsp;            for (; ; ) {
+<b class="nc"><i>593</i>&nbsp;                p = b * nextDouble();</b>
+<b class="nc"><i>594</i>&nbsp;                if (p &lt;= 1.0) {                       // Step 2. Case gds &lt;= 1</b>
+<b class="nc"><i>595</i>&nbsp;                    gds = Math.exp(Math.log(p) / a);</b>
+<b class="nc"><i>596</i>&nbsp;                    if (Math.log(nextDouble()) &lt;= -gds) return (gds / lambda);</b>
+<i>597</i>&nbsp;                } else {                                // Step 3. Case gds &gt; 1
+<b class="nc"><i>598</i>&nbsp;                    gds = -Math.log((b - p) / a);</b>
+<b class="nc"><i>599</i>&nbsp;                    if (Math.log(nextDouble()) &lt;= ((a - 1.0) * Math.log(gds))) return (gds / lambda);</b>
+<i>600</i>&nbsp;                }
+<i>601</i>&nbsp;            }
+<i>602</i>&nbsp;        } else {        // CASE B: Acceptance complement algorithm gd (gaussian distribution, box muller transformation)
+<b class="nc"><i>603</i>&nbsp;            if (a != aa) {                        // Step 1. Preparations</b>
+<b class="nc"><i>604</i>&nbsp;                aa = a;</b>
+<b class="nc"><i>605</i>&nbsp;                ss = a - 0.5;</b>
+<b class="nc"><i>606</i>&nbsp;                s = Math.sqrt(ss);</b>
+<b class="nc"><i>607</i>&nbsp;                d = 5.656854249 - 12.0 * s;</b>
+<i>608</i>&nbsp;            }
+<i>609</i>&nbsp;            // Step 2. Normal deviate
+<i>610</i>&nbsp;            do {
+<b class="nc"><i>611</i>&nbsp;                v1 = 2.0 * nextDouble() - 1.0;</b>
+<b class="nc"><i>612</i>&nbsp;                v2 = 2.0 * nextDouble() - 1.0;</b>
+<b class="nc"><i>613</i>&nbsp;                v12 = v1 * v1 + v2 * v2;</b>
+<b class="nc"><i>614</i>&nbsp;            } while (v12 &gt; 1.0);</b>
+<b class="nc"><i>615</i>&nbsp;            t = v1 * Math.sqrt(-2.0 * Math.log(v12) / v12);</b>
+<b class="nc"><i>616</i>&nbsp;            x = s + 0.5 * t;</b>
+<b class="nc"><i>617</i>&nbsp;            gds = x * x;</b>
+<b class="nc"><i>618</i>&nbsp;            if (t &gt;= 0.0) return (gds / lambda);         // Immediate acceptance</b>
+<i>619</i>&nbsp;
+<b class="nc"><i>620</i>&nbsp;            u = nextDouble();                // Step 3. Uniform random number</b>
+<b class="nc"><i>621</i>&nbsp;            if (d * u &lt;= t * t * t) return (gds / lambda); // Squeeze acceptance</b>
+<i>622</i>&nbsp;
+<b class="nc"><i>623</i>&nbsp;            if (a != aaa) {                           // Step 4. Set-up for hat case</b>
+<b class="nc"><i>624</i>&nbsp;                aaa = a;</b>
+<b class="nc"><i>625</i>&nbsp;                r = 1.0 / a;</b>
+<b class="nc"><i>626</i>&nbsp;                q0 = ((((((((q9 * r + q8) * r + q7) * r + q6) * r + q5) * r + q4) *</b>
+<i>627</i>&nbsp;                        r + q3) * r + q2) * r + q1) * r;
+<b class="nc"><i>628</i>&nbsp;                if (a &gt; 3.686) {</b>
+<b class="nc"><i>629</i>&nbsp;                    if (a &gt; 13.022) {</b>
+<b class="nc"><i>630</i>&nbsp;                        b = 1.77;</b>
+<b class="nc"><i>631</i>&nbsp;                        si = 0.75;</b>
+<b class="nc"><i>632</i>&nbsp;                        c = 0.1515 / s;</b>
+<i>633</i>&nbsp;                    } else {
+<b class="nc"><i>634</i>&nbsp;                        b = 1.654 + 0.0076 * ss;</b>
+<b class="nc"><i>635</i>&nbsp;                        si = 1.68 / s + 0.275;</b>
+<b class="nc"><i>636</i>&nbsp;                        c = 0.062 / s + 0.024;</b>
+<i>637</i>&nbsp;                    }
+<i>638</i>&nbsp;                } else {
+<b class="nc"><i>639</i>&nbsp;                    b = 0.463 + s - 0.178 * ss;</b>
+<b class="nc"><i>640</i>&nbsp;                    si = 1.235;</b>
+<b class="nc"><i>641</i>&nbsp;                    c = 0.195 / s - 0.079 + 0.016 * s;</b>
+<i>642</i>&nbsp;                }
+<i>643</i>&nbsp;            }
+<b class="nc"><i>644</i>&nbsp;            if (x &gt; 0.0) {                        // Step 5. Calculation of q</b>
+<b class="nc"><i>645</i>&nbsp;                v = t / (s + s);                  // Step 6.</b>
+<b class="nc"><i>646</i>&nbsp;                if (Math.abs(v) &gt; 0.25) {</b>
+<b class="nc"><i>647</i>&nbsp;                    q = q0 - s * t + 0.25 * t * t + (ss + ss) * Math.log(1.0 + v);</b>
+<i>648</i>&nbsp;                } else {
+<b class="nc"><i>649</i>&nbsp;                    q = q0 + 0.5 * t * t * ((((((((a9 * v + a8) * v + a7) * v + a6) *</b>
+<i>650</i>&nbsp;                            v + a5) * v + a4) * v + a3) * v + a2) * v + a1) * v;
+<i>651</i>&nbsp;                }                                  // Step 7. Quotient acceptance
+<b class="nc"><i>652</i>&nbsp;                if (Math.log(1.0 - u) &lt;= q) return (gds / lambda);</b>
+<i>653</i>&nbsp;            }
+<i>654</i>&nbsp;
+<i>655</i>&nbsp;            for (; ; ) {                                // Step 8. Double exponential deviate t
+<i>656</i>&nbsp;                do {
+<b class="nc"><i>657</i>&nbsp;                    e = -Math.log(nextDouble());</b>
+<b class="nc"><i>658</i>&nbsp;                    u = nextDouble();</b>
+<b class="nc"><i>659</i>&nbsp;                    u = u + u - 1.0;</b>
+<b class="nc"><i>660</i>&nbsp;                    sign_u = (u &gt; 0) ? 1.0 : -1.0;</b>
+<b class="nc"><i>661</i>&nbsp;                    t = b + (e * si) * sign_u;</b>
+<b class="nc"><i>662</i>&nbsp;                } while (t &lt;= -0.71874483771719); // Step 9. Rejection of t</b>
+<b class="nc"><i>663</i>&nbsp;                v = t / (s + s);                  // Step 10. New q(t)</b>
+<b class="nc"><i>664</i>&nbsp;                if (Math.abs(v) &gt; 0.25) {</b>
+<b class="nc"><i>665</i>&nbsp;                    q = q0 - s * t + 0.25 * t * t + (ss + ss) * Math.log(1.0 + v);</b>
+<i>666</i>&nbsp;                } else {
+<b class="nc"><i>667</i>&nbsp;                    q = q0 + 0.5 * t * t * ((((((((a9 * v + a8) * v + a7) * v + a6) *</b>
+<i>668</i>&nbsp;                            v + a5) * v + a4) * v + a3) * v + a2) * v + a1) * v;
+<i>669</i>&nbsp;                }
+<b class="nc"><i>670</i>&nbsp;                if (q &lt;= 0.0) continue;           // Step 11.</b>
+<b class="nc"><i>671</i>&nbsp;                if (q &gt; 0.5) {</b>
+<b class="nc"><i>672</i>&nbsp;                    w = Math.exp(q) - 1.0;</b>
+<i>673</i>&nbsp;                } else {
+<b class="nc"><i>674</i>&nbsp;                    w = ((((((e7 * q + e6) * q + e5) * q + e4) * q + e3) * q + e2) *</b>
+<i>675</i>&nbsp;                            q + e1) * q;
+<i>676</i>&nbsp;                }                                  // Step 12. Hat acceptance
+<b class="nc"><i>677</i>&nbsp;                if (c * u * sign_u &lt;= w * Math.exp(e - 0.5 * t * t)) {</b>
+<b class="nc"><i>678</i>&nbsp;                    x = s + 0.5 * t;</b>
+<b class="nc"><i>679</i>&nbsp;                    return (x * x / lambda);</b>
+<i>680</i>&nbsp;                }
+<i>681</i>&nbsp;            }
+<i>682</i>&nbsp;        }
+<i>683</i>&nbsp;    }
+<i>684</i>&nbsp;    
+<i>685</i>&nbsp;    /**********************************************************
+<i>686</i>&nbsp;     *                                                        *
+<i>687</i>&nbsp;     *  Poissonian distribution - Rejection + direct method   *
+<i>688</i>&nbsp;     *                                                        *
+<i>689</i>&nbsp;     **********************************************************/
+<i>690</i>&nbsp;    
+<i>691</i>&nbsp;    /**
+<i>692</i>&nbsp;     * Rejection method from NR, apparently good for lambda&gt;=12, although
+<i>693</i>&nbsp;     * systematic errors start to creep in at lambda&gt;=1e14.  Can we improve
+<i>694</i>&nbsp;     * on this?  A straight Gaussian seems to stay accurate for larger
+<i>695</i>&nbsp;     * means.
+<i>696</i>&nbsp;     * 
+<i>697</i>&nbsp;     * @param lambda
+<i>698</i>&nbsp;     * @return 
+<i>699</i>&nbsp;     */
+<i>700</i>&nbsp;    private long poissonian_reject(double lambda) {
+<b class="nc"><i>701</i>&nbsp;        double sq = Math.sqrt(2.0*lambda);</b>
+<b class="nc"><i>702</i>&nbsp;        double alxm = Math.log(lambda);</b>
+<b class="nc"><i>703</i>&nbsp;        double g = lambda*alxm-GammaFunction.lnGamma(lambda+1.0);</b>
+<i>704</i>&nbsp;        double em, t, y;
+<i>705</i>&nbsp;
+<i>706</i>&nbsp;        do {
+<i>707</i>&nbsp;            do {
+<b class="nc"><i>708</i>&nbsp;                y = Math.tan(Math.PI*nextDouble());</b>
+<b class="nc"><i>709</i>&nbsp;                em = sq*y+lambda;</b>
+<b class="nc"><i>710</i>&nbsp;            } while (em&lt;0.0);</b>
+<i>711</i>&nbsp;
+<b class="nc"><i>712</i>&nbsp;            em = Math.floor(em);</b>
+<b class="nc"><i>713</i>&nbsp;            t = 0.9*(1.0+y*y)*Math.exp(em*alxm</b>
+<b class="nc"><i>714</i>&nbsp;                    -GammaFunction.lnGamma(em+1.0)-g);</b>
+<i>715</i>&nbsp;
+<b class="nc"><i>716</i>&nbsp;        } while (nextDouble()&gt;t);</b>
+<i>717</i>&nbsp;
+<b class="nc"><i>718</i>&nbsp;        return Math.round(em);</b>
+<i>719</i>&nbsp;    }
+<i>720</i>&nbsp;
+<i>721</i>&nbsp;    /**
+<i>722</i>&nbsp;     * Inverse CDF method: only efficient for small lambda.  Warning:
+<i>723</i>&nbsp;     * this method assumes that lambda &lt; 12 by including a fail-safe
+<i>724</i>&nbsp;     * loop abort which truncates the possible sample values to &lt;500.
+<i>725</i>&nbsp;     * (Numerical implementations of the cDF method can occasionally
+<i>726</i>&nbsp;     * lead to infinite loops due to floating point errors.)
+<i>727</i>&nbsp;     * 
+<i>728</i>&nbsp;     * @param lambda
+<i>729</i>&nbsp;     * @return 
+<i>730</i>&nbsp;     */
+<i>731</i>&nbsp;    private long poissonian_icdf(double lambda) {
+<b class="nc"><i>732</i>&nbsp;        double p = nextDouble();</b>
+<i>733</i>&nbsp;
+<b class="nc"><i>734</i>&nbsp;        double factor = Math.exp(-lambda);</b>
+<b class="nc"><i>735</i>&nbsp;        double  acc = factor;</b>
+<b class="nc"><i>736</i>&nbsp;        int n=0;</b>
+<i>737</i>&nbsp;
+<b class="nc"><i>738</i>&nbsp;        while (p&gt;acc &amp;&amp; n&lt;500) {</b>
+<b class="nc"><i>739</i>&nbsp;            n += 1;</b>
+<b class="nc"><i>740</i>&nbsp;            factor *= lambda/n;</b>
+<b class="nc"><i>741</i>&nbsp;            acc += factor;</b>
+<i>742</i>&nbsp;        }
+<i>743</i>&nbsp;
+<b class="nc"><i>744</i>&nbsp;        return n;</b>
+<i>745</i>&nbsp;    }
+<i>746</i>&nbsp;
+<i>747</i>&nbsp;    /**
+<i>748</i>&nbsp;     * Sample from a Poissonian distribution.
+<i>749</i>&nbsp;     *
+<i>750</i>&nbsp;     * @param lambda mean of Poissonian distribution
+<i>751</i>&nbsp;     * @return Draw from Pois(lambda). Note: returns a double for historical reasons.
+<i>752</i>&nbsp;     */
+<i>753</i>&nbsp;    public long nextPoisson(double lambda) {
+<b class="nc"><i>754</i>&nbsp;        if (lambda&lt;12)</b>
+<b class="nc"><i>755</i>&nbsp;            return poissonian_icdf(lambda);</b>
+<i>756</i>&nbsp;
+<b class="nc"><i>757</i>&nbsp;        return poissonian_reject(lambda);</b>
+<i>758</i>&nbsp;    }
+<i>759</i>&nbsp;    
+<i>760</i>&nbsp;    /**
+<i>761</i>&nbsp;     * Main for debugging only.
+<i>762</i>&nbsp;     */
+<i>763</i>&nbsp;    public static void main (String [] args) throws FileNotFoundException {
+<i>764</i>&nbsp;        
+<b class="nc"><i>765</i>&nbsp;        double lambda = 1e14;</b>
+<b class="nc"><i>766</i>&nbsp;        int reps=100000;</b>
+<i>767</i>&nbsp;        
+<b class="nc"><i>768</i>&nbsp;        double [] vals = new double[reps];</b>
+<i>769</i>&nbsp;
+<i>770</i>&nbsp;//        PrintStream outf = new PrintStream(&quot;vals.txt&quot;);
+<i>771</i>&nbsp;        
+<b class="nc"><i>772</i>&nbsp;        for (int i=0; i&lt;reps; i++) {</b>
+<b class="nc"><i>773</i>&nbsp;            double val = Randomizer.nextPoisson(lambda);</b>
+<b class="nc"><i>774</i>&nbsp;            vals[i] = val;</b>
+<i>775</i>&nbsp;//            outf.println(val);
+<i>776</i>&nbsp;        }
+<i>777</i>&nbsp;//        outf.close();
+<i>778</i>&nbsp;        
+<b class="nc"><i>779</i>&nbsp;        System.out.format(&quot;E[x]=%g\n&quot;,DiscreteStatistics.mean(vals));</b>
+<b class="nc"><i>780</i>&nbsp;        System.out.format(&quot;Var[x]=%g\n&quot;, DiscreteStatistics.variance(vals));</b>
+<b class="nc"><i>781</i>&nbsp;    }</b>
+<i>782</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,386 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Script</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.util</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Script (beast.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+</tr>
+  <tr>
+    <td class="name">Script$Engine</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.util;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;import java.io.PrintStream;
+<i>7</i>&nbsp;import java.util.*;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;import javax.script.*;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;import beast.core.*;
+<i>12</i>&nbsp;import beast.core.Input.*;
+<i>13</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>14</i>&nbsp;import beast.core.util.*;
+<i>15</i>&nbsp;import beast.evolution.tree.*;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;@Description(&quot;Base class for Script-BEAST interoperation&quot;)
+<i>18</i>&nbsp;public class Script extends CalculationNode implements Loggable, beast.core.Function {
+<i>19</i>&nbsp;    public Input&lt;String&gt; scriptInput = new Input&lt;String&gt;(&quot;value&quot;, &quot;Script script needed for the calculations. &quot; +
+<i>20</i>&nbsp;    		&quot;It assumes there is a function f defined, which returns a single number or array of numbers.&quot;);
+<i>21</i>&nbsp;    public Input&lt;String&gt; expressionInput = new Input&lt;String&gt;(&quot;expression&quot;, &quot;expression representing the calculations&quot;, Validate.XOR, scriptInput);
+<i>22</i>&nbsp;    public Input&lt;List&lt;beast.core.Function&gt;&gt; functionInput = new Input&lt;List&lt;beast.core.Function&gt;&gt;(&quot;x&quot;, &quot;Parameters needed for the calculations&quot;, new ArrayList&lt;beast.core.Function&gt;());
+<i>23</i>&nbsp;    public Input&lt;String&gt; argNames = new Input&lt;&gt;(&quot;argnames&quot;, &quot;names of arguments used in expression (space delimited),&quot; +
+<i>24</i>&nbsp;            &quot; order as given by XML&quot;);
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;    enum Engine {JavaScript, python, jruby, groovy};
+<i>27</i>&nbsp;    public Input&lt;Engine&gt; engineInput = new Input&lt;Engine&gt;(&quot;engine&quot;, &quot;Script needed for the calculations (one of &quot;+ Arrays.toString(Engine.values()) + &quot; default Javascript)&quot;, Engine.JavaScript, Engine.values());
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;    ScriptEngine engine;
+<i>30</i>&nbsp;    Invocable inv;
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;    boolean isUpToDate = false;
+<i>33</i>&nbsp;    boolean isScript = true; // otherwise it is an expression
+<i>34</i>&nbsp;    double [] value;
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;    @Override public void initAndValidate() {
+<i>37</i>&nbsp;        // create a script engine manager
+<i>38</i>&nbsp;        ScriptEngineManager factory = new ScriptEngineManager();
+<i>39</i>&nbsp;        // create a JavaScript engine
+<i>40</i>&nbsp;        engine = factory.getEngineByName(engineInput.get().name());
+<i>41</i>&nbsp;        value = new double[1];
+<i>42</i>&nbsp;        value[0] = Double.NaN;
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;        Object o = null;
+<i>45</i>&nbsp;        if (scriptInput.get() != null &amp;&amp; scriptInput.get().trim().length() &gt; 0) { 
+<i>46</i>&nbsp;	        try {
+<i>47</i>&nbsp;				o = engine.eval(scriptInput.get());
+<i>48</i>&nbsp;			} catch (ScriptException e) {
+<i>49</i>&nbsp;				throw new IllegalArgumentException(e);
+<i>50</i>&nbsp;			}
+<i>51</i>&nbsp;        } else {
+<i>52</i>&nbsp;        	StringBuilder f = new StringBuilder();
+<i>53</i>&nbsp;        	// create function with argument list
+<i>54</i>&nbsp;        	f.append(&quot;with (Math) { function f(&quot;);
+<i>55</i>&nbsp;            if( argNames.get() != null ) {
+<i>56</i>&nbsp;                String[] args = argNames.get().split(&quot;\\s+&quot;);
+<i>57</i>&nbsp;                f.append(args[0]);
+<i>58</i>&nbsp;                for (String a : Arrays.copyOfRange(args, 1, args.length) ) {
+<i>59</i>&nbsp;                    f.append(&quot;, &quot;).append(a);
+<i>60</i>&nbsp;                }
+<i>61</i>&nbsp;            } else {
+<i>62</i>&nbsp;                for (Function x : functionInput.get()) {
+<i>63</i>&nbsp;                    f.append(((BEASTObject) x).getID());
+<i>64</i>&nbsp;                    f.append(&quot;, &quot;);
+<i>65</i>&nbsp;                }
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;                if( functionInput.get().size() &gt; 0 ) {
+<i>68</i>&nbsp;                    // eat up trailing comma
+<i>69</i>&nbsp;                    f.deleteCharAt(f.length() - 2);
+<i>70</i>&nbsp;                }
+<i>71</i>&nbsp;            }
+<i>72</i>&nbsp;        	f.append(&quot;) { return &quot;);
+<i>73</i>&nbsp;        	f.append(expressionInput.get());
+<i>74</i>&nbsp;        	f.append(&quot;;}\n}&quot;);
+<i>75</i>&nbsp;        	Log.info.println(f);
+<i>76</i>&nbsp;        	try {
+<i>77</i>&nbsp;        		o = engine.eval(f.toString());
+<i>78</i>&nbsp;			} catch (ScriptException e) {
+<i>79</i>&nbsp;				throw new IllegalArgumentException(e);
+<i>80</i>&nbsp;			}
+<i>81</i>&nbsp;
+<i>82</i>&nbsp;        }
+<i>83</i>&nbsp;//        if (o instanceof NativeArray) {
+<i>84</i>&nbsp;//            value = new double[((NativeArray)o).size()];
+<i>85</i>&nbsp;//            for (int i = 0; i &lt; value.length; i++) {
+<i>86</i>&nbsp;//                value[i] = Double.NaN;
+<i>87</i>&nbsp;//            }
+<i>88</i>&nbsp;//        }
+<i>89</i>&nbsp;        //initEngine();
+<i>90</i>&nbsp;        inv = (Invocable) engine;
+<i>91</i>&nbsp;        
+<i>92</i>&nbsp;    }
+<i>93</i>&nbsp;
+<i>94</i>&nbsp;
+<i>95</i>&nbsp;
+<i>96</i>&nbsp;
+<i>97</i>&nbsp;    private void calc() {
+<i>98</i>&nbsp;        //Bindings bind = engine.getBindings(ScriptContext.ENGINE_SCOPE);
+<i>99</i>&nbsp;        Object [] args = new Object[functionInput.get().size()];
+<i>100</i>&nbsp;        int k = 0;
+<i>101</i>&nbsp;        for (beast.core.Function f : functionInput.get()) {
+<i>102</i>&nbsp;            //String name = var.nameInput.get();
+<i>103</i>&nbsp;            Object _value = null;
+<i>104</i>&nbsp;            //beast.core.Function f = var.functionInput.get();
+<i>105</i>&nbsp;            if (f instanceof Tree) {
+<i>106</i>&nbsp;                Tree tree = (Tree) f;
+<i>107</i>&nbsp;                JSONProducer p = new JSONProducer();
+<i>108</i>&nbsp;                String treeString = toJSON(tree.getRoot());
+<i>109</i>&nbsp;                _value = &quot;{&quot; + treeString + &quot;}&quot;;
+<i>110</i>&nbsp;            } else if (f.getDimension() &gt; 1) {
+<i>111</i>&nbsp;                Double [] a = new Double[f.getDimension()];
+<i>112</i>&nbsp;                for (int i = 0;i &lt; f.getDimension(); i++) {
+<i>113</i>&nbsp;                    a[i] = f.getArrayValue(i);
+<i>114</i>&nbsp;                }
+<i>115</i>&nbsp;                _value = a;
+<i>116</i>&nbsp;            } else {
+<i>117</i>&nbsp;                _value = f.getArrayValue();
+<i>118</i>&nbsp;            }
+<i>119</i>&nbsp;            args[k++] = _value;
+<i>120</i>&nbsp;            //bind.put(name, _value);
+<i>121</i>&nbsp;        }
+<i>122</i>&nbsp;
+<i>123</i>&nbsp;        
+<i>124</i>&nbsp;        try {
+<i>125</i>&nbsp;       		Object o = inv.invokeFunction(&quot;f&quot;, args);
+<i>126</i>&nbsp;
+<i>127</i>&nbsp;//            if (o instanceof NativeArray) {
+<i>128</i>&nbsp;//                value = new double[((NativeArray)o).size()];
+<i>129</i>&nbsp;//                for (int i = 0; i &lt; value.length; i++) {
+<i>130</i>&nbsp;//                    this.value[i] = Double.parseDouble(((NativeArray)o).get(i).toString());
+<i>131</i>&nbsp;//                }
+<i>132</i>&nbsp;//            } else {
+<i>133</i>&nbsp;                this.value[0] = Double.parseDouble(o.toString());
+<i>134</i>&nbsp;//            }
+<i>135</i>&nbsp;        } catch (NoSuchMethodException | ScriptException e) {
+<i>136</i>&nbsp;            this.value[0] = Double.NaN;
+<i>137</i>&nbsp;            Log.err.println(e.getMessage());
+<i>138</i>&nbsp;        }
+<i>139</i>&nbsp;        isUpToDate = true;
+<i>140</i>&nbsp;    }
+<i>141</i>&nbsp;
+<i>142</i>&nbsp;//    private void initEngine() {
+<i>143</i>&nbsp;//        StringBuilder buf = new StringBuilder();
+<i>144</i>&nbsp;//        for (Var var : functionInput.get()) {
+<i>145</i>&nbsp;//            buf.append(var.nameInput.get());
+<i>146</i>&nbsp;//            buf.append(&quot;=&quot;);
+<i>147</i>&nbsp;//            beast.core.Function f = var.functionInput.get();
+<i>148</i>&nbsp;//            if (f instanceof Tree) {
+<i>149</i>&nbsp;//                Tree tree = (Tree) f;
+<i>150</i>&nbsp;//                JSONProducer p = new JSONProducer();
+<i>151</i>&nbsp;//                String treeString = p.toJSON(tree);
+<i>152</i>&nbsp;//                buf.append(treeString);
+<i>153</i>&nbsp;//            } else if (f.getDimension() &gt; 1) {
+<i>154</i>&nbsp;//                buf.append(&#39;[&#39;);
+<i>155</i>&nbsp;//                for (int i = 0;i &lt; f.getDimension()- 1; i++) {
+<i>156</i>&nbsp;//                    buf.append(f.getArrayValue(i));
+<i>157</i>&nbsp;//                    buf.append(&#39;,&#39;);
+<i>158</i>&nbsp;//                }
+<i>159</i>&nbsp;//                buf.append(f.getArrayValue(f.getDimension()- 1));
+<i>160</i>&nbsp;//                buf.append(&#39;]&#39;);
+<i>161</i>&nbsp;//            } else {
+<i>162</i>&nbsp;//                buf.append(f.getArrayValue());
+<i>163</i>&nbsp;//            }
+<i>164</i>&nbsp;//            if (engineInput.get() == Engine.JavaScript) {
+<i>165</i>&nbsp;//                buf.append(&#39;;&#39;);
+<i>166</i>&nbsp;//            }
+<i>167</i>&nbsp;//            buf.append(&#39;\n&#39;);
+<i>168</i>&nbsp;//        }
+<i>169</i>&nbsp;//        buf.append(scriptInput.get());
+<i>170</i>&nbsp;//        String formula = buf.toString();
+<i>171</i>&nbsp;//
+<i>172</i>&nbsp;//        try {
+<i>173</i>&nbsp;//            Object o = engine.eval(formula);
+<i>174</i>&nbsp;////            o = engine.get(&quot;a&quot;);
+<i>175</i>&nbsp;////            NativeArray as = (NativeArray) o;
+<i>176</i>&nbsp;////            System.out.println(as);
+<i>177</i>&nbsp;////            for (int i = 0; i &lt; as.size(); i++) {
+<i>178</i>&nbsp;////                o = as.get(i);
+<i>179</i>&nbsp;////            }
+<i>180</i>&nbsp;//            //value = Double.parseDouble(o.toString());
+<i>181</i>&nbsp;//            value = Double.NaN;
+<i>182</i>&nbsp;//        } catch (javax.script.ScriptException es) {
+<i>183</i>&nbsp;//            Log.err.println(es.getMessage());
+<i>184</i>&nbsp;//            value = Double.NaN;
+<i>185</i>&nbsp;//        }
+<i>186</i>&nbsp;////        isUpToDate = true;
+<i>187</i>&nbsp;//    }
+<i>188</i>&nbsp;
+<i>189</i>&nbsp;    private String toJSON(Node node) {
+<i>190</i>&nbsp;        StringBuilder bf = new StringBuilder();
+<i>191</i>&nbsp;        bf.append(&quot;height: &quot; + node.getHeight());
+<i>192</i>&nbsp;        bf.append(&quot;,nr:&quot; + node.getNr());
+<i>193</i>&nbsp;        if (!node.isLeaf()) {
+<i>194</i>&nbsp;            bf.append(&quot;,children:{&quot;);
+<i>195</i>&nbsp;            for (int i = 0; i &lt; node.getChildCount(); i++) {
+<i>196</i>&nbsp;                bf.append(toJSON(node.getChild(i)));
+<i>197</i>&nbsp;                if (i &lt; node.getChildCount() - 1) {
+<i>198</i>&nbsp;                    bf.append(&quot;,&quot;);
+<i>199</i>&nbsp;                }
+<i>200</i>&nbsp;            }
+<i>201</i>&nbsp;            bf.append(&quot;}&quot;);
+<i>202</i>&nbsp;        } else {
+<i>203</i>&nbsp;            //bf.append(&quot;,id:&quot; + node.getID());
+<i>204</i>&nbsp;        }
+<i>205</i>&nbsp;        return bf.toString();
+<i>206</i>&nbsp;    }
+<i>207</i>&nbsp;
+<i>208</i>&nbsp;
+<i>209</i>&nbsp;
+<i>210</i>&nbsp;
+<i>211</i>&nbsp;    @Override public double getArrayValue() {
+<i>212</i>&nbsp;        if (!isUpToDate) {
+<i>213</i>&nbsp;            calc();
+<i>214</i>&nbsp;        }
+<i>215</i>&nbsp;        return value[0];
+<i>216</i>&nbsp;    }
+<i>217</i>&nbsp;
+<i>218</i>&nbsp;    @Override public double getArrayValue(int iDim) {
+<i>219</i>&nbsp;        if (!isUpToDate) {
+<i>220</i>&nbsp;            calc();
+<i>221</i>&nbsp;        }
+<i>222</i>&nbsp;        return value[iDim];
+<i>223</i>&nbsp;    }
+<i>224</i>&nbsp;
+<i>225</i>&nbsp;    @Override public int getDimension() {return value.length;}
+<i>226</i>&nbsp;
+<i>227</i>&nbsp;
+<i>228</i>&nbsp;    @Override protected void store() {
+<i>229</i>&nbsp;        isUpToDate = false;
+<i>230</i>&nbsp;        super.store();
+<i>231</i>&nbsp;    }
+<i>232</i>&nbsp;
+<i>233</i>&nbsp;    @Override protected void restore() {
+<i>234</i>&nbsp;        isUpToDate = false;
+<i>235</i>&nbsp;        super.restore();
+<i>236</i>&nbsp;    }
+<i>237</i>&nbsp;
+<i>238</i>&nbsp;    @Override protected boolean requiresRecalculation() {
+<i>239</i>&nbsp;        // we only get here if at least one input has changed, so always recalculate
+<i>240</i>&nbsp;        isUpToDate = false;
+<i>241</i>&nbsp;        return true;
+<i>242</i>&nbsp;    }
+<i>243</i>&nbsp;
+<i>244</i>&nbsp;
+<i>245</i>&nbsp;    public static void main(String[] args) throws Exception {
+<i>246</i>&nbsp;      RealParameter a = new RealParameter(&quot;1.0 3.0&quot;);
+<i>247</i>&nbsp;      a.setID(&quot;a&quot;);
+<i>248</i>&nbsp;      RealParameter b = new RealParameter(&quot;4.0&quot;);
+<i>249</i>&nbsp;      b.setID(&quot;b&quot;);
+<i>250</i>&nbsp;      Script jsBEAST = new Script();
+<i>251</i>&nbsp;      jsBEAST.initByName(&quot;expression&quot;, &quot;3 * sin(a[0]) + log(a[1]) * b&quot;, &quot;x&quot;, a, &quot;x&quot;, b);
+<i>252</i>&nbsp;      System.out.println(jsBEAST.expressionInput.get() + &quot;  = &quot; + jsBEAST.getArrayValue());
+<i>253</i>&nbsp;
+<i>254</i>&nbsp;      jsBEAST.requiresRecalculation();
+<i>255</i>&nbsp;      a.initByName(&quot;value&quot;, &quot;3.0 4.0&quot;);
+<i>256</i>&nbsp;      b.initByName(&quot;value&quot;, &quot;-4.0&quot;);
+<i>257</i>&nbsp;      System.out.println(jsBEAST.expressionInput.get() + &quot;  = &quot; + jsBEAST.getArrayValue());
+<i>258</i>&nbsp;      
+<i>259</i>&nbsp;      
+<i>260</i>&nbsp;      jsBEAST = new Script();
+<i>261</i>&nbsp;      a = new RealParameter(&quot;1.0&quot;);
+<i>262</i>&nbsp;      jsBEAST.initByName(&quot;value&quot;, 
+<i>263</i>&nbsp;    		  &quot;function fac(x) {\n&quot; +
+<i>264</i>&nbsp;    		  &quot;		if (x &lt;= 1) {return 1;}\n\n&quot; +
+<i>265</i>&nbsp;    		  &quot;		return x * fac(x-1);\n&quot;+
+<i>266</i>&nbsp;    		  &quot;}\n&quot;+
+<i>267</i>&nbsp;    		  &quot;function f(a) {return fac(a);}\n&quot;
+<i>268</i>&nbsp;    		  , &quot;x&quot;, a);
+<i>269</i>&nbsp;      System.out.println(jsBEAST.scriptInput.get() + &quot; = &quot; + jsBEAST.getArrayValue());
+<i>270</i>&nbsp;
+<i>271</i>&nbsp;      jsBEAST.requiresRecalculation();
+<i>272</i>&nbsp;      a.initByName(&quot;value&quot;, &quot;5&quot;);
+<i>273</i>&nbsp;      System.out.println(jsBEAST.scriptInput.get() + &quot; = &quot; + jsBEAST.getArrayValue());
+<i>274</i>&nbsp;
+<i>275</i>&nbsp;      
+<i>276</i>&nbsp;      
+<i>277</i>&nbsp;    	
+<i>278</i>&nbsp;//    	String tree = &quot;(((A:1.0,B:1.0):1.0,C:2.0);&quot;;
+<i>279</i>&nbsp;//        TreeParser newickTree = new TreeParser(tree, false, false, true, 1);
+<i>280</i>&nbsp;//        ScriptEngineManager factory = new ScriptEngineManager();
+<i>281</i>&nbsp;//        ScriptEngine engine = factory.getEngineByName(&quot;JavaScript&quot;);
+<i>282</i>&nbsp;//        Object o = engine.eval(&quot;var tree = eval(\&quot;({&#39;height&#39;:&#39;3.0&#39;})\&quot;); tree.height;&quot;);
+<i>283</i>&nbsp;//        System.out.println(o);
+<i>284</i>&nbsp;
+<i>285</i>&nbsp;//        jsBEAST = new JSBEAST();
+<i>286</i>&nbsp;//        String script = &quot;function f(t) {var tree = eval(\&quot;(\&quot;+t+\&quot;)\&quot;); tree.height}&quot;;
+<i>287</i>&nbsp;//        jsBEAST.initByName(&quot;value&quot;, script, &quot;x&quot;, newickTree);
+<i>288</i>&nbsp;//
+<i>289</i>&nbsp;//        System.out.println(&quot;f = &quot; + jsBEAST.getArrayValue());
+<i>290</i>&nbsp;
+<i>291</i>&nbsp;
+<i>292</i>&nbsp;    }
+<i>293</i>&nbsp;    
+<i>294</i>&nbsp;//    void x() throws Exception {
+<i>295</i>&nbsp;//        RealParameter a = new RealParameter(&quot;1.0 3.0&quot;);
+<i>296</i>&nbsp;//        RealParameter b = new RealParameter(&quot;4.0&quot;);
+<i>297</i>&nbsp;//        Var v = new Var();
+<i>298</i>&nbsp;//        v.initByName(&quot;varname&quot;,&quot;a&quot;, &quot;value&quot;, a);
+<i>299</i>&nbsp;//
+<i>300</i>&nbsp;//        Var v2 = new Var();
+<i>301</i>&nbsp;//        v2.initByName(&quot;varname&quot;,&quot;b&quot;, &quot;value&quot;, b);
+<i>302</i>&nbsp;//
+<i>303</i>&nbsp;//        JSBEAST jsBEAST = new JSBEAST();
+<i>304</i>&nbsp;//        jsBEAST.initByName(&quot;value&quot;, &quot;function f(a,b) {a[0] = 3*a[1]; return +a[0] + a[1] * b;}&quot;, &quot;x&quot;, a, &quot;x&quot;, b);
+<i>305</i>&nbsp;//        System.out.println(&quot;a[0] + a[1] * b = &quot; + jsBEAST.getArrayValue());
+<i>306</i>&nbsp;//
+<i>307</i>&nbsp;//        jsBEAST.requiresRecalculation();
+<i>308</i>&nbsp;//        a.initByName(&quot;value&quot;, &quot;3.0 4.0&quot;);
+<i>309</i>&nbsp;//        b.initByName(&quot;value&quot;, &quot;-4.0&quot;);
+<i>310</i>&nbsp;//        System.out.println(&quot;a * 3 = &quot; + jsBEAST.getArrayValue());
+<i>311</i>&nbsp;//    }
+<i>312</i>&nbsp;
+<i>313</i>&nbsp;
+<i>314</i>&nbsp;    // Loggable implementation
+<i>315</i>&nbsp;    @Override
+<i>316</i>&nbsp;    public void init(final PrintStream out) {
+<i>317</i>&nbsp;        if (value.length == 1)
+<i>318</i>&nbsp;            out.print(this.getID() + &quot;\t&quot;);
+<i>319</i>&nbsp;        else
+<i>320</i>&nbsp;            for (int i = 0; i &lt; value.length; i++)
+<i>321</i>&nbsp;                out.print(this.getID() + &quot;_&quot; + i + &quot;\t&quot;);
+<i>322</i>&nbsp;    }
+<i>323</i>&nbsp;
+<i>324</i>&nbsp;    @Override
+<i>325</i>&nbsp;    public void log(final int nSample, final PrintStream out) {
+<i>326</i>&nbsp;    	isUpToDate = false;
+<i>327</i>&nbsp;        for (int i = 0; i &lt; value.length; i++)
+<i>328</i>&nbsp;            out.print(getArrayValue(i) + &quot;\t&quot;);
+<i>329</i>&nbsp;    }
+<i>330</i>&nbsp;
+<i>331</i>&nbsp;    @Override
+<i>332</i>&nbsp;    public void close(final PrintStream out) {
+<i>333</i>&nbsp;        // nothing to do
+<i>334</i>&nbsp;    }
+<i>335</i>&nbsp;    
+<i>336</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

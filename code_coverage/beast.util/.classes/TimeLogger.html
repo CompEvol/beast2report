@@ -1,0 +1,109 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TimeLogger</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.util</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TimeLogger (beast.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+</tr>
+  <tr>
+    <td class="name">TimeLogger$1</td>
+  </tr>
+  <tr>
+    <td class="name">TimeLogger$reportUnits</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.util;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.io.PrintStream;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import beast.core.BEASTObject;
+<i>6</i>&nbsp;import beast.core.Description;
+<i>7</i>&nbsp;import beast.core.Input;
+<i>8</i>&nbsp;import beast.core.Loggable;
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;@Description(&quot;Logger for reporting elapsed time since start of run&quot;)
+<i>11</i>&nbsp;public class TimeLogger extends BEASTObject implements Loggable {
+<i>12</i>&nbsp;	enum reportUnits {milliseconds, seconds, minutes, hours}
+<i>13</i>&nbsp;	final public Input&lt;reportUnits&gt; reportInput = new Input&lt;&gt;(&quot;report&quot;, &quot;units to report time in&quot;, reportUnits.seconds, reportUnits.values());
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;	long start;
+<i>16</i>&nbsp;	reportUnits report;
+<i>17</i>&nbsp;	
+<i>18</i>&nbsp;	@Override
+<i>19</i>&nbsp;	public void initAndValidate() {
+<i>20</i>&nbsp;		report = reportInput.get();
+<i>21</i>&nbsp;	}
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;	@Override
+<i>24</i>&nbsp;	public void init(PrintStream out) {
+<i>25</i>&nbsp;		if (getID() == null) {
+<i>26</i>&nbsp;			out.append(&quot;time\n&quot;);
+<i>27</i>&nbsp;		} else {
+<i>28</i>&nbsp;			out.append(getID() + &quot;\t&quot;);
+<i>29</i>&nbsp;		}
+<i>30</i>&nbsp;		start = System.currentTimeMillis();
+<i>31</i>&nbsp;	}
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;	@Override
+<i>34</i>&nbsp;	public void log(int sample, PrintStream out) {
+<i>35</i>&nbsp;		long elapsed = System.currentTimeMillis() - start;
+<i>36</i>&nbsp;		switch (report) {
+<i>37</i>&nbsp;		case milliseconds: 
+<i>38</i>&nbsp;			out.append(elapsed + &quot;\t&quot;);
+<i>39</i>&nbsp;			break;
+<i>40</i>&nbsp;		case seconds: 
+<i>41</i>&nbsp;			out.append(elapsed/1000 + &quot;\t&quot;);
+<i>42</i>&nbsp;			break;
+<i>43</i>&nbsp;		case minutes: 
+<i>44</i>&nbsp;			out.append(elapsed/60000 + &quot;\t&quot;);
+<i>45</i>&nbsp;			break;
+<i>46</i>&nbsp;		case hours: 
+<i>47</i>&nbsp;			out.append(elapsed/3600000 + &quot;\t&quot;);
+<i>48</i>&nbsp;			break;
+<i>49</i>&nbsp;		}
+<i>50</i>&nbsp;	}
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;	@Override
+<i>53</i>&nbsp;	public void close(PrintStream out) {
+<i>54</i>&nbsp;		// nothing to do
+<i>55</i>&nbsp;	}
+<i>56</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

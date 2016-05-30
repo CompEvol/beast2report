@@ -1,0 +1,271 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: StandardData</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.datatype</a> ]
+</div>
+
+<h1>Coverage Summary for Class: StandardData (beast.evolution.datatype)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StandardData</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (2/ 8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    8.8%
+  </span>
+  <span class="absValue">
+    (6/ 68)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.datatype;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import java.util.ArrayList;
+<i>6</i>&nbsp;import java.util.Collections;
+<i>7</i>&nbsp;import java.util.List;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;import beast.core.Description;
+<i>10</i>&nbsp;import beast.core.Input;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;@Description(&quot;Integer data type to describe discrete morphological characters with polymorphisms&quot;)
+<b class="fc"><i>13</i>&nbsp;public class StandardData extends DataType.Base {</b>
+<i>14</i>&nbsp;
+<b class="fc"><i>15</i>&nbsp;    final public Input&lt;Integer&gt; maxNrOfStatesInput = new Input&lt;&gt;(&quot;nrOfStates&quot;, &quot;specifies the maximum number of &quot; +</b>
+<i>16</i>&nbsp;            &quot;character states in data matrix or in the filtered alignment&quot;);
+<b class="fc"><i>17</i>&nbsp;    final public Input&lt;String&gt; listOfAmbiguitiesInput = new Input&lt;&gt;(&quot;ambiguities&quot;, &quot;all possible ambiguities presented &quot; +</b>
+<i>18</i>&nbsp;            &quot;as space separated sets of ordered elements. Elements are digits 0..9.&quot;);
+<b class="fc"><i>19</i>&nbsp;    final public Input&lt;List&lt;UserDataType&gt;&gt; charStateLabelsInput = new Input&lt;&gt;(&quot;charstatelabels&quot;,</b>
+<i>20</i>&nbsp;            &quot;list of morphological character descriptions. Position in the list corresponds to the position of the&quot; +
+<i>21</i>&nbsp;                    &quot;character in the alignment&quot;, new ArrayList&lt;&gt;());
+<i>22</i>&nbsp;
+<b class="fc"><i>23</i>&nbsp;    private String[] ambiguities = {};</b>
+<i>24</i>&nbsp;    private ArrayList&lt;String&gt; codeMapping;
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;    private int ambCount;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;	@Override
+<i>30</i>&nbsp;	public void initAndValidate() {
+<b class="nc"><i>31</i>&nbsp;        if (maxNrOfStatesInput.get() != null &amp;&amp; maxNrOfStatesInput.get() != 0) {</b>
+<b class="nc"><i>32</i>&nbsp;            stateCount = maxNrOfStatesInput.get();</b>
+<i>33</i>&nbsp;        } else {
+<b class="nc"><i>34</i>&nbsp;            stateCount = -1;</b>
+<i>35</i>&nbsp;        }
+<i>36</i>&nbsp;
+<b class="nc"><i>37</i>&nbsp;        mapCodeToStateSet = null;</b>
+<b class="nc"><i>38</i>&nbsp;        codeLength = -1;</b>
+<b class="nc"><i>39</i>&nbsp;        codeMap = null;</b>
+<b class="nc"><i>40</i>&nbsp;        createCodeMapping();</b>
+<b class="nc"><i>41</i>&nbsp;	}</b>
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;    private void createCodeMapping() {
+<b class="nc"><i>44</i>&nbsp;        if (listOfAmbiguitiesInput.get() != null) {</b>
+<b class="nc"><i>45</i>&nbsp;            ambiguities = listOfAmbiguitiesInput.get().split(&quot; &quot;);</b>
+<i>46</i>&nbsp;        }
+<i>47</i>&nbsp;
+<b class="nc"><i>48</i>&nbsp;        ambCount = ambiguities.length;</b>
+<b class="nc"><i>49</i>&nbsp;        codeMapping = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>50</i>&nbsp;        for (int i=0; i&lt;stateCount; i++) {</b>
+<b class="nc"><i>51</i>&nbsp;            codeMapping.add(Integer.toString(i));</b>
+<i>52</i>&nbsp;        }
+<b class="nc"><i>53</i>&nbsp;        for (int i=0; i&lt; ambCount; i++) {</b>
+<b class="nc"><i>54</i>&nbsp;            codeMapping.add(ambiguities[i]);</b>
+<i>55</i>&nbsp;        }
+<b class="nc"><i>56</i>&nbsp;        codeMapping.add(Character.toString(GAP_CHAR));</b>
+<b class="nc"><i>57</i>&nbsp;        codeMapping.add(Character.toString(MISSING_CHAR));</b>
+<i>58</i>&nbsp;
+<b class="nc"><i>59</i>&nbsp;        mapCodeToStateSet = new int[codeMapping.size()][];</b>
+<b class="nc"><i>60</i>&nbsp;        for (int i = 0; i &lt; codeMapping.size() - 2; i++) {</b>
+<b class="nc"><i>61</i>&nbsp;        	int [] stateSet = new int[codeMapping.get(i).length()];</b>
+<b class="nc"><i>62</i>&nbsp;        	for (int k = 0; k &lt; stateSet.length; k++) {</b>
+<b class="nc"><i>63</i>&nbsp;        		stateSet[k] = (codeMapping.get(i).charAt(k) - &#39;0&#39;);</b>
+<i>64</i>&nbsp;        	}
+<b class="nc"><i>65</i>&nbsp;        	mapCodeToStateSet[i] = stateSet;</b>
+<i>66</i>&nbsp;        }
+<i>67</i>&nbsp;        
+<i>68</i>&nbsp;    	// TODO: is this the correct way to deal with stateCount == -1?
+<b class="nc"><i>69</i>&nbsp;    	int n = stateCount &gt;= 0 ? stateCount : 10;</b>
+<b class="nc"><i>70</i>&nbsp;        int [] stateSet = new int[n];</b>
+<b class="nc"><i>71</i>&nbsp;        for (int i = 0; i &lt; n; i++) {</b>
+<b class="nc"><i>72</i>&nbsp;        	stateSet[i] = i;</b>
+<i>73</i>&nbsp;        }
+<i>74</i>&nbsp;        // GAP_CHAR
+<b class="nc"><i>75</i>&nbsp;        mapCodeToStateSet[mapCodeToStateSet.length - 2] = stateSet;</b>
+<i>76</i>&nbsp;        // MISSING_CHAR
+<b class="nc"><i>77</i>&nbsp;        mapCodeToStateSet[mapCodeToStateSet.length - 1] = stateSet;</b>
+<b class="nc"><i>78</i>&nbsp;    }</b>
+<i>79</i>&nbsp;    
+<i>80</i>&nbsp;    @Override
+<i>81</i>&nbsp;    public int[] getStatesForCode(int state) {
+<b class="nc"><i>82</i>&nbsp;    	if (state &gt;= 0) {</b>
+<b class="nc"><i>83</i>&nbsp;    		return mapCodeToStateSet[state];</b>
+<i>84</i>&nbsp;    	} else {
+<b class="nc"><i>85</i>&nbsp;    		return mapCodeToStateSet[mapCodeToStateSet.length - 1];</b>
+<i>86</i>&nbsp;    	}
+<i>87</i>&nbsp;    }
+<i>88</i>&nbsp;
+<i>89</i>&nbsp;
+<i>90</i>&nbsp;    @Override
+<i>91</i>&nbsp;    public List&lt;Integer&gt; string2state(String data) {
+<i>92</i>&nbsp;        List&lt;Integer&gt; sequence;
+<b class="nc"><i>93</i>&nbsp;        sequence = new ArrayList&lt;&gt;();</b>
+<i>94</i>&nbsp;        // remove spaces
+<b class="nc"><i>95</i>&nbsp;        data = data.replaceAll(&quot;\\s&quot;, &quot;&quot;);</b>
+<i>96</i>&nbsp;
+<b class="nc"><i>97</i>&nbsp;        ArrayList&lt;Integer&gt; amb = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>98</i>&nbsp;        boolean readingAmb=false;</b>
+<b class="nc"><i>99</i>&nbsp;        for (byte c : data.getBytes()) {</b>
+<b class="nc"><i>100</i>&nbsp;            if (!readingAmb) {</b>
+<b class="nc"><i>101</i>&nbsp;                switch (c) {</b>
+<i>102</i>&nbsp;                    case GAP_CHAR:
+<i>103</i>&nbsp;                    case MISSING_CHAR:
+<b class="nc"><i>104</i>&nbsp;                    	String missing = Character.toString(MISSING_CHAR);</b>
+<b class="nc"><i>105</i>&nbsp;                   		sequence.add(codeMapping.indexOf(missing));</b>
+<b class="nc"><i>106</i>&nbsp;                        break;</b>
+<i>107</i>&nbsp;                    case &#39;{&#39;:
+<b class="nc"><i>108</i>&nbsp;                        readingAmb = true;</b>
+<b class="nc"><i>109</i>&nbsp;                        amb.clear();</b>
+<b class="nc"><i>110</i>&nbsp;                        break;</b>
+<i>111</i>&nbsp;                    default:
+<b class="nc"><i>112</i>&nbsp;                        sequence.add(Integer.parseInt((char) c + &quot;&quot;));</b>
+<i>113</i>&nbsp;                }
+<i>114</i>&nbsp;            } else {
+<b class="nc"><i>115</i>&nbsp;                if (c != &#39;}&#39;) {</b>
+<b class="nc"><i>116</i>&nbsp;                    amb.add(Integer.parseInt((char) c + &quot;&quot;) );</b>
+<i>117</i>&nbsp;                } else {
+<b class="nc"><i>118</i>&nbsp;                    readingAmb = false;</b>
+<b class="nc"><i>119</i>&nbsp;                    Collections.sort(amb);</b>
+<b class="nc"><i>120</i>&nbsp;                    String ambStr = &quot;&quot;;</b>
+<b class="nc"><i>121</i>&nbsp;                    for (Integer a : amb) {</b>
+<b class="nc"><i>122</i>&nbsp;                        ambStr += Integer.toString(a);</b>
+<b class="nc"><i>123</i>&nbsp;                    }</b>
+<b class="nc"><i>124</i>&nbsp;                    sequence.add(codeMapping.indexOf(ambStr));</b>
+<i>125</i>&nbsp;                }
+<i>126</i>&nbsp;
+<i>127</i>&nbsp;            }
+<i>128</i>&nbsp;
+<i>129</i>&nbsp;        }
+<i>130</i>&nbsp;
+<b class="nc"><i>131</i>&nbsp;        return sequence;</b>
+<i>132</i>&nbsp;    } // string2state
+<i>133</i>&nbsp;
+<i>134</i>&nbsp;    @Override
+<i>135</i>&nbsp;    public String getTypeDescription() {
+<b class="fc"><i>136</i>&nbsp;        return &quot;standard&quot;;</b>
+<i>137</i>&nbsp;    }
+<i>138</i>&nbsp;
+<i>139</i>&nbsp;    @Override
+<i>140</i>&nbsp;    public char getChar(int state) {
+<b class="nc"><i>141</i>&nbsp;        if (state &lt; 0) {</b>
+<b class="nc"><i>142</i>&nbsp;            return &#39;?&#39;;</b>
+<i>143</i>&nbsp;        }
+<b class="nc"><i>144</i>&nbsp;        return (char)(&#39;0&#39;+state);</b>
+<i>145</i>&nbsp;    }
+<i>146</i>&nbsp;    
+<i>147</i>&nbsp;    @Override
+<i>148</i>&nbsp;    public String getCode(int state) {
+<b class="nc"><i>149</i>&nbsp;    	return codeMapping.get(state);</b>
+<i>150</i>&nbsp;    }
+<i>151</i>&nbsp;
+<i>152</i>&nbsp;//    @Description(&quot;A class to store the description of a character&quot;)
+<i>153</i>&nbsp;//    public class CharStateLabels extends BEASTObject {
+<i>154</i>&nbsp;//
+<i>155</i>&nbsp;//        public Input&lt;Integer&gt; nrOfStatesInput = new Input&lt;&gt;(&quot;states&quot;, &quot;number of states fro this character&quot;);
+<i>156</i>&nbsp;//        public Input&lt;String&gt; characterNameInput = new Input&lt;&gt;(&quot;characterName&quot;, &quot;the name of the charcter&quot;);
+<i>157</i>&nbsp;//        public Input&lt;List&lt;String&gt;&gt; stateNamesInput = new Input&lt;&gt;(&quot;stateNames&quot;, &quot;the list of the state names ordered &quot; +
+<i>158</i>&nbsp;//                &quot;according to codes given, that is the first in the list is coded by 0, second, by 1 and so forth.&quot;, new ArrayList&lt;&gt;());
+<i>159</i>&nbsp;//
+<i>160</i>&nbsp;//        private int nrOfStates;
+<i>161</i>&nbsp;//        private String charName;
+<i>162</i>&nbsp;//        private ArrayList&lt;String&gt; stateNames;
+<i>163</i>&nbsp;//
+<i>164</i>&nbsp;//        public CharStateLabels(String newCharName, ArrayList&lt;String&gt; newStateNames) {
+<i>165</i>&nbsp;//            characterNameInput.setValue(newCharName, this);
+<i>166</i>&nbsp;//            charName = newCharName;
+<i>167</i>&nbsp;//            stateNamesInput.setValue(newStateNames, this);
+<i>168</i>&nbsp;//            stateNames = newStateNames;
+<i>169</i>&nbsp;//            nrOfStates = stateNames.size();
+<i>170</i>&nbsp;//            nrOfStatesInput.setValue(nrOfStates, this);
+<i>171</i>&nbsp;//        }
+<i>172</i>&nbsp;//
+<i>173</i>&nbsp;//        public int getNrOfStates() {
+<i>174</i>&nbsp;//            return nrOfStates;
+<i>175</i>&nbsp;//        }
+<i>176</i>&nbsp;//
+<i>177</i>&nbsp;//        public String getCharacterName() {
+<i>178</i>&nbsp;//            return charName;
+<i>179</i>&nbsp;//        }
+<i>180</i>&nbsp;//
+<i>181</i>&nbsp;//        public ArrayList&lt;String&gt; getStateNames() { return stateNames; }
+<i>182</i>&nbsp;//
+<i>183</i>&nbsp;//        @Override
+<i>184</i>&nbsp;//        public void initAndValidate() {
+<i>185</i>&nbsp;//        }
+<i>186</i>&nbsp;//
+<i>187</i>&nbsp;//    }
+<i>188</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

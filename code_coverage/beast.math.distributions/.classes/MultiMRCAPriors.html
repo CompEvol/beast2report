@@ -1,0 +1,178 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: MultiMRCAPriors</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.math.distributions</a> ]
+</div>
+
+<h1>Coverage Summary for Class: MultiMRCAPriors (beast.math.distributions)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">MultiMRCAPriors</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.math.distributions;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import beast.core.Description;
+<i>4</i>&nbsp;import beast.core.Input;
+<i>5</i>&nbsp;import beast.core.State;
+<i>6</i>&nbsp;import beast.evolution.operators.MonoCladesMapping;
+<i>7</i>&nbsp;import beast.evolution.tree.Node;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;import java.util.*;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;@Description(&quot;A single distribution which efficiently takes care of a set of MRCA constraints.&quot;)
+<i>12</i>&nbsp;public class MultiMRCAPriors extends MultiMonophyleticConstraint {
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;    public Input&lt;List&lt;MRCAPrior&gt;&gt; calibrationsInput =
+<i>15</i>&nbsp;                new Input&lt;List&lt;MRCAPrior&gt;&gt;(&quot;distribution&quot;, &quot;Set of calibrated nodes&quot;, new ArrayList&lt;MRCAPrior&gt;());
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;    private int[] nodeToCladeGroup = null;
+<i>18</i>&nbsp;    private int prevNodeCount = -1;
+<i>19</i>&nbsp;    private int[] ctops = null;
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;    @Override
+<i>22</i>&nbsp;    public void initAndValidate() {
+<i>23</i>&nbsp;        super.initAndValidate();
+<i>24</i>&nbsp;    }
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;    @Override
+<i>27</i>&nbsp;    protected void parse(String newick) {
+<i>28</i>&nbsp;        super.parse(newick);
+<i>29</i>&nbsp;        for( MRCAPrior m : calibrationsInput.get() ) {
+<i>30</i>&nbsp;            if( ! m.tree.equals(this.tree) ) {
+<i>31</i>&nbsp;                throw new IllegalArgumentException(&quot;All constraints must be on the same tree&quot;);
+<i>32</i>&nbsp;            }
+<i>33</i>&nbsp;            List&lt;Integer&gt; list = new ArrayList&lt;Integer&gt;();
+<i>34</i>&nbsp;            for( String taxon : m.taxonsetInput.get().getTaxaNames() ) {
+<i>35</i>&nbsp;                list.add(indexOf(taxon));
+<i>36</i>&nbsp;            }
+<i>37</i>&nbsp;            boolean add = true;
+<i>38</i>&nbsp;            Set&lt;Integer&gt; slist = new HashSet&lt;&gt;(list);
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;            for( List l : taxonIDList ) {
+<i>41</i>&nbsp;                if( l.size() == slist.size() &amp;&amp; slist.containsAll(l) ) {
+<i>42</i>&nbsp;                    add = false;
+<i>43</i>&nbsp;                    break;
+<i>44</i>&nbsp;                }
+<i>45</i>&nbsp;            }
+<i>46</i>&nbsp;            if( add ) {
+<i>47</i>&nbsp;                taxonIDList.add(list);
+<i>48</i>&nbsp;            }
+<i>49</i>&nbsp;        }
+<i>50</i>&nbsp;    }
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;    @Override
+<i>53</i>&nbsp;    public double calculateLogP() {
+<i>54</i>&nbsp;        double logp = super.calculateLogP();
+<i>55</i>&nbsp;        if( logp != Double.NEGATIVE_INFINITY ) {
+<i>56</i>&nbsp;            List&lt;MRCAPrior&gt; mrcaPriors = calibrationsInput.get();
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;            if( tree.getNodeCount() != prevNodeCount ) {
+<i>59</i>&nbsp;                nodeToCladeGroup = MonoCladesMapping.setupNodeGroup(tree, this);
+<i>60</i>&nbsp;                prevNodeCount = tree.getNodeCount();
+<i>61</i>&nbsp;
+<i>62</i>&nbsp;                final int nCals = mrcaPriors.size();
+<i>63</i>&nbsp;                ctops = new int[nCals];
+<i>64</i>&nbsp;                int i = 0;
+<i>65</i>&nbsp;                for( MRCAPrior m : mrcaPriors ) {
+<i>66</i>&nbsp;                    m.calculateLogP(); // init
+<i>67</i>&nbsp;                    ctops[i] = m.getCommonAncestor().getNr();
+<i>68</i>&nbsp;                    i += 1;
+<i>69</i>&nbsp;                }
+<i>70</i>&nbsp;            }
+<i>71</i>&nbsp;            for(int k = 0; k &lt; ctops.length; ++k) {
+<i>72</i>&nbsp;                final int nr = ctops[k];
+<i>73</i>&nbsp;                Node n = tree.getNode(nr);
+<i>74</i>&nbsp;                final int ng = nodeToCladeGroup[nr];
+<i>75</i>&nbsp;                while( ng == nodeToCladeGroup[n.getParent().getNr()] ) {
+<i>76</i>&nbsp;                    n = n.getParent();
+<i>77</i>&nbsp;                }
+<i>78</i>&nbsp;                ctops[k] = n.getNr();
+<i>79</i>&nbsp;                {
+<i>80</i>&nbsp;                    boolean ICC = false;
+<i>81</i>&nbsp;                    if( ICC ) {
+<i>82</i>&nbsp;                        mrcaPriors.get(k).calculateLogP();
+<i>83</i>&nbsp;                        assert mrcaPriors.get(k).getCommonAncestor().equals(n);
+<i>84</i>&nbsp;                    }
+<i>85</i>&nbsp;                }
+<i>86</i>&nbsp;                final double MRCATime = n.getDate();
+<i>87</i>&nbsp;                ParametricDistribution dist = mrcaPriors.get(k).dist;
+<i>88</i>&nbsp;                if( dist != null ) {
+<i>89</i>&nbsp;                    final double v = dist.logDensity(MRCATime);
+<i>90</i>&nbsp;                    if( v == Double.NEGATIVE_INFINITY ) {
+<i>91</i>&nbsp;                        logp = Double.NEGATIVE_INFINITY;
+<i>92</i>&nbsp;                        break;
+<i>93</i>&nbsp;                    }
+<i>94</i>&nbsp;                    logp += v;
+<i>95</i>&nbsp;                }
+<i>96</i>&nbsp;            }
+<i>97</i>&nbsp;
+<i>98</i>&nbsp;        }
+<i>99</i>&nbsp;        logP = logp;
+<i>100</i>&nbsp;        return logp;
+<i>101</i>&nbsp;    }
+<i>102</i>&nbsp;
+<i>103</i>&nbsp;    @Override
+<i>104</i>&nbsp;    public void store() {
+<i>105</i>&nbsp;        super.store();
+<i>106</i>&nbsp;    }
+<i>107</i>&nbsp;
+<i>108</i>&nbsp;    @Override
+<i>109</i>&nbsp;    public void restore() {
+<i>110</i>&nbsp;        super.restore();
+<i>111</i>&nbsp;    }
+<i>112</i>&nbsp;
+<i>113</i>&nbsp;    @Override
+<i>114</i>&nbsp;    protected boolean requiresRecalculation() {
+<i>115</i>&nbsp;        return super.requiresRecalculation();
+<i>116</i>&nbsp;    }
+<i>117</i>&nbsp;
+<i>118</i>&nbsp;    @Override
+<i>119</i>&nbsp;    public void sample(final State state, final Random random) {
+<i>120</i>&nbsp;    }
+<i>121</i>&nbsp;
+<i>122</i>&nbsp;    @Override
+<i>123</i>&nbsp;    public List&lt;String&gt; getArguments() {
+<i>124</i>&nbsp;        return null;
+<i>125</i>&nbsp;    }
+<i>126</i>&nbsp;
+<i>127</i>&nbsp;    @Override
+<i>128</i>&nbsp;    public List&lt;String&gt; getConditions() {
+<i>129</i>&nbsp;        return null;
+<i>130</i>&nbsp;    }
+<i>131</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

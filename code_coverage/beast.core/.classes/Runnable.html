@@ -1,0 +1,128 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Runnable</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.core</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Runnable (beast.core)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Runnable</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 10)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.core;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;@Description(&quot;Entry point for running a Beast task, for instance an MCMC or other probabilistic &quot; +
+<i>5</i>&nbsp;        &quot;analysis, a simulation, etc.&quot;)
+<b class="nc"><i>6</i>&nbsp;public abstract class Runnable extends BEASTObject {	</b>
+<i>7</i>&nbsp;	
+<i>8</i>&nbsp;	/** entry point for anything runnable **/
+<i>9</i>&nbsp;	abstract public void run() throws Exception;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;    /**
+<i>12</i>&nbsp;     * Set up information related to the file for (re)storing the State.
+<i>13</i>&nbsp;     * The Runnable implementation is responsible for making its
+<i>14</i>&nbsp;     * State synchronising with the file *
+<i>15</i>&nbsp;     * @param fileName
+<i>16</i>&nbsp;     * @param isRestoreFromFile
+<i>17</i>&nbsp;     */
+<i>18</i>&nbsp;    public void setStateFile(final String fileName, final boolean isRestoreFromFile) {
+<b class="nc"><i>19</i>&nbsp;    	if (System.getProperty(&quot;state.file.name&quot;) != null) {</b>
+<b class="nc"><i>20</i>&nbsp;    		stateFileName = System.getProperty(&quot;state.file.name&quot;);</b>
+<i>21</i>&nbsp;    	} else {
+<b class="nc"><i>22</i>&nbsp;            if (System.getProperty(&quot;file.name.prefix&quot;) != null) {</b>
+<b class="nc"><i>23</i>&nbsp;            	stateFileName = System.getProperty(&quot;file.name.prefix&quot;) + &quot;/&quot; + fileName;</b>
+<i>24</i>&nbsp;            } else {
+<b class="nc"><i>25</i>&nbsp;            	stateFileName = fileName;</b>
+<i>26</i>&nbsp;            }
+<i>27</i>&nbsp;    	}
+<b class="nc"><i>28</i>&nbsp;        restoreFromFile = isRestoreFromFile;</b>
+<i>29</i>&nbsp;    }
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;    /**
+<i>32</i>&nbsp;     * flag to indicate that the State should be restored from File at the start of the analysis *
+<i>33</i>&nbsp;     */
+<b class="nc"><i>34</i>&nbsp;    protected boolean restoreFromFile = false;</b>
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;    /**
+<i>37</i>&nbsp;     * name of the file store the state in *
+<i>38</i>&nbsp;     */
+<b class="nc"><i>39</i>&nbsp;    protected String stateFileName = &quot;state.backup.xml&quot;;</b>
+<i>40</i>&nbsp;    
+<i>41</i>&nbsp;    /** 
+<i>42</i>&nbsp;     * indicate whether this runnable distinguishes partitions, like MCMC, or not 
+<i>43</i>&nbsp;     * **/
+<b class="nc"><i>44</i>&nbsp;    public boolean hasPartitions() {return true;}</b>
+<i>45</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

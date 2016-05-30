@@ -1,0 +1,312 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: StateNode</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.core</a> ]
+</div>
+
+<h1>Coverage Summary for Class: StateNode (beast.core)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StateNode</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    61.5%
+  </span>
+  <span class="absValue">
+    (8/ 13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    67.6%
+  </span>
+  <span class="absValue">
+    (23/ 34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.core;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.io.PrintStream;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import org.w3c.dom.Node;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;/**
+<i>8</i>&nbsp; * This class represents a node of the state. Concrete classes include Parameters and Trees.
+<i>9</i>&nbsp; * StateNodes differ from CalculationNodes in that they
+<i>10</i>&nbsp; * 1. Do not calculate anything, with the exception of initialisation time
+<i>11</i>&nbsp; * 2. can be changed by Operators
+<i>12</i>&nbsp; *
+<i>13</i>&nbsp; * @author Alexei Drummond
+<i>14</i>&nbsp; */
+<b class="fc"><i>15</i>&nbsp;@Description(&quot;A node that can be part of the state.&quot;)</b>
+<b class="fc"><i>16</i>&nbsp;public abstract class StateNode extends CalculationNode implements Loggable, Cloneable, Function {</b>
+<i>17</i>&nbsp;    /**
+<i>18</i>&nbsp;     * Flag to indicate the StateNode is not constant.
+<i>19</i>&nbsp;     * This is particularly useful for Beauti *
+<i>20</i>&nbsp;     */
+<b class="fc"><i>21</i>&nbsp;    final public Input&lt;Boolean&gt; isEstimatedInput = new Input&lt;&gt;(&quot;estimate&quot;, &quot;whether to estimate this item or keep constant to its initial value&quot;, true);</b>
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;    /**
+<i>24</i>&nbsp;     * @return this StateNode if it is not in the State.
+<i>25</i>&nbsp;     *         If it is in the State, return the version that is currently valid
+<i>26</i>&nbsp;     *         (i.e. not the stored one).
+<i>27</i>&nbsp;     */
+<i>28</i>&nbsp;    public StateNode getCurrent() {
+<b class="nc"><i>29</i>&nbsp;        if (state == null) {</b>
+<b class="nc"><i>30</i>&nbsp;            return this;</b>
+<i>31</i>&nbsp;        }
+<b class="nc"><i>32</i>&nbsp;        return state.getStateNode(index);</b>
+<i>33</i>&nbsp;    }
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;    /**
+<i>36</i>&nbsp;     * @param operator explain here why operator is useful
+<i>37</i>&nbsp;     * @return StateNode for an operation to do its magic on.
+<i>38</i>&nbsp;     *         The State will make a copy first, if there is not already
+<i>39</i>&nbsp;     *         one available.
+<i>40</i>&nbsp;     */
+<i>41</i>&nbsp;    public StateNode getCurrentEditable(final Operator operator) {
+<b class="nc"><i>42</i>&nbsp;        startEditing(operator);</b>
+<b class="nc"><i>43</i>&nbsp;        return this;</b>
+<i>44</i>&nbsp;    }
+<i>45</i>&nbsp;
+<i>46</i>&nbsp;    /**
+<i>47</i>&nbsp;     * Getting/setting global dirtiness state for this StateNode.
+<i>48</i>&nbsp;     * Every StateNode has a flag (somethingIsDirty) that represents whether anything
+<i>49</i>&nbsp;     * in the state has changed. StateNode implementations like Parameters and Trees
+<i>50</i>&nbsp;     * have their own internal flag to represent which part of a StateNode (e.g.
+<i>51</i>&nbsp;     * an element in an array, or a node in a tree) has changed.
+<i>52</i>&nbsp;     * *
+<i>53</i>&nbsp;     */
+<i>54</i>&nbsp;    public boolean somethingIsDirty() {
+<b class="nc"><i>55</i>&nbsp;        return this.hasStartedEditing;</b>
+<i>56</i>&nbsp;    }
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;    public void setSomethingIsDirty(final boolean isDirty) {
+<b class="fc"><i>59</i>&nbsp;        this.hasStartedEditing = isDirty;</b>
+<b class="fc"><i>60</i>&nbsp;    }</b>
+<i>61</i>&nbsp;
+<i>62</i>&nbsp;    /**
+<i>63</i>&nbsp;     * mark every internal element of a StateNode as isDirty.
+<i>64</i>&nbsp;     * So both the global flag for this StateNode (somethingIsDirty) should be set as
+<i>65</i>&nbsp;     * well as all the local flags.
+<i>66</i>&nbsp;     *
+<i>67</i>&nbsp;     * @param isDirty
+<i>68</i>&nbsp;     */
+<i>69</i>&nbsp;    abstract public void setEverythingDirty(final boolean isDirty);
+<i>70</i>&nbsp;
+<i>71</i>&nbsp;    /**
+<i>72</i>&nbsp;     * @return a deep copy of this node in the state.
+<i>73</i>&nbsp;     *         This will generally be called only for stochastic nodes.
+<i>74</i>&nbsp;     */
+<i>75</i>&nbsp;    public abstract StateNode copy();
+<i>76</i>&nbsp;
+<i>77</i>&nbsp;    /**
+<i>78</i>&nbsp;     * other := this
+<i>79</i>&nbsp;     * Assign all values of this to other
+<i>80</i>&nbsp;     * NB: Should only be used for initialisation!
+<i>81</i>&nbsp;     */
+<i>82</i>&nbsp;    public abstract void assignTo(StateNode other);
+<i>83</i>&nbsp;
+<i>84</i>&nbsp;    /**
+<i>85</i>&nbsp;     * this := other
+<i>86</i>&nbsp;     * Assign all values of other to this
+<i>87</i>&nbsp;     * NB: Should only be used for initialisation!
+<i>88</i>&nbsp;     */
+<i>89</i>&nbsp;    public abstract void assignFrom(StateNode other);
+<i>90</i>&nbsp;
+<i>91</i>&nbsp;    /**
+<i>92</i>&nbsp;     * As assignFrom, but without copying the ID
+<i>93</i>&nbsp;     * NB: Should only be used for initialisation!
+<i>94</i>&nbsp;     */
+<i>95</i>&nbsp;    public void assignFromWithoutID(StateNode other) {
+<b class="fc"><i>96</i>&nbsp;        final String id = getID();</b>
+<b class="fc"><i>97</i>&nbsp;        assignFrom(other);</b>
+<b class="fc"><i>98</i>&nbsp;        setID(id);</b>
+<b class="fc"><i>99</i>&nbsp;    }</b>
+<i>100</i>&nbsp;
+<i>101</i>&nbsp;    /**
+<i>102</i>&nbsp;     * As assignFrom, but only those parts are assigned that
+<i>103</i>&nbsp;     * are variable, for instance for parameters bounds and dimension
+<i>104</i>&nbsp;     * do not need to be copied.
+<i>105</i>&nbsp;     */
+<i>106</i>&nbsp;    public abstract void assignFromFragile(StateNode other);
+<i>107</i>&nbsp;
+<i>108</i>&nbsp;    /**
+<i>109</i>&nbsp;     * for storing a state *
+<i>110</i>&nbsp;     */
+<i>111</i>&nbsp;    final public void toXML(PrintStream out) {
+<b class="nc"><i>112</i>&nbsp;        out.print(&quot;&lt;statenode id=&#39;&quot; + getID() + &quot;&#39;&gt;&quot;);</b>
+<b class="nc"><i>113</i>&nbsp;        out.print(toString());</b>
+<b class="nc"><i>114</i>&nbsp;        out.print(&quot;&lt;/statenode&gt;\n&quot;);</b>
+<b class="nc"><i>115</i>&nbsp;    }</b>
+<i>116</i>&nbsp;
+<i>117</i>&nbsp;    /**
+<i>118</i>&nbsp;     * stores a state node in XML format, to be restored by fromXML() *
+<i>119</i>&nbsp;     */
+<i>120</i>&nbsp;    final public String toXML() {
+<b class="fc"><i>121</i>&nbsp;        return &quot;&lt;statenode id=&#39;&quot; + getID() + &quot;&#39;&gt;&quot; +</b>
+<b class="fc"><i>122</i>&nbsp;                toString() +</b>
+<i>123</i>&nbsp;                &quot;&lt;/statenode&gt;\n&quot;;
+<i>124</i>&nbsp;    }
+<i>125</i>&nbsp;
+<i>126</i>&nbsp;    /**
+<i>127</i>&nbsp;     * for restoring a state that was stored using toXML() above
+<i>128</i>&nbsp;     * from a DOM Node. *
+<i>129</i>&nbsp;     */
+<i>130</i>&nbsp;    public abstract void fromXML(Node node);
+<i>131</i>&nbsp;
+<i>132</i>&nbsp;
+<i>133</i>&nbsp;//    /**
+<i>134</i>&nbsp;//     * @return true if this node is acting as a random variable, false if this node is fixed and effectively data.
+<i>135</i>&nbsp;//     */
+<i>136</i>&nbsp;//    public final boolean isStochastic() {
+<i>137</i>&nbsp;//        return this.isStochastic;
+<i>138</i>&nbsp;//    }
+<i>139</i>&nbsp;//
+<i>140</i>&nbsp;//    /**
+<i>141</i>&nbsp;//     * @param isStochastic true if this need should be treated as stochastic, false if this node should be fixed
+<i>142</i>&nbsp;//     *                     and treated as data
+<i>143</i>&nbsp;//     */
+<i>144</i>&nbsp;//    final void setStochastic(boolean isStochastic) {
+<i>145</i>&nbsp;//        this.isStochastic = isStochastic;
+<i>146</i>&nbsp;//    }
+<i>147</i>&nbsp;//
+<i>148</i>&nbsp;//    boolean isStochastic = true;
+<i>149</i>&nbsp;
+<i>150</i>&nbsp;    /**
+<i>151</i>&nbsp;     * Scale StateNode with amount scale and
+<i>152</i>&nbsp;     *
+<i>153</i>&nbsp;     * @param scale scaling factor
+<i>154</i>&nbsp;     * @return the number of degrees of freedom used in this operation. This number varies
+<i>155</i>&nbsp;     *         for the different types of StateNodes. For example, for real
+<i>156</i>&nbsp;     *         valued n-dimensional parameters, it is n, for a tree it is the
+<i>157</i>&nbsp;     *         number of internal nodes being scaled.
+<i>158</i>&nbsp;     * @throws IllegalArgumentException when StateNode become not valid, e.g. has
+<i>159</i>&nbsp;     *                   values outside bounds or negative branch lengths.
+<i>160</i>&nbsp;     */
+<i>161</i>&nbsp;    abstract public int scale(double scale);
+<i>162</i>&nbsp;
+<i>163</i>&nbsp;    /**
+<i>164</i>&nbsp;     * Pointer to state, null if not part of a State.
+<i>165</i>&nbsp;     */
+<b class="fc"><i>166</i>&nbsp;    protected State state = null;</b>
+<i>167</i>&nbsp;
+<i>168</i>&nbsp;    public State getState() {
+<b class="fc"><i>169</i>&nbsp;        return state;</b>
+<i>170</i>&nbsp;    }
+<i>171</i>&nbsp;
+<i>172</i>&nbsp;    /**
+<i>173</i>&nbsp;     * flag to indicate some value has changed after operation is performed on state
+<i>174</i>&nbsp;     * For multidimensional parameters, there is an internal flag to indicate which
+<i>175</i>&nbsp;     * dimension is dirty
+<i>176</i>&nbsp;     */
+<b class="fc"><i>177</i>&nbsp;    protected boolean hasStartedEditing = false;</b>
+<i>178</i>&nbsp;
+<i>179</i>&nbsp;    /**
+<i>180</i>&nbsp;     * The index of the parameter for identifying this StateNode
+<i>181</i>&nbsp;     * in the State.
+<i>182</i>&nbsp;     */
+<b class="fc"><i>183</i>&nbsp;    public int index = -1;</b>
+<i>184</i>&nbsp;
+<i>185</i>&nbsp;    public int getIndex() {
+<b class="nc"><i>186</i>&nbsp;        return index;</b>
+<i>187</i>&nbsp;    }
+<i>188</i>&nbsp;
+<i>189</i>&nbsp;    /**
+<i>190</i>&nbsp;     * should be called before an Operator proposes a new State *
+<i>191</i>&nbsp;     *
+<i>192</i>&nbsp;     * @param operator
+<i>193</i>&nbsp;     */
+<i>194</i>&nbsp;    public void startEditing(final Operator operator) {
+<b class="fc"><i>195</i>&nbsp;        assert (isCalledFromOperator(4));</b>
+<b class="fc"><i>196</i>&nbsp;        if (hasStartedEditing) {</b>
+<i>197</i>&nbsp;            // we are already editing
+<b class="fc"><i>198</i>&nbsp;            return;</b>
+<i>199</i>&nbsp;        }
+<b class="fc"><i>200</i>&nbsp;        hasStartedEditing = true;</b>
+<i>201</i>&nbsp;        // notify the state
+<b class="fc"><i>202</i>&nbsp;        state.getEditableStateNode(this.index, operator);</b>
+<b class="fc"><i>203</i>&nbsp;        store();</b>
+<b class="fc"><i>204</i>&nbsp;    }</b>
+<i>205</i>&nbsp;
+<i>206</i>&nbsp;    private boolean isCalledFromOperator(int level) {
+<i>207</i>&nbsp;        // TODO: sun.reflect.Reflection.getCallerClass is not available in JDK7
+<i>208</i>&nbsp;        // and alternative methods are really slow according to
+<i>209</i>&nbsp;        // http://stackoverflow.com/questions/421280/in-java-how-do-i-find-the-caller-of-a-method-using-stacktrace-or-reflection
+<i>210</i>&nbsp;
+<i>211</i>&nbsp;//    	Class&lt;?&gt; caller = sun.reflect.Reflection.getCallerClass(level);
+<i>212</i>&nbsp;//    	while (caller != null) {
+<i>213</i>&nbsp;//    		if (Operator.class.isAssignableFrom(caller)) {
+<i>214</i>&nbsp;//    			return true;
+<i>215</i>&nbsp;//    		}
+<i>216</i>&nbsp;//    		caller = sun.reflect.Reflection.getCallerClass(++level);
+<i>217</i>&nbsp;//    	}
+<i>218</i>&nbsp;//    	return false;
+<i>219</i>&nbsp;
+<b class="fc"><i>220</i>&nbsp;        return true;</b>
+<i>221</i>&nbsp;    }
+<i>222</i>&nbsp;
+<i>223</i>&nbsp;    @Override
+<i>224</i>&nbsp;	abstract protected void store();
+<i>225</i>&nbsp;
+<i>226</i>&nbsp;    @Override
+<i>227</i>&nbsp;	abstract public void restore();
+<i>228</i>&nbsp;
+<i>229</i>&nbsp;} // class StateNode
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

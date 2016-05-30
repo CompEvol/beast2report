@@ -1,0 +1,558 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: BeautiPanel</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.beauti</a> ]
+</div>
+
+<h1>Coverage Summary for Class: BeautiPanel (beast.app.beauti)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BeautiPanel</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.3%
+  </span>
+  <span class="absValue">
+    (12/ 13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    82%
+  </span>
+  <span class="absValue">
+    (182/ 222)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.beauti;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.awt.BorderLayout;
+<i>4</i>&nbsp;import java.awt.Component;
+<i>5</i>&nbsp;import java.awt.Dimension;
+<i>6</i>&nbsp;import java.awt.Frame;
+<i>7</i>&nbsp;import java.awt.Rectangle;
+<i>8</i>&nbsp;import java.lang.reflect.InvocationTargetException;
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;import javax.swing.Box;
+<i>11</i>&nbsp;import javax.swing.DefaultListModel;
+<i>12</i>&nbsp;import javax.swing.JComponent;
+<i>13</i>&nbsp;import javax.swing.JLabel;
+<i>14</i>&nbsp;import javax.swing.JList;
+<i>15</i>&nbsp;import javax.swing.JOptionPane;
+<i>16</i>&nbsp;import javax.swing.JPanel;
+<i>17</i>&nbsp;import javax.swing.JScrollPane;
+<i>18</i>&nbsp;import javax.swing.JSplitPane;
+<i>19</i>&nbsp;import javax.swing.JViewport;
+<i>20</i>&nbsp;import javax.swing.ListSelectionModel;
+<i>21</i>&nbsp;import javax.swing.SwingConstants;
+<i>22</i>&nbsp;import javax.swing.event.ListSelectionEvent;
+<i>23</i>&nbsp;import javax.swing.event.ListSelectionListener;
+<i>24</i>&nbsp;
+<i>25</i>&nbsp;import beast.app.beauti.BeautiPanelConfig.Partition;
+<i>26</i>&nbsp;import beast.app.draw.InputEditor;
+<i>27</i>&nbsp;import beast.app.draw.InputEditor.ExpandOption;
+<i>28</i>&nbsp;import beast.app.util.Utils;
+<i>29</i>&nbsp;import beast.core.BEASTInterface;
+<i>30</i>&nbsp;import beast.core.Input;
+<i>31</i>&nbsp;import beast.core.MCMC;
+<i>32</i>&nbsp;import beast.core.util.CompoundDistribution;
+<i>33</i>&nbsp;import beast.evolution.alignment.Taxon;
+<i>34</i>&nbsp;import beast.evolution.branchratemodel.BranchRateModel;
+<i>35</i>&nbsp;import beast.evolution.likelihood.GenericTreeLikelihood;
+<i>36</i>&nbsp;import beast.evolution.sitemodel.SiteModel;
+<i>37</i>&nbsp;import beast.evolution.sitemodel.SiteModelInterface;
+<i>38</i>&nbsp;import beast.evolution.tree.TreeInterface;
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;/**
+<i>41</i>&nbsp; * panel making up each of the tabs in Beauti *
+<i>42</i>&nbsp; */
+<i>43</i>&nbsp;public class BeautiPanel extends JPanel implements ListSelectionListener {
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;    private static final long serialVersionUID = 1L;
+<i>46</i>&nbsp;    public final static String ICONPATH = &quot;beast/app/beauti/&quot;;
+<i>47</i>&nbsp;
+<b class="fc"><i>48</i>&nbsp;    static int partitionListPreferredWidth = 120;</b>
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;    private JSplitPane splitPane;
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;    /**
+<i>53</i>&nbsp;     * document that this panel applies to *
+<i>54</i>&nbsp;     */
+<i>55</i>&nbsp;    BeautiDoc doc;
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;    public BeautiDoc getDoc() {
+<b class="nc"><i>58</i>&nbsp;        return doc;</b>
+<i>59</i>&nbsp;    }
+<i>60</i>&nbsp;
+<i>61</i>&nbsp;    /**
+<i>62</i>&nbsp;     * configuration for this panel *
+<i>63</i>&nbsp;     */
+<i>64</i>&nbsp;    public BeautiPanelConfig config;
+<i>65</i>&nbsp;
+<i>66</i>&nbsp;    /**
+<i>67</i>&nbsp;     * panel number *
+<i>68</i>&nbsp;     */
+<i>69</i>&nbsp;    int panelIndex;
+<i>70</i>&nbsp;
+<i>71</i>&nbsp;    /**
+<i>72</i>&nbsp;     * partition currently on display *
+<i>73</i>&nbsp;     */
+<b class="fc"><i>74</i>&nbsp;    public int partitionIndex = 0;</b>
+<i>75</i>&nbsp;
+<i>76</i>&nbsp;    /**
+<i>77</i>&nbsp;     * box containing the list of partitions, to make (in)visible on update *
+<i>78</i>&nbsp;     */
+<i>79</i>&nbsp;    JComponent partitionComponent;
+<i>80</i>&nbsp;    /**
+<i>81</i>&nbsp;     * list of partitions in m_listBox *
+<i>82</i>&nbsp;     */
+<i>83</i>&nbsp;    JList&lt;String&gt; listOfPartitions;
+<i>84</i>&nbsp;    /**
+<i>85</i>&nbsp;     * model for m_listOfPartitions *
+<i>86</i>&nbsp;     */
+<i>87</i>&nbsp;    DefaultListModel&lt;String&gt; listModel;
+<i>88</i>&nbsp;
+<i>89</i>&nbsp;    JScrollPane scroller;
+<i>90</i>&nbsp;
+<i>91</i>&nbsp;    /**
+<i>92</i>&nbsp;     * component containing main input editor *
+<i>93</i>&nbsp;     */
+<b class="fc"><i>94</i>&nbsp;    Component centralComponent = null;</b>
+<i>95</i>&nbsp;
+<b class="nc"><i>96</i>&nbsp;    public BeautiPanel() {</b>
+<b class="nc"><i>97</i>&nbsp;    }</b>
+<i>98</i>&nbsp;
+<b class="fc"><i>99</i>&nbsp;    public BeautiPanel(int panelIndex, BeautiDoc doc, BeautiPanelConfig config) throws NoSuchMethodException, SecurityException, ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {</b>
+<b class="fc"><i>100</i>&nbsp;        this.doc = doc;</b>
+<b class="fc"><i>101</i>&nbsp;        this.panelIndex = panelIndex;</b>
+<i>102</i>&nbsp;
+<b class="fc"><i>103</i>&nbsp;        setLayout(new BorderLayout());</b>
+<i>104</i>&nbsp;
+<b class="fc"><i>105</i>&nbsp;        this.config = config;</b>
+<b class="fc"><i>106</i>&nbsp;        if (this.config.hasPartition() != Partition.none &amp;&amp;</b>
+<b class="fc"><i>107</i>&nbsp;                doc.getPartitions(config.hasPartitionsInput.get().toString()).size() &gt; 1) {</b>
+<b class="nc"><i>108</i>&nbsp;            splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);</b>
+<b class="nc"><i>109</i>&nbsp;            add(splitPane,BorderLayout.CENTER);</b>
+<i>110</i>&nbsp;        } else {
+<b class="fc"><i>111</i>&nbsp;            splitPane = null;</b>
+<i>112</i>&nbsp;        }
+<i>113</i>&nbsp;
+<b class="fc"><i>114</i>&nbsp;        refreshPanel();</b>
+<b class="fc"><i>115</i>&nbsp;        addPartitionPanel(this.config.hasPartition(), panelIndex);</b>
+<i>116</i>&nbsp;
+<b class="fc"><i>117</i>&nbsp;        setOpaque(false);</b>
+<b class="fc"><i>118</i>&nbsp;    } // c&#39;tor</b>
+<i>119</i>&nbsp;
+<i>120</i>&nbsp;    void addPartitionPanel(Partition hasPartition, int panelIndex) {
+<b class="fc"><i>121</i>&nbsp;        Box box = Box.createVerticalBox();</b>
+<b class="fc"><i>122</i>&nbsp;        if (splitPane != null &amp;&amp; hasPartition != Partition.none) {</b>
+<b class="fc"><i>123</i>&nbsp;            box.add(createList());</b>
+<i>124</i>&nbsp;        } else {
+<b class="fc"><i>125</i>&nbsp;            return;</b>
+<i>126</i>&nbsp;        }
+<b class="fc"><i>127</i>&nbsp;        box.add(Box.createVerticalGlue());</b>
+<b class="fc"><i>128</i>&nbsp;        box.add(new JLabel(Utils.getIcon(panelIndex, config)));</b>
+<i>129</i>&nbsp;
+<b class="fc"><i>130</i>&nbsp;        splitPane.add(box, JSplitPane.LEFT);</b>
+<b class="fc"><i>131</i>&nbsp;        if (listOfPartitions != null) {</b>
+<b class="fc"><i>132</i>&nbsp;            listOfPartitions.setSelectedIndex(partitionIndex);</b>
+<i>133</i>&nbsp;        }
+<b class="fc"><i>134</i>&nbsp;    }</b>
+<i>135</i>&nbsp;
+<i>136</i>&nbsp;    /**
+<i>137</i>&nbsp;     * Create a list of partitions and return as a JComponent;
+<i>138</i>&nbsp;     * @return
+<i>139</i>&nbsp;     */
+<i>140</i>&nbsp;    JComponent createList() {
+<b class="fc"><i>141</i>&nbsp;        partitionComponent = new JPanel();</b>
+<b class="fc"><i>142</i>&nbsp;        partitionComponent.setLayout(new BorderLayout());</b>
+<b class="fc"><i>143</i>&nbsp;        JLabel partitionLabel = new JLabel(&quot;Partition&quot;);</b>
+<b class="fc"><i>144</i>&nbsp;        partitionLabel.setHorizontalAlignment(SwingConstants.CENTER);</b>
+<b class="fc"><i>145</i>&nbsp;        partitionComponent.add(partitionLabel, BorderLayout.NORTH);</b>
+<b class="fc"><i>146</i>&nbsp;        listModel = new DefaultListModel&lt;&gt;();</b>
+<b class="fc"><i>147</i>&nbsp;        listOfPartitions = new JList&lt;&gt;(listModel);</b>
+<b class="fc"><i>148</i>&nbsp;        listOfPartitions.setName(&quot;listOfPartitions&quot;);</b>
+<b class="fc"><i>149</i>&nbsp;        listOfPartitions.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);</b>
+<i>150</i>&nbsp;
+<b class="fc"><i>151</i>&nbsp;        Dimension size = new Dimension(partitionListPreferredWidth, 300);</b>
+<i>152</i>&nbsp;        //listOfPartitions.setFixedCellWidth(120);
+<i>153</i>&nbsp;//    	m_listOfPartitions.setSize(size);
+<i>154</i>&nbsp;        //listOfPartitions.setPreferredSize(size);
+<b class="fc"><i>155</i>&nbsp;    	listOfPartitions.setMinimumSize(size);</b>
+<i>156</i>&nbsp;//    	m_listOfPartitions.setBounds(0, 0, 100, 100);
+<i>157</i>&nbsp;
+<b class="fc"><i>158</i>&nbsp;        listOfPartitions.addListSelectionListener(this);</b>
+<b class="fc"><i>159</i>&nbsp;        updateList();</b>
+<i>160</i>&nbsp;
+<i>161</i>&nbsp;        // AJD: This is unnecessary and not appropriate for Mac OS X look and feel
+<i>162</i>&nbsp;        //listOfPartitions.setBorder(new BevelBorder(BevelBorder.RAISED));
+<i>163</i>&nbsp;
+<b class="fc"><i>164</i>&nbsp;        JScrollPane listPane = new JScrollPane(listOfPartitions);</b>
+<b class="fc"><i>165</i>&nbsp;        partitionComponent.add(listPane, BorderLayout.CENTER);</b>
+<i>166</i>&nbsp;        // AJD: This is unnecessary and not appropriate for Mac OS X look and feel
+<i>167</i>&nbsp;        //partitionComponent.setBorder(new EtchedBorder());
+<b class="fc"><i>168</i>&nbsp;        return partitionComponent;</b>
+<i>169</i>&nbsp;    }
+<i>170</i>&nbsp;
+<i>171</i>&nbsp;    public void updateList() {
+<b class="fc"><i>172</i>&nbsp;        if (listModel == null) {</b>
+<b class="fc"><i>173</i>&nbsp;            return;</b>
+<i>174</i>&nbsp;        }
+<b class="fc"><i>175</i>&nbsp;        listModel.clear();</b>
+<b class="fc"><i>176</i>&nbsp;        if (listModel.size() &gt; 0) {</b>
+<i>177</i>&nbsp;            // this is a weird bit of code, since listModel.clear should ensure that size()==0, but it doesn&#39;t
+<b class="nc"><i>178</i>&nbsp;            return;</b>
+<i>179</i>&nbsp;        }
+<b class="fc"><i>180</i>&nbsp;        String type = config.hasPartitionsInput.get().toString();</b>
+<b class="fc"><i>181</i>&nbsp;        for (BEASTInterface partition : doc.getPartitions(type)) {</b>
+<b class="fc"><i>182</i>&nbsp;        	if (type.equals(&quot;SiteModel&quot;)) {</b>
+<b class="fc"><i>183</i>&nbsp;        		partition = (BEASTInterface) ((GenericTreeLikelihood) partition).siteModelInput.get();</b>
+<b class="fc"><i>184</i>&nbsp;        	} else if (type.equals(&quot;ClockModel&quot;)) {</b>
+<b class="fc"><i>185</i>&nbsp;        		partition = ((GenericTreeLikelihood) partition).branchRateModelInput.get();</b>
+<b class="nc"><i>186</i>&nbsp;        	} else if (type.equals(&quot;Tree&quot;)) {</b>
+<b class="nc"><i>187</i>&nbsp;        		partition = (BEASTInterface) ((GenericTreeLikelihood) partition).treeInput.get();</b>
+<i>188</i>&nbsp;        	}
+<b class="fc"><i>189</i>&nbsp;            String partitionID = partition.getID();</b>
+<b class="fc"><i>190</i>&nbsp;            partitionID = partitionID.substring(partitionID.lastIndexOf(&#39;.&#39;) + 1);</b>
+<b class="fc"><i>191</i>&nbsp;            if (partitionID.length() &gt; 1 &amp;&amp; partitionID.charAt(1) == &#39;:&#39;) {</b>
+<b class="fc"><i>192</i>&nbsp;            	partitionID = partitionID.substring(2);</b>
+<i>193</i>&nbsp;            }
+<b class="fc"><i>194</i>&nbsp;            listModel.addElement(partitionID);</b>
+<b class="fc"><i>195</i>&nbsp;        }</b>
+<b class="fc"><i>196</i>&nbsp;        if (partitionIndex &gt;= 0 &amp;&amp; listModel.size() &gt; 0)</b>
+<b class="fc"><i>197</i>&nbsp;            listOfPartitions.setSelectedIndex(partitionIndex);</b>
+<b class="fc"><i>198</i>&nbsp;    }</b>
+<i>199</i>&nbsp;
+<i>200</i>&nbsp;    
+<i>201</i>&nbsp;
+<i>202</i>&nbsp;    // AR remove globals (doesn&#39;t seem to be used anywhere)...
+<i>203</i>&nbsp;//	static BeautiPanel g_currentPanel = null;
+<i>204</i>&nbsp;
+<i>205</i>&nbsp;    public void refreshPanel() throws NoSuchMethodException, SecurityException, ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+<b class="fc"><i>206</i>&nbsp;        if (doc.alignments.size() == 0) {</b>
+<b class="fc"><i>207</i>&nbsp;            refreshInputPanel();</b>
+<b class="fc"><i>208</i>&nbsp;            return;</b>
+<i>209</i>&nbsp;        }
+<b class="fc"><i>210</i>&nbsp;        doc.scrubAll(true, false);</b>
+<i>211</i>&nbsp;
+<i>212</i>&nbsp;        // toggle splitpane
+<b class="fc"><i>213</i>&nbsp;        if (splitPane == null &amp;&amp; config.hasPartition() != Partition.none &amp;&amp;</b>
+<b class="fc"><i>214</i>&nbsp;                doc.getPartitions(config.hasPartitionsInput.get().toString()).size() &gt; 1) {</b>
+<b class="fc"><i>215</i>&nbsp;            splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);</b>
+<b class="fc"><i>216</i>&nbsp;            add(splitPane,BorderLayout.CENTER);</b>
+<b class="fc"><i>217</i>&nbsp;            addPartitionPanel(config.hasPartition(), panelIndex);</b>
+<i>218</i>&nbsp;        }
+<b class="fc"><i>219</i>&nbsp;        if (splitPane != null &amp;&amp; (config.hasPartition() == Partition.none ||</b>
+<b class="fc"><i>220</i>&nbsp;                doc.getPartitions(config.hasPartitionsInput.get().toString()).size() &lt;= 1)) {</b>
+<b class="nc"><i>221</i>&nbsp;            remove(splitPane);</b>
+<b class="nc"><i>222</i>&nbsp;            splitPane = null;</b>
+<i>223</i>&nbsp;        }
+<i>224</i>&nbsp;
+<b class="fc"><i>225</i>&nbsp;        refreshInputPanel();</b>
+<b class="fc"><i>226</i>&nbsp;        if (partitionComponent != null &amp;&amp; config.getType() != null) {</b>
+<b class="fc"><i>227</i>&nbsp;            partitionComponent.setVisible(doc.getPartitions(config.getType()).size() &gt; 1);</b>
+<i>228</i>&nbsp;        }
+<i>229</i>&nbsp;
+<i>230</i>&nbsp;//		g_currentPanel = this;
+<b class="fc"><i>231</i>&nbsp;    }</b>
+<i>232</i>&nbsp;    
+<i>233</i>&nbsp;    void refreshInputPanel(BEASTInterface beastObject, Input&lt;?&gt; input, boolean addButtons, InputEditor.ExpandOption forceExpansion) throws NoSuchMethodException, SecurityException, ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+<b class="fc"><i>234</i>&nbsp;        if (centralComponent != null) {</b>
+<b class="fc"><i>235</i>&nbsp;            remove(centralComponent);</b>
+<i>236</i>&nbsp;        }
+<b class="fc"><i>237</i>&nbsp;        if (input != null &amp;&amp; input.get() != null &amp;&amp; input.getType() != null) {</b>
+<b class="fc"><i>238</i>&nbsp;            InputEditor.ButtonStatus bs = config.buttonStatusInput.get();</b>
+<b class="fc"><i>239</i>&nbsp;            InputEditor inputEditor = doc.getInputEditorFactory().createInputEditor(input, beastObject, addButtons, forceExpansion, bs, null, doc);</b>
+<i>240</i>&nbsp;
+<b class="fc"><i>241</i>&nbsp;            JPanel p = new JPanel();</b>
+<b class="fc"><i>242</i>&nbsp;            p.setLayout(new BorderLayout());</b>
+<b class="fc"><i>243</i>&nbsp;            if (isToClone()) {</b>
+<b class="fc"><i>244</i>&nbsp;                ClonePartitionPanel clonePartitionPanel = new ClonePartitionPanel(this);</b>
+<b class="fc"><i>245</i>&nbsp;                p.add(clonePartitionPanel, BorderLayout.NORTH);</b>
+<b class="fc"><i>246</i>&nbsp;            } else {</b>
+<b class="fc"><i>247</i>&nbsp;                p.add(inputEditor.getComponent(), BorderLayout.CENTER);</b>
+<i>248</i>&nbsp;            }
+<i>249</i>&nbsp;
+<b class="fc"><i>250</i>&nbsp;            Rectangle bounds = new Rectangle(0,0);</b>
+<b class="fc"><i>251</i>&nbsp;            if (scroller != null) {</b>
+<i>252</i>&nbsp;            	// get lastPaintPosition from viewport
+<i>253</i>&nbsp;            	// HACK access it through its string representation
+<b class="fc"><i>254</i>&nbsp;	            JViewport v = scroller.getViewport();</b>
+<b class="fc"><i>255</i>&nbsp;	            String vs = v.toString();</b>
+<b class="fc"><i>256</i>&nbsp;	            int i = vs.indexOf(&quot;lastPaintPosition=java.awt.Point[x=&quot;);</b>
+<b class="fc"><i>257</i>&nbsp;	            if (i &gt; -1) {</b>
+<b class="fc"><i>258</i>&nbsp;	            	i = vs.indexOf(&quot;y=&quot;, i);</b>
+<b class="fc"><i>259</i>&nbsp;	            	vs = vs.substring(i+2, vs.indexOf(&quot;]&quot;, i));</b>
+<b class="fc"><i>260</i>&nbsp;	            	i = Integer.parseInt(vs);</b>
+<i>261</i>&nbsp;	            } else {
+<b class="fc"><i>262</i>&nbsp;	            	i = 0;</b>
+<i>263</i>&nbsp;	            }
+<b class="fc"><i>264</i>&nbsp;	            bounds.y = -i;</b>
+<i>265</i>&nbsp;            }
+<b class="fc"><i>266</i>&nbsp;            scroller = new JScrollPane(p);</b>
+<b class="fc"><i>267</i>&nbsp;            scroller.getViewport().scrollRectToVisible(bounds);</b>
+<b class="fc"><i>268</i>&nbsp;            centralComponent = scroller;</b>
+<b class="fc"><i>269</i>&nbsp;        } else {</b>
+<b class="fc"><i>270</i>&nbsp;            centralComponent = new JLabel(&quot;No input editors.&quot;);</b>
+<i>271</i>&nbsp;        }
+<b class="fc"><i>272</i>&nbsp;        if (splitPane != null) {</b>
+<b class="fc"><i>273</i>&nbsp;            JPanel panel = new JPanel();</b>
+<b class="fc"><i>274</i>&nbsp;            panel.setLayout(new BorderLayout());</b>
+<b class="fc"><i>275</i>&nbsp;            panel.add(centralComponent, BorderLayout.NORTH);</b>
+<b class="fc"><i>276</i>&nbsp;            splitPane.add(panel, JSplitPane.RIGHT);</b>
+<b class="fc"><i>277</i>&nbsp;        } else {</b>
+<b class="fc"><i>278</i>&nbsp;            add(centralComponent);</b>
+<i>279</i>&nbsp;        }
+<b class="fc"><i>280</i>&nbsp;    }</b>
+<i>281</i>&nbsp;
+<i>282</i>&nbsp;    void refreshInputPanel() throws NoSuchMethodException, SecurityException, ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+<b class="fc"><i>283</i>&nbsp;        doc.currentInputEditors.clear();</b>
+<b class="fc"><i>284</i>&nbsp;        InputEditor.Base.g_nLabelWidth = config.labelWidthInput.get();</b>
+<b class="fc"><i>285</i>&nbsp;        BEASTInterface beastObject = config;</b>
+<b class="fc"><i>286</i>&nbsp;        final Input&lt;?&gt; input = config.resolveInput(doc, partitionIndex);</b>
+<i>287</i>&nbsp;
+<b class="fc"><i>288</i>&nbsp;        boolean addButtons = config.addButtons();</b>
+<b class="fc"><i>289</i>&nbsp;        ExpandOption forceExpansion = config.forceExpansion();</b>
+<b class="fc"><i>290</i>&nbsp;        refreshInputPanel(beastObject, input, addButtons, forceExpansion);</b>
+<b class="fc"><i>291</i>&nbsp;    }</b>
+<i>292</i>&nbsp;
+<i>293</i>&nbsp;    /** 
+<i>294</i>&nbsp;     * Clones partition identified by sourceID to targetID and type (Site/Clock/Tree model)
+<i>295</i>&nbsp;     * as stored in config.
+<i>296</i>&nbsp;     * @param sourceID
+<i>297</i>&nbsp;     * @param targetID
+<i>298</i>&nbsp;     */
+<i>299</i>&nbsp;    public void cloneFrom(String sourceID, String targetID) {
+<b class="fc"><i>300</i>&nbsp;    	if (sourceID.equals(targetID)) {</b>
+<b class="fc"><i>301</i>&nbsp;    		return;</b>
+<i>302</i>&nbsp;    	}
+<i>303</i>&nbsp;
+<b class="fc"><i>304</i>&nbsp;    	String type = config.hasPartitionsInput.get().toString();</b>
+<b class="fc"><i>305</i>&nbsp;    	java.util.List&lt;BEASTInterface&gt; list = doc.getPartitions(type);</b>
+<b class="fc"><i>306</i>&nbsp;    	int source = -1, target = -1;</b>
+<b class="fc"><i>307</i>&nbsp;        for (int i = 0; i &lt; list.size(); i++) {</b>
+<b class="fc"><i>308</i>&nbsp;        	BEASTInterface partition = list.get(i);</b>
+<b class="fc"><i>309</i>&nbsp;        	if (type.equals(&quot;SiteModel&quot;)) {</b>
+<b class="fc"><i>310</i>&nbsp;        		partition = (BEASTInterface) ((GenericTreeLikelihood) partition).siteModelInput.get();</b>
+<b class="fc"><i>311</i>&nbsp;        	} else if (type.equals(&quot;ClockModel&quot;)) {</b>
+<b class="fc"><i>312</i>&nbsp;        		partition = ((GenericTreeLikelihood) partition).branchRateModelInput.get();</b>
+<b class="nc"><i>313</i>&nbsp;        	} else if (type.equals(&quot;Tree&quot;)) {</b>
+<b class="nc"><i>314</i>&nbsp;        		partition = (BEASTInterface) ((GenericTreeLikelihood) partition).treeInput.get();</b>
+<i>315</i>&nbsp;        	}
+<b class="fc"><i>316</i>&nbsp;            String partitionID = partition.getID();</b>
+<b class="fc"><i>317</i>&nbsp;            partitionID = partitionID.substring(partitionID.lastIndexOf(&#39;.&#39;) + 1);</b>
+<b class="fc"><i>318</i>&nbsp;            if (partitionID.length() &gt; 1 &amp;&amp; partitionID.charAt(1) == &#39;:&#39;) {</b>
+<b class="fc"><i>319</i>&nbsp;            	partitionID = partitionID.substring(2);</b>
+<i>320</i>&nbsp;            }
+<b class="fc"><i>321</i>&nbsp;            if (partitionID.equals(sourceID)) {</b>
+<b class="fc"><i>322</i>&nbsp;            	source = i;</b>
+<i>323</i>&nbsp;            }
+<b class="fc"><i>324</i>&nbsp;            if (partitionID.equals(targetID)) {</b>
+<b class="fc"><i>325</i>&nbsp;            	target = i;</b>
+<i>326</i>&nbsp;            }
+<i>327</i>&nbsp;        } 
+<b class="fc"><i>328</i>&nbsp;    	if (target == -1) {</b>
+<b class="nc"><i>329</i>&nbsp;    		throw new RuntimeException(&quot;Programmer error: sourceID and targetID should be in list&quot;);</b>
+<i>330</i>&nbsp;    	}
+<i>331</i>&nbsp;    	
+<b class="fc"><i>332</i>&nbsp;		CompoundDistribution likelihoods = (CompoundDistribution) doc.pluginmap.get(&quot;likelihood&quot;);</b>
+<i>333</i>&nbsp;		
+<b class="fc"><i>334</i>&nbsp;		GenericTreeLikelihood likelihoodSource = (GenericTreeLikelihood) likelihoods.pDistributions.get().get(source);</b>
+<b class="fc"><i>335</i>&nbsp;		GenericTreeLikelihood likelihood = (GenericTreeLikelihood) likelihoods.pDistributions.get().get(target);</b>
+<b class="fc"><i>336</i>&nbsp;		PartitionContext oldContext = doc.getContextFor(likelihoodSource);</b>
+<b class="fc"><i>337</i>&nbsp;		PartitionContext newContext = doc.getContextFor(likelihood);</b>
+<i>338</i>&nbsp;		// this ensures the config.sync does not set any input value
+<b class="fc"><i>339</i>&nbsp;		config._input.setValue(null, config);</b>
+<i>340</i>&nbsp;
+<b class="fc"><i>341</i>&nbsp;    	if (type.equals(&quot;SiteModel&quot;)) {		</b>
+<b class="fc"><i>342</i>&nbsp;			SiteModelInterface siteModelSource = likelihoodSource.siteModelInput.get();</b>
+<b class="fc"><i>343</i>&nbsp;			SiteModelInterface  siteModel = null;</b>
+<i>344</i>&nbsp;			try {
+<b class="fc"><i>345</i>&nbsp;				siteModel = (SiteModel.Base) BeautiDoc.deepCopyPlugin((BEASTInterface) siteModelSource,</b>
+<b class="fc"><i>346</i>&nbsp;					likelihood, (MCMC) doc.mcmc.get(), oldContext, newContext, doc, null);</b>
+<b class="nc"><i>347</i>&nbsp;			} catch (RuntimeException e) {</b>
+<b class="nc"><i>348</i>&nbsp;				JOptionPane.showMessageDialog(this, &quot;Could not clone &quot; + sourceID + &quot; to &quot; + targetID + &quot; &quot; + e.getMessage());</b>
+<b class="nc"><i>349</i>&nbsp;				return;</b>
+<b class="fc"><i>350</i>&nbsp;			}</b>
+<b class="fc"><i>351</i>&nbsp;			likelihood.siteModelInput.setValue(siteModel, likelihood);</b>
+<b class="fc"><i>352</i>&nbsp;			return;</b>
+<b class="fc"><i>353</i>&nbsp;    	} else if (type.equals(&quot;ClockModel&quot;)) {</b>
+<b class="fc"><i>354</i>&nbsp;    		BranchRateModel clockModelSource = likelihoodSource.branchRateModelInput.get();</b>
+<b class="fc"><i>355</i>&nbsp;    		BranchRateModel clockModel = null;</b>
+<i>356</i>&nbsp;			try {
+<b class="fc"><i>357</i>&nbsp;				clockModel = (BranchRateModel) BeautiDoc.deepCopyPlugin((BEASTInterface) clockModelSource,</b>
+<b class="fc"><i>358</i>&nbsp;						likelihood, (MCMC) doc.mcmc.get(), oldContext, newContext, doc, null);</b>
+<b class="nc"><i>359</i>&nbsp;			} catch (Exception e) {</b>
+<b class="nc"><i>360</i>&nbsp;				JOptionPane.showMessageDialog(this, &quot;Could not clone &quot; + sourceID + &quot; to &quot; + targetID + &quot; &quot; + e.getMessage());</b>
+<b class="nc"><i>361</i>&nbsp;				return;</b>
+<b class="fc"><i>362</i>&nbsp;			}</b>
+<i>363</i>&nbsp;			// make sure that *if* the clock model has a tree as input, it is
+<i>364</i>&nbsp;			// the same as for the likelihood
+<b class="fc"><i>365</i>&nbsp;			TreeInterface tree = null;</b>
+<i>366</i>&nbsp;			try {
+<b class="fc"><i>367</i>&nbsp;				for (Input&lt;?&gt; input : ((BEASTInterface) clockModel).listInputs()) {</b>
+<b class="fc"><i>368</i>&nbsp;					if (input.getName().equals(&quot;tree&quot;)) {</b>
+<b class="fc"><i>369</i>&nbsp;						tree = (TreeInterface) input.get();</b>
+<i>370</i>&nbsp;					}
+<i>371</i>&nbsp;
+<b class="fc"><i>372</i>&nbsp;				}</b>
+<b class="nc"><i>373</i>&nbsp;			} catch (IllegalArgumentException e) {</b>
+<i>374</i>&nbsp;				// TODO Auto-generated catch block
+<b class="nc"><i>375</i>&nbsp;				e.printStackTrace();</b>
+<b class="fc"><i>376</i>&nbsp;			}</b>
+<b class="fc"><i>377</i>&nbsp;			if (tree != null &amp;&amp; tree != likelihood.treeInput.get()) {</b>
+<i>378</i>&nbsp;				//likelihood.treeInput.setValue(tree, likelihood);
+<b class="nc"><i>379</i>&nbsp;				JOptionPane.showMessageDialog(null, &quot;Cannot clone clock model with different trees&quot;);</b>
+<b class="nc"><i>380</i>&nbsp;				return;</b>
+<i>381</i>&nbsp;			}
+<i>382</i>&nbsp;
+<b class="fc"><i>383</i>&nbsp;			likelihood.branchRateModelInput.setValue(clockModel, likelihood);</b>
+<b class="fc"><i>384</i>&nbsp;			return;</b>
+<b class="nc"><i>385</i>&nbsp;    	} else if (type.equals(&quot;Tree&quot;)) {</b>
+<b class="nc"><i>386</i>&nbsp;			TreeInterface tree = null;</b>
+<b class="nc"><i>387</i>&nbsp;			TreeInterface treeSource = likelihoodSource.treeInput.get();</b>
+<i>388</i>&nbsp;			try {
+<b class="nc"><i>389</i>&nbsp;			tree = (TreeInterface) BeautiDoc.deepCopyPlugin((BEASTInterface) treeSource, likelihood,</b>
+<b class="nc"><i>390</i>&nbsp;							(MCMC) doc.mcmc.get(), oldContext, newContext, doc, null);</b>
+<b class="nc"><i>391</i>&nbsp;				} catch (Exception e) {</b>
+<b class="nc"><i>392</i>&nbsp;					JOptionPane.showMessageDialog(this, &quot;Could not clone &quot; + sourceID + &quot; to &quot; + targetID + &quot; &quot; + e.getMessage());</b>
+<b class="nc"><i>393</i>&nbsp;					return;</b>
+<b class="nc"><i>394</i>&nbsp;			}</b>
+<i>395</i>&nbsp;			// sanity check: make sure taxon sets are compatible
+<b class="nc"><i>396</i>&nbsp;            Taxon.assertSameTaxa(tree.getID(), tree.getTaxonset().getTaxaNames(),</b>
+<b class="nc"><i>397</i>&nbsp;                    likelihood.dataInput.get().getID(), likelihood.dataInput.get().getTaxaNames());</b>
+<i>398</i>&nbsp;
+<b class="nc"><i>399</i>&nbsp;			likelihood.treeInput.setValue(tree, likelihood);</b>
+<b class="nc"><i>400</i>&nbsp;			return;</b>
+<i>401</i>&nbsp;
+<i>402</i>&nbsp;    	} else {
+<b class="nc"><i>403</i>&nbsp;    		throw new RuntimeException(&quot;Programmer error calling cloneFrom: Should only clone Site/Clock/Tree model&quot;);</b>
+<i>404</i>&nbsp;    	}
+<i>405</i>&nbsp;    } // cloneFrom
+<i>406</i>&nbsp;
+<i>407</i>&nbsp;    private boolean isToClone() {
+<b class="fc"><i>408</i>&nbsp;        return listOfPartitions != null &amp;&amp; listOfPartitions.getSelectedIndices().length &gt; 1;</b>
+<i>409</i>&nbsp;    }
+<i>410</i>&nbsp;
+<i>411</i>&nbsp;//    public static boolean soundIsPlaying = false;
+<i>412</i>&nbsp;//
+<i>413</i>&nbsp;//    public static synchronized void playSound(final String url) {
+<i>414</i>&nbsp;//        new Thread(new Runnable() {
+<i>415</i>&nbsp;//            public void run() {
+<i>416</i>&nbsp;//                try {
+<i>417</i>&nbsp;//                    synchronized (this) {
+<i>418</i>&nbsp;//                        if (soundIsPlaying) {
+<i>419</i>&nbsp;//                            return;
+<i>420</i>&nbsp;//                        }
+<i>421</i>&nbsp;//                        soundIsPlaying = true;
+<i>422</i>&nbsp;//                    }
+<i>423</i>&nbsp;//                    Clip clip = AudioSystem.getClip();
+<i>424</i>&nbsp;//                    AudioInputStream inputStream = AudioSystem.getAudioInputStream(getClass().getResourceAsStream(&quot;/beast/app/beauti/&quot; + url));
+<i>425</i>&nbsp;//                    clip.open(inputStream);
+<i>426</i>&nbsp;//                    clip.start();
+<i>427</i>&nbsp;//                    Thread.sleep(500);
+<i>428</i>&nbsp;//                    synchronized (this) {
+<i>429</i>&nbsp;//                        soundIsPlaying = false;
+<i>430</i>&nbsp;//                    }
+<i>431</i>&nbsp;//                } catch (Exception e) {
+<i>432</i>&nbsp;//                    soundIsPlaying = false;
+<i>433</i>&nbsp;//                    System.err.println(e.getMessage());
+<i>434</i>&nbsp;//                }
+<i>435</i>&nbsp;//            }
+<i>436</i>&nbsp;//        }).start();
+<i>437</i>&nbsp;//    }
+<i>438</i>&nbsp;
+<i>439</i>&nbsp;    @Override
+<i>440</i>&nbsp;    public void valueChanged(ListSelectionEvent e) {
+<i>441</i>&nbsp;        //System.err.print(&quot;BeautiPanel::valueChanged &quot; + m_iPartition + &quot; =&gt; &quot;);
+<b class="fc"><i>442</i>&nbsp;        if (e != null) {</b>
+<b class="fc"><i>443</i>&nbsp;            config.sync(partitionIndex);</b>
+<b class="fc"><i>444</i>&nbsp;            if (listOfPartitions != null) {</b>
+<b class="fc"><i>445</i>&nbsp;                partitionIndex = Math.max(0, listOfPartitions.getSelectedIndex());</b>
+<i>446</i>&nbsp;            }
+<i>447</i>&nbsp;        }
+<i>448</i>&nbsp;//        BeautiPanel.playSound(&quot;woosh.wav&quot;);
+<i>449</i>&nbsp;        //System.err.println(m_iPartition);
+<i>450</i>&nbsp;        try {
+<b class="fc"><i>451</i>&nbsp;            refreshPanel();</b>
+<i>452</i>&nbsp;
+<b class="fc"><i>453</i>&nbsp;            centralComponent.repaint();</b>
+<b class="fc"><i>454</i>&nbsp;            repaint();</b>
+<i>455</i>&nbsp;
+<i>456</i>&nbsp;            // hack to ensure m_centralComponent is repainted RRB: is there a better way???
+<b class="fc"><i>457</i>&nbsp;            if (Frame.getFrames().length == 0) {</b>
+<i>458</i>&nbsp;                // happens at startup
+<b class="nc"><i>459</i>&nbsp;                return;</b>
+<i>460</i>&nbsp;            }
+<b class="fc"><i>461</i>&nbsp;            Frame frame = Frame.getFrames()[Frame.getFrames().length - 1];</b>
+<b class="fc"><i>462</i>&nbsp;            frame.setSize(frame.getSize());</b>
+<i>463</i>&nbsp;            //Frame frame = frames[frames.length - 1];
+<i>464</i>&nbsp;//			Dimension size = frames[frames.length-1].getSize();
+<i>465</i>&nbsp;//			frames[frames.length-1].setSize(size);
+<i>466</i>&nbsp;
+<i>467</i>&nbsp;//			m_centralComponent.repaint();
+<i>468</i>&nbsp;//			m_centralComponent.requestFocusInWindow();
+<b class="fc"><i>469</i>&nbsp;            centralComponent.requestFocus();</b>
+<b class="nc"><i>470</i>&nbsp;        } catch (Exception ex) {</b>
+<b class="nc"><i>471</i>&nbsp;            ex.printStackTrace();</b>
+<b class="fc"><i>472</i>&nbsp;        }</b>
+<b class="fc"><i>473</i>&nbsp;    }</b>
+<i>474</i>&nbsp;    
+<i>475</i>&nbsp;} // class BeautiPanel
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

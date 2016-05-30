@@ -1,0 +1,362 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: MTREV</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.substitutionmodel</a> ]
+</div>
+
+<h1>Coverage Summary for Class: MTREV (beast.evolution.substitutionmodel)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MTREV</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    99.6%
+  </span>
+  <span class="absValue">
+    (227/ 228)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.substitutionmodel;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import beast.core.Description;
+<i>4</i>&nbsp;import beast.evolution.datatype.Aminoacid;
+<i>5</i>&nbsp;import beast.evolution.datatype.DataType;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;@Description(&quot;MTREV24 model of amino acid evolution &quot; +
+<i>8</i>&nbsp;        &quot; (complete sequence data of mtDNA from 24 vertebrate species) &quot; +
+<i>9</i>&nbsp;        &quot; Adachi, J., and Hasegawa, M. 1996. J. Mol. Evol. 42:459-468.&quot;)
+<b class="fc"><i>10</i>&nbsp;public class MTREV extends EmpiricalSubstitutionModel {</b>
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;    @Override
+<i>14</i>&nbsp;    double[][] getEmpiricalRates() {
+<b class="fc"><i>15</i>&nbsp;        double[][] rate = new double[20][20];</b>
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;        // Q matrix from Beast 1
+<b class="fc"><i>18</i>&nbsp;        rate[0][1] = 1.2199217606346e+01;</b>
+<b class="fc"><i>19</i>&nbsp;        rate[0][2] = 1.4182139942122e+01;</b>
+<b class="fc"><i>20</i>&nbsp;        rate[0][3] = 9.2985091873208e+00;</b>
+<b class="fc"><i>21</i>&nbsp;        rate[0][4] = 3.1542792981957e+01;</b>
+<b class="fc"><i>22</i>&nbsp;        rate[0][5] = 1.0025852846688e+00;</b>
+<b class="fc"><i>23</i>&nbsp;        rate[0][6] = 5.1418866803338e+00;</b>
+<b class="fc"><i>24</i>&nbsp;        rate[0][7] = 6.3531246495131e+01;</b>
+<b class="fc"><i>25</i>&nbsp;        rate[0][8] = 7.3137132861715e+00;</b>
+<b class="fc"><i>26</i>&nbsp;        rate[0][9] = 5.0782382656186e+01;</b>
+<b class="fc"><i>27</i>&nbsp;        rate[0][10] = 1.3399741808481e+01;</b>
+<b class="fc"><i>28</i>&nbsp;        rate[0][11] = 4.4021672780560e+00;</b>
+<b class="fc"><i>29</i>&nbsp;        rate[0][12] = 7.4673480520104e+01;</b>
+<b class="fc"><i>30</i>&nbsp;        rate[0][13] = 3.3513021631978e+00;</b>
+<b class="fc"><i>31</i>&nbsp;        rate[0][14] = 2.8582502221773e+01;</b>
+<b class="fc"><i>32</i>&nbsp;        rate[0][15] = 2.0413623195312e+02;</b>
+<b class="fc"><i>33</i>&nbsp;        rate[0][16] = 2.5301305153906e+02;</b>
+<b class="fc"><i>34</i>&nbsp;        rate[0][17] = 1.0000000000000e+00;</b>
+<b class="fc"><i>35</i>&nbsp;        rate[0][18] = 3.4084158197615e+00;</b>
+<b class="fc"><i>36</i>&nbsp;        rate[0][19] = 1.0266468401249e+02;</b>
+<i>37</i>&nbsp;
+<b class="fc"><i>38</i>&nbsp;        rate[1][2] = 6.9661274444534e+00;</b>
+<b class="fc"><i>39</i>&nbsp;        rate[1][3] = 1.0000000000000e+00;</b>
+<b class="fc"><i>40</i>&nbsp;        rate[1][4] = 5.4384584796568e+01;</b>
+<b class="fc"><i>41</i>&nbsp;        rate[1][5] = 1.1631134513343e+02;</b>
+<b class="fc"><i>42</i>&nbsp;        rate[1][6] = 1.0000000000000e+00;</b>
+<b class="fc"><i>43</i>&nbsp;        rate[1][7] = 1.2122831341194e+01;</b>
+<b class="fc"><i>44</i>&nbsp;        rate[1][8] = 8.6961067087353e+01;</b>
+<b class="fc"><i>45</i>&nbsp;        rate[1][9] = 1.0000000000000e+00;</b>
+<b class="fc"><i>46</i>&nbsp;        rate[1][10] = 8.1976829394538e+00;</b>
+<b class="fc"><i>47</i>&nbsp;        rate[1][11] = 7.4423215395318e+01;</b>
+<b class="fc"><i>48</i>&nbsp;        rate[1][12] = 1.0000000000000e+00;</b>
+<b class="fc"><i>49</i>&nbsp;        rate[1][13] = 2.4659158338099e+00;</b>
+<b class="fc"><i>50</i>&nbsp;        rate[1][14] = 1.2439947713615e+01;</b>
+<b class="fc"><i>51</i>&nbsp;        rate[1][15] = 3.1791814866372e+00;</b>
+<b class="fc"><i>52</i>&nbsp;        rate[1][16] = 1.0935327216119e+00;</b>
+<b class="fc"><i>53</i>&nbsp;        rate[1][17] = 1.1550775790126e+01;</b>
+<b class="fc"><i>54</i>&nbsp;        rate[1][18] = 1.0000000000000e+00;</b>
+<b class="fc"><i>55</i>&nbsp;        rate[1][19] = 4.0211417480338e+00;</b>
+<i>56</i>&nbsp;
+<b class="fc"><i>57</i>&nbsp;        rate[2][3] = 4.1809325468160e+02;</b>
+<b class="fc"><i>58</i>&nbsp;        rate[2][4] = 3.1020979842967e+01;</b>
+<b class="fc"><i>59</i>&nbsp;        rate[2][5] = 9.1349622725361e+01;</b>
+<b class="fc"><i>60</i>&nbsp;        rate[2][6] = 3.3185663516310e+01;</b>
+<b class="fc"><i>61</i>&nbsp;        rate[2][7] = 2.8052324651124e+01;</b>
+<b class="fc"><i>62</i>&nbsp;        rate[2][8] = 2.6112087577885e+02;</b>
+<b class="fc"><i>63</i>&nbsp;        rate[2][9] = 1.4261453863336e+01;</b>
+<b class="fc"><i>64</i>&nbsp;        rate[2][10] = 7.9775653461977e+00;</b>
+<b class="fc"><i>65</i>&nbsp;        rate[2][11] = 3.2036829276162e+02;</b>
+<b class="fc"><i>66</i>&nbsp;        rate[2][12] = 3.4424354918739e+01;</b>
+<b class="fc"><i>67</i>&nbsp;        rate[2][13] = 7.9996445145608e+00;</b>
+<b class="fc"><i>68</i>&nbsp;        rate[2][14] = 3.8586541461044e+01;</b>
+<b class="fc"><i>69</i>&nbsp;        rate[2][15] = 2.6020426225852e+02;</b>
+<b class="fc"><i>70</i>&nbsp;        rate[2][16] = 1.2550758780474e+02;</b>
+<b class="fc"><i>71</i>&nbsp;        rate[2][17] = 5.6207759736659e+00;</b>
+<b class="fc"><i>72</i>&nbsp;        rate[2][18] = 1.0071406219571e+02;</b>
+<b class="fc"><i>73</i>&nbsp;        rate[2][19] = 1.0000000000000e+00;</b>
+<i>74</i>&nbsp;
+<b class="fc"><i>75</i>&nbsp;        rate[3][4] = 1.0000000000000e+00;</b>
+<b class="fc"><i>76</i>&nbsp;        rate[3][5] = 2.9097352675564e+01;</b>
+<b class="fc"><i>77</i>&nbsp;        rate[3][6] = 3.0713149855302e+02;</b>
+<b class="fc"><i>78</i>&nbsp;        rate[3][7] = 2.9877072751897e+01;</b>
+<b class="fc"><i>79</i>&nbsp;        rate[3][8] = 5.9995408885817e+01;</b>
+<b class="fc"><i>80</i>&nbsp;        rate[3][9] = 2.2827096245105e+00;</b>
+<b class="fc"><i>81</i>&nbsp;        rate[3][10] = 1.0000000000000e+00;</b>
+<b class="fc"><i>82</i>&nbsp;        rate[3][11] = 1.2183938185384e+00;</b>
+<b class="fc"><i>83</i>&nbsp;        rate[3][12] = 1.0000000000000e+00;</b>
+<b class="fc"><i>84</i>&nbsp;        rate[3][13] = 2.6221929413096e+00;</b>
+<b class="fc"><i>85</i>&nbsp;        rate[3][14] = 7.0708004204733e+00;</b>
+<b class="fc"><i>86</i>&nbsp;        rate[3][15] = 3.6327934317139e+01;</b>
+<b class="fc"><i>87</i>&nbsp;        rate[3][16] = 1.4743408713748e+01;</b>
+<b class="fc"><i>88</i>&nbsp;        rate[3][17] = 1.0453246057102e+01;</b>
+<b class="fc"><i>89</i>&nbsp;        rate[3][18] = 1.1165627147496e+01;</b>
+<b class="fc"><i>90</i>&nbsp;        rate[3][19] = 1.0000000000000e+00;</b>
+<i>91</i>&nbsp;
+<b class="fc"><i>92</i>&nbsp;        rate[4][5] = 3.9599394038972e+01;</b>
+<b class="fc"><i>93</i>&nbsp;        rate[4][6] = 1.0000000000000e+00;</b>
+<b class="fc"><i>94</i>&nbsp;        rate[4][7] = 1.6163581056674e+01;</b>
+<b class="fc"><i>95</i>&nbsp;        rate[4][8] = 7.4467985406234e+01;</b>
+<b class="fc"><i>96</i>&nbsp;        rate[4][9] = 3.3018175376623e+01;</b>
+<b class="fc"><i>97</i>&nbsp;        rate[4][10] = 1.3500725995091e+01;</b>
+<b class="fc"><i>98</i>&nbsp;        rate[4][11] = 1.0000000000000e+00;</b>
+<b class="fc"><i>99</i>&nbsp;        rate[4][12] = 3.2504095376923e+00;</b>
+<b class="fc"><i>100</i>&nbsp;        rate[4][13] = 3.7264767083096e+01;</b>
+<b class="fc"><i>101</i>&nbsp;        rate[4][14] = 1.6454136037822e+01;</b>
+<b class="fc"><i>102</i>&nbsp;        rate[4][15] = 1.4581783243113e+02;</b>
+<b class="fc"><i>103</i>&nbsp;        rate[4][16] = 9.4720031458442e+01;</b>
+<b class="fc"><i>104</i>&nbsp;        rate[4][17] = 1.7684087896962e+01;</b>
+<b class="fc"><i>105</i>&nbsp;        rate[4][18] = 1.3409157685926e+02;</b>
+<b class="fc"><i>106</i>&nbsp;        rate[4][19] = 1.0000000000000e+00;</b>
+<i>107</i>&nbsp;
+<b class="fc"><i>108</i>&nbsp;        rate[5][6] = 1.6503249008836e+02;</b>
+<b class="fc"><i>109</i>&nbsp;        rate[5][7] = 3.5530760735494e+00;</b>
+<b class="fc"><i>110</i>&nbsp;        rate[5][8] = 3.0652523140859e+02;</b>
+<b class="fc"><i>111</i>&nbsp;        rate[5][9] = 4.3905393139325e+00;</b>
+<b class="fc"><i>112</i>&nbsp;        rate[5][10] = 2.0895470525345e+01;</b>
+<b class="fc"><i>113</i>&nbsp;        rate[5][11] = 2.4504076430724e+02;</b>
+<b class="fc"><i>114</i>&nbsp;        rate[5][12] = 2.4931300477797e+01;</b>
+<b class="fc"><i>115</i>&nbsp;        rate[5][13] = 1.0059428264289e+01;</b>
+<b class="fc"><i>116</i>&nbsp;        rate[5][14] = 7.2256314165467e+01;</b>
+<b class="fc"><i>117</i>&nbsp;        rate[5][15] = 2.8480937892158e+01;</b>
+<b class="fc"><i>118</i>&nbsp;        rate[5][16] = 4.9962974409828e+01;</b>
+<b class="fc"><i>119</i>&nbsp;        rate[5][17] = 1.0000000000000e+00;</b>
+<b class="fc"><i>120</i>&nbsp;        rate[5][18] = 2.0430790980529e+01;</b>
+<b class="fc"><i>121</i>&nbsp;        rate[5][19] = 9.9986289000676e+00;</b>
+<i>122</i>&nbsp;
+<b class="fc"><i>123</i>&nbsp;        rate[6][7] = 1.4884496769963e+01;</b>
+<b class="fc"><i>124</i>&nbsp;        rate[6][8] = 2.5853576435567e+01;</b>
+<b class="fc"><i>125</i>&nbsp;        rate[6][9] = 1.7418201388328e+00;</b>
+<b class="fc"><i>126</i>&nbsp;        rate[6][10] = 1.0000000000000e+00;</b>
+<b class="fc"><i>127</i>&nbsp;        rate[6][11] = 1.6519126809071e+02;</b>
+<b class="fc"><i>128</i>&nbsp;        rate[6][12] = 1.0000000000000e+00;</b>
+<b class="fc"><i>129</i>&nbsp;        rate[6][13] = 1.4067850525292e+00;</b>
+<b class="fc"><i>130</i>&nbsp;        rate[6][14] = 6.7547121641947e+00;</b>
+<b class="fc"><i>131</i>&nbsp;        rate[6][15] = 2.8794794140840e+01;</b>
+<b class="fc"><i>132</i>&nbsp;        rate[6][16] = 7.8001372062558e+00;</b>
+<b class="fc"><i>133</i>&nbsp;        rate[6][17] = 1.0000000000000e+00;</b>
+<b class="fc"><i>134</i>&nbsp;        rate[6][18] = 6.9067239183061e+00;</b>
+<b class="fc"><i>135</i>&nbsp;        rate[6][19] = 1.1127702362585e+01;</b>
+<i>136</i>&nbsp;
+<b class="fc"><i>137</i>&nbsp;        rate[7][8] = 1.0000000000000e+00;</b>
+<b class="fc"><i>138</i>&nbsp;        rate[7][9] = 3.1466649021550e+00;</b>
+<b class="fc"><i>139</i>&nbsp;        rate[7][10] = 1.2699794194865e+00;</b>
+<b class="fc"><i>140</i>&nbsp;        rate[7][11] = 1.1962111069278e+01;</b>
+<b class="fc"><i>141</i>&nbsp;        rate[7][12] = 1.0000000000000e+00;</b>
+<b class="fc"><i>142</i>&nbsp;        rate[7][13] = 1.0000000000000e+00;</b>
+<b class="fc"><i>143</i>&nbsp;        rate[7][14] = 1.0000000000000e+00;</b>
+<b class="fc"><i>144</i>&nbsp;        rate[7][15] = 6.6277950574411e+01;</b>
+<b class="fc"><i>145</i>&nbsp;        rate[7][16] = 5.8800079133028e+00;</b>
+<b class="fc"><i>146</i>&nbsp;        rate[7][17] = 5.7494182626674e+00;</b>
+<b class="fc"><i>147</i>&nbsp;        rate[7][18] = 1.6887657206208e+00;</b>
+<b class="fc"><i>148</i>&nbsp;        rate[7][19] = 1.3320553471351e+00;</b>
+<i>149</i>&nbsp;
+<b class="fc"><i>150</i>&nbsp;        rate[8][9] = 6.4536986087271e+00;</b>
+<b class="fc"><i>151</i>&nbsp;        rate[8][10] = 6.0472584534958e+00;</b>
+<b class="fc"><i>152</i>&nbsp;        rate[8][11] = 6.7197196398961e+01;</b>
+<b class="fc"><i>153</i>&nbsp;        rate[8][12] = 6.2977633277779e+00;</b>
+<b class="fc"><i>154</i>&nbsp;        rate[8][13] = 2.5347805183364e+01;</b>
+<b class="fc"><i>155</i>&nbsp;        rate[8][14] = 3.2089868698728e+01;</b>
+<b class="fc"><i>156</i>&nbsp;        rate[8][15] = 4.0766987134407e+01;</b>
+<b class="fc"><i>157</i>&nbsp;        rate[8][16] = 2.3570850628539e+01;</b>
+<b class="fc"><i>158</i>&nbsp;        rate[8][17] = 3.7286635325194e+00;</b>
+<b class="fc"><i>159</i>&nbsp;        rate[8][18] = 3.5270764890474e+02;</b>
+<b class="fc"><i>160</i>&nbsp;        rate[8][19] = 1.0000000000000e+00;</b>
+<i>161</i>&nbsp;
+<b class="fc"><i>162</i>&nbsp;        rate[9][10] = 1.7320653206333e+02;</b>
+<b class="fc"><i>163</i>&nbsp;        rate[9][11] = 1.0298655619743e+01;</b>
+<b class="fc"><i>164</i>&nbsp;        rate[9][12] = 2.7262244199514e+02;</b>
+<b class="fc"><i>165</i>&nbsp;        rate[9][13] = 4.4561065036310e+01;</b>
+<b class="fc"><i>166</i>&nbsp;        rate[9][14] = 1.0856482766156e+01;</b>
+<b class="fc"><i>167</i>&nbsp;        rate[9][15] = 2.5107659603898e+01;</b>
+<b class="fc"><i>168</i>&nbsp;        rate[9][16] = 1.9391167162525e+02;</b>
+<b class="fc"><i>169</i>&nbsp;        rate[9][17] = 1.0000000000000e+00;</b>
+<b class="fc"><i>170</i>&nbsp;        rate[9][18] = 1.3161329199391e+01;</b>
+<b class="fc"><i>171</i>&nbsp;        rate[9][19] = 6.4365086389428e+02;</b>
+<i>172</i>&nbsp;
+<b class="fc"><i>173</i>&nbsp;        rate[10][11] = 7.8314019154706e+00;</b>
+<b class="fc"><i>174</i>&nbsp;        rate[10][12] = 2.8290920517725e+02;</b>
+<b class="fc"><i>175</i>&nbsp;        rate[10][13] = 1.1371735519833e+02;</b>
+<b class="fc"><i>176</i>&nbsp;        rate[10][14] = 2.1105885757279e+01;</b>
+<b class="fc"><i>177</i>&nbsp;        rate[10][15] = 3.8741359395934e+01;</b>
+<b class="fc"><i>178</i>&nbsp;        rate[10][16] = 6.6524559321657e+01;</b>
+<b class="fc"><i>179</i>&nbsp;        rate[10][17] = 1.7071378554833e+01;</b>
+<b class="fc"><i>180</i>&nbsp;        rate[10][18] = 2.3234516108847e+01;</b>
+<b class="fc"><i>181</i>&nbsp;        rate[10][19] = 4.8247261078055e+01;</b>
+<i>182</i>&nbsp;
+<b class="fc"><i>183</i>&nbsp;        rate[11][12] = 4.8092094826036e+01;</b>
+<b class="fc"><i>184</i>&nbsp;        rate[11][13] = 3.3887559483420e+00;</b>
+<b class="fc"><i>185</i>&nbsp;        rate[11][14] = 2.6368577564199e+01;</b>
+<b class="fc"><i>186</i>&nbsp;        rate[11][15] = 5.5679895711418e+01;</b>
+<b class="fc"><i>187</i>&nbsp;        rate[11][16] = 7.1750284708933e+01;</b>
+<b class="fc"><i>188</i>&nbsp;        rate[11][17] = 1.2631893872825e+01;</b>
+<b class="fc"><i>189</i>&nbsp;        rate[11][18] = 2.6932728996777e+01;</b>
+<b class="fc"><i>190</i>&nbsp;        rate[11][19] = 1.0000000000000e+00;</b>
+<i>191</i>&nbsp;
+<b class="fc"><i>192</i>&nbsp;        rate[12][13] = 4.7798798034572e+01;</b>
+<b class="fc"><i>193</i>&nbsp;        rate[12][14] = 9.9165053447429e+00;</b>
+<b class="fc"><i>194</i>&nbsp;        rate[12][15] = 5.8505442466161e+01;</b>
+<b class="fc"><i>195</i>&nbsp;        rate[12][16] = 2.7798190504760e+02;</b>
+<b class="fc"><i>196</i>&nbsp;        rate[12][17] = 1.1427000119701e+01;</b>
+<b class="fc"><i>197</i>&nbsp;        rate[12][18] = 2.1029990530586e+01;</b>
+<b class="fc"><i>198</i>&nbsp;        rate[12][19] = 2.0397078683768e+02;</b>
+<i>199</i>&nbsp;
+<b class="fc"><i>200</i>&nbsp;        rate[13][14] = 9.1089574817139e+00;</b>
+<b class="fc"><i>201</i>&nbsp;        rate[13][15] = 3.3835737720574e+01;</b>
+<b class="fc"><i>202</i>&nbsp;        rate[13][16] = 1.7815549567056e+01;</b>
+<b class="fc"><i>203</i>&nbsp;        rate[13][17] = 4.1272404968214e+00;</b>
+<b class="fc"><i>204</i>&nbsp;        rate[13][18] = 2.4504156395152e+02;</b>
+<b class="fc"><i>205</i>&nbsp;        rate[13][19] = 3.3435675442163e+00;</b>
+<i>206</i>&nbsp;
+<b class="fc"><i>207</i>&nbsp;        rate[14][15] = 8.9421193040709e+01;</b>
+<b class="fc"><i>208</i>&nbsp;        rate[14][16] = 6.7485067008375e+01;</b>
+<b class="fc"><i>209</i>&nbsp;        rate[14][17] = 2.2161693733113e+00;</b>
+<b class="fc"><i>210</i>&nbsp;        rate[14][18] = 8.5338209390745e+00;</b>
+<b class="fc"><i>211</i>&nbsp;        rate[14][19] = 4.3342126659660e+00;</b>
+<i>212</i>&nbsp;
+<b class="fc"><i>213</i>&nbsp;        rate[15][16] = 3.1432036618746e+02;</b>
+<b class="fc"><i>214</i>&nbsp;        rate[15][17] = 2.0305343047059e+01;</b>
+<b class="fc"><i>215</i>&nbsp;        rate[15][18] = 3.4167877957799e+01;</b>
+<b class="fc"><i>216</i>&nbsp;        rate[15][19] = 1.0000000000000e+00;</b>
+<i>217</i>&nbsp;
+<b class="fc"><i>218</i>&nbsp;        rate[16][17] = 5.2559565123081e+00;</b>
+<b class="fc"><i>219</i>&nbsp;        rate[16][18] = 2.0382362288681e+01;</b>
+<b class="fc"><i>220</i>&nbsp;        rate[16][19] = 1.0765527137500e+02;</b>
+<i>221</i>&nbsp;
+<b class="fc"><i>222</i>&nbsp;        rate[17][18] = 1.3814733274637e+01;</b>
+<b class="fc"><i>223</i>&nbsp;        rate[17][19] = 2.8259139240676e+00;</b>
+<i>224</i>&nbsp;
+<b class="fc"><i>225</i>&nbsp;        rate[18][19] = 1.0000000000000e+00;</b>
+<i>226</i>&nbsp;
+<b class="fc"><i>227</i>&nbsp;        return rate;</b>
+<i>228</i>&nbsp;    }
+<i>229</i>&nbsp;
+<i>230</i>&nbsp;    @Override
+<i>231</i>&nbsp;    public double[] getEmpiricalFrequencies() {
+<b class="fc"><i>232</i>&nbsp;        double[] f = new double[20];</b>
+<b class="fc"><i>233</i>&nbsp;        f[0] = 0.072;</b>
+<b class="fc"><i>234</i>&nbsp;        f[1] = 0.019;</b>
+<b class="fc"><i>235</i>&nbsp;        f[2] = 0.039;</b>
+<b class="fc"><i>236</i>&nbsp;        f[3] = 0.019;</b>
+<b class="fc"><i>237</i>&nbsp;        f[4] = 0.006;</b>
+<b class="fc"><i>238</i>&nbsp;        f[5] = 0.025;</b>
+<b class="fc"><i>239</i>&nbsp;        f[6] = 0.024;</b>
+<b class="fc"><i>240</i>&nbsp;        f[7] = 0.056;</b>
+<b class="fc"><i>241</i>&nbsp;        f[8] = 0.028;</b>
+<b class="fc"><i>242</i>&nbsp;        f[9] = 0.088;</b>
+<b class="fc"><i>243</i>&nbsp;        f[10] = 0.168;</b>
+<b class="fc"><i>244</i>&nbsp;        f[11] = 0.023;</b>
+<b class="fc"><i>245</i>&nbsp;        f[12] = 0.054;</b>
+<b class="fc"><i>246</i>&nbsp;        f[13] = 0.061;</b>
+<b class="fc"><i>247</i>&nbsp;        f[14] = 0.054;</b>
+<b class="fc"><i>248</i>&nbsp;        f[15] = 0.072;</b>
+<b class="fc"><i>249</i>&nbsp;        f[16] = 0.086;</b>
+<b class="fc"><i>250</i>&nbsp;        f[17] = 0.029;</b>
+<b class="fc"><i>251</i>&nbsp;        f[18] = 0.033;</b>
+<b class="fc"><i>252</i>&nbsp;        f[19] = 0.043;</b>
+<b class="fc"><i>253</i>&nbsp;        double sum = 0;</b>
+<b class="fc"><i>254</i>&nbsp;        for (double value : f) {</b>
+<b class="fc"><i>255</i>&nbsp;            sum += value;</b>
+<i>256</i>&nbsp;        }
+<b class="fc"><i>257</i>&nbsp;        for (int i = 0; i &lt; 20; i++) {</b>
+<b class="fc"><i>258</i>&nbsp;            f[i] = f[i] / sum;</b>
+<i>259</i>&nbsp;        }
+<b class="fc"><i>260</i>&nbsp;        return f;</b>
+<i>261</i>&nbsp;    }
+<i>262</i>&nbsp;
+<i>263</i>&nbsp;    @Override
+<i>264</i>&nbsp;    public int[] getEncodingOrder() {
+<b class="fc"><i>265</i>&nbsp;        Aminoacid dataType = new Aminoacid();</b>
+<b class="fc"><i>266</i>&nbsp;        String codeMap = dataType.getCodeMap();</b>
+<b class="fc"><i>267</i>&nbsp;        int[] codeMapNrs = new int[dataType.getStateCount()];</b>
+<b class="fc"><i>268</i>&nbsp;        String encoding = &quot;ARNDCQEGHILKMFPSTWYV&quot;;</b>
+<b class="fc"><i>269</i>&nbsp;        for (int i = 0; i &lt; dataType.getStateCount(); i++) {</b>
+<b class="fc"><i>270</i>&nbsp;            codeMapNrs[i] = encoding.indexOf(codeMap.charAt(i));</b>
+<i>271</i>&nbsp;        }
+<b class="fc"><i>272</i>&nbsp;        return codeMapNrs;</b>
+<i>273</i>&nbsp;    }
+<i>274</i>&nbsp;
+<i>275</i>&nbsp;    @Override
+<i>276</i>&nbsp;    public boolean canHandleDataType(DataType dataType) {
+<b class="nc"><i>277</i>&nbsp;        return dataType instanceof Aminoacid;</b>
+<i>278</i>&nbsp;    }
+<i>279</i>&nbsp;} // class WAG
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

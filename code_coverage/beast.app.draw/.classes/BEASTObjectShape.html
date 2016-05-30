@@ -1,0 +1,344 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: BEASTObjectShape</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.draw</a> ]
+</div>
+
+<h1>Coverage Summary for Class: BEASTObjectShape (beast.app.draw)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BEASTObjectShape</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    6.7%
+  </span>
+  <span class="absValue">
+    (1/ 15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0.8%
+  </span>
+  <span class="absValue">
+    (1/ 131)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;* File PluginShape.java
+<i>3</i>&nbsp;*
+<i>4</i>&nbsp;* Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>5</i>&nbsp;*
+<i>6</i>&nbsp;* This file is part of BEAST2.
+<i>7</i>&nbsp;* See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp;* information regarding copyright ownership and licensing.
+<i>9</i>&nbsp;*
+<i>10</i>&nbsp;* BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp;* it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp;* published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp;* of the License, or (at your option) any later version.
+<i>14</i>&nbsp;*
+<i>15</i>&nbsp;*  BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp;*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp;*  GNU Lesser General Public License for more details.
+<i>19</i>&nbsp;*
+<i>20</i>&nbsp;* You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp;* License along with BEAST; if not, write to the
+<i>22</i>&nbsp;* Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp;* Boston, MA  02110-1301  USA
+<i>24</i>&nbsp;*/
+<i>25</i>&nbsp;package beast.app.draw;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;import java.awt.BasicStroke;
+<i>29</i>&nbsp;import java.awt.Color;
+<i>30</i>&nbsp;import java.awt.Font;
+<i>31</i>&nbsp;import java.awt.GradientPaint;
+<i>32</i>&nbsp;import java.awt.Graphics2D;
+<i>33</i>&nbsp;import java.awt.Point;
+<i>34</i>&nbsp;import java.io.PrintStream;
+<i>35</i>&nbsp;import java.util.ArrayList;
+<i>36</i>&nbsp;import java.util.List;
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;import javax.swing.JPanel;
+<i>39</i>&nbsp;import javax.swing.UIManager;
+<i>40</i>&nbsp;
+<i>41</i>&nbsp;import org.w3c.dom.Node;
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;import beast.core.BEASTInterface;
+<i>44</i>&nbsp;import beast.core.Input;
+<i>45</i>&nbsp;import beast.util.Randomizer;
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;public class BEASTObjectShape extends Shape {
+<b class="fc"><i>52</i>&nbsp;    static Font g_PluginFont = new Font(&quot;arial&quot;, Font.PLAIN, UIManager.getFont(&quot;Label.font&quot;).getSize() * 11 / 12);</b>
+<i>53</i>&nbsp;    public beast.core.BEASTInterface m_beastObject;
+<i>54</i>&nbsp;    List&lt;InputShape&gt; m_inputs;
+<i>55</i>&nbsp;
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;    public BEASTObjectShape() {
+<b class="nc"><i>58</i>&nbsp;        super();</b>
+<b class="nc"><i>59</i>&nbsp;        m_fillcolor = new Color(Randomizer.nextInt(256), 128 + Randomizer.nextInt(128), Randomizer.nextInt(128));</b>
+<b class="nc"><i>60</i>&nbsp;    }</b>
+<i>61</i>&nbsp;
+<i>62</i>&nbsp;    public BEASTObjectShape(BEASTInterface beastObject, Document doc) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+<b class="nc"><i>63</i>&nbsp;        super();</b>
+<b class="nc"><i>64</i>&nbsp;        m_beastObject = beastObject;</b>
+<b class="nc"><i>65</i>&nbsp;        m_fillcolor = new Color(Randomizer.nextInt(256), 128 + Randomizer.nextInt(128), Randomizer.nextInt(128));</b>
+<b class="nc"><i>66</i>&nbsp;        init(beastObject.getClass().getName(), doc);</b>
+<b class="nc"><i>67</i>&nbsp;    }</b>
+<i>68</i>&nbsp;
+<b class="nc"><i>69</i>&nbsp;    public BEASTObjectShape(Node node, Document doc, boolean reconstructBEASTObjects) {</b>
+<b class="nc"><i>70</i>&nbsp;        parse(node, doc, reconstructBEASTObjects);</b>
+<b class="nc"><i>71</i>&nbsp;    }</b>
+<i>72</i>&nbsp;
+<i>73</i>&nbsp;    public void init(String className, Document doc) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+<b class="nc"><i>74</i>&nbsp;    	m_doc = doc;</b>
+<b class="nc"><i>75</i>&nbsp;        if (m_beastObject == null) {</b>
+<b class="nc"><i>76</i>&nbsp;            m_beastObject = (beast.core.BEASTInterface) Class.forName(className).newInstance();</b>
+<i>77</i>&nbsp;        }
+<b class="nc"><i>78</i>&nbsp;        m_inputs = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>79</i>&nbsp;        if (m_beastObject.getID() == null) {</b>
+<b class="nc"><i>80</i>&nbsp;        	String id = m_beastObject.getClass().getName();</b>
+<b class="nc"><i>81</i>&nbsp;        	id = id.substring(id.lastIndexOf(&#39;.&#39;) + 1);</b>
+<b class="nc"><i>82</i>&nbsp;        	m_beastObject.setID(id);</b>
+<i>83</i>&nbsp;        }
+<i>84</i>&nbsp;        //System.err.println(&quot;\n&gt;&gt;&gt;&gt;&quot; + m_beastObject.getID());        
+<b class="nc"><i>85</i>&nbsp;        List&lt;Input&lt;?&gt;&gt; inputs = m_beastObject.listInputs();</b>
+<b class="nc"><i>86</i>&nbsp;        for (Input&lt;?&gt; input_ : inputs) {</b>
+<b class="nc"><i>87</i>&nbsp;			String longInputName = m_beastObject.getClass().getName() + &quot;.&quot; + input_.getName(); </b>
+<i>88</i>&nbsp;			//System.err.print(longInputName);
+<b class="nc"><i>89</i>&nbsp;        	if (doc.showAllInputs() ||</b>
+<b class="nc"><i>90</i>&nbsp;        			!doc.tabulist.contains(longInputName) &amp;&amp; </b>
+<b class="nc"><i>91</i>&nbsp;        			input_.get() != null &amp;&amp; (</b>
+<b class="nc"><i>92</i>&nbsp;        			(input_.get() instanceof List &amp;&amp; ((List&lt;?&gt;)input_.get()).size()&gt;0) ||  </b>
+<b class="nc"><i>93</i>&nbsp;        			!input_.get().equals(input_.defaultValue))) {</b>
+<b class="nc"><i>94</i>&nbsp;	            InputShape input = new InputShape(input_);</b>
+<b class="nc"><i>95</i>&nbsp;	            input.setPluginShape(this);</b>
+<b class="nc"><i>96</i>&nbsp;	            input.m_fillcolor = m_fillcolor;</b>
+<b class="nc"><i>97</i>&nbsp;	            input.m_w = 10;</b>
+<b class="nc"><i>98</i>&nbsp;	            doc.addNewShape(input);</b>
+<b class="nc"><i>99</i>&nbsp;	            m_inputs.add(input);</b>
+<i>100</i>&nbsp;        		//System.err.println(&quot; shown&quot;);
+<i>101</i>&nbsp;        	} else {
+<i>102</i>&nbsp;        		//System.err.println(&quot; skipped&quot;);
+<i>103</i>&nbsp;        	}
+<b class="nc"><i>104</i>&nbsp;        }</b>
+<b class="nc"><i>105</i>&nbsp;        m_h = Math.max(40, m_inputs.size() * 12);</b>
+<b class="nc"><i>106</i>&nbsp;        adjustInputs();</b>
+<b class="nc"><i>107</i>&nbsp;    } // setClassName</b>
+<i>108</i>&nbsp;
+<i>109</i>&nbsp;    // find input shape associated with input with name label
+<i>110</i>&nbsp;    InputShape getInputShape(String label) {
+<b class="nc"><i>111</i>&nbsp;        for (InputShape shape : m_inputs) {</b>
+<b class="nc"><i>112</i>&nbsp;            String label2 = shape.getLabel();</b>
+<b class="nc"><i>113</i>&nbsp;            if (label2 != null) {</b>
+<b class="nc"><i>114</i>&nbsp;                if (label2.contains(&quot;=&quot;)) {</b>
+<b class="nc"><i>115</i>&nbsp;                    label2 = label2.substring(0, label2.indexOf(&#39;=&#39;));</b>
+<i>116</i>&nbsp;                }
+<b class="nc"><i>117</i>&nbsp;                if (label2.equals(label)) {</b>
+<b class="nc"><i>118</i>&nbsp;                    return shape;</b>
+<i>119</i>&nbsp;                }
+<i>120</i>&nbsp;            }
+<b class="nc"><i>121</i>&nbsp;        }</b>
+<b class="nc"><i>122</i>&nbsp;        return null;</b>
+<i>123</i>&nbsp;    }
+<i>124</i>&nbsp;
+<i>125</i>&nbsp;    /**
+<i>126</i>&nbsp;     * set coordinates of inputs based on location of this PluginShape
+<i>127</i>&nbsp;     */
+<i>128</i>&nbsp;    void adjustInputs() {
+<b class="nc"><i>129</i>&nbsp;        if (m_beastObject != null) {</b>
+<i>130</i>&nbsp;            try {
+<i>131</i>&nbsp;                //List&lt;Input&lt;?&gt;&gt; inputs = m_beastObject.listInputs();
+<b class="nc"><i>132</i>&nbsp;                for (int i = 0; i &lt; m_inputs.size(); i++) {</b>
+<b class="nc"><i>133</i>&nbsp;                    InputShape input = m_inputs.get(i);</b>
+<i>134</i>&nbsp;                    //input.m_input = inputs.get(i);
+<b class="nc"><i>135</i>&nbsp;                    int offset = i * m_h / (m_inputs.size()) + m_h / (2 * (m_inputs.size()));</b>
+<b class="nc"><i>136</i>&nbsp;                    input.m_x = m_x - input.m_w;</b>
+<b class="nc"><i>137</i>&nbsp;                    input.m_y = m_y + offset;</b>
+<i>138</i>&nbsp;                    //input.m_w = 10;
+<b class="nc"><i>139</i>&nbsp;                    input.m_h = 10;</b>
+<b class="nc"><i>140</i>&nbsp;                    input.m_fillcolor = m_fillcolor;</b>
+<b class="nc"><i>141</i>&nbsp;                    input.m_nPenWidth = 0;</b>
+<i>142</i>&nbsp;                }
+<b class="nc"><i>143</i>&nbsp;            } catch (Exception e) {</b>
+<b class="nc"><i>144</i>&nbsp;                e.printStackTrace();</b>
+<b class="nc"><i>145</i>&nbsp;            }</b>
+<i>146</i>&nbsp;        }
+<b class="nc"><i>147</i>&nbsp;    }</b>
+<i>148</i>&nbsp;
+<i>149</i>&nbsp;
+<i>150</i>&nbsp;    @Override
+<i>151</i>&nbsp;    public void draw(Graphics2D g, JPanel panel) {
+<b class="nc"><i>152</i>&nbsp;        if (m_bFilled) {</b>
+<b class="nc"><i>153</i>&nbsp;            GradientPaint m_gradientPaint = new GradientPaint(new Point(m_x, m_y), Color.WHITE, new Point(m_x + m_w, m_y + m_h), m_fillcolor);</b>
+<b class="nc"><i>154</i>&nbsp;            g.setPaint(m_gradientPaint);</b>
+<b class="nc"><i>155</i>&nbsp;            g.fillOval(m_x, m_y, m_w, m_h);</b>
+<b class="nc"><i>156</i>&nbsp;            g.fillRect(m_x, m_y, m_w / 2, m_h);</b>
+<b class="nc"><i>157</i>&nbsp;        } else {</b>
+<b class="nc"><i>158</i>&nbsp;            g.setColor(m_fillcolor);</b>
+<b class="nc"><i>159</i>&nbsp;            g.drawLine(m_x, m_y, m_x, m_y + m_h);</b>
+<b class="nc"><i>160</i>&nbsp;            g.drawLine(m_x, m_y, m_x + m_w / 2, m_y);</b>
+<b class="nc"><i>161</i>&nbsp;            g.drawLine(m_x, m_y + m_h, m_x + m_w / 2, m_y + m_h);</b>
+<b class="nc"><i>162</i>&nbsp;            g.drawArc(m_x, m_y, m_w, m_h, 0, 90);</b>
+<b class="nc"><i>163</i>&nbsp;            g.drawArc(m_x, m_y, m_w, m_h, 0, -90);</b>
+<i>164</i>&nbsp;        }
+<b class="nc"><i>165</i>&nbsp;        g.setStroke(new BasicStroke(m_nPenWidth));</b>
+<b class="nc"><i>166</i>&nbsp;        g.setColor(m_pencolor);</b>
+<b class="nc"><i>167</i>&nbsp;        g.setFont(g_PluginFont);</b>
+<b class="nc"><i>168</i>&nbsp;        drawLabel(g);</b>
+<b class="nc"><i>169</i>&nbsp;        adjustInputs();</b>
+<b class="nc"><i>170</i>&nbsp;    }</b>
+<i>171</i>&nbsp;
+<i>172</i>&nbsp;    @Override
+<i>173</i>&nbsp;    void parse(Node node, Document doc, boolean reconstructBEASTObjects) {
+<b class="nc"><i>174</i>&nbsp;        super.parse(node, doc, reconstructBEASTObjects);</b>
+<b class="nc"><i>175</i>&nbsp;        if (reconstructBEASTObjects) {</b>
+<b class="nc"><i>176</i>&nbsp;            if (node.getAttributes().getNamedItem(&quot;class&quot;) != null) {</b>
+<b class="nc"><i>177</i>&nbsp;                String className = node.getAttributes().getNamedItem(&quot;class&quot;).getNodeValue();</b>
+<i>178</i>&nbsp;                try {
+<b class="nc"><i>179</i>&nbsp;                    m_beastObject = (beast.core.BEASTInterface) Class.forName(className).newInstance();</b>
+<b class="nc"><i>180</i>&nbsp;                    m_beastObject.setID(m_sID);</b>
+<b class="nc"><i>181</i>&nbsp;                } catch (Exception e) {</b>
+<i>182</i>&nbsp;                    // TODO: handle exception
+<b class="nc"><i>183</i>&nbsp;                }</b>
+<i>184</i>&nbsp;            }
+<b class="nc"><i>185</i>&nbsp;            if (node.getAttributes().getNamedItem(&quot;inputids&quot;) != null) {</b>
+<b class="nc"><i>186</i>&nbsp;                String inputIDs = node.getAttributes().getNamedItem(&quot;inputids&quot;).getNodeValue();</b>
+<b class="nc"><i>187</i>&nbsp;                String[] inputID = inputIDs.split(&quot; &quot;);</b>
+<b class="nc"><i>188</i>&nbsp;                m_inputs = new ArrayList&lt;&gt;();</b>
+<i>189</i>&nbsp;                try {
+<i>190</i>&nbsp;                    //List&lt;Input&lt;?&gt;&gt; inputs = m_beastObject.listInputs();
+<b class="nc"><i>191</i>&nbsp;                    for (int i = 0; i &lt; inputID.length; i++) {</b>
+<b class="nc"><i>192</i>&nbsp;                        InputShape ellipse = (InputShape) doc.findObjectWithID(inputID[i]);</b>
+<b class="nc"><i>193</i>&nbsp;                        m_inputs.add(ellipse);</b>
+<b class="nc"><i>194</i>&nbsp;                        ellipse.setPluginShape(this);</b>
+<i>195</i>&nbsp;                        //ellipse.m_input = inputs.get(i);
+<i>196</i>&nbsp;                    }
+<b class="nc"><i>197</i>&nbsp;                } catch (Exception e) {</b>
+<b class="nc"><i>198</i>&nbsp;                    e.printStackTrace();</b>
+<b class="nc"><i>199</i>&nbsp;                }</b>
+<i>200</i>&nbsp;            }
+<i>201</i>&nbsp;        }
+<b class="nc"><i>202</i>&nbsp;    }</b>
+<i>203</i>&nbsp;
+<i>204</i>&nbsp;    @Override
+<i>205</i>&nbsp;    public String getXML() {
+<b class="nc"><i>206</i>&nbsp;        StringBuffer buf = new StringBuffer();</b>
+<b class="nc"><i>207</i>&nbsp;        buf.append(&quot;&lt;&quot; + Document.PLUGIN_SHAPE_ELEMENT);</b>
+<b class="nc"><i>208</i>&nbsp;        buf.append(&quot; class=&#39;&quot;);</b>
+<b class="nc"><i>209</i>&nbsp;        buf.append(m_beastObject.getClass().getName());</b>
+<b class="nc"><i>210</i>&nbsp;        buf.append(&quot;&#39;&quot;);</b>
+<b class="nc"><i>211</i>&nbsp;        buf.append(&quot; inputids=&#39;&quot;);</b>
+<b class="nc"><i>212</i>&nbsp;        for (int i = 0; i &lt; m_inputs.size(); i++) {</b>
+<b class="nc"><i>213</i>&nbsp;            buf.append(m_inputs.get(i).getID());</b>
+<b class="nc"><i>214</i>&nbsp;            buf.append(&#39; &#39;);</b>
+<i>215</i>&nbsp;        }
+<b class="nc"><i>216</i>&nbsp;        buf.append(&quot;&#39;&quot;);</b>
+<i>217</i>&nbsp;
+<b class="nc"><i>218</i>&nbsp;        buf.append(getAtts());</b>
+<b class="nc"><i>219</i>&nbsp;        buf.append(&quot;&gt;\n&quot;);</b>
+<b class="nc"><i>220</i>&nbsp;        buf.append(&quot;&lt;/&quot; + Document.PLUGIN_SHAPE_ELEMENT + &quot;&gt;&quot;);</b>
+<b class="nc"><i>221</i>&nbsp;        return buf.toString();</b>
+<i>222</i>&nbsp;    }
+<i>223</i>&nbsp;
+<i>224</i>&nbsp;    @Override
+<i>225</i>&nbsp;    void assignFrom(Shape other) {
+<b class="nc"><i>226</i>&nbsp;        super.assignFrom(other);</b>
+<b class="nc"><i>227</i>&nbsp;        m_beastObject.setID(other.m_sID);</b>
+<b class="nc"><i>228</i>&nbsp;    }</b>
+<i>229</i>&nbsp;
+<i>230</i>&nbsp;    @Override
+<i>231</i>&nbsp;    boolean intersects(int x, int y) {
+<b class="nc"><i>232</i>&nbsp;        return super.intersects(x, y);</b>
+<i>233</i>&nbsp;    }
+<i>234</i>&nbsp;
+<i>235</i>&nbsp;    @Override
+<i>236</i>&nbsp;    String getLabel() {
+<b class="nc"><i>237</i>&nbsp;        return getID();</b>
+<i>238</i>&nbsp;    }
+<i>239</i>&nbsp;
+<i>240</i>&nbsp;    @Override
+<i>241</i>&nbsp;    String getID() {
+<b class="nc"><i>242</i>&nbsp;        if (m_beastObject == null) {</b>
+<b class="nc"><i>243</i>&nbsp;            return null;</b>
+<i>244</i>&nbsp;        }
+<b class="nc"><i>245</i>&nbsp;        return m_beastObject.getID();</b>
+<i>246</i>&nbsp;    }
+<i>247</i>&nbsp;
+<i>248</i>&nbsp;    @Override
+<i>249</i>&nbsp;    void toSVG(PrintStream out) {
+<b class="nc"><i>250</i>&nbsp;        out.println(&quot;&lt;defs&gt;&quot;);</b>
+<b class="nc"><i>251</i>&nbsp;        out.println(&quot;  &lt;linearGradient id=&#39;grad&quot; + getID() + &quot;&#39; x1=&#39;0%&#39; y1=&#39;0%&#39; x2=&#39;100%&#39; y2=&#39;100%&#39;&gt;&quot;);</b>
+<b class="nc"><i>252</i>&nbsp;        out.println(&quot;    &lt;stop offset=&#39;0%&#39; style=&#39;stop-color:rgb(255,255,255);stop-opacity:1&#39; /&gt;&quot;);</b>
+<b class="nc"><i>253</i>&nbsp;        out.println(&quot;    &lt;stop offset=&#39;100%&#39; style=&#39;stop-color:rgb(&quot; + m_fillcolor.getRed() + &quot;,&quot; + m_fillcolor.getGreen() + &quot;,&quot; + m_fillcolor.getBlue() + &quot;);stop-opacity:1&#39; /&gt;&quot;);</b>
+<b class="nc"><i>254</i>&nbsp;        out.println(&quot;  &lt;/linearGradient&gt;&quot;);</b>
+<b class="nc"><i>255</i>&nbsp;        out.println(&quot;&lt;/defs&gt;&quot;);</b>
+<b class="nc"><i>256</i>&nbsp;        out.print(&quot;&lt;path id=&#39;&quot; + getID() + &quot;&#39; d=&#39;M &quot; + m_x + &quot; &quot; + (m_y + m_h) + &quot; l &quot; + m_w / 2 + &quot; 0 &quot;);</b>
+<b class="nc"><i>257</i>&nbsp;        out.print(&quot; a &quot; + m_w / 2 + &quot; &quot; + (-m_h / 2) + &quot; 0 0,0 0,&quot; + (-m_h) + &quot; l &quot; + (-m_w / 2) + &quot; 0 z&#39;&quot;);</b>
+<b class="nc"><i>258</i>&nbsp;        out.println(&quot; fill=&#39;url(#grad&quot; + getID() + &quot;)&#39; /&gt;&quot;);</b>
+<b class="nc"><i>259</i>&nbsp;        drawSVGString(out, g_PluginFont, m_pencolor, &quot;middle&quot;);</b>
+<b class="nc"><i>260</i>&nbsp;    }</b>
+<i>261</i>&nbsp;} // class Function
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

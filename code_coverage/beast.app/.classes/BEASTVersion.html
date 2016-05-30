@@ -1,0 +1,238 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: BEASTVersion</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app</a> ]
+</div>
+
+<h1>Coverage Summary for Class: BEASTVersion (beast.app)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BEASTVersion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    22.2%
+  </span>
+  <span class="absValue">
+    (2/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    8%
+  </span>
+  <span class="absValue">
+    (2/ 25)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import beast.app.util.Version;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;/**
+<i>6</i>&nbsp; * This class provides a mechanism for returning the version number of the
+<i>7</i>&nbsp; * dr software. It relies on the administrator of the dr source using the
+<i>8</i>&nbsp; * module tagging system in CVS. The method getVersion() will return
+<i>9</i>&nbsp; * the version of dr under the following condition: &lt;BR&gt;
+<i>10</i>&nbsp; * 1. the dr source has been checked out *by tag* before being packaged for
+<i>11</i>&nbsp; * distribution.
+<i>12</i>&nbsp; * &lt;p/&gt;
+<i>13</i>&nbsp; *
+<i>14</i>&nbsp; * @author Alexei Drummond
+<i>15</i>&nbsp; * @author Andrew Rambaut
+<i>16</i>&nbsp; */
+<b class="fc"><i>17</i>&nbsp;public class BEASTVersion extends Version {</b>
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;    /**
+<i>20</i>&nbsp;     * Version string: assumed to be in format x.x.x
+<i>21</i>&nbsp;     */
+<i>22</i>&nbsp;    private static final String VERSION = &quot;2.4.1&quot;;
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;    private static final String DATE_STRING = &quot;2002-2016&quot;;
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;    private static final boolean IS_PRERELEASE = true;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;    private static final String BEAST2_WEBPAGE = &quot;http://beast2.org/&quot;;
+<i>29</i>&nbsp;    
+<i>30</i>&nbsp;    private static final String BEAST2_SOURCE = &quot;http://github.com/CompEvol/beast2&quot;;
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;    @Override
+<i>33</i>&nbsp;	public String getVersion() {
+<b class="nc"><i>34</i>&nbsp;        return VERSION;</b>
+<i>35</i>&nbsp;    }
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;    @Override
+<i>38</i>&nbsp;	public String getVersionString() {
+<b class="nc"><i>39</i>&nbsp;        return &quot;v&quot; + VERSION + (IS_PRERELEASE ? &quot; Prerelease&quot; : &quot;&quot;);</b>
+<i>40</i>&nbsp;    }
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;    @Override
+<i>43</i>&nbsp;	public String getDateString() {
+<b class="nc"><i>44</i>&nbsp;        return DATE_STRING;</b>
+<i>45</i>&nbsp;    }
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;    @Override
+<i>48</i>&nbsp;	public String[] getCredits() {
+<b class="nc"><i>49</i>&nbsp;        return new String[]{</b>
+<i>50</i>&nbsp;                &quot;Designed and developed by&quot;,
+<i>51</i>&nbsp;                &quot;Remco Bouckaert, Alexei J. Drummond, Andrew Rambaut &amp; Marc A. Suchard&quot;,
+<i>52</i>&nbsp;                &quot;&quot;,
+<i>53</i>&nbsp;                &quot;Department of Computer Science&quot;,
+<i>54</i>&nbsp;                &quot;University of Auckland&quot;,
+<i>55</i>&nbsp;                &quot;remco@cs.auckland.ac.nz&quot;,
+<i>56</i>&nbsp;                &quot;alexei@cs.auckland.ac.nz&quot;,
+<i>57</i>&nbsp;                &quot;&quot;,
+<i>58</i>&nbsp;                &quot;Institute of Evolutionary Biology&quot;,
+<i>59</i>&nbsp;                &quot;University of Edinburgh&quot;,
+<i>60</i>&nbsp;                &quot;a.rambaut@ed.ac.uk&quot;,
+<i>61</i>&nbsp;                &quot;&quot;,
+<i>62</i>&nbsp;                &quot;David Geffen School of Medicine&quot;,
+<i>63</i>&nbsp;                &quot;University of California, Los Angeles&quot;,
+<i>64</i>&nbsp;                &quot;msuchard@ucla.edu&quot;,
+<i>65</i>&nbsp;                &quot;&quot;,
+<i>66</i>&nbsp;                &quot;Downloads, Help &amp; Resources:&quot;,
+<i>67</i>&nbsp;
+<i>68</i>&nbsp;                BEAST2_WEBPAGE,
+<i>69</i>&nbsp;                &quot;&quot;,
+<i>70</i>&nbsp;                &quot;Source code distributed under the GNU Lesser General Public License:&quot;,
+<i>71</i>&nbsp;                BEAST2_SOURCE,
+<i>72</i>&nbsp;                &quot;&quot;,
+<i>73</i>&nbsp;                &quot;BEAST developers:&quot;,
+<i>74</i>&nbsp;                &quot;Alex Alekseyenko, Trevor Bedford, Erik Bloomquist, Joseph Heled, &quot;,
+<i>75</i>&nbsp;                &quot;Sebastian Hoehna, Denise Kuehnert, Philippe Lemey, Wai Lok Sibon Li, &quot;,
+<i>76</i>&nbsp;                &quot;Gerton Lunter, Sidney Markowitz, Vladimir Minin, Michael Defoin Platel, &quot;,
+<i>77</i>&nbsp;                &quot;Oliver Pybus, Chieh-Hsi Wu, Walter Xie&quot;,
+<i>78</i>&nbsp;                &quot;&quot;,
+<i>79</i>&nbsp;                &quot;Thanks to:&quot;,
+<i>80</i>&nbsp;                &quot;Roald Forsberg, Beth Shapiro and Korbinian Strimmer&quot;};
+<i>81</i>&nbsp;    }
+<i>82</i>&nbsp;
+<i>83</i>&nbsp;    @Override
+<i>84</i>&nbsp;	public String getHTMLCredits() {
+<b class="nc"><i>85</i>&nbsp;        return</b>
+<i>86</i>&nbsp;                &quot;&lt;p&gt;Designed and developed by&lt;br&gt;&quot; +
+<i>87</i>&nbsp;                        &quot;Remco Bouckaert, Alexei J. Drummond, Andrew Rambaut and Marc A. Suchard&lt;/p&gt;&quot; +
+<i>88</i>&nbsp;                        &quot;&lt;p&gt;Department of Computer Science, University of Auckland&lt;br&gt;&quot; +
+<i>89</i>&nbsp;                        &quot;&lt;a href=\&quot;mailto:remco@cs.auckland.ac.nz\&quot;&gt;remco@cs.auckland.ac.nz&lt;/a&gt;&lt;br&gt;&quot; +
+<i>90</i>&nbsp;                        &quot;&lt;a href=\&quot;mailto:alexei@cs.auckland.ac.nz\&quot;&gt;alexei@cs.auckland.ac.nz&lt;/a&gt;&lt;/p&gt;&quot; +
+<i>91</i>&nbsp;                        &quot;&lt;p&gt;Institute of Evolutionary Biology, University of Edinburgh&lt;br&gt;&quot; +
+<i>92</i>&nbsp;                        &quot;&lt;a href=\&quot;mailto:a.rambaut@ed.ac.uk\&quot;&gt;a.rambaut@ed.ac.uk&lt;/a&gt;&lt;/p&gt;&quot; +
+<i>93</i>&nbsp;                        &quot;&lt;p&gt;David Geffen School of Medicine, University of California, Los Angeles&lt;br&gt;&quot; +
+<i>94</i>&nbsp;                        &quot;&lt;a href=\&quot;mailto:msuchard@ucla.edu\&quot;&gt;msuchard@ucla.edu&lt;/a&gt;&lt;/p&gt;&quot; +
+<i>95</i>&nbsp;                        &quot;&lt;p&gt;&lt;a href=\&quot;&quot; + BEAST2_WEBPAGE + &quot;\&quot;&gt;&quot; + BEAST2_WEBPAGE + &quot;&lt;/a&gt;&lt;/p&gt;&quot; +
+<i>96</i>&nbsp;                        &quot;&lt;p&gt;Source code distributed under the GNU LGPL:&lt;br&gt;&quot; +
+<i>97</i>&nbsp;                        &quot;&lt;a href=\&quot;&quot; + BEAST2_SOURCE + &quot;\&quot;&gt;&quot; + BEAST2_SOURCE + &quot;&lt;/a&gt;&lt;/p&gt;&quot; +
+<i>98</i>&nbsp;                        &quot;&lt;p&gt;BEAST developers:&lt;br&gt;&quot; +
+<i>99</i>&nbsp;                        &quot;Alex Alekseyenko, Erik Bloomquist, Joseph Heled, Sebastian Hoehna, Philippe Lemey,&lt;br&gt;&quot; +
+<i>100</i>&nbsp;                        &quot;Wai Lok Sibon Li, Gerton Lunter, Sidney Markowitz, Vladimir Minin,&lt;br&gt;&quot; +
+<i>101</i>&nbsp;                        &quot;Michael Defoin Platel, Oliver Pybus, Chieh-Hsi Wu, Walter Xie,&lt;br&gt;&quot; +
+<i>102</i>&nbsp;                        &quot;Denise Kuehnert&lt;/p&gt;&quot; +
+<i>103</i>&nbsp;                        &quot;&lt;p&gt;Thanks to Roald Forsberg, Beth Shapiro and Korbinian Strimmer&lt;/p&gt;&quot;;
+<i>104</i>&nbsp;    }
+<i>105</i>&nbsp;
+<i>106</i>&nbsp;    /**
+<i>107</i>&nbsp;     * such as 2.1
+<i>108</i>&nbsp;     * @return
+<i>109</i>&nbsp;     */
+<i>110</i>&nbsp;    public String getMajorVersion() {
+<b class="fc"><i>111</i>&nbsp;        return VERSION.substring(0, VERSION.lastIndexOf(&quot;.&quot;));</b>
+<i>112</i>&nbsp;    }
+<i>113</i>&nbsp;
+<i>114</i>&nbsp;    /** Parse version string, assume it is of the form 1.2.3
+<i>115</i>&nbsp;     * returns version where each sub-version is divided by 100,
+<i>116</i>&nbsp;     * so 2.0 -&gt; return 2
+<i>117</i>&nbsp;     * 2.1 return 2.01
+<i>118</i>&nbsp;     * 2.2.3 return 2.0103
+<i>119</i>&nbsp;     * Letters are ignored, so
+<i>120</i>&nbsp;     * 2.0.e -&gt; 2.0
+<i>121</i>&nbsp;     * 2.x.1 -&gt; 2.0001
+<i>122</i>&nbsp;     * @return
+<i>123</i>&nbsp;     */
+<i>124</i>&nbsp;    public double parseVersion(String versionString) {
+<i>125</i>&nbsp;        // is of the form 1.2.3
+<b class="nc"><i>126</i>&nbsp;        String [] strs = versionString.split(&quot;\\.&quot;);</b>
+<b class="nc"><i>127</i>&nbsp;        double version = 0;</b>
+<b class="nc"><i>128</i>&nbsp;        double divider = 1.0;</b>
+<b class="nc"><i>129</i>&nbsp;        for (int i = 0; i &lt; strs.length; i++) {</b>
+<i>130</i>&nbsp;            try {
+<b class="nc"><i>131</i>&nbsp;                version += Double.parseDouble(strs[i]) / divider;</b>
+<b class="nc"><i>132</i>&nbsp;                divider = divider * 100.0;</b>
+<b class="nc"><i>133</i>&nbsp;            } catch (NumberFormatException e) {</b>
+<i>134</i>&nbsp;                // ignore
+<b class="nc"><i>135</i>&nbsp;            }</b>
+<i>136</i>&nbsp;        }
+<b class="nc"><i>137</i>&nbsp;        return version;</b>
+<i>138</i>&nbsp;    }
+<i>139</i>&nbsp;
+<i>140</i>&nbsp;    /** inverse of parseVersion **/
+<i>141</i>&nbsp;    public String formatVersion(double version) {
+<b class="nc"><i>142</i>&nbsp;        if (Double.isInfinite(version)) {</b>
+<b class="nc"><i>143</i>&nbsp;            return &quot; any number&quot;;</b>
+<i>144</i>&nbsp;        }
+<b class="nc"><i>145</i>&nbsp;        String str = &quot;&quot; + (int) (version + 0.000001);</b>
+<b class="nc"><i>146</i>&nbsp;        version = version - (int) (version + 0.000001);</b>
+<b class="nc"><i>147</i>&nbsp;        while (version &gt; 0.00001) {</b>
+<b class="nc"><i>148</i>&nbsp;            version *= 100;</b>
+<b class="nc"><i>149</i>&nbsp;            str += &quot;.&quot; + (int) (version + 0.00001);</b>
+<b class="nc"><i>150</i>&nbsp;            version = version - (int) (version + 0.00001);</b>
+<i>151</i>&nbsp;        }
+<b class="nc"><i>152</i>&nbsp;        return str;</b>
+<i>153</i>&nbsp;    }
+<i>154</i>&nbsp;
+<i>155</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

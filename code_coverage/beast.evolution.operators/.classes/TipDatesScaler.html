@@ -1,0 +1,208 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TipDatesScaler</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.operators</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TipDatesScaler (beast.evolution.operators)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TipDatesScaler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 49)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.operators;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.text.DecimalFormat;
+<i>4</i>&nbsp;import java.util.ArrayList;
+<i>5</i>&nbsp;import java.util.List;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import beast.core.Description;
+<i>8</i>&nbsp;import beast.core.Input;
+<i>9</i>&nbsp;import beast.evolution.alignment.TaxonSet;
+<i>10</i>&nbsp;import beast.evolution.tree.Node;
+<i>11</i>&nbsp;import beast.evolution.tree.Tree;
+<i>12</i>&nbsp;import beast.util.Randomizer;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;@Description(&quot;Scales tip dates on a tree by randomly selecting one from (a subset of) taxa&quot;)
+<b class="nc"><i>17</i>&nbsp;public class TipDatesScaler extends TreeOperator {</b>
+<i>18</i>&nbsp;    // perhaps multiple trees may be necessary if they share the same taxon?
+<i>19</i>&nbsp;    // public Input&lt;List&lt;Tree&gt;&gt; m_treesInput = new Input&lt;&gt;(&quot;tree&quot; ,&quot;tree to operate on&quot;, new ArrayList&lt;&gt;(), Validate.REQUIRED);
+<i>20</i>&nbsp;
+<b class="nc"><i>21</i>&nbsp;    final public Input&lt;Double&gt; scaleFactorInput = new Input&lt;&gt;(&quot;scaleFactor&quot;, &quot;scaling factor: larger means more bold proposals&quot;, 1.0);</b>
+<b class="nc"><i>22</i>&nbsp;    final public Input&lt;TaxonSet&gt; taxonsetInput = new Input&lt;&gt;(&quot;taxonset&quot;, &quot;limit scaling to a subset of taxa. By default all tips are scaled.&quot;);</b>
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;    /**
+<i>25</i>&nbsp;     * shadows input *
+<i>26</i>&nbsp;     */
+<i>27</i>&nbsp;    double scaleFactor;
+<i>28</i>&nbsp;    /**
+<i>29</i>&nbsp;     * node indices of taxa to choose from *
+<i>30</i>&nbsp;     */
+<i>31</i>&nbsp;    int[] taxonIndices;
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;    @Override
+<i>34</i>&nbsp;    public void initAndValidate() {
+<b class="nc"><i>35</i>&nbsp;        scaleFactor = scaleFactorInput.get();</b>
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;        // determine taxon set to choose from
+<b class="nc"><i>38</i>&nbsp;        if (taxonsetInput.get() != null) {</b>
+<b class="nc"><i>39</i>&nbsp;            List&lt;String&gt; taxaNames = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>40</i>&nbsp;            for (String taxon : treeInput.get().getTaxaNames()) {</b>
+<b class="nc"><i>41</i>&nbsp;                taxaNames.add(taxon);</b>
+<i>42</i>&nbsp;            }
+<i>43</i>&nbsp;
+<b class="nc"><i>44</i>&nbsp;            List&lt;String&gt; set = taxonsetInput.get().asStringList();</b>
+<b class="nc"><i>45</i>&nbsp;            int nrOfTaxa = set.size();</b>
+<b class="nc"><i>46</i>&nbsp;            taxonIndices = new int[nrOfTaxa];</b>
+<b class="nc"><i>47</i>&nbsp;            int k = 0;</b>
+<b class="nc"><i>48</i>&nbsp;            for (String taxon : set) {</b>
+<b class="nc"><i>49</i>&nbsp;                int taxonIndex = taxaNames.indexOf(taxon);</b>
+<b class="nc"><i>50</i>&nbsp;                if (taxonIndex &lt; 0) {</b>
+<b class="nc"><i>51</i>&nbsp;                    throw new IllegalArgumentException(&quot;Cannot find taxon &quot; + taxon + &quot; in tree&quot;);</b>
+<i>52</i>&nbsp;                }
+<b class="nc"><i>53</i>&nbsp;                taxonIndices[k++] = taxonIndex;</b>
+<b class="nc"><i>54</i>&nbsp;            }</b>
+<b class="nc"><i>55</i>&nbsp;        } else {</b>
+<b class="nc"><i>56</i>&nbsp;            taxonIndices = new int[treeInput.get().getTaxaNames().length];</b>
+<b class="nc"><i>57</i>&nbsp;            for (int i = 0; i &lt; taxonIndices.length; i++) {</b>
+<b class="nc"><i>58</i>&nbsp;                taxonIndices[i] = i;</b>
+<i>59</i>&nbsp;            }
+<i>60</i>&nbsp;        }
+<i>61</i>&nbsp;    }
+<i>62</i>&nbsp;
+<i>63</i>&nbsp;    @Override
+<i>64</i>&nbsp;    public double proposal() {
+<b class="nc"><i>65</i>&nbsp;        Tree tree = treeInput.get(this);</b>
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;        // randomly select leaf node
+<b class="nc"><i>68</i>&nbsp;        int i = Randomizer.nextInt(taxonIndices.length);</b>
+<b class="nc"><i>69</i>&nbsp;        Node node = tree.getNode(taxonIndices[i]);</b>
+<b class="nc"><i>70</i>&nbsp;        double upper = node.getParent().getHeight();</b>
+<i>71</i>&nbsp;        //double lower = 0.0;
+<i>72</i>&nbsp;        //final double newValue = (Randomizer.nextDouble() * (upper -lower)) + lower;
+<i>73</i>&nbsp;
+<i>74</i>&nbsp;        // scale node
+<b class="nc"><i>75</i>&nbsp;        double scale = (scaleFactor + (Randomizer.nextDouble() * ((1.0 / scaleFactor) - scaleFactor)));</b>
+<b class="nc"><i>76</i>&nbsp;        final double newValue = node.getHeight() * scale;</b>
+<i>77</i>&nbsp;
+<i>78</i>&nbsp;        // check the tree does not get negative branch lengths
+<b class="nc"><i>79</i>&nbsp;        if (newValue &gt; upper) {</b>
+<b class="nc"><i>80</i>&nbsp;            return Double.NEGATIVE_INFINITY;</b>
+<i>81</i>&nbsp;        }
+<b class="nc"><i>82</i>&nbsp;        node.setHeight(newValue);</b>
+<i>83</i>&nbsp;
+<b class="nc"><i>84</i>&nbsp;        return -Math.log(scale);</b>
+<i>85</i>&nbsp;    }
+<i>86</i>&nbsp;
+<i>87</i>&nbsp;    @Override
+<i>88</i>&nbsp;    public double getCoercableParameterValue() {
+<b class="nc"><i>89</i>&nbsp;        return scaleFactor;</b>
+<i>90</i>&nbsp;    }
+<i>91</i>&nbsp;
+<i>92</i>&nbsp;    @Override
+<i>93</i>&nbsp;    public void setCoercableParameterValue(double value) {
+<b class="nc"><i>94</i>&nbsp;        scaleFactor = value;</b>
+<i>95</i>&nbsp;    }
+<i>96</i>&nbsp;
+<i>97</i>&nbsp;
+<i>98</i>&nbsp;    @Override
+<i>99</i>&nbsp;    public void optimize(double logAlpha) {
+<b class="nc"><i>100</i>&nbsp;        double delta = calcDelta(logAlpha);</b>
+<b class="nc"><i>101</i>&nbsp;        delta += Math.log(1.0 / scaleFactor - 1.0);</b>
+<b class="nc"><i>102</i>&nbsp;        scaleFactor = 1.0 / (Math.exp(delta) + 1.0);</b>
+<i>103</i>&nbsp;    }
+<i>104</i>&nbsp;
+<i>105</i>&nbsp;    @Override
+<i>106</i>&nbsp;    public String getPerformanceSuggestion() {
+<b class="nc"><i>107</i>&nbsp;        double prob = m_nNrAccepted / (m_nNrAccepted + m_nNrRejected + 0.0);</b>
+<b class="nc"><i>108</i>&nbsp;        double targetProb = getTargetAcceptanceProbability();</b>
+<i>109</i>&nbsp;
+<b class="nc"><i>110</i>&nbsp;        double ratio = prob / targetProb;</b>
+<b class="nc"><i>111</i>&nbsp;        if (ratio &gt; 2.0) ratio = 2.0;</b>
+<b class="nc"><i>112</i>&nbsp;        if (ratio &lt; 0.5) ratio = 0.5;</b>
+<i>113</i>&nbsp;
+<i>114</i>&nbsp;        // new scale factor
+<b class="nc"><i>115</i>&nbsp;        double sf = Math.pow(scaleFactor, ratio);</b>
+<i>116</i>&nbsp;
+<b class="nc"><i>117</i>&nbsp;        DecimalFormat formatter = new DecimalFormat(&quot;#.###&quot;);</b>
+<b class="nc"><i>118</i>&nbsp;        if (prob &lt; 0.10) {</b>
+<b class="nc"><i>119</i>&nbsp;            return &quot;Try setting scaleFactor to about &quot; + formatter.format(sf);</b>
+<b class="nc"><i>120</i>&nbsp;        } else if (prob &gt; 0.40) {</b>
+<b class="nc"><i>121</i>&nbsp;            return &quot;Try setting scaleFactor to about &quot; + formatter.format(sf);</b>
+<b class="nc"><i>122</i>&nbsp;        } else return &quot;&quot;;</b>
+<i>123</i>&nbsp;    }
+<i>124</i>&nbsp;
+<i>125</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

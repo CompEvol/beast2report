@@ -1,0 +1,83 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: StateNodeInitialiser</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.core</a> ]
+</div>
+
+<h1>Coverage Summary for Class: StateNodeInitialiser (beast.core)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">StateNodeInitialiser</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.core;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.util.List;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;/**
+<i>6</i>&nbsp; * Typically, StateNodes are initialised through their inputs. However, there are initialisation scenarios
+<i>7</i>&nbsp; * too complex for this approach to work. For example, initialisation may require additional information not
+<i>8</i>&nbsp; * provided by the inputs, or several dependent beastObjects need to initialise together,
+<i>9</i>&nbsp; * such as gene trees and a species tree.
+<i>10</i>&nbsp; * &lt;p/&gt;
+<i>11</i>&nbsp; * StateNodeInitialisers take one or more StateNodes as input and  initializes them in initStateNodes().
+<i>12</i>&nbsp; * getInitialisedStateNodes() reports back which nodes has been initialized, but this is currently only used to
+<i>13</i>&nbsp; * check for multiple initialiser for the same object.
+<i>14</i>&nbsp; *  &lt;p/&gt;
+<i>15</i>&nbsp; * Like any other isEASTObject, a state initialiser must have an initAndValidate(), which is called once.
+<i>16</i>&nbsp; * getInitialisedStateNodes(), on the other hand,  may be called multiple times as its inputs change while the system
+<i>17</i>&nbsp; * tries to establish a valid starting state. initAndValidate is executed in order that the XML parser see objects,
+<i>18</i>&nbsp; * so the inputs are not guaranteed to be initialized at this time. initStateNodes is executed in order of appearance
+<i>19</i>&nbsp; * in MCMC, so inputs requiring initialization are properly initialized when initStateNodes is called.
+<i>20</i>&nbsp; *
+<i>21</i>&nbsp; * @author remco
+<i>22</i>&nbsp; */
+<i>23</i>&nbsp;public interface StateNodeInitialiser {
+<i>24</i>&nbsp;
+<i>25</i>&nbsp;    /**
+<i>26</i>&nbsp;     * Called to set up start state. May be called multiple times. *
+<i>27</i>&nbsp;     */
+<i>28</i>&nbsp;    void initStateNodes();
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;    /**
+<i>31</i>&nbsp;     * @return list of StateNodes that are initialised
+<i>32</i>&nbsp;     *         This information is used to ensure StateNode are not initialised more than once.
+<i>33</i>&nbsp;     * @param stateNodes
+<i>34</i>&nbsp;     */
+<i>35</i>&nbsp;    void getInitialisedStateNodes(List&lt;StateNode&gt; stateNodes);
+<i>36</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

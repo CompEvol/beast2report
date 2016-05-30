@@ -1,0 +1,449 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: MultiMonophyleticConstraint</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.math.distributions</a> ]
+</div>
+
+<h1>Coverage Summary for Class: MultiMonophyleticConstraint (beast.math.distributions)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">MultiMonophyleticConstraint</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.math.distributions;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.util.*;
+<i>4</i>&nbsp;import java.util.regex.Matcher;
+<i>5</i>&nbsp;import java.util.regex.Pattern;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import beast.core.Description;
+<i>8</i>&nbsp;import beast.core.Distribution;
+<i>9</i>&nbsp;import beast.core.Input;
+<i>10</i>&nbsp;import beast.core.State;
+<i>11</i>&nbsp;import beast.core.Input.Validate;
+<i>12</i>&nbsp;import beast.core.util.Log;
+<i>13</i>&nbsp;import beast.evolution.tree.Node;
+<i>14</i>&nbsp;import beast.evolution.tree.Tree;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;@Description(&quot;Prior over set of taxa, useful for defining multiple monophyletic constraints using a newick format&quot;)
+<i>17</i>&nbsp;public class MultiMonophyleticConstraint extends Distribution {
+<i>18</i>&nbsp;    public final Input&lt;Tree&gt; treeInput = new Input&lt;Tree&gt;(&quot;tree&quot;, &quot;the tree containing the taxon set&quot;, Validate.REQUIRED);
+<i>19</i>&nbsp;    //public final Input&lt;TaxonSet&gt; taxonsetInput = new Input&lt;TaxonSet&gt;(&quot;taxonset&quot;, &quot;set of taxa for which prior information is available&quot;);
+<i>20</i>&nbsp;    public final Input&lt;String&gt; newickInput = new Input&lt;String&gt;(&quot;newick&quot;, &quot;the tree constraints specified as newick tree using polytopes, &quot;
+<i>21</i>&nbsp;	    		+ &quot;e.g. ((human,chimp,bonobo),gorilla) specifies two monophyletic constraints,&quot;
+<i>22</i>&nbsp;	    		+ &quot;one for human,chimp,bonobo&#39; and one for &#39;human,chimp,bonobo,gorilla&#39;&quot;, Validate.REQUIRED);
+<i>23</i>&nbsp;    
+<i>24</i>&nbsp;    public final Input&lt;Boolean&gt; isBinaryInput = new Input&lt;&gt;(&quot;isBinary&quot;, &quot;flag to indicate tree is a binary tree instead of a polytopy (faster)&quot;, true);
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;    
+<i>27</i>&nbsp;    /** Constraints are encoded as a list of taxon numbers for each constraint
+<i>28</i>&nbsp;     * TaxonIDList contains a list of constraints
+<i>29</i>&nbsp;     */
+<i>30</i>&nbsp;    protected List&lt;List&lt;Integer&gt;&gt; taxonIDList;
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;    protected Tree tree;
+<i>33</i>&nbsp;    String[] taxaList;
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;    // indexed by node number, the (smallest monophyletic) clade this leaf belongs to (0 .. #clades). -1 for free taxa.
+<i>36</i>&nbsp;    int[] leafCladeAssignments;
+<i>37</i>&nbsp;    // cladeSize[i] is the size (number of taxa) in the i&#39;th clade.
+<i>38</i>&nbsp;    int[] cladeSize;
+<i>39</i>&nbsp;    // cladeParent[i] is the clade assignment of the embedding monophyletic clade (-1 for none)
+<i>40</i>&nbsp;    int[] cladeParent;
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;    @Override
+<i>43</i>&nbsp;    public void initAndValidate() {
+<i>44</i>&nbsp;        taxonIDList = new ArrayList&lt;List&lt;Integer&gt;&gt;();
+<i>45</i>&nbsp;        tree = treeInput.get();
+<i>46</i>&nbsp;        taxaList = tree.getTaxonset().asStringList().toArray(new String[]{});
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;        parse(newickInput.get());
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;        // setup internal arrays for monophyly check
+<i>51</i>&nbsp;        leafCladeAssignments = new int[tree.getNodeCount()];
+<i>52</i>&nbsp;        Arrays.fill(leafCladeAssignments, -1);
+<i>53</i>&nbsp;
+<i>54</i>&nbsp;        cladeSize = new int[taxonIDList.size()];
+<i>55</i>&nbsp;        cladeParent = new int[taxonIDList.size()];
+<i>56</i>&nbsp;        Arrays.fill(cladeParent, -1);
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;        Node [] nodes = tree.getNodesAsArray();
+<i>59</i>&nbsp;        for(int k = 0; k &lt; taxonIDList.size(); ++k ) {
+<i>60</i>&nbsp;            cladeSize[k] = taxonIDList.get(k).size();
+<i>61</i>&nbsp;        }
+<i>62</i>&nbsp;
+<i>63</i>&nbsp;        for(int k = 0; k &lt; taxonIDList.size(); ++k ) {
+<i>64</i>&nbsp;            final List&lt;Integer&gt; t = taxonIDList.get(k);
+<i>65</i>&nbsp;            for( int n : t ) {
+<i>66</i>&nbsp;                final int i = nodes[n].getNr();
+<i>67</i>&nbsp;                if( leafCladeAssignments[i] == -1 ) {
+<i>68</i>&nbsp;                    leafCladeAssignments[i] = k;
+<i>69</i>&nbsp;                } else {
+<i>70</i>&nbsp;                    // nesting situation k and leafCladeAssignments[i]; keep the assignment to the smaller clade
+<i>71</i>&nbsp;                    if( cladeSize[leafCladeAssignments[i]] &gt; cladeSize[k] ) {
+<i>72</i>&nbsp;                        // [i] is parent of k
+<i>73</i>&nbsp;                        leafCladeAssignments[i] = k;
+<i>74</i>&nbsp;                    }
+<i>75</i>&nbsp;                }
+<i>76</i>&nbsp;            }
+<i>77</i>&nbsp;        }
+<i>78</i>&nbsp;        // slow but who cares - one time only
+<i>79</i>&nbsp;        for(int k = 0; k &lt; taxonIDList.size(); ++k ) {
+<i>80</i>&nbsp;            final List&lt;Integer&gt; tk = taxonIDList.get(k);
+<i>81</i>&nbsp;            for(int i = 0; i &lt; k; ++i ) {
+<i>82</i>&nbsp;                final List&lt;Integer&gt; ti = taxonIDList.get(i);
+<i>83</i>&nbsp;                for( int n : ti ) {
+<i>84</i>&nbsp;                    if( tk.contains(n) ) {
+<i>85</i>&nbsp;                        updateCladeParent(i, k);
+<i>86</i>&nbsp;                        break;
+<i>87</i>&nbsp;                    }
+<i>88</i>&nbsp;                }
+<i>89</i>&nbsp;            }
+<i>90</i>&nbsp;        }
+<i>91</i>&nbsp;    }
+<i>92</i>&nbsp;
+<i>93</i>&nbsp;    private void updateCladeParent(int subClade, int clade) {
+<i>94</i>&nbsp;        if( cladeSize[subClade] &gt; cladeSize[clade] ) {
+<i>95</i>&nbsp;            int tmp = subClade;
+<i>96</i>&nbsp;            subClade = clade;
+<i>97</i>&nbsp;            clade = tmp;
+<i>98</i>&nbsp;        }
+<i>99</i>&nbsp;
+<i>100</i>&nbsp;        if( cladeParent[subClade] != clade ) {
+<i>101</i>&nbsp;            if( cladeParent[subClade] == -1 ||
+<i>102</i>&nbsp;                    cladeSize[cladeParent[subClade]] &gt; cladeSize[clade] ) {
+<i>103</i>&nbsp;                cladeParent[subClade] = clade;
+<i>104</i>&nbsp;            }
+<i>105</i>&nbsp;        }
+<i>106</i>&nbsp;    }
+<i>107</i>&nbsp;
+<i>108</i>&nbsp;    /** extract clades from Newick string, and add constraints for all internal nodes
+<i>109</i>&nbsp;     ** (except the root if it contains all taxa). This code populates taxonIDList.
+<i>110</i>&nbsp;     **
+<i>111</i>&nbsp;	 **/
+<i>112</i>&nbsp;	protected void parse(String newick) {
+<i>113</i>&nbsp;		// get rid of initial and trailing spaces
+<i>114</i>&nbsp;		newick = newick.trim();
+<i>115</i>&nbsp;		// remove comments
+<i>116</i>&nbsp;		newick = newick.replaceAll(&quot;.*\\[[^\\]]*\\].*&quot;, &quot;&quot;);
+<i>117</i>&nbsp;		// remove branch lengths
+<i>118</i>&nbsp;		newick = newick.replaceAll(&quot;:[^,\\(\\)]*&quot;, &quot;&quot;);
+<i>119</i>&nbsp;		Pattern pattern = Pattern.compile(&quot;\\(([^\\(\\)]*)\\)&quot;);
+<i>120</i>&nbsp;		Matcher m = pattern.matcher(newick);
+<i>121</i>&nbsp;		
+<i>122</i>&nbsp;		//List&lt;String&gt; taxaList = taxonsetInput.get().asStringList();
+<i>123</i>&nbsp;		while (m.find()) {
+<i>124</i>&nbsp;			String group = m.group();
+<i>125</i>&nbsp;			String [] taxa = group.substring(1,group.length()-1).split(&quot;,&quot;);
+<i>126</i>&nbsp;			List&lt;Integer&gt; list = new ArrayList&lt;Integer&gt;();
+<i>127</i>&nbsp;			for (String taxon : taxa) {
+<i>128</i>&nbsp;				taxon = taxon.trim();
+<i>129</i>&nbsp;				if (taxon.length() &gt; 0) {
+<i>130</i>&nbsp;					int i = indexOf(taxon);
+<i>131</i>&nbsp;					if (i == -1 &amp;&amp; (taxon.startsWith(&quot;&#39;&quot;) || taxon.startsWith(&quot;\&quot;&quot;))) {
+<i>132</i>&nbsp;						i = indexOf(taxon.substring(1, taxon.length() - 1));
+<i>133</i>&nbsp;
+<i>134</i>&nbsp;					}
+<i>135</i>&nbsp;                    if (i == -1) {
+<i>136</i>&nbsp;                        throw new RuntimeException(&quot;Cannot find taxon &quot; + taxon + &quot;  in taxon list&quot;);
+<i>137</i>&nbsp;                    }
+<i>138</i>&nbsp;					list.add(i);
+<i>139</i>&nbsp;				}
+<i>140</i>&nbsp;			}
+<i>141</i>&nbsp;			if (list.size() &lt; tree.getLeafNodeCount()) {
+<i>142</i>&nbsp;				taxonIDList.add(list);
+<i>143</i>&nbsp;				//Log.trace.println(&quot;Constraining &quot; + group);// + &quot; &quot; + Arrays.toString(list.toArray()));			
+<i>144</i>&nbsp;			}
+<i>145</i>&nbsp;			newick = newick.replaceFirst(&quot;\\(([^\\(\\)]*)\\)&quot;, &quot;,$1,&quot;);
+<i>146</i>&nbsp;			newick = newick.replaceAll(&quot;([\\(,]),&quot;, &quot;$1&quot;);
+<i>147</i>&nbsp;			newick = newick.replaceAll(&quot;,\\)&quot;, &quot;)&quot;);
+<i>148</i>&nbsp;			m = pattern.matcher(newick);
+<i>149</i>&nbsp;		}
+<i>150</i>&nbsp;	}
+<i>151</i>&nbsp;
+<i>152</i>&nbsp;
+<i>153</i>&nbsp;    protected int indexOf(String taxon) {
+<i>154</i>&nbsp;		for (int k = 0; k &lt; taxaList.length; k++) {
+<i>155</i>&nbsp;			if (taxon.equals(taxaList[k])) {
+<i>156</i>&nbsp;				return k;
+<i>157</i>&nbsp;			}
+<i>158</i>&nbsp;		}
+<i>159</i>&nbsp;		return -1;
+<i>160</i>&nbsp;	}
+<i>161</i>&nbsp;
+<i>162</i>&nbsp;	@Override
+<i>163</i>&nbsp;    public double calculateLogP() {
+<i>164</i>&nbsp;        boolean mono1 = isBinaryInput.get() ? isMonoJH() : isMonoJHNonBinary();
+<i>165</i>&nbsp;        if( false ) assert mono1 == isMonoRB();   // assert is expensive. isMonoJH replaces the much slower isMonoRB
+<i>166</i>&nbsp;
+<i>167</i>&nbsp;        if (!mono1) {
+<i>168</i>&nbsp;        	//mono1 = isMonoRB();
+<i>169</i>&nbsp;        }
+<i>170</i>&nbsp;        logP = mono1 ? 0 : Double.NEGATIVE_INFINITY;
+<i>171</i>&nbsp;        return logP;
+<i>172</i>&nbsp;    }
+<i>173</i>&nbsp;
+<i>174</i>&nbsp;
+<i>175</i>&nbsp;    private boolean isMonoRB() {
+<i>176</i>&nbsp;        for (List&lt;Integer&gt; list : taxonIDList) {
+<i>177</i>&nbsp;            if( !isMonophyletic(list) ) {
+<i>178</i>&nbsp;                return false;
+<i>179</i>&nbsp;            }
+<i>180</i>&nbsp;        }
+<i>181</i>&nbsp;        return true;
+<i>182</i>&nbsp;    }
+<i>183</i>&nbsp;
+<i>184</i>&nbsp;    /** walk up the tree from the nodes, to see whether a clade is monophyletic
+<i>185</i>&nbsp;     * After initialising steps from each of the child nodes,
+<i>186</i>&nbsp;     * a step is made from any internal nodes if there are two 
+<i>187</i>&nbsp;     * paths to an internal node. Iff the clade is monophyletic, 
+<i>188</i>&nbsp;     * this process halts after n-1 steps where n is the nr of taxa
+<i>189</i>&nbsp;     * in the clade.
+<i>190</i>&nbsp;     * NB assumes that the tree is binary **/
+<i>191</i>&nbsp;	private boolean isMonophyletic(List&lt;Integer&gt; list) {
+<i>192</i>&nbsp;		int [] parentcount = new int[tree.getNodeCount()];
+<i>193</i>&nbsp;		Node [] nodes = tree.getNodesAsArray();
+<i>194</i>&nbsp;		
+<i>195</i>&nbsp;		// mark parents of leaf nodes
+<i>196</i>&nbsp;		Set&lt;Integer&gt; list2 = new HashSet&lt;Integer&gt;();
+<i>197</i>&nbsp;		int k = 0;
+<i>198</i>&nbsp;		for (int i : list) {
+<i>199</i>&nbsp;			int parentNr = nodes[i].getParent().getNr();
+<i>200</i>&nbsp;			parentcount[parentNr]++;
+<i>201</i>&nbsp;			if (parentcount[parentNr] == 2) {
+<i>202</i>&nbsp;				list2.add(parentNr);
+<i>203</i>&nbsp;				k++;
+<i>204</i>&nbsp;			}
+<i>205</i>&nbsp;		}
+<i>206</i>&nbsp;		// mark parents of nodes that have two children marked
+<i>207</i>&nbsp;		while (list2.size() &gt; 0) {
+<i>208</i>&nbsp;			Set&lt;Integer&gt; list3 = new HashSet&lt;Integer&gt;();
+<i>209</i>&nbsp;			for (int i : list2) {
+<i>210</i>&nbsp;				int parentNr = nodes[i].getParent().getNr();
+<i>211</i>&nbsp;				parentcount[parentNr]++;
+<i>212</i>&nbsp;				if (parentcount[parentNr] == 2) {
+<i>213</i>&nbsp;					list3.add(parentNr);
+<i>214</i>&nbsp;					k++;
+<i>215</i>&nbsp;				}
+<i>216</i>&nbsp;			}
+<i>217</i>&nbsp;			list2 = list3;
+<i>218</i>&nbsp;		}
+<i>219</i>&nbsp;        return k == list.size() - 1;
+<i>220</i>&nbsp;    }
+<i>221</i>&nbsp;
+<i>222</i>&nbsp;    /**
+<i>223</i>&nbsp;     *  Check all monophyly constraints simultaneously in one (post-order) pass.
+<i>224</i>&nbsp;     *  A monophyly violation is detected when a subtree contains taxa from two incompatible clades,
+<i>225</i>&nbsp;     *  and then the function immediately returns false.
+<i>226</i>&nbsp;     *  Each taxon is assigned a clade index/assignment, the smallest clade it belongs to.
+<i>227</i>&nbsp;     *  A clade count is calculated for each internal node, that is the number of taxa in the current clade it is
+<i>228</i>&nbsp;     *  embedding in. The node inherits the clade index/assignment from its children. When the root of a clade is
+<i>229</i>&nbsp;     *  reached, i.e. when the count is equal to the known size of the clade, its clade assignment is updated to be the
+<i>230</i>&nbsp;     *  assignment of its parent (if any).
+<i>231</i>&nbsp;     *
+<i>232</i>&nbsp;     * @return  true if all monophyly constraints are met, false otherwise
+<i>233</i>&nbsp;     */
+<i>234</i>&nbsp;    private boolean isMonoJH() {
+<i>235</i>&nbsp;        // this traversal is shared between all calling code in current cycle.
+<i>236</i>&nbsp;        Node[] post = tree.listNodesPostOrder(null, null);
+<i>237</i>&nbsp;        final int nNodes = post.length;
+<i>238</i>&nbsp;        // per tree node, number of taxa in current monophyletic clade
+<i>239</i>&nbsp;        int nodeCladeSize[] = new int[nNodes];
+<i>240</i>&nbsp;        // per tree node, clade index (or assignment) of taxa in this sub tree.
+<i>241</i>&nbsp;        int[] nodeClade = new int[nNodes];
+<i>242</i>&nbsp;
+<i>243</i>&nbsp;        for (final Node n : post) {
+<i>244</i>&nbsp;            final int nr = n.getNr();
+<i>245</i>&nbsp;            if( n.isLeaf() ) {
+<i>246</i>&nbsp;                nodeClade[nr] = leafCladeAssignments[nr];
+<i>247</i>&nbsp;                if( nodeClade[nr] &gt;= 0 ) {
+<i>248</i>&nbsp;                    nodeCladeSize[nr] = 1;
+<i>249</i>&nbsp;                    // a leaf in a clade of its own is ipso facto completed.
+<i>250</i>&nbsp;                    if( cladeSize[nodeClade[nr]] == 1 ) {
+<i>251</i>&nbsp;                        nodeClade[nr] = cladeParent[nodeClade[nr]];
+<i>252</i>&nbsp;                    }
+<i>253</i>&nbsp;                }
+<i>254</i>&nbsp;            } else {
+<i>255</i>&nbsp;                final int lnr = n.getLeft().getNr();
+<i>256</i>&nbsp;                final int l = nodeClade[lnr];
+<i>257</i>&nbsp;                final int rnr = n.getRight().getNr();
+<i>258</i>&nbsp;                final int r = nodeClade[rnr];
+<i>259</i>&nbsp;
+<i>260</i>&nbsp;                if( l != r ) {
+<i>261</i>&nbsp;                    // A node with mixed taxa (from two mono clades or one clade and free taxa)
+<i>262</i>&nbsp;                    return false;
+<i>263</i>&nbsp;                }
+<i>264</i>&nbsp;
+<i>265</i>&nbsp;                nodeClade[nr] = l;
+<i>266</i>&nbsp;
+<i>267</i>&nbsp;                if( l != -1 ) {
+<i>268</i>&nbsp;                    nodeCladeSize[nr] = nodeCladeSize[lnr] + nodeCladeSize[rnr];
+<i>269</i>&nbsp;                    if( nodeCladeSize[nr] == cladeSize[l] ) {
+<i>270</i>&nbsp;                        // clade root: set its assignment to parent, if any.
+<i>271</i>&nbsp;                        nodeClade[nr] = cladeParent[l];
+<i>272</i>&nbsp;                    }
+<i>273</i>&nbsp;                }
+<i>274</i>&nbsp;            }
+<i>275</i>&nbsp;        }
+<i>276</i>&nbsp;        return true;
+<i>277</i>&nbsp;    }
+<i>278</i>&nbsp;
+<i>279</i>&nbsp;    private boolean isMonoJHNonBinary() {
+<i>280</i>&nbsp;        // this traversal is shared between all calling code in current cycle.
+<i>281</i>&nbsp;        Node[] post = tree.listNodesPostOrder(null, null);
+<i>282</i>&nbsp;        final int nNodes = post.length;
+<i>283</i>&nbsp;        // per tree node, number of taxa in current monophyletic clade
+<i>284</i>&nbsp;        int nodeCladeSize[] = new int[nNodes];
+<i>285</i>&nbsp;        // per tree node, clade index (or assignment) of taxa in this sub tree.
+<i>286</i>&nbsp;        int[] nodeClade = new int[nNodes];
+<i>287</i>&nbsp;
+<i>288</i>&nbsp;        for (final Node n : post) {
+<i>289</i>&nbsp;        	if (n != null) {
+<i>290</i>&nbsp;	            final int nr = n.getNr();
+<i>291</i>&nbsp;	            if( n.isLeaf() ) {
+<i>292</i>&nbsp;	                nodeClade[nr] = leafCladeAssignments[nr];
+<i>293</i>&nbsp;	                if( nodeClade[nr] &gt;= 0 ) {
+<i>294</i>&nbsp;	                    nodeCladeSize[nr] = 1;
+<i>295</i>&nbsp;	                    // a leaf in a clade of its own is ipso facto completed.
+<i>296</i>&nbsp;	                    if( cladeSize[nodeClade[nr]] == 1 ) {
+<i>297</i>&nbsp;	                        nodeClade[nr] = cladeParent[nodeClade[nr]];
+<i>298</i>&nbsp;	                    }
+<i>299</i>&nbsp;	                }
+<i>300</i>&nbsp;	            } else {
+<i>301</i>&nbsp;	                final int lnr = n.getLeft().getNr();
+<i>302</i>&nbsp;	                final int l = nodeClade[lnr];
+<i>303</i>&nbsp;	                if (l != -1) {
+<i>304</i>&nbsp;	                	nodeCladeSize[nr] = nodeCladeSize[lnr];
+<i>305</i>&nbsp;	                }
+<i>306</i>&nbsp;	                for (int i = 1; i &lt; n.getChildCount(); i++) {
+<i>307</i>&nbsp;		                final int rnr = n.getChild(i).getNr();
+<i>308</i>&nbsp;		                final int r = nodeClade[rnr];
+<i>309</i>&nbsp;		
+<i>310</i>&nbsp;		                if( l != r ) {
+<i>311</i>&nbsp;		                    // A node with mixed taxa (from two mono clades or one clade and free taxa)
+<i>312</i>&nbsp;		                    return false;
+<i>313</i>&nbsp;		                }
+<i>314</i>&nbsp;		
+<i>315</i>&nbsp;		                nodeClade[nr] = l;
+<i>316</i>&nbsp;		
+<i>317</i>&nbsp;		                if( l != -1 ) {
+<i>318</i>&nbsp;		                	nodeCladeSize[nr] += nodeCladeSize[rnr];
+<i>319</i>&nbsp;		                }
+<i>320</i>&nbsp;	                }
+<i>321</i>&nbsp;	                if (l != -1 ) {
+<i>322</i>&nbsp;		                if (nodeCladeSize[nr] == cladeSize[l] ) {
+<i>323</i>&nbsp;		                    // clade root: set its assignment to parent, if any.
+<i>324</i>&nbsp;		                    nodeClade[nr] = cladeParent[l];
+<i>325</i>&nbsp;		                }
+<i>326</i>&nbsp;	                }
+<i>327</i>&nbsp;	            }
+<i>328</i>&nbsp;        	}
+<i>329</i>&nbsp;        }
+<i>330</i>&nbsp;        return true;
+<i>331</i>&nbsp;    }
+<i>332</i>&nbsp;
+<i>333</i>&nbsp;    public int getMonoNodes(boolean[] nodes) {
+<i>334</i>&nbsp;
+<i>335</i>&nbsp;        // this traversal is shared between all calling code in current cycle.
+<i>336</i>&nbsp;        Node[] post = tree.listNodesPostOrder(null, null);
+<i>337</i>&nbsp;        final int nNodes = post.length;
+<i>338</i>&nbsp;
+<i>339</i>&nbsp;        assert nNodes == nodes.length;
+<i>340</i>&nbsp;        Arrays.fill(nodes, false);
+<i>341</i>&nbsp;
+<i>342</i>&nbsp;        // per tree node, number of taxa in current monophyletic clade
+<i>343</i>&nbsp;        int nodeCladeSize[] = new int[nNodes];
+<i>344</i>&nbsp;        // per tree node, clade index (or assignment) of taxa in this sub tree.
+<i>345</i>&nbsp;        int[] nodeClade = new int[nNodes];
+<i>346</i>&nbsp;        int nMono = 0;
+<i>347</i>&nbsp;        for (final Node n : post) {
+<i>348</i>&nbsp;            final int nr = n.getNr();
+<i>349</i>&nbsp;            if( n.isLeaf() ) {
+<i>350</i>&nbsp;                nodeClade[nr] = leafCladeAssignments[nr];
+<i>351</i>&nbsp;                if( nodeClade[nr] &gt;= 0 ) {
+<i>352</i>&nbsp;                    nodeCladeSize[nr] = 1;
+<i>353</i>&nbsp;                    // a leaf in a clade of its own is ipso facto completed.
+<i>354</i>&nbsp;                    if( cladeSize[nodeClade[nr]] == 1 ) {
+<i>355</i>&nbsp;                        nodeClade[nr] = cladeParent[nodeClade[nr]];
+<i>356</i>&nbsp;                    }
+<i>357</i>&nbsp;                }
+<i>358</i>&nbsp;            } else {
+<i>359</i>&nbsp;                final int lnr = n.getLeft().getNr();
+<i>360</i>&nbsp;                final int l = nodeClade[lnr];
+<i>361</i>&nbsp;                final int rnr = n.getRight().getNr();
+<i>362</i>&nbsp;                final int r = nodeClade[rnr];
+<i>363</i>&nbsp;
+<i>364</i>&nbsp;                if( l != r ) {
+<i>365</i>&nbsp;                    // A node with mixed taxa (from two mono clades or one clade and free taxa)
+<i>366</i>&nbsp;                    return -1;
+<i>367</i>&nbsp;                }
+<i>368</i>&nbsp;
+<i>369</i>&nbsp;                nodeClade[nr] = l;
+<i>370</i>&nbsp;
+<i>371</i>&nbsp;                if( l != -1 ) {
+<i>372</i>&nbsp;                    nodeCladeSize[nr] = nodeCladeSize[lnr] + nodeCladeSize[rnr];
+<i>373</i>&nbsp;                    if( nodeCladeSize[nr] == cladeSize[l] ) {
+<i>374</i>&nbsp;                        nodes[n.getNr()] = true;
+<i>375</i>&nbsp;                        nMono += 1;
+<i>376</i>&nbsp;                        // clade root: set its assignment to parent, if any.
+<i>377</i>&nbsp;                        nodeClade[nr] = cladeParent[l];
+<i>378</i>&nbsp;                    }
+<i>379</i>&nbsp;                }
+<i>380</i>&nbsp;            }
+<i>381</i>&nbsp;        }
+<i>382</i>&nbsp;        return nMono;
+<i>383</i>&nbsp;    }
+<i>384</i>&nbsp;
+<i>385</i>&nbsp;	@Override public List&lt;String&gt; getArguments() {return null;}
+<i>386</i>&nbsp;	@Override public List&lt;String&gt; getConditions() {return null;}
+<i>387</i>&nbsp;	@Override public void sample(State state, Random random) {}
+<i>388</i>&nbsp;
+<i>389</i>&nbsp;    /** Return constraints as a collection of clade tip sets (tips taxa as strings) **/
+<i>390</i>&nbsp;
+<i>391</i>&nbsp;    public List&lt;List&lt;String&gt;&gt; getConstraints() {
+<i>392</i>&nbsp;        List&lt;List&lt;String&gt;&gt; allc = new ArrayList&lt;List&lt;String&gt;&gt;();
+<i>393</i>&nbsp;        for (List&lt;Integer&gt; list : taxonIDList) {
+<i>394</i>&nbsp;            List&lt;String&gt; tax = new ArrayList&lt;&gt;(list.size());
+<i>395</i>&nbsp;            for( int i : list ) {
+<i>396</i>&nbsp;                tax.add(taxaList[i]);
+<i>397</i>&nbsp;            }
+<i>398</i>&nbsp;            allc.add(tax);
+<i>399</i>&nbsp;        }
+<i>400</i>&nbsp;        return allc;
+<i>401</i>&nbsp;    }
+<i>402</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

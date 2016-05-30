@@ -1,0 +1,386 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: BeautiConnector</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.beauti</a> ]
+</div>
+
+<h1>Coverage Summary for Class: BeautiConnector (beast.app.beauti)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BeautiConnector</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/ 8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    89.2%
+  </span>
+  <span class="absValue">
+    (107/ 120)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BeautiConnector$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BeautiConnector$Operation</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/ 10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    89.3%
+  </span>
+  <span class="absValue">
+    (109/ 122)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.beauti;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import java.lang.reflect.Method;
+<i>5</i>&nbsp;import java.util.List;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import beast.core.BEASTInterface;
+<i>8</i>&nbsp;import beast.core.BEASTObject;
+<i>9</i>&nbsp;import beast.core.Description;
+<i>10</i>&nbsp;import beast.core.Input;
+<i>11</i>&nbsp;import beast.core.Input.Validate;
+<i>12</i>&nbsp;import beast.core.MCMC;
+<i>13</i>&nbsp;import beast.core.Operator;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;@Description(&quot;Specifies which part of the template get connected to the main network&quot;)
+<i>18</i>&nbsp;public class BeautiConnector extends BEASTObject {
+<b class="fc"><i>19</i>&nbsp;    final public Input&lt;String&gt; methodnput = new Input&lt;&gt;(&quot;method&quot;, &quot;name of static method that should be called with BeautiDoc as &quot; +</b>
+<i>20</i>&nbsp;    		&quot;argument. For example beast.app.beauti.SiteModelInputEditor.custmoConnector&quot;);
+<i>21</i>&nbsp;
+<b class="fc"><i>22</i>&nbsp;    final public Input&lt;String&gt; sourceIDInput = new Input&lt;&gt;(&quot;srcID&quot;, &quot;ID of the beastObject to be connected&quot;, Validate.XOR, methodnput);</b>
+<b class="fc"><i>23</i>&nbsp;    final public Input&lt;String&gt; targetIDInput = new Input&lt;&gt;(&quot;targetID&quot;, &quot;ID of beastObject to connect to&quot;, Validate.XOR, methodnput);</b>
+<b class="fc"><i>24</i>&nbsp;    final public Input&lt;String&gt; inputNameInput = new Input&lt;&gt;(&quot;inputName&quot;, &quot;name of the input of the beastObject to connect to&quot;, Validate.XOR, methodnput);</b>
+<b class="fc"><i>25</i>&nbsp;    final public Input&lt;String&gt; tipText = new Input&lt;&gt;(&quot;value&quot;, &quot;associate some tip text with the srcID beastObject, useful for displaying prior and operator specific information&quot;);</b>
+<i>26</i>&nbsp;
+<b class="fc"><i>27</i>&nbsp;    final public Input&lt;String&gt; conditionInput = new Input&lt;&gt;(&quot;if&quot;, &quot;condition under which this connector should be executed.&quot; +</b>
+<i>28</i>&nbsp;            &quot;These should be of the form &quot; +
+<i>29</i>&nbsp;            &quot;inposterior(id) or id/input=value, e.g. inposterior(kappa), kappa/estimate=true. &quot; +
+<i>30</i>&nbsp;            &quot;inlikelihood(id) to check there is a beastObject with suplied id that is predecessor of likelihood. &quot; +
+<i>31</i>&nbsp;            &quot;nooperator(id) to check there is no operator with suplied id. &quot; +
+<i>32</i>&nbsp;            &quot;isInitialising to execute only when subtemplate is first instantiated. &quot; +
+<i>33</i>&nbsp;            &quot;For partition specific ids, use $(n), e.g. e.g. kappa.$(n)/estimate=true. &quot; +
+<i>34</i>&nbsp;            &quot;For multiple conditions, separate by &#39;and&#39;, e.g. inposterior(kappa.$(n)) and kappa.$(n)/estimate=true&quot;);
+<i>35</i>&nbsp;//	public enum ConnectCondition {always, ifunlinked};
+<i>36</i>&nbsp;//	public Input&lt;ConnectCondition&gt; connectCondition = new Input&lt;&gt;(&quot;connect&quot;,&quot;condition when to connect. Default is &#39;always&#39;. &quot; +
+<i>37</i>&nbsp;//			&quot;With ifunlinked, the connector is only activated if the link does not already exists. &quot; +
+<i>38</i>&nbsp;//			&quot;Possible values: &quot; + ConnectCondition.values(),
+<i>39</i>&nbsp;//			ConnectCondition.always, ConnectCondition.values());
+<i>40</i>&nbsp;
+<i>41</i>&nbsp;
+<b class="fc"><i>42</i>&nbsp;    enum Operation {EQUALS, NOT_EQUALS, IS_IN_POSTERIOR, IS_IN_LIKELIHOOD, IS_NOT_AN_OPERTOR, AT_INITIALISATION_ONLY}</b>
+<i>43</i>&nbsp;//	final static String IS_IN_POSTERIOR = &quot;x&quot;;
+<i>44</i>&nbsp;//	final static String AT_INITIALISATION_ONLY = &quot;y&quot;;
+<i>45</i>&nbsp;
+<i>46</i>&nbsp;    String sourceID;
+<i>47</i>&nbsp;    String targetID;
+<i>48</i>&nbsp;    String targetInput;
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;    String[] conditionIDs;
+<i>51</i>&nbsp;    String[] conditionInputs;
+<i>52</i>&nbsp;    Operation[] conditionOperations;
+<i>53</i>&nbsp;    String[] conditionValues;
+<i>54</i>&nbsp;    
+<b class="fc"><i>55</i>&nbsp;    boolean isRegularConnector = true;</b>
+<i>56</i>&nbsp;    
+<b class="fc"><i>57</i>&nbsp;    Method method = null;</b>
+<i>58</i>&nbsp;
+<b class="fc"><i>59</i>&nbsp;    public BeautiConnector() {}</b>
+<i>60</i>&nbsp;
+<b class="fc"><i>61</i>&nbsp;    public BeautiConnector(String sourceID, String targetID, String inputName, String condition) {</b>
+<b class="fc"><i>62</i>&nbsp;		initByName(&quot;srcID&quot;, sourceID, &quot;targetID&quot;, targetID, &quot;inputName&quot;, inputName, </b>
+<i>63</i>&nbsp;				&quot;if&quot;, condition);
+<b class="fc"><i>64</i>&nbsp;    }</b>
+<i>65</i>&nbsp;
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;	@Override
+<i>68</i>&nbsp;    public void initAndValidate() {
+<b class="fc"><i>69</i>&nbsp;        sourceID = sourceIDInput.get();</b>
+<b class="fc"><i>70</i>&nbsp;        targetID = targetIDInput.get();</b>
+<b class="fc"><i>71</i>&nbsp;        targetInput = inputNameInput.get();</b>
+<i>72</i>&nbsp;
+<b class="fc"><i>73</i>&nbsp;        if (conditionInput.get() != null) {</b>
+<b class="fc"><i>74</i>&nbsp;            String[] conditions = conditionInput.get().split(&quot;\\s+and\\s+&quot;);</b>
+<b class="fc"><i>75</i>&nbsp;            conditionIDs = new String[conditions.length];</b>
+<b class="fc"><i>76</i>&nbsp;            conditionInputs = new String[conditions.length];</b>
+<b class="fc"><i>77</i>&nbsp;            conditionValues = new String[conditions.length];</b>
+<b class="fc"><i>78</i>&nbsp;            conditionOperations = new Operation[conditions.length];</b>
+<b class="fc"><i>79</i>&nbsp;            for (int i = 0; i &lt; conditions.length; i++) {</b>
+<b class="fc"><i>80</i>&nbsp;                String s = conditions[i];</b>
+<b class="fc"><i>81</i>&nbsp;                if (s.startsWith(&quot;inposterior(&quot;)) {</b>
+<b class="fc"><i>82</i>&nbsp;                    conditionIDs[i] = s.substring(s.indexOf(&quot;(&quot;) + 1, s.lastIndexOf(&quot;)&quot;));</b>
+<b class="fc"><i>83</i>&nbsp;                    conditionInputs[i] = null;</b>
+<b class="fc"><i>84</i>&nbsp;                    conditionOperations[i] = Operation.IS_IN_POSTERIOR;</b>
+<b class="fc"><i>85</i>&nbsp;                    conditionValues[i] = null;</b>
+<b class="fc"><i>86</i>&nbsp;                } else if (s.startsWith(&quot;inlikelihood(&quot;)) {</b>
+<b class="fc"><i>87</i>&nbsp;                    conditionIDs[i] = s.substring(s.indexOf(&quot;(&quot;) + 1, s.lastIndexOf(&quot;)&quot;));</b>
+<b class="fc"><i>88</i>&nbsp;                    conditionInputs[i] = null;</b>
+<b class="fc"><i>89</i>&nbsp;                    conditionOperations[i] = Operation.IS_IN_LIKELIHOOD;</b>
+<b class="fc"><i>90</i>&nbsp;                    conditionValues[i] = null;</b>
+<b class="fc"><i>91</i>&nbsp;                } else if (s.startsWith(&quot;nooperator&quot;)) {</b>
+<b class="fc"><i>92</i>&nbsp;                    conditionIDs[i] = s.substring(s.indexOf(&quot;(&quot;) + 1, s.lastIndexOf(&quot;)&quot;));</b>
+<b class="fc"><i>93</i>&nbsp;                    conditionOperations[i] = Operation.IS_NOT_AN_OPERTOR;</b>
+<b class="fc"><i>94</i>&nbsp;                    conditionInputs[i] = null;</b>
+<b class="fc"><i>95</i>&nbsp;                    conditionValues[i] = null;</b>
+<b class="fc"><i>96</i>&nbsp;                } else if (s.startsWith(&quot;isInitializing&quot;)) {</b>
+<b class="fc"><i>97</i>&nbsp;                    conditionIDs[i] = null;</b>
+<b class="fc"><i>98</i>&nbsp;                    conditionOperations[i] = Operation.AT_INITIALISATION_ONLY;</b>
+<b class="fc"><i>99</i>&nbsp;                    conditionInputs[i] = null;</b>
+<b class="fc"><i>100</i>&nbsp;                    conditionValues[i] = null;</b>
+<i>101</i>&nbsp;                } else {
+<b class="fc"><i>102</i>&nbsp;                    conditionIDs[i] = s.substring(0, s.indexOf(&quot;/&quot;));</b>
+<b class="fc"><i>103</i>&nbsp;                    conditionInputs[i] = s.substring(s.indexOf(&quot;/&quot;) + 1, s.indexOf(&quot;=&quot;));</b>
+<b class="fc"><i>104</i>&nbsp;                    conditionValues[i] = s.substring(s.indexOf(&quot;=&quot;) + 1);</b>
+<b class="fc"><i>105</i>&nbsp;                    conditionOperations[i] = Operation.EQUALS;</b>
+<b class="fc"><i>106</i>&nbsp;                    if (conditionInputs[i].endsWith(&quot;!&quot;)) {</b>
+<b class="fc"><i>107</i>&nbsp;                        conditionInputs[i] = conditionInputs[i].substring(0, conditionInputs[i].length() - 1);</b>
+<b class="fc"><i>108</i>&nbsp;                        conditionOperations[i] = Operation.NOT_EQUALS;</b>
+<i>109</i>&nbsp;                    }
+<i>110</i>&nbsp;                }
+<i>111</i>&nbsp;            }
+<b class="fc"><i>112</i>&nbsp;        } else {</b>
+<b class="fc"><i>113</i>&nbsp;            conditionIDs = new String[0];</b>
+<b class="fc"><i>114</i>&nbsp;            conditionInputs = new String[0];</b>
+<b class="fc"><i>115</i>&nbsp;            conditionOperations = new Operation[0];</b>
+<b class="fc"><i>116</i>&nbsp;            conditionValues = new String[0];</b>
+<i>117</i>&nbsp;        }
+<b class="fc"><i>118</i>&nbsp;        if (methodnput.get() != null) {</b>
+<b class="fc"><i>119</i>&nbsp;        	String fullMethod = methodnput.get();</b>
+<b class="fc"><i>120</i>&nbsp;        	String className = fullMethod.substring(0, fullMethod.lastIndexOf(&#39;.&#39;));</b>
+<b class="fc"><i>121</i>&nbsp;        	String methodName = fullMethod.substring(fullMethod.lastIndexOf(&#39;.&#39;) + 1);</b>
+<i>122</i>&nbsp;        	Class&lt;?&gt; class_;
+<i>123</i>&nbsp;			try {
+<b class="fc"><i>124</i>&nbsp;				class_ = Class.forName(className);</b>
+<b class="fc"><i>125</i>&nbsp;	        	method = class_.getMethod(methodName, BeautiDoc.class);</b>
+<b class="nc"><i>126</i>&nbsp;			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {</b>
+<b class="nc"><i>127</i>&nbsp;				throw new IllegalArgumentException(e.getMessage());</b>
+<b class="fc"><i>128</i>&nbsp;			}</b>
+<b class="fc"><i>129</i>&nbsp;            isRegularConnector = false;</b>
+<i>130</i>&nbsp;        }
+<i>131</i>&nbsp;
+<b class="fc"><i>132</i>&nbsp;    }</b>
+<i>133</i>&nbsp;
+<i>134</i>&nbsp;
+<i>135</i>&nbsp;    public boolean atInitialisationOnly() {
+<b class="fc"><i>136</i>&nbsp;        if (conditionOperations.length &gt; 0) {</b>
+<b class="fc"><i>137</i>&nbsp;            return conditionOperations[0].equals(Operation.AT_INITIALISATION_ONLY);</b>
+<i>138</i>&nbsp;        } else {
+<b class="fc"><i>139</i>&nbsp;            return false;</b>
+<i>140</i>&nbsp;        }
+<i>141</i>&nbsp;    }
+<i>142</i>&nbsp;
+<i>143</i>&nbsp;    /**
+<i>144</i>&nbsp;     * check that conditions in the &#39;if&#39; input are met *
+<i>145</i>&nbsp;     */
+<i>146</i>&nbsp;    public boolean isActivated(PartitionContext partitionContext, List&lt;BEASTInterface&gt; posteriorPredecessors,
+<i>147</i>&nbsp;    		List&lt;BEASTInterface&gt; likelihoodPredecessors, BeautiDoc doc) {
+<b class="fc"><i>148</i>&nbsp;        if (atInitialisationOnly()) {</b>
+<b class="nc"><i>149</i>&nbsp;            return false;</b>
+<i>150</i>&nbsp;        }
+<b class="fc"><i>151</i>&nbsp;        if (methodnput.get() != null) {</b>
+<i>152</i>&nbsp;//        if (method != null) {
+<i>153</i>&nbsp;	    	try {
+<b class="fc"><i>154</i>&nbsp;            	String fullMethod = methodnput.get();</b>
+<b class="fc"><i>155</i>&nbsp;            	String className = fullMethod.substring(0, fullMethod.lastIndexOf(&#39;.&#39;));</b>
+<b class="fc"><i>156</i>&nbsp;            	String methodName = fullMethod.substring(fullMethod.lastIndexOf(&#39;.&#39;) + 1);</b>
+<b class="fc"><i>157</i>&nbsp;            	Class&lt;?&gt; class_ = Class.forName(className);</b>
+<b class="fc"><i>158</i>&nbsp;            	method = class_.getMethod(methodName, BeautiDoc.class);</b>
+<b class="fc"><i>159</i>&nbsp;        		method.invoke(null, doc);</b>
+<b class="nc"><i>160</i>&nbsp;        	} catch (Exception e) {</b>
+<i>161</i>&nbsp;        		// ignore
+<b class="fc"><i>162</i>&nbsp;        	}</b>
+<i>163</i>&nbsp;        }
+<i>164</i>&nbsp;
+<b class="fc"><i>165</i>&nbsp;        boolean isActive = true;</b>
+<b class="fc"><i>166</i>&nbsp;        for (int i = 0; i &lt; conditionIDs.length; i++) {</b>
+<i>167</i>&nbsp;        	//String id = conditionIDs[i].replaceAll(&quot;\\$\\(n\\)&quot;, partition);
+<b class="fc"><i>168</i>&nbsp;        	String id = BeautiDoc.translatePartitionNames(conditionIDs[i], partitionContext);</b>
+<b class="fc"><i>169</i>&nbsp;            BEASTInterface beastObject = doc.pluginmap.get(id);</b>
+<b class="fc"><i>170</i>&nbsp;            if (beastObject == null) {</b>
+<b class="fc"><i>171</i>&nbsp;            	if (conditionOperations[i] != Operation.IS_NOT_AN_OPERTOR) {</b>
+<b class="fc"><i>172</i>&nbsp;                    return false;</b>
+<i>173</i>&nbsp;            		
+<i>174</i>&nbsp;            	}
+<i>175</i>&nbsp;                //System.err.println(&quot;isActivated::no beastObject found&quot;);
+<i>176</i>&nbsp;            }
+<i>177</i>&nbsp;            //System.err.println(&quot;isActivated::found &quot; + id);
+<i>178</i>&nbsp;            try {
+<b class="fc"><i>179</i>&nbsp;                switch (conditionOperations[i]) {</b>
+<i>180</i>&nbsp;                    case IS_IN_POSTERIOR:
+<b class="fc"><i>181</i>&nbsp;                        if (!posteriorPredecessors.contains(beastObject)) {</b>
+<i>182</i>&nbsp;                            //System.err.println(posteriorPredecessors);
+<i>183</i>&nbsp;                            //System.err.println(&quot;isActivated::is not in posterior, return false&quot;);
+<b class="fc"><i>184</i>&nbsp;                            return false;</b>
+<i>185</i>&nbsp;                        }
+<i>186</i>&nbsp;                        break;
+<i>187</i>&nbsp;                    case IS_IN_LIKELIHOOD:
+<b class="fc"><i>188</i>&nbsp;                        if (!likelihoodPredecessors.contains(beastObject)) {</b>
+<i>189</i>&nbsp;                            //System.err.println(posteriorPredecessors);
+<i>190</i>&nbsp;                            //System.err.println(&quot;isActivated::is not in posterior, return false&quot;);
+<b class="fc"><i>191</i>&nbsp;                            return false;</b>
+<i>192</i>&nbsp;                        }
+<i>193</i>&nbsp;                        break;
+<i>194</i>&nbsp;                    //System.err.println(&quot;isActivated::is in posterior&quot;);
+<i>195</i>&nbsp;                    case IS_NOT_AN_OPERTOR:
+<b class="fc"><i>196</i>&nbsp;        				List&lt;Operator&gt; operators = ((MCMC) doc.mcmc.get()).operatorsInput.get();</b>
+<b class="fc"><i>197</i>&nbsp;        				if (operators.contains(beastObject)) {</b>
+<b class="fc"><i>198</i>&nbsp;        					return false;</b>
+<i>199</i>&nbsp;        				}
+<i>200</i>&nbsp;                    	break;
+<i>201</i>&nbsp;                    case EQUALS:
+<b class="fc"><i>202</i>&nbsp;                        final Input&lt;?&gt; input = beastObject.getInput(conditionInputs[i]);</b>
+<i>203</i>&nbsp;                        //System.err.println(&quot;isActivated::input &quot; + input.get().toString() + &quot; expected &quot; + conditionValues[i]);
+<b class="fc"><i>204</i>&nbsp;                        if (input.get() == null) {</b>
+<b class="nc"><i>205</i>&nbsp;                        	if (!conditionValues[i].equals(&quot;null&quot;)) {</b>
+<b class="nc"><i>206</i>&nbsp;                        		return false;</b>
+<i>207</i>&nbsp;                        	}
+<b class="fc"><i>208</i>&nbsp;                        } else if (!input.get().toString().equals(conditionValues[i])) {</b>
+<i>209</i>&nbsp;                            //System.err.println(&quot;isActivated::return false&quot;);
+<b class="fc"><i>210</i>&nbsp;                            return false;</b>
+<i>211</i>&nbsp;                        }
+<i>212</i>&nbsp;                        break;
+<i>213</i>&nbsp;                    case NOT_EQUALS:
+<b class="fc"><i>214</i>&nbsp;                        final Input&lt;?&gt; input2 = beastObject.getInput(conditionInputs[i]);</b>
+<i>215</i>&nbsp;                        //System.err.println(&quot;isActivated::input &quot; + input.get().toString() + &quot; expected &quot; + conditionValues[i]);
+<b class="fc"><i>216</i>&nbsp;                        if (input2.get() == null) {</b>
+<b class="nc"><i>217</i>&nbsp;                        	if (conditionValues[i].equals(&quot;null&quot;)) {</b>
+<b class="nc"><i>218</i>&nbsp;                        		return false;</b>
+<i>219</i>&nbsp;                        	}
+<b class="fc"><i>220</i>&nbsp;                        } else if (input2.get().toString().equals(conditionValues[i])) {</b>
+<i>221</i>&nbsp;                            //System.err.println(&quot;isActivated::return false&quot;);
+<b class="fc"><i>222</i>&nbsp;                            return false;</b>
+<i>223</i>&nbsp;                        }
+<i>224</i>&nbsp;                        break;
+<i>225</i>&nbsp;                    default:
+<b class="nc"><i>226</i>&nbsp;                        throw new IllegalArgumentException(&quot;Unexpected operation: &quot; + conditionOperations[i]);</b>
+<i>227</i>&nbsp;                }
+<b class="nc"><i>228</i>&nbsp;            } catch (Exception e) {</b>
+<b class="nc"><i>229</i>&nbsp;                e.printStackTrace();</b>
+<b class="nc"><i>230</i>&nbsp;                return false;</b>
+<b class="fc"><i>231</i>&nbsp;            }</b>
+<i>232</i>&nbsp;        }
+<i>233</i>&nbsp;        //if (conditionIDs.length &gt; 0) {
+<i>234</i>&nbsp;        //	System.err.println(&quot;isActivated::return true&quot;);
+<i>235</i>&nbsp;        //}
+<b class="fc"><i>236</i>&nbsp;        return isActive;</b>
+<i>237</i>&nbsp;    }
+<i>238</i>&nbsp;
+<i>239</i>&nbsp;    public String getTipText() {
+<b class="fc"><i>240</i>&nbsp;        return tipText.get();</b>
+<i>241</i>&nbsp;    }
+<i>242</i>&nbsp;
+<i>243</i>&nbsp;    @Override
+<i>244</i>&nbsp;	public String toString() {
+<b class="fc"><i>245</i>&nbsp;    	if (methodnput.get() != null) {</b>
+<b class="fc"><i>246</i>&nbsp;    		return &quot;call &quot; + methodnput.get();</b>
+<i>247</i>&nbsp;    	}
+<b class="nc"><i>248</i>&nbsp;        return &quot;@&quot; + sourceID + &quot; -&gt; @&quot; + targetID + &quot;/&quot; + targetInput;</b>
+<i>249</i>&nbsp;    }
+<i>250</i>&nbsp;
+<i>251</i>&nbsp;
+<i>252</i>&nbsp;    public String toString(PartitionContext context) {
+<b class="fc"><i>253</i>&nbsp;    	if (methodnput.get() != null) {</b>
+<b class="fc"><i>254</i>&nbsp;    		return toString();</b>
+<i>255</i>&nbsp;    	}
+<b class="fc"><i>256</i>&nbsp;        return &quot;@&quot; + BeautiDoc.translatePartitionNames(sourceID, context) + &quot; -&gt; @&quot; + targetID + &quot;/&quot; + BeautiDoc.translatePartitionNames(targetInput, context);</b>
+<i>257</i>&nbsp;    }
+<i>258</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

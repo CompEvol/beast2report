@@ -1,0 +1,534 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: JSONProducer</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.util</a> ]
+</div>
+
+<h1>Coverage Summary for Class: JSONProducer (beast.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JSONProducer</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    77.8%
+  </span>
+  <span class="absValue">
+    (7/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    86.2%
+  </span>
+  <span class="absValue">
+    (188/ 218)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.util;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.io.File;
+<i>4</i>&nbsp;import java.io.IOException;
+<i>5</i>&nbsp;import java.io.PrintStream;
+<i>6</i>&nbsp;import java.util.ArrayList;
+<i>7</i>&nbsp;import java.util.Collection;
+<i>8</i>&nbsp;import java.util.Collections;
+<i>9</i>&nbsp;import java.util.HashMap;
+<i>10</i>&nbsp;import java.util.HashSet;
+<i>11</i>&nbsp;import java.util.List;
+<i>12</i>&nbsp;import java.util.Map;
+<i>13</i>&nbsp;import java.util.Set;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;import javax.xml.parsers.ParserConfigurationException;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;import org.xml.sax.SAXException;
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;import beast.app.BEASTVersion2;
+<i>20</i>&nbsp;import beast.core.BEASTInterface;
+<i>21</i>&nbsp;import beast.core.Input;
+<i>22</i>&nbsp;import beast.core.State;
+<i>23</i>&nbsp;import beast.core.parameter.BooleanParameter;
+<i>24</i>&nbsp;import beast.core.parameter.IntegerParameter;
+<i>25</i>&nbsp;import beast.core.parameter.Parameter;
+<i>26</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>27</i>&nbsp;import beast.evolution.alignment.Alignment;
+<i>28</i>&nbsp;import beast.evolution.tree.TraitSet;
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;/*
+<i>35</i>&nbsp; * Why JSON:
+<i>36</i>&nbsp; *
+<i>37</i>&nbsp; * JSON vs XML: http://www.json.org/fatfree.html
+<i>38</i>&nbsp; * + JSON more readable
+<i>39</i>&nbsp; * + JSON less to type
+<i>40</i>&nbsp; * 
+<i>41</i>&nbsp; * JSON vs YAML: http://en.wikipedia.org/wiki/YAML
+<i>42</i>&nbsp; * 
+<i>43</i>&nbsp; * + JSON has editor support -- gedit, any Javascript editor
+<i>44</i>&nbsp; * + JSON validation -- http://jsonlint.com/ for validation
+<i>45</i>&nbsp; * + JSON = Javascript, useful format for GUIs
+<i>46</i>&nbsp; * - JSON bracket matching is not well supported in editors
+<i>47</i>&nbsp; * 
+<i>48</i>&nbsp; * + YAML no issues with brackets
+<i>49</i>&nbsp; * - YAML little editor support
+<i>50</i>&nbsp;*/
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;public class JSONProducer {
+<i>53</i>&nbsp;
+<i>54</i>&nbsp;    /**
+<i>55</i>&nbsp;     * list of objects already converted to JSON, so an idref suffices
+<i>56</i>&nbsp;     */
+<i>57</i>&nbsp;    Set&lt;BEASTInterface&gt; isDone;
+<i>58</i>&nbsp;    Map&lt;BEASTInterface, Set&lt;String&gt;&gt; isInputsDone;
+<i>59</i>&nbsp;    /**
+<i>60</i>&nbsp;     * list of IDs of elements produces, used to prevent duplicate ID generation
+<i>61</i>&nbsp;     */
+<i>62</i>&nbsp;    HashSet&lt;String&gt; IDs;
+<i>63</i>&nbsp;    /**
+<i>64</i>&nbsp;     * #spaces before elements in JSON *
+<i>65</i>&nbsp;     */
+<i>66</i>&nbsp;    int indentCount;
+<i>67</i>&nbsp;    
+<i>68</i>&nbsp;    final public static String DEFAULT_NAMESPACE = &quot;beast.core:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood&quot;;
+<i>69</i>&nbsp;
+<i>70</i>&nbsp;    public JSONProducer() {
+<b class="fc"><i>71</i>&nbsp;        super();</b>
+<b class="fc"><i>72</i>&nbsp;    }</b>
+<i>73</i>&nbsp;
+<i>74</i>&nbsp;    /**
+<i>75</i>&nbsp;     * Main entry point for this class
+<i>76</i>&nbsp;     * Given a plug-in, produces the JSON in BEAST 2 format
+<i>77</i>&nbsp;     * representing the plug-in. This assumes beastObject is Runnable
+<i>78</i>&nbsp;     */
+<i>79</i>&nbsp;    public String toJSON(BEASTInterface beastObject) {
+<b class="fc"><i>80</i>&nbsp;    	return toJSON(beastObject, new ArrayList&lt;&gt;());</b>
+<i>81</i>&nbsp;    }
+<i>82</i>&nbsp;
+<i>83</i>&nbsp;    public String toJSON(BEASTInterface beastObject, Collection&lt;BEASTInterface&gt; others) {
+<i>84</i>&nbsp;        try {
+<b class="fc"><i>85</i>&nbsp;            StringBuffer buf = new StringBuffer();</b>
+<i>86</i>&nbsp;            //buf.append(&quot;{\&quot;version\&quot;: \&quot;2.0\&quot;,\n\&quot;namespace\&quot;: \&quot;&quot; + DEFAULT_NAMESPACE + &quot;\&quot;,\n\n&quot; +
+<i>87</i>&nbsp;            //		&quot;\&quot;&quot; + JSONParser.ANALYSIS_ELEMENT + &quot;\&quot;: [\n&quot;);
+<b class="fc"><i>88</i>&nbsp;            buf.append(&quot;{version: \&quot;&quot; + (new BEASTVersion2()).getMajorVersion() + &quot;\&quot;,\nnamespace: \&quot;&quot; + DEFAULT_NAMESPACE + &quot;\&quot;,\n\n&quot; +</b>
+<i>89</i>&nbsp;            		XMLParser.BEAST_ELEMENT + &quot;: [\n&quot;);
+<i>90</i>&nbsp;            //buf.append(&quot;\n\n&quot;);
+<b class="fc"><i>91</i>&nbsp;            isDone = new HashSet&lt;&gt;();</b>
+<b class="fc"><i>92</i>&nbsp;            isInputsDone = new HashMap&lt;&gt;();</b>
+<b class="fc"><i>93</i>&nbsp;            IDs = new HashSet&lt;&gt;();</b>
+<b class="fc"><i>94</i>&nbsp;            indentCount = 1;</b>
+<i>95</i>&nbsp;            
+<b class="fc"><i>96</i>&nbsp;            List&lt;BEASTInterface&gt; priorityBeastObjects = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>97</i>&nbsp;            findPriorityBeastObjects(beastObject, priorityBeastObjects);</b>
+<b class="fc"><i>98</i>&nbsp;            for (BEASTInterface beastObject2 : priorityBeastObjects) {</b>
+<b class="fc"><i>99</i>&nbsp;            	if (!isDone.contains(beastObject2)) {</b>
+<i>100</i>&nbsp;            		//name = name.substring(name.lastIndexOf(&#39;.&#39;) + 1).toLowerCase();
+<b class="fc"><i>101</i>&nbsp;            		beastObjectToJSON(beastObject2, BEASTInterface.class, buf, null, true);</b>
+<b class="fc"><i>102</i>&nbsp;            		buf.append(&quot;,&quot;);</b>
+<i>103</i>&nbsp;            	}
+<b class="fc"><i>104</i>&nbsp;            }</b>
+<b class="fc"><i>105</i>&nbsp;            buf.append(&quot;\n\n&quot;);</b>
+<i>106</i>&nbsp;            
+<b class="fc"><i>107</i>&nbsp;            beastObjectToJSON(beastObject, BEASTInterface.class, buf, null, true);</b>
+<b class="fc"><i>108</i>&nbsp;            String end = &quot;\n]\n}&quot;;</b>
+<b class="fc"><i>109</i>&nbsp;            buf.append(end);</b>
+<i>110</i>&nbsp;
+<b class="fc"><i>111</i>&nbsp;            String JSON = buf.toString();</b>
+<b class="fc"><i>112</i>&nbsp;            String[] nameSpaces = DEFAULT_NAMESPACE.split(&quot;:&quot;);</b>
+<b class="fc"><i>113</i>&nbsp;            for (String nameSpace : nameSpaces) {</b>
+<i>114</i>&nbsp;                //JSON = JSON.replaceAll(&quot;\&quot;spec\&quot;: \&quot;&quot; + nameSpace + &quot;.&quot;, &quot;\&quot;spec\&quot;: \&quot;&quot;);
+<b class="fc"><i>115</i>&nbsp;                JSON = JSON.replaceAll(&quot;spec: \&quot;&quot; + nameSpace + &quot;.&quot;, &quot;spec: \&quot;&quot;);</b>
+<i>116</i>&nbsp;            }
+<b class="fc"><i>117</i>&nbsp;            return JSON;</b>
+<b class="nc"><i>118</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>119</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>120</i>&nbsp;            return null;</b>
+<i>121</i>&nbsp;        }
+<i>122</i>&nbsp;    } // toJSON
+<i>123</i>&nbsp;
+<i>124</i>&nbsp;    private void findPriorityBeastObjects(BEASTInterface beastObject, List&lt;BEASTInterface&gt; priorityBeastObjects) throws IllegalArgumentException, IllegalAccessException {
+<b class="fc"><i>125</i>&nbsp;    	if (beastObject.getClass().equals(Alignment.class)) {</b>
+<b class="fc"><i>126</i>&nbsp;    		priorityBeastObjects.add(beastObject);</b>
+<i>127</i>&nbsp;    	}
+<b class="fc"><i>128</i>&nbsp;    	if (beastObject instanceof TraitSet) {</b>
+<b class="nc"><i>129</i>&nbsp;    		priorityBeastObjects.add(beastObject);</b>
+<i>130</i>&nbsp;    	}
+<b class="fc"><i>131</i>&nbsp;		for (BEASTInterface beastObject2 : beastObject.listActiveBEASTObjects()) {</b>
+<b class="fc"><i>132</i>&nbsp;			findPriorityBeastObjects(beastObject2, priorityBeastObjects);</b>
+<b class="fc"><i>133</i>&nbsp;		}</b>
+<b class="fc"><i>134</i>&nbsp;	}</b>
+<i>135</i>&nbsp;
+<i>136</i>&nbsp;
+<i>137</i>&nbsp;
+<i>138</i>&nbsp;    public String stateNodeToJSON(BEASTInterface beastObject) {
+<i>139</i>&nbsp;        try {
+<b class="nc"><i>140</i>&nbsp;            StringBuffer buf = new StringBuffer();</b>
+<b class="nc"><i>141</i>&nbsp;            isDone = new HashSet&lt;&gt;();</b>
+<b class="nc"><i>142</i>&nbsp;            IDs = new HashSet&lt;&gt;();</b>
+<b class="nc"><i>143</i>&nbsp;            indentCount = 1;</b>
+<b class="nc"><i>144</i>&nbsp;            beastObjectToJSON(beastObject, null, buf, null, false);</b>
+<b class="nc"><i>145</i>&nbsp;            return buf.toString();</b>
+<b class="nc"><i>146</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>147</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>148</i>&nbsp;            return null;</b>
+<i>149</i>&nbsp;        }
+<i>150</i>&nbsp;    }
+<i>151</i>&nbsp;
+<i>152</i>&nbsp;
+<i>153</i>&nbsp;
+<i>154</i>&nbsp;    /**
+<i>155</i>&nbsp;     * Produce JSON fragment for a beast object with given name, putting results in buf.
+<i>156</i>&nbsp;     * It tries to create JSON conforming to the JSON transformation rules (see JSONParser)
+<i>157</i>&nbsp;     * that is moderately readable.
+<i>158</i>&nbsp;     */
+<i>159</i>&nbsp;    void beastObjectToJSON(BEASTInterface beastObject, Class&lt;?&gt; defaultType, StringBuffer buf, String name, boolean isTopLevel) {
+<i>160</i>&nbsp;        // determine element name, default is input, otherwise find one of the defaults
+<i>161</i>&nbsp;
+<b class="fc"><i>162</i>&nbsp;    	String indent = &quot;&quot;;</b>
+<b class="fc"><i>163</i>&nbsp;        for (int i = 0; i &lt; indentCount; i++) {</b>
+<b class="fc"><i>164</i>&nbsp;        	indent += &quot;\t&quot;;</b>
+<i>165</i>&nbsp;            //buf.append(&quot;    &quot;);
+<i>166</i>&nbsp;        }
+<b class="fc"><i>167</i>&nbsp;        indentCount++;</b>
+<i>168</i>&nbsp;
+<i>169</i>&nbsp;        // open element
+<b class="fc"><i>170</i>&nbsp;        boolean needsComma = false;</b>
+<b class="fc"><i>171</i>&nbsp;        if (name != null) {</b>
+<i>172</i>&nbsp;            //buf.append((indentCount == 1 ? &quot;&quot; : indent.substring(1)) + &quot; \&quot;&quot; + name + &quot;\&quot;: {&quot;);
+<b class="fc"><i>173</i>&nbsp;            buf.append((indentCount == 1 ? &quot;&quot; : indent.substring(1)) + &quot; &quot; + name + &quot;: {&quot;);</b>
+<i>174</i>&nbsp;        } else {
+<b class="fc"><i>175</i>&nbsp;        	buf.append(indent + &quot;{&quot;);</b>
+<i>176</i>&nbsp;        }
+<i>177</i>&nbsp;
+<b class="fc"><i>178</i>&nbsp;        boolean skipInputs = false;</b>
+<b class="fc"><i>179</i>&nbsp;        if (isDone.contains(beastObject)) {</b>
+<i>180</i>&nbsp;            // JSON is already produced, we can idref it
+<b class="fc"><i>181</i>&nbsp;        	buf.append((needsComma == true) ? &quot;,\n&quot; + indent + &quot; &quot; : &quot;&quot;); </b>
+<b class="fc"><i>182</i>&nbsp;            buf.append(&quot;idref: \&quot;&quot; + beastObject.getID() + &quot;\&quot; &quot;);</b>
+<b class="fc"><i>183</i>&nbsp;            needsComma = true;</b>
+<b class="fc"><i>184</i>&nbsp;            skipInputs = true;</b>
+<i>185</i>&nbsp;        } else {
+<i>186</i>&nbsp;            // see whether a reasonable id can be generated
+<b class="fc"><i>187</i>&nbsp;            if (beastObject.getID() != null &amp;&amp; !beastObject.getID().equals(&quot;&quot;)) {</b>
+<b class="fc"><i>188</i>&nbsp;                String id = beastObject.getID();</b>
+<i>189</i>&nbsp;                // ensure ID is unique
+<b class="fc"><i>190</i>&nbsp;                if (IDs.contains(id)) {</b>
+<b class="nc"><i>191</i>&nbsp;                    int k = 1;</b>
+<b class="nc"><i>192</i>&nbsp;                    while (IDs.contains(id + k)) {</b>
+<b class="nc"><i>193</i>&nbsp;                        k++;</b>
+<i>194</i>&nbsp;                    }
+<b class="nc"><i>195</i>&nbsp;                    id = id + k;</b>
+<i>196</i>&nbsp;                }
+<b class="fc"><i>197</i>&nbsp;            	buf.append((needsComma == true) ? &quot;,\n&quot; + indent + &quot; &quot; : &quot;&quot;); </b>
+<b class="fc"><i>198</i>&nbsp;                buf.append(&quot;id: \&quot;&quot; + normalise(null, id) + &quot;\&quot;&quot;);</b>
+<b class="fc"><i>199</i>&nbsp;                needsComma = true;</b>
+<b class="fc"><i>200</i>&nbsp;                IDs.add(id);</b>
+<i>201</i>&nbsp;            }
+<b class="fc"><i>202</i>&nbsp;            isDone.add(beastObject);</b>
+<i>203</i>&nbsp;        }
+<b class="fc"><i>204</i>&nbsp;        String className = beastObject.getClass().getName();</b>
+<b class="fc"><i>205</i>&nbsp;        if (skipInputs == false) {</b>
+<i>206</i>&nbsp;            // only add spec element if it cannot be deduced otherwise (i.e., by idref)
+<b class="fc"><i>207</i>&nbsp;        	if (defaultType != null &amp;&amp; !defaultType.getName().equals(className)) {</b>
+<b class="fc"><i>208</i>&nbsp;	        	buf.append((needsComma == true) ? &quot;,\n&quot; + indent + &quot; &quot; : &quot;&quot;); </b>
+<i>209</i>&nbsp;	            //buf.append(&quot;\&quot;spec\&quot;: \&quot;&quot; + className + &quot;\&quot;&quot;);
+<b class="fc"><i>210</i>&nbsp;	            buf.append(&quot;spec: \&quot;&quot; + className + &quot;\&quot;&quot;);</b>
+<b class="fc"><i>211</i>&nbsp;	            needsComma = true;</b>
+<i>212</i>&nbsp;        	}
+<i>213</i>&nbsp;        }
+<i>214</i>&nbsp;
+<b class="fc"><i>215</i>&nbsp;        if (!skipInputs) {</b>
+<i>216</i>&nbsp;            // process inputs of this beastObject
+<i>217</i>&nbsp;            // first, collect values as attributes
+<b class="fc"><i>218</i>&nbsp;            List&lt;Input&lt;?&gt;&gt; inputs = beastObject.listInputs();</b>
+<i>219</i>&nbsp;            //List&lt;InputType&gt; inputs = XMLParserUtils.listInputs(beastObject.getClass(), beastObject);
+<b class="fc"><i>220</i>&nbsp;            for (Input&lt;?&gt; input : inputs) {</b>
+<b class="fc"><i>221</i>&nbsp;            	StringBuffer buf2 = new StringBuffer();</b>
+<b class="fc"><i>222</i>&nbsp;            	Object value = input.get();</b>
+<b class="fc"><i>223</i>&nbsp;                inputToJSON(input, value, beastObject, buf2, true, indent);</b>
+<b class="fc"><i>224</i>&nbsp;                if (buf2.length() &gt; 0) {</b>
+<b class="fc"><i>225</i>&nbsp;                	buf.append((needsComma == true) ? &quot;,&quot; : &quot;&quot;);</b>
+<b class="fc"><i>226</i>&nbsp;                	buf.append(buf2);</b>
+<b class="fc"><i>227</i>&nbsp;                    needsComma = true;</b>
+<i>228</i>&nbsp;                }
+<b class="fc"><i>229</i>&nbsp;            }</b>
+<i>230</i>&nbsp;            // next, collect values as input elements
+<b class="fc"><i>231</i>&nbsp;            StringBuffer buf2 = new StringBuffer();</b>
+<b class="fc"><i>232</i>&nbsp;            for (Input&lt;?&gt; input : inputs) {</b>
+<b class="fc"><i>233</i>&nbsp;            	StringBuffer buf3 = new StringBuffer();</b>
+<b class="fc"><i>234</i>&nbsp;            	Object value = input.get();</b>
+<b class="fc"><i>235</i>&nbsp;                inputToJSON(input, value, beastObject, buf3, false, indent);</b>
+<b class="fc"><i>236</i>&nbsp;                if (buf3.length() &gt; 0) {</b>
+<b class="fc"><i>237</i>&nbsp;                	buf2.append((needsComma == true) ? &quot;,\n&quot; : &quot;\n&quot;);</b>
+<b class="fc"><i>238</i>&nbsp;                	buf2.append(buf3);</b>
+<b class="fc"><i>239</i>&nbsp;                    needsComma = true;</b>
+<i>240</i>&nbsp;                }
+<b class="fc"><i>241</i>&nbsp;            }</b>
+<b class="fc"><i>242</i>&nbsp;            if (buf2.length() != 0) {</b>
+<b class="fc"><i>243</i>&nbsp;                buf.append(buf2);</b>
+<i>244</i>&nbsp;            }
+<b class="fc"><i>245</i>&nbsp;            indentCount--;</b>
+<b class="fc"><i>246</i>&nbsp;            if (needsComma) {</b>
+<b class="fc"><i>247</i>&nbsp;                buf.append(&quot;\n&quot;+indent);</b>
+<i>248</i>&nbsp;            }
+<b class="fc"><i>249</i>&nbsp;            needsComma = true;</b>
+<b class="fc"><i>250</i>&nbsp;        } else {</b>
+<i>251</i>&nbsp;            // close element
+<b class="fc"><i>252</i>&nbsp;            indentCount--;</b>
+<b class="fc"><i>253</i>&nbsp;            buf.append(&quot;&quot;);</b>
+<b class="fc"><i>254</i>&nbsp;            needsComma = true;</b>
+<i>255</i>&nbsp;        }
+<i>256</i>&nbsp;        //if (m_nIndent &lt; 2) {
+<i>257</i>&nbsp;        // collapse newlines if there are no sub-objects
+<b class="fc"><i>258</i>&nbsp;        String str = buf.toString();</b>
+<b class="fc"><i>259</i>&nbsp;        if (str.indexOf(&#39;}&#39;) &lt; 0 &amp;&amp; str.length() &lt; 1024) {</b>
+<b class="fc"><i>260</i>&nbsp;        	str = str.replaceAll(&quot;\\s+&quot;, &quot; &quot;);</b>
+<b class="fc"><i>261</i>&nbsp;        	buf.delete(0, buf.length());</b>
+<b class="fc"><i>262</i>&nbsp;        	buf.append(indent);</b>
+<b class="fc"><i>263</i>&nbsp;        	buf.append(str);</b>
+<i>264</i>&nbsp;        }
+<i>265</i>&nbsp;        
+<b class="fc"><i>266</i>&nbsp;        buf.append(&quot;}&quot;);</b>
+<i>267</i>&nbsp;        //}
+<b class="fc"><i>268</i>&nbsp;    } // beastObjectToJSON</b>
+<i>269</i>&nbsp;
+<i>270</i>&nbsp;
+<i>271</i>&nbsp;	/**
+<i>272</i>&nbsp;     * produce JSON for an input of a beastObject, both as attribute/value pairs for
+<i>273</i>&nbsp;     * primitive inputs (if isShort=true) and as individual elements (if isShort=false)
+<i>274</i>&nbsp;     *
+<i>275</i>&nbsp;     * @param input0: name of the input
+<i>276</i>&nbsp;     * @param beastObject: beastObject to produce this input JSON for
+<i>277</i>&nbsp;     * @param buf:    gets JSON results are appended
+<i>278</i>&nbsp;     * @param isShort: flag to indicate attribute/value format (true) or element format (false)
+<i>279</i>&nbsp;     */
+<i>280</i>&nbsp;    @SuppressWarnings({ &quot;rawtypes&quot;, &quot;unchecked&quot; })
+<i>281</i>&nbsp;    private void inputToJSON(Input input, Object value, BEASTInterface beastObject, StringBuffer buf, boolean isShort, String indent) {
+<b class="fc"><i>282</i>&nbsp;        if (value != null) {</b>
+<i>283</i>&nbsp;        	
+<i>284</i>&nbsp;            // distinguish between Map, List, BEASTObject and primitive input types
+<b class="fc"><i>285</i>&nbsp;            if (value instanceof Map) {</b>
+<b class="fc"><i>286</i>&nbsp;                if (!isShort) {</b>
+<b class="fc"><i>287</i>&nbsp;                	Map&lt;String,?&gt; map = (Map&lt;String,?&gt;) value;</b>
+<b class="fc"><i>288</i>&nbsp;                	StringBuffer buf2 = new StringBuffer();</b>
+<i>289</i>&nbsp;                	
+<i>290</i>&nbsp;                	// determine label width
+<b class="fc"><i>291</i>&nbsp;                	int whiteSpaceWidth = 0;</b>
+<b class="fc"><i>292</i>&nbsp;                	for (String key : map.keySet()) {</b>
+<b class="fc"><i>293</i>&nbsp;                		whiteSpaceWidth = Math.max(whiteSpaceWidth, key.length());</b>
+<b class="fc"><i>294</i>&nbsp;                	}</b>
+<b class="fc"><i>295</i>&nbsp;                	boolean needsComma = false;</b>
+<b class="fc"><i>296</i>&nbsp;                	List&lt;String&gt; keys = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>297</i>&nbsp;                	keys.addAll(map.keySet());</b>
+<b class="fc"><i>298</i>&nbsp;                	Collections.sort(keys);</b>
+<b class="fc"><i>299</i>&nbsp;                	for (String key : keys) {</b>
+<b class="fc"><i>300</i>&nbsp;                    	if (needsComma) {</b>
+<b class="fc"><i>301</i>&nbsp;                    		buf2.append(&quot;,\n&quot;);</b>
+<i>302</i>&nbsp;                    	}
+<b class="fc"><i>303</i>&nbsp;                		buf2.append(indent + &quot; &quot; + key);</b>
+<b class="fc"><i>304</i>&nbsp;                		for (int k = key.length(); k &lt; whiteSpaceWidth; k++) {</b>
+<b class="fc"><i>305</i>&nbsp;                			buf2.append(&#39; &#39;);</b>
+<i>306</i>&nbsp;                		}
+<b class="fc"><i>307</i>&nbsp;                		buf2.append(&quot; :\&quot;&quot; + map.get(key) +&quot;\&quot;&quot;);</b>
+<b class="fc"><i>308</i>&nbsp;                		needsComma = true;</b>
+<b class="fc"><i>309</i>&nbsp;                	}</b>
+<b class="fc"><i>310</i>&nbsp;                	buf.append(buf2);</b>
+<i>311</i>&nbsp;                }
+<b class="fc"><i>312</i>&nbsp;            	return;</b>
+<b class="fc"><i>313</i>&nbsp;            } else if (input.getName().startsWith(&quot;*&quot;)) {</b>
+<i>314</i>&nbsp;        		// this can happen with private inputs, like in ThreadedTreeLikelihood
+<i>315</i>&nbsp;        		// and * is not a valid XML attribute name
+<b class="nc"><i>316</i>&nbsp;            	return;</b>
+<b class="fc"><i>317</i>&nbsp;            } else if (value instanceof List) {</b>
+<b class="fc"><i>318</i>&nbsp;                if (!isShort) {</b>
+<b class="fc"><i>319</i>&nbsp;                	StringBuffer buf2 = new StringBuffer();</b>
+<i>320</i>&nbsp;                	//buf2.append(indent + &quot; \&quot;&quot; + input0 + &quot;\&quot;: [\n&quot;);
+<b class="fc"><i>321</i>&nbsp;                	buf2.append(indent + &quot; &quot; + input.getName() + &quot;: [\n&quot;);</b>
+<b class="fc"><i>322</i>&nbsp;                	boolean needsComma = false;</b>
+<b class="fc"><i>323</i>&nbsp;                	int oldLen = buf2.length();</b>
+<b class="fc"><i>324</i>&nbsp;                    for (Object o2 : (List) value) {</b>
+<b class="fc"><i>325</i>&nbsp;                    	if (needsComma) {</b>
+<b class="fc"><i>326</i>&nbsp;                    		buf2.append(&quot;,\n&quot;);</b>
+<i>327</i>&nbsp;                    	}
+<b class="fc"><i>328</i>&nbsp;                    	StringBuffer buf3 = new StringBuffer();</b>
+<b class="fc"><i>329</i>&nbsp;                    	if (o2 instanceof BEASTInterface) {</b>
+<b class="fc"><i>330</i>&nbsp;                    		beastObjectToJSON((BEASTInterface) o2, input.getType(), buf3, null, false);</b>
+<i>331</i>&nbsp;                    	} else {
+<b class="fc"><i>332</i>&nbsp;                    		buf2.append(o2.toString());</b>
+<i>333</i>&nbsp;                    	}
+<b class="fc"><i>334</i>&nbsp;                        buf2.append(buf3);</b>
+<b class="fc"><i>335</i>&nbsp;                        needsComma = oldLen &lt; buf2.length();</b>
+<b class="fc"><i>336</i>&nbsp;                    }</b>
+<b class="fc"><i>337</i>&nbsp;                    if (buf2.length() != oldLen) {</b>
+<b class="fc"><i>338</i>&nbsp;                    	buf.append(buf2);</b>
+<b class="fc"><i>339</i>&nbsp;                    	buf.append(&quot;\n&quot; + indent + &quot;  ]&quot;);</b>
+<i>340</i>&nbsp;                    }
+<i>341</i>&nbsp;                }
+<b class="fc"><i>342</i>&nbsp;                return;</b>
+<b class="fc"><i>343</i>&nbsp;            } else if (value instanceof BEASTInterface) {</b>
+<b class="fc"><i>344</i>&nbsp;            	if (!value.equals(input.defaultValue)) {</b>
+<i>345</i>&nbsp;            		
+<i>346</i>&nbsp;            		// Parameters can use short hand notation if they are not in the state 
+<i>347</i>&nbsp;            		// Note this means lower and upper bounds are lost -- no problem for BEAST, but maybe for BEAUti
+<b class="fc"><i>348</i>&nbsp;            		if (value instanceof BooleanParameter || value instanceof IntegerParameter || value instanceof RealParameter) {</b>
+<b class="fc"><i>349</i>&nbsp;            			Parameter.Base parameter = (Parameter.Base) value;</b>
+<b class="fc"><i>350</i>&nbsp;            			boolean isInState = false;</b>
+<b class="fc"><i>351</i>&nbsp;            			for (Object o : parameter.getOutputs()) {</b>
+<b class="fc"><i>352</i>&nbsp;            				if (o instanceof State) {</b>
+<b class="fc"><i>353</i>&nbsp;            					isInState = true;</b>
+<b class="fc"><i>354</i>&nbsp;            					break;</b>
+<i>355</i>&nbsp;            				}
+<b class="fc"><i>356</i>&nbsp;            			}</b>
+<b class="fc"><i>357</i>&nbsp;            			if (!isInState &amp;&amp; parameter.getDimension() == 1 &amp;&amp; parameter.getMinorDimension1() == 1) {</b>
+<i>358</i>&nbsp;            				// if not in state, bounds do not matter
+<i>359</i>&nbsp;            				//if ((parameter instanceof RealParameter &amp;&amp; parameter.getLower().equals(Double.NEGATIVE_INFINITY) &amp;&amp; parameter.getUpper().equals(Double.POSITIVE_INFINITY)) ||
+<i>360</i>&nbsp;            				//	(parameter instanceof IntegerParameter &amp;&amp; parameter.getLower().equals(Integer.MIN_VALUE + 1) &amp;&amp; parameter.getUpper().equals(Integer.MAX_VALUE - 1))) {
+<b class="fc"><i>361</i>&nbsp;	            				if (isShort) {</b>
+<b class="fc"><i>362</i>&nbsp;	                                buf.append(&quot; &quot; + input.getName() + &quot;: \&quot;&quot; + parameter.getValue() + &quot;\&quot;&quot;);</b>
+<i>363</i>&nbsp;	            				} else {
+<b class="fc"><i>364</i>&nbsp;	            					return;</b>
+<i>365</i>&nbsp;	            				}
+<i>366</i>&nbsp;            				//}
+<i>367</i>&nbsp;            			}
+<i>368</i>&nbsp;            		}
+<i>369</i>&nbsp;            		
+<b class="fc"><i>370</i>&nbsp;                    if (isShort &amp;&amp; isDone.contains(value)) {</b>
+<b class="fc"><i>371</i>&nbsp;                        buf.append(&quot; &quot; + input.getName() + &quot;: \&quot;@&quot; + ((BEASTInterface) value).getID() + &quot;\&quot;&quot;);</b>
+<b class="fc"><i>372</i>&nbsp;                        if (!isInputsDone.containsKey(beastObject)) {</b>
+<b class="fc"><i>373</i>&nbsp;                        	isInputsDone.put(beastObject, new HashSet&lt;&gt;());</b>
+<i>374</i>&nbsp;                        }
+<b class="fc"><i>375</i>&nbsp;                        isInputsDone.get(beastObject).add(input.getName());</b>
+<i>376</i>&nbsp;                    }
+<b class="fc"><i>377</i>&nbsp;                    if (!isShort &amp;&amp; (!isInputsDone.containsKey(beastObject) ||</b>
+<b class="fc"><i>378</i>&nbsp;                    		!isInputsDone.get(beastObject).contains(input.getName()))) {</b>
+<b class="fc"><i>379</i>&nbsp;                        beastObjectToJSON((BEASTInterface) value, input.getType(), buf, input.getName(), false);</b>
+<i>380</i>&nbsp;                    }
+<i>381</i>&nbsp;            	}
+<b class="fc"><i>382</i>&nbsp;                return;</b>
+<i>383</i>&nbsp;            } else {
+<i>384</i>&nbsp;                // primitive type
+<i>385</i>&nbsp;
+<b class="fc"><i>386</i>&nbsp;            	if (!value.equals(input.defaultValue)) {</b>
+<i>387</i>&nbsp;            		
+<b class="fc"><i>388</i>&nbsp;                    String valueString = value.toString();</b>
+<b class="fc"><i>389</i>&nbsp;                    if (isShort) {</b>
+<b class="fc"><i>390</i>&nbsp;                        if (valueString.indexOf(&#39;\n&#39;) &lt; 0) {</b>
+<b class="fc"><i>391</i>&nbsp;                            buf.append(&quot; &quot; + input.getName() + &quot;: &quot; + normalise(input, value.toString()) + &quot;&quot;);</b>
+<i>392</i>&nbsp;                        }
+<i>393</i>&nbsp;                    } else {
+<b class="fc"><i>394</i>&nbsp;                        if (valueString.indexOf(&#39;\n&#39;) &gt;= 0) {</b>
+<b class="nc"><i>395</i>&nbsp;                                buf.append(indent + &quot;&quot; + input.getName() + &quot;: &quot; + normalise(input, value.toString()) + &quot;&quot;);</b>
+<i>396</i>&nbsp;                        }
+<i>397</i>&nbsp;                    }
+<i>398</i>&nbsp;            	}
+<b class="fc"><i>399</i>&nbsp;                return;</b>
+<i>400</i>&nbsp;            }
+<i>401</i>&nbsp;        } else {
+<i>402</i>&nbsp;            // value=null, no JSON to produce
+<b class="fc"><i>403</i>&nbsp;            return;</b>
+<i>404</i>&nbsp;        }
+<i>405</i>&nbsp;    } // inputToJSON
+<i>406</i>&nbsp;
+<i>407</i>&nbsp;    
+<i>408</i>&nbsp;   /** convert plain text string to JSON string, replacing some entities **/
+<i>409</i>&nbsp;    private String normalise(Input&lt;?&gt; input, String str) {
+<b class="fc"><i>410</i>&nbsp;    	str = str.replaceAll(&quot;\\\\&quot;, &quot;\\\\\\\\&quot;);</b>
+<b class="fc"><i>411</i>&nbsp;    	str = str.replaceAll(&quot;/&quot;, &quot;\\\\/&quot;);</b>
+<b class="fc"><i>412</i>&nbsp;    	str = str.replaceAll(&quot;\b&quot;, &quot;\\\\b&quot;);</b>
+<b class="fc"><i>413</i>&nbsp;    	str = str.replaceAll(&quot;\f&quot;, &quot;\\\\f&quot;);</b>
+<b class="fc"><i>414</i>&nbsp;    	str = str.replaceAll(&quot;\t&quot;, &quot;\\\\t&quot;);</b>
+<b class="fc"><i>415</i>&nbsp;    	str = str.replaceAll(&quot;\\r&quot;, &quot;\\\\r&quot;);</b>
+<b class="fc"><i>416</i>&nbsp;    	str = str.replaceAll(&quot;\&quot;&quot;, &quot;\\\\\&quot;&quot;);</b>
+<b class="fc"><i>417</i>&nbsp;    	str = str.replaceAll(&quot;\n&quot;, &quot;\\\\n&quot;);</b>
+<b class="fc"><i>418</i>&nbsp;    	if (input != null &amp;&amp; !input.getType().equals(Double.class) &amp;&amp;</b>
+<b class="fc"><i>419</i>&nbsp;    			!input.getType().equals(Integer.class)&amp;&amp;</b>
+<b class="fc"><i>420</i>&nbsp;    			!input.getType().equals(Boolean.class)) {</b>
+<b class="fc"><i>421</i>&nbsp;    		str = &quot;\&quot;&quot; + str + &quot;\&quot;&quot;;</b>
+<i>422</i>&nbsp;    	}
+<b class="fc"><i>423</i>&nbsp;    	return str;</b>
+<i>424</i>&nbsp;    }
+<i>425</i>&nbsp;    
+<i>426</i>&nbsp;
+<i>427</i>&nbsp;	
+<i>428</i>&nbsp;	public static void main(String[] args) throws SAXException, IOException, ParserConfigurationException, XMLParserException {
+<i>429</i>&nbsp;		// convert BEAST 2 XML to BEAST JSON file
+<b class="nc"><i>430</i>&nbsp;		XMLParser parser = new XMLParser();</b>
+<b class="nc"><i>431</i>&nbsp;		BEASTInterface beastObject = parser.parseFile(new File(args[0]));</b>
+<i>432</i>&nbsp;
+<b class="nc"><i>433</i>&nbsp;		String JSONFile = args[0].replace(&quot;.xml&quot;, &quot;.json&quot;);</b>
+<i>434</i>&nbsp;		PrintStream out;
+<b class="nc"><i>435</i>&nbsp;		if (JSONFile.endsWith(&quot;.json&quot;)) {</b>
+<b class="nc"><i>436</i>&nbsp;			out = new PrintStream(new File(JSONFile));</b>
+<i>437</i>&nbsp;		} else {
+<b class="nc"><i>438</i>&nbsp;			out = System.out;</b>
+<i>439</i>&nbsp;		}
+<i>440</i>&nbsp;		
+<b class="nc"><i>441</i>&nbsp;		JSONProducer writer = new JSONProducer();</b>
+<b class="nc"><i>442</i>&nbsp;		String JSON = writer.toJSON(beastObject);</b>
+<b class="nc"><i>443</i>&nbsp;		out.println(JSON);</b>
+<b class="nc"><i>444</i>&nbsp;		out.close();</b>
+<i>445</i>&nbsp;		
+<i>446</i>&nbsp;		
+<b class="nc"><i>447</i>&nbsp;	}</b>
+<i>448</i>&nbsp;
+<i>449</i>&nbsp;}
+<i>450</i>&nbsp;
+<i>451</i>&nbsp;
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

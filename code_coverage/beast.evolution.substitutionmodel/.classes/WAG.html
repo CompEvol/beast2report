@@ -1,0 +1,810 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: WAG</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.substitutionmodel</a> ]
+</div>
+
+<h1>Coverage Summary for Class: WAG (beast.evolution.substitutionmodel)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WAG</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (4/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.9%
+  </span>
+  <span class="absValue">
+    (242/ 285)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.substitutionmodel;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import beast.core.Description;
+<i>4</i>&nbsp;import beast.evolution.datatype.Aminoacid;
+<i>5</i>&nbsp;import beast.evolution.datatype.DataType;
+<i>6</i>&nbsp;import beast.math.statistic.DiscreteStatistics;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;@Description(&quot;WAG model of amino acid evolution by &quot; +
+<i>9</i>&nbsp;        &quot;S. Whelan and N. Goldman. 2000. Bioinformatics ?.&quot;)
+<i>10</i>&nbsp;
+<b class="fc"><i>11</i>&nbsp;public class WAG extends EmpiricalSubstitutionModel {</b>
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;    @Override
+<i>14</i>&nbsp;    double[][] getEmpiricalRates() {
+<b class="fc"><i>15</i>&nbsp;        double[][] rate = new double[20][20];</b>
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;        // Q matrix from Beast 1
+<b class="fc"><i>18</i>&nbsp;        rate[0][1] = 0.610810;</b>
+<b class="fc"><i>19</i>&nbsp;        rate[0][2] = 0.569079;</b>
+<b class="fc"><i>20</i>&nbsp;        rate[0][3] = 0.821500;</b>
+<b class="fc"><i>21</i>&nbsp;        rate[0][4] = 1.141050;</b>
+<b class="fc"><i>22</i>&nbsp;        rate[0][5] = 1.011980;</b>
+<b class="fc"><i>23</i>&nbsp;        rate[0][6] = 1.756410;</b>
+<b class="fc"><i>24</i>&nbsp;        rate[0][7] = 1.572160;</b>
+<b class="fc"><i>25</i>&nbsp;        rate[0][8] = 0.354813;</b>
+<b class="fc"><i>26</i>&nbsp;        rate[0][9] = 0.219023;</b>
+<b class="fc"><i>27</i>&nbsp;        rate[0][10] = 0.443935;</b>
+<b class="fc"><i>28</i>&nbsp;        rate[0][11] = 1.005440;</b>
+<b class="fc"><i>29</i>&nbsp;        rate[0][12] = 0.989475;</b>
+<b class="fc"><i>30</i>&nbsp;        rate[0][13] = 0.233492;</b>
+<b class="fc"><i>31</i>&nbsp;        rate[0][14] = 1.594890;</b>
+<b class="fc"><i>32</i>&nbsp;        rate[0][15] = 3.733380;</b>
+<b class="fc"><i>33</i>&nbsp;        rate[0][16] = 2.349220;</b>
+<b class="fc"><i>34</i>&nbsp;        rate[0][17] = 0.125227;</b>
+<b class="fc"><i>35</i>&nbsp;        rate[0][18] = 0.268987;</b>
+<b class="fc"><i>36</i>&nbsp;        rate[0][19] = 2.221870;</b>
+<i>37</i>&nbsp;
+<b class="fc"><i>38</i>&nbsp;        rate[1][2] = 0.711690;</b>
+<b class="fc"><i>39</i>&nbsp;        rate[1][3] = 0.165074;</b>
+<b class="fc"><i>40</i>&nbsp;        rate[1][4] = 0.585809;</b>
+<b class="fc"><i>41</i>&nbsp;        rate[1][5] = 3.360330;</b>
+<b class="fc"><i>42</i>&nbsp;        rate[1][6] = 0.488649;</b>
+<b class="fc"><i>43</i>&nbsp;        rate[1][7] = 0.650469;</b>
+<b class="fc"><i>44</i>&nbsp;        rate[1][8] = 2.362040;</b>
+<b class="fc"><i>45</i>&nbsp;        rate[1][9] = 0.206722;</b>
+<b class="fc"><i>46</i>&nbsp;        rate[1][10] = 0.551450;</b>
+<b class="fc"><i>47</i>&nbsp;        rate[1][11] = 5.925170;</b>
+<b class="fc"><i>48</i>&nbsp;        rate[1][12] = 0.758446;</b>
+<b class="fc"><i>49</i>&nbsp;        rate[1][13] = 0.116821;</b>
+<b class="fc"><i>50</i>&nbsp;        rate[1][14] = 0.753467;</b>
+<b class="fc"><i>51</i>&nbsp;        rate[1][15] = 1.357640;</b>
+<b class="fc"><i>52</i>&nbsp;        rate[1][16] = 0.613776;</b>
+<b class="fc"><i>53</i>&nbsp;        rate[1][17] = 1.294610;</b>
+<b class="fc"><i>54</i>&nbsp;        rate[1][18] = 0.423612;</b>
+<b class="fc"><i>55</i>&nbsp;        rate[1][19] = 0.280336;</b>
+<i>56</i>&nbsp;
+<b class="fc"><i>57</i>&nbsp;        rate[2][3] = 6.013660;</b>
+<b class="fc"><i>58</i>&nbsp;        rate[2][4] = 0.296524;</b>
+<b class="fc"><i>59</i>&nbsp;        rate[2][5] = 1.716740;</b>
+<b class="fc"><i>60</i>&nbsp;        rate[2][6] = 1.056790;</b>
+<b class="fc"><i>61</i>&nbsp;        rate[2][7] = 1.253910;</b>
+<b class="fc"><i>62</i>&nbsp;        rate[2][8] = 4.378930;</b>
+<b class="fc"><i>63</i>&nbsp;        rate[2][9] = 0.615636;</b>
+<b class="fc"><i>64</i>&nbsp;        rate[2][10] = 0.147156;</b>
+<b class="fc"><i>65</i>&nbsp;        rate[2][11] = 3.334390;</b>
+<b class="fc"><i>66</i>&nbsp;        rate[2][12] = 0.224747;</b>
+<b class="fc"><i>67</i>&nbsp;        rate[2][13] = 0.110793;</b>
+<b class="fc"><i>68</i>&nbsp;        rate[2][14] = 0.217538;</b>
+<b class="fc"><i>69</i>&nbsp;        rate[2][15] = 4.394450;</b>
+<b class="fc"><i>70</i>&nbsp;        rate[2][16] = 2.257930;</b>
+<b class="fc"><i>71</i>&nbsp;        rate[2][17] = 0.078463;</b>
+<b class="fc"><i>72</i>&nbsp;        rate[2][18] = 1.208560;</b>
+<b class="fc"><i>73</i>&nbsp;        rate[2][19] = 0.221176;</b>
+<i>74</i>&nbsp;
+<b class="fc"><i>75</i>&nbsp;        rate[3][4] = 0.033379;</b>
+<b class="fc"><i>76</i>&nbsp;        rate[3][5] = 0.691268;</b>
+<b class="fc"><i>77</i>&nbsp;        rate[3][6] = 6.833400;</b>
+<b class="fc"><i>78</i>&nbsp;        rate[3][7] = 0.961142;</b>
+<b class="fc"><i>79</i>&nbsp;        rate[3][8] = 1.032910;</b>
+<b class="fc"><i>80</i>&nbsp;        rate[3][9] = 0.043523;</b>
+<b class="fc"><i>81</i>&nbsp;        rate[3][10] = 0.093930;</b>
+<b class="fc"><i>82</i>&nbsp;        rate[3][11] = 0.533362;</b>
+<b class="fc"><i>83</i>&nbsp;        rate[3][12] = 0.116813;</b>
+<b class="fc"><i>84</i>&nbsp;        rate[3][13] = 0.052004;</b>
+<b class="fc"><i>85</i>&nbsp;        rate[3][14] = 0.472601;</b>
+<b class="fc"><i>86</i>&nbsp;        rate[3][15] = 1.192810;</b>
+<b class="fc"><i>87</i>&nbsp;        rate[3][16] = 0.417372;</b>
+<b class="fc"><i>88</i>&nbsp;        rate[3][17] = 0.146348;</b>
+<b class="fc"><i>89</i>&nbsp;        rate[3][18] = 0.363243;</b>
+<b class="fc"><i>90</i>&nbsp;        rate[3][19] = 0.169417;</b>
+<i>91</i>&nbsp;
+<b class="fc"><i>92</i>&nbsp;        rate[4][5] = 0.109261;</b>
+<b class="fc"><i>93</i>&nbsp;        rate[4][6] = 0.023920;</b>
+<b class="fc"><i>94</i>&nbsp;        rate[4][7] = 0.341086;</b>
+<b class="fc"><i>95</i>&nbsp;        rate[4][8] = 0.275403;</b>
+<b class="fc"><i>96</i>&nbsp;        rate[4][9] = 0.189890;</b>
+<b class="fc"><i>97</i>&nbsp;        rate[4][10] = 0.428414;</b>
+<b class="fc"><i>98</i>&nbsp;        rate[4][11] = 0.083649;</b>
+<b class="fc"><i>99</i>&nbsp;        rate[4][12] = 0.437393;</b>
+<b class="fc"><i>100</i>&nbsp;        rate[4][13] = 0.441300;</b>
+<b class="fc"><i>101</i>&nbsp;        rate[4][14] = 0.122303;</b>
+<b class="fc"><i>102</i>&nbsp;        rate[4][15] = 1.560590;</b>
+<b class="fc"><i>103</i>&nbsp;        rate[4][16] = 0.570186;</b>
+<b class="fc"><i>104</i>&nbsp;        rate[4][17] = 0.795736;</b>
+<b class="fc"><i>105</i>&nbsp;        rate[4][18] = 0.604634;</b>
+<b class="fc"><i>106</i>&nbsp;        rate[4][19] = 1.114570;</b>
+<i>107</i>&nbsp;
+<b class="fc"><i>108</i>&nbsp;        rate[5][6] = 6.048790;</b>
+<b class="fc"><i>109</i>&nbsp;        rate[5][7] = 0.366510;</b>
+<b class="fc"><i>110</i>&nbsp;        rate[5][8] = 4.749460;</b>
+<b class="fc"><i>111</i>&nbsp;        rate[5][9] = 0.131046;</b>
+<b class="fc"><i>112</i>&nbsp;        rate[5][10] = 0.964886;</b>
+<b class="fc"><i>113</i>&nbsp;        rate[5][11] = 4.308310;</b>
+<b class="fc"><i>114</i>&nbsp;        rate[5][12] = 1.705070;</b>
+<b class="fc"><i>115</i>&nbsp;        rate[5][13] = 0.110744;</b>
+<b class="fc"><i>116</i>&nbsp;        rate[5][14] = 1.036370;</b>
+<b class="fc"><i>117</i>&nbsp;        rate[5][15] = 1.141210;</b>
+<b class="fc"><i>118</i>&nbsp;        rate[5][16] = 0.954144;</b>
+<b class="fc"><i>119</i>&nbsp;        rate[5][17] = 0.243615;</b>
+<b class="fc"><i>120</i>&nbsp;        rate[5][18] = 0.252457;</b>
+<b class="fc"><i>121</i>&nbsp;        rate[5][19] = 0.333890;</b>
+<i>122</i>&nbsp;
+<b class="fc"><i>123</i>&nbsp;        rate[6][7] = 0.630832;</b>
+<b class="fc"><i>124</i>&nbsp;        rate[6][8] = 0.635025;</b>
+<b class="fc"><i>125</i>&nbsp;        rate[6][9] = 0.141320;</b>
+<b class="fc"><i>126</i>&nbsp;        rate[6][10] = 0.172579;</b>
+<b class="fc"><i>127</i>&nbsp;        rate[6][11] = 2.867580;</b>
+<b class="fc"><i>128</i>&nbsp;        rate[6][12] = 0.353912;</b>
+<b class="fc"><i>129</i>&nbsp;        rate[6][13] = 0.092310;</b>
+<b class="fc"><i>130</i>&nbsp;        rate[6][14] = 0.755791;</b>
+<b class="fc"><i>131</i>&nbsp;        rate[6][15] = 0.782467;</b>
+<b class="fc"><i>132</i>&nbsp;        rate[6][16] = 0.914814;</b>
+<b class="fc"><i>133</i>&nbsp;        rate[6][17] = 0.172682;</b>
+<b class="fc"><i>134</i>&nbsp;        rate[6][18] = 0.217549;</b>
+<b class="fc"><i>135</i>&nbsp;        rate[6][19] = 0.655045;</b>
+<i>136</i>&nbsp;
+<b class="fc"><i>137</i>&nbsp;        rate[7][8] = 0.276379;</b>
+<b class="fc"><i>138</i>&nbsp;        rate[7][9] = 0.034151;</b>
+<b class="fc"><i>139</i>&nbsp;        rate[7][10] = 0.068651;</b>
+<b class="fc"><i>140</i>&nbsp;        rate[7][11] = 0.415992;</b>
+<b class="fc"><i>141</i>&nbsp;        rate[7][12] = 0.194220;</b>
+<b class="fc"><i>142</i>&nbsp;        rate[7][13] = 0.055288;</b>
+<b class="fc"><i>143</i>&nbsp;        rate[7][14] = 0.273149;</b>
+<b class="fc"><i>144</i>&nbsp;        rate[7][15] = 1.486700;</b>
+<b class="fc"><i>145</i>&nbsp;        rate[7][16] = 0.251477;</b>
+<b class="fc"><i>146</i>&nbsp;        rate[7][17] = 0.374321;</b>
+<b class="fc"><i>147</i>&nbsp;        rate[7][18] = 0.114187;</b>
+<b class="fc"><i>148</i>&nbsp;        rate[7][19] = 0.209108;</b>
+<i>149</i>&nbsp;
+<b class="fc"><i>150</i>&nbsp;        rate[8][9] = 0.152215;</b>
+<b class="fc"><i>151</i>&nbsp;        rate[8][10] = 0.555096;</b>
+<b class="fc"><i>152</i>&nbsp;        rate[8][11] = 0.992083;</b>
+<b class="fc"><i>153</i>&nbsp;        rate[8][12] = 0.450867;</b>
+<b class="fc"><i>154</i>&nbsp;        rate[8][13] = 0.756080;</b>
+<b class="fc"><i>155</i>&nbsp;        rate[8][14] = 0.771387;</b>
+<b class="fc"><i>156</i>&nbsp;        rate[8][15] = 0.822459;</b>
+<b class="fc"><i>157</i>&nbsp;        rate[8][16] = 0.525511;</b>
+<b class="fc"><i>158</i>&nbsp;        rate[8][17] = 0.289998;</b>
+<b class="fc"><i>159</i>&nbsp;        rate[8][18] = 4.290350;</b>
+<b class="fc"><i>160</i>&nbsp;        rate[8][19] = 0.131869;</b>
+<i>161</i>&nbsp;
+<b class="fc"><i>162</i>&nbsp;        rate[9][10] = 3.517820;</b>
+<b class="fc"><i>163</i>&nbsp;        rate[9][11] = 0.360574;</b>
+<b class="fc"><i>164</i>&nbsp;        rate[9][12] = 4.714220;</b>
+<b class="fc"><i>165</i>&nbsp;        rate[9][13] = 1.177640;</b>
+<b class="fc"><i>166</i>&nbsp;        rate[9][14] = 0.111502;</b>
+<b class="fc"><i>167</i>&nbsp;        rate[9][15] = 0.353443;</b>
+<b class="fc"><i>168</i>&nbsp;        rate[9][16] = 1.615050;</b>
+<b class="fc"><i>169</i>&nbsp;        rate[9][17] = 0.234326;</b>
+<b class="fc"><i>170</i>&nbsp;        rate[9][18] = 0.468951;</b>
+<b class="fc"><i>171</i>&nbsp;        rate[9][19] = 8.659740;</b>
+<i>172</i>&nbsp;
+<b class="fc"><i>173</i>&nbsp;        rate[10][11] = 0.287583;</b>
+<b class="fc"><i>174</i>&nbsp;        rate[10][12] = 5.375250;</b>
+<b class="fc"><i>175</i>&nbsp;        rate[10][13] = 2.348200;</b>
+<b class="fc"><i>176</i>&nbsp;        rate[10][14] = 0.462018;</b>
+<b class="fc"><i>177</i>&nbsp;        rate[10][15] = 0.382421;</b>
+<b class="fc"><i>178</i>&nbsp;        rate[10][16] = 0.364222;</b>
+<b class="fc"><i>179</i>&nbsp;        rate[10][17] = 0.740259;</b>
+<b class="fc"><i>180</i>&nbsp;        rate[10][18] = 0.443205;</b>
+<b class="fc"><i>181</i>&nbsp;        rate[10][19] = 1.997370;</b>
+<i>182</i>&nbsp;
+<b class="fc"><i>183</i>&nbsp;        rate[11][12] = 1.032220;</b>
+<b class="fc"><i>184</i>&nbsp;        rate[11][13] = 0.098843;</b>
+<b class="fc"><i>185</i>&nbsp;        rate[11][14] = 0.619503;</b>
+<b class="fc"><i>186</i>&nbsp;        rate[11][15] = 1.073780;</b>
+<b class="fc"><i>187</i>&nbsp;        rate[11][16] = 1.537920;</b>
+<b class="fc"><i>188</i>&nbsp;        rate[11][17] = 0.152232;</b>
+<b class="fc"><i>189</i>&nbsp;        rate[11][18] = 0.147411;</b>
+<b class="fc"><i>190</i>&nbsp;        rate[11][19] = 0.342012;</b>
+<i>191</i>&nbsp;
+<b class="fc"><i>192</i>&nbsp;        rate[12][13] = 1.320870;</b>
+<b class="fc"><i>193</i>&nbsp;        rate[12][14] = 0.194864;</b>
+<b class="fc"><i>194</i>&nbsp;        rate[12][15] = 0.556353;</b>
+<b class="fc"><i>195</i>&nbsp;        rate[12][16] = 1.681970;</b>
+<b class="fc"><i>196</i>&nbsp;        rate[12][17] = 0.570369;</b>
+<b class="fc"><i>197</i>&nbsp;        rate[12][18] = 0.473810;</b>
+<b class="fc"><i>198</i>&nbsp;        rate[12][19] = 2.282020;</b>
+<i>199</i>&nbsp;
+<b class="fc"><i>200</i>&nbsp;        rate[13][14] = 0.179896;</b>
+<b class="fc"><i>201</i>&nbsp;        rate[13][15] = 0.606814;</b>
+<b class="fc"><i>202</i>&nbsp;        rate[13][16] = 0.191467;</b>
+<b class="fc"><i>203</i>&nbsp;        rate[13][17] = 1.699780;</b>
+<b class="fc"><i>204</i>&nbsp;        rate[13][18] = 7.154480;</b>
+<b class="fc"><i>205</i>&nbsp;        rate[13][19] = 0.725096;</b>
+<i>206</i>&nbsp;
+<b class="fc"><i>207</i>&nbsp;        rate[14][15] = 1.786490;</b>
+<b class="fc"><i>208</i>&nbsp;        rate[14][16] = 0.885349;</b>
+<b class="fc"><i>209</i>&nbsp;        rate[14][17] = 0.156619;</b>
+<b class="fc"><i>210</i>&nbsp;        rate[14][18] = 0.239607;</b>
+<b class="fc"><i>211</i>&nbsp;        rate[14][19] = 0.351250;</b>
+<i>212</i>&nbsp;
+<b class="fc"><i>213</i>&nbsp;        rate[15][16] = 4.847130;</b>
+<b class="fc"><i>214</i>&nbsp;        rate[15][17] = 0.578784;</b>
+<b class="fc"><i>215</i>&nbsp;        rate[15][18] = 0.872519;</b>
+<b class="fc"><i>216</i>&nbsp;        rate[15][19] = 0.258861;</b>
+<i>217</i>&nbsp;
+<b class="fc"><i>218</i>&nbsp;        rate[16][17] = 0.126678;</b>
+<b class="fc"><i>219</i>&nbsp;        rate[16][18] = 0.325490;</b>
+<b class="fc"><i>220</i>&nbsp;        rate[16][19] = 1.547670;</b>
+<i>221</i>&nbsp;
+<b class="fc"><i>222</i>&nbsp;        rate[17][18] = 2.763540;</b>
+<b class="fc"><i>223</i>&nbsp;        rate[17][19] = 0.409817;</b>
+<i>224</i>&nbsp;
+<b class="fc"><i>225</i>&nbsp;        rate[18][19] = 0.347826;</b>
+<i>226</i>&nbsp;
+<i>227</i>&nbsp;        // Current (May 2011) version from http://www.ebi.ac.uk/goldman/WAG/index.html
+<i>228</i>&nbsp;        //
+<i>229</i>&nbsp;//			0.551571 
+<i>230</i>&nbsp;//			0.509848  0.635346 
+<i>231</i>&nbsp;//			0.738998  0.147304  5.429420 
+<i>232</i>&nbsp;//			1.027040  0.528191  0.265256  0.0302949 
+<i>233</i>&nbsp;//			0.908598  3.035500  1.543640  0.616783  0.0988179 
+<i>234</i>&nbsp;//			1.582850  0.439157  0.947198  6.174160  0.021352  5.469470 
+<i>235</i>&nbsp;//			1.416720  0.584665  1.125560  0.865584  0.306674  0.330052  0.567717 
+<i>236</i>&nbsp;//			0.316954  2.137150  3.956290  0.930676  0.248972  4.294110  0.570025  0.249410 
+<i>237</i>&nbsp;//			0.193335  0.186979  0.554236  0.039437  0.170135  0.113917  0.127395  0.0304501 0.138190 
+<i>238</i>&nbsp;//			0.397915  0.497671  0.131528  0.0848047 0.384287  0.869489  0.154263  0.0613037 0.499462  3.170970 
+<i>239</i>&nbsp;//			0.906265  5.351420  3.012010  0.479855  0.0740339 3.894900  2.584430  0.373558  0.890432  0.323832  0.257555 
+<i>240</i>&nbsp;//			0.893496  0.683162  0.198221  0.103754  0.390482  1.545260  0.315124  0.174100  0.404141  4.257460  4.854020  0.934276 
+<i>241</i>&nbsp;//			0.210494  0.102711  0.0961621 0.0467304 0.398020  0.0999208 0.0811339 0.049931  0.679371  1.059470  2.115170  0.088836  1.190630 
+<i>242</i>&nbsp;//			1.438550  0.679489  0.195081  0.423984  0.109404  0.933372  0.682355  0.243570  0.696198  0.0999288 0.415844  0.556896  0.171329  0.161444 
+<i>243</i>&nbsp;//			3.370790  1.224190  3.974230  1.071760  1.407660  1.028870  0.704939  1.341820  0.740169  0.319440  0.344739  0.967130  0.493905  0.545931  1.613280 
+<i>244</i>&nbsp;//			2.121110  0.554413  2.030060  0.374866  0.512984  0.857928  0.822765  0.225833  0.473307  1.458160  0.326622  1.386980  1.516120  0.171903  0.795384  4.378020 
+<i>245</i>&nbsp;//			0.113133  1.163920  0.0719167 0.129767  0.717070  0.215737  0.156557  0.336983  0.262569  0.212483  0.665309  0.137505  0.515706  1.529640  0.139405  0.523742  0.110864 
+<i>246</i>&nbsp;//			0.240735  0.381533  1.086000  0.325711  0.543833  0.227710  0.196303  0.103604  3.873440  0.420170  0.398618  0.133264  0.428437  6.454280  0.216046  0.786993  0.291148  2.485390 
+<i>247</i>&nbsp;//			2.006010  0.251849  0.196246  0.152335  1.002140  0.301281  0.588731  0.187247  0.118358  7.821300  1.800340  0.305434  2.058450  0.649892  0.314887  0.232739  1.388230  0.365369  0.314730 
+<i>248</i>&nbsp;        //
+<i>249</i>&nbsp;//			0.0866279 0.043972  0.0390894 0.0570451 0.0193078 0.0367281 0.0580589 0.0832518 0.0244313 0.048466  0.086209  0.0620286 0.0195027 0.0384319 0.0457631 0.0695179 0.0610127 0.0143859 0.0352742 0.0708956
+<i>250</i>&nbsp;        //
+<i>251</i>&nbsp;        //
+<i>252</i>&nbsp;//			 A   R   N   D   C   Q   E   G   H   I   L   K   M   F   P   S   T   W   Y   V
+<i>253</i>&nbsp;//			Ala Arg Asn Asp Cys Gln Glu Gly His Ile Leu Lys Met Phe Pro Ser Thr Trp Tyr Val
+<i>254</i>&nbsp;        //
+<i>255</i>&nbsp;//			  
+<i>256</i>&nbsp;//				Symmetrical part of the WAG rate matrix and aa frequencies,
+<i>257</i>&nbsp;//			estimated from 3905 globular protein amino acid sequences forming 182
+<i>258</i>&nbsp;//			protein families.
+<i>259</i>&nbsp;//				The first part above indicates the symmetric &#39;exchangeability&#39;
+<i>260</i>&nbsp;//			parameters, where s_ij = s_ji.  The s_ij above are not scaled, but the
+<i>261</i>&nbsp;//			PAML package will perform this scaling.
+<i>262</i>&nbsp;//				The second part gives the amino acid frequencies (pi_i)
+<i>263</i>&nbsp;//			estimated from the 3905 sequences.  The net replacement rate from i to
+<i>264</i>&nbsp;//			j is Q_ij = s_ij*pi_j.
+<i>265</i>&nbsp;//				Prepared by Simon Whelan and Nick Goldman, December 2000.
+<i>266</i>&nbsp;        //
+<i>267</i>&nbsp;//			Citation:
+<i>268</i>&nbsp;//			Whelan, S. and N. Goldman.  2001.  A general empirical model of
+<i>269</i>&nbsp;//				protein evolution derived from multiple protein families using
+<i>270</i>&nbsp;//				a maximum likelihood approach.  Molecular Biology and
+<i>271</i>&nbsp;//				Evolution 18:691-699.
+<i>272</i>&nbsp;
+<i>273</i>&nbsp;/*
+<i>274</i>&nbsp;		// Q matrix
+<i>275</i>&nbsp;		rate[0][1] = 0.551571; rate[0][2] = 0.509848; 
+<i>276</i>&nbsp;		rate[0][3] = 0.738998; rate[0][4] = 1.027040; 
+<i>277</i>&nbsp;		rate[0][5] = 0.908598; rate[0][6] = 1.582850; 
+<i>278</i>&nbsp;		rate[0][7] = 1.416720; rate[0][8] = 0.316954; 
+<i>279</i>&nbsp;		rate[0][9] = 0.193335; rate[0][10] = 0.397915; 
+<i>280</i>&nbsp;		rate[0][11] = 0.906265; rate[0][12] = 0.893496; 
+<i>281</i>&nbsp;		rate[0][13] = 0.210494; rate[0][14] = 1.438550; 
+<i>282</i>&nbsp;		rate[0][15] = 3.370790; rate[0][16] = 2.121110; 
+<i>283</i>&nbsp;		rate[0][17] = 0.113133; rate[0][18] = 0.240735; 
+<i>284</i>&nbsp;		rate[0][19] = 2.006010; 
+<i>285</i>&nbsp;
+<i>286</i>&nbsp;		rate[0][1] = 0.551571;rate[0][2] = 0.509848;
+<i>287</i>&nbsp;		rate[0][3] = 0.738998;rate[0][4] = 1.027040;
+<i>288</i>&nbsp;		rate[0][5] = 0.908598;rate[0][6] = 1.582850;
+<i>289</i>&nbsp;		rate[0][7] = 1.416720;rate[0][8] = 0.316954;
+<i>290</i>&nbsp;		rate[0][9] = 0.193335;rate[0][10] = 0.397915;
+<i>291</i>&nbsp;		rate[0][11] = 0.906265;rate[0][12] = 0.893496;
+<i>292</i>&nbsp;		rate[0][13] = 0.210494;rate[0][14] = 1.438550;
+<i>293</i>&nbsp;		rate[0][15] = 3.370790;rate[0][16] = 2.121110;
+<i>294</i>&nbsp;		rate[0][17] = 0.113133;rate[0][18] = 0.240735;
+<i>295</i>&nbsp;		rate[0][19] = 2.006010;
+<i>296</i>&nbsp;
+<i>297</i>&nbsp;		rate[1][2] = 0.635346;rate[1][3] = 0.147304;
+<i>298</i>&nbsp;		rate[1][4] = 0.528191;rate[1][5] = 3.0355;
+<i>299</i>&nbsp;		rate[1][6] = 0.439157;rate[1][7] = 0.584665;
+<i>300</i>&nbsp;		rate[1][8] = 2.13715;rate[1][9] = 0.186979;
+<i>301</i>&nbsp;		rate[1][10] = 0.497671;rate[1][11] = 5.35142;
+<i>302</i>&nbsp;		rate[1][12] = 0.683162;rate[1][13] = 0.102711;
+<i>303</i>&nbsp;		rate[1][14] = 0.679489;rate[1][15] = 1.22419;
+<i>304</i>&nbsp;		rate[1][16] = 0.554413;rate[1][17] = 1.16392;
+<i>305</i>&nbsp;		rate[1][18] = 0.381533;rate[1][19] = 0.251849;
+<i>306</i>&nbsp;
+<i>307</i>&nbsp;
+<i>308</i>&nbsp;		rate[2][3] = 5.42942;rate[2][4] = 0.265256;
+<i>309</i>&nbsp;		rate[2][5] = 1.54364;rate[2][6] = 0.947198;
+<i>310</i>&nbsp;		rate[2][7] = 1.12556;rate[2][8] = 3.95629;
+<i>311</i>&nbsp;		rate[2][9] = 0.554236;rate[2][10] = 0.131528;
+<i>312</i>&nbsp;		rate[2][11] = 3.01201;rate[2][12] = 0.198221;
+<i>313</i>&nbsp;		rate[2][13] = 0.0961621;rate[2][14] = 0.195081;
+<i>314</i>&nbsp;		rate[2][15] = 3.97423;rate[2][16] = 2.03006;
+<i>315</i>&nbsp;		rate[2][17] = 0.0719167;rate[2][18] = 1.086;
+<i>316</i>&nbsp;		rate[2][19] = 0.196246;
+<i>317</i>&nbsp;
+<i>318</i>&nbsp;		rate[3][4] = 0.0302949;rate[3][5] = 0.616783;
+<i>319</i>&nbsp;		rate[3][6] = 6.17416;rate[3][7] = 0.865584;
+<i>320</i>&nbsp;		rate[3][8] = 0.930676;rate[3][9] = 0.039437;
+<i>321</i>&nbsp;		rate[3][10] = 0.0848047;rate[3][11] = 0.479855;
+<i>322</i>&nbsp;		rate[3][12] = 0.103754;rate[3][13] = 0.0467304;
+<i>323</i>&nbsp;		rate[3][14] = 0.423984;rate[3][15] = 1.07176;
+<i>324</i>&nbsp;		rate[3][16] = 0.374866;rate[3][17] = 0.129767;
+<i>325</i>&nbsp;		rate[3][18] = 0.325711;rate[3][19] = 0.152335;
+<i>326</i>&nbsp;
+<i>327</i>&nbsp;
+<i>328</i>&nbsp;		rate[4][5] = 0.0988179;rate[4][6] = 0.021352;
+<i>329</i>&nbsp;		rate[4][7] = 0.306674;rate[4][8] = 0.248972;
+<i>330</i>&nbsp;		rate[4][9] = 0.170135;rate[4][10] = 0.384287;
+<i>331</i>&nbsp;		rate[4][11] = 0.0740339;rate[4][12] = 0.390482;
+<i>332</i>&nbsp;		rate[4][13] = 0.39802;rate[4][14] = 0.109404;
+<i>333</i>&nbsp;		rate[4][15] = 1.40766;rate[4][16] = 0.512984;
+<i>334</i>&nbsp;		rate[4][17] = 0.71707;rate[4][18] = 0.543833;
+<i>335</i>&nbsp;		rate[4][19] = 1.00214;
+<i>336</i>&nbsp;
+<i>337</i>&nbsp;		rate[5][6] = 5.46947;rate[5][7] = 0.330052;
+<i>338</i>&nbsp;		rate[5][8] = 4.29411;rate[5][9] = 0.113917;
+<i>339</i>&nbsp;		rate[5][10] = 0.869489;rate[5][11] = 3.8949;
+<i>340</i>&nbsp;		rate[5][12] = 1.54526;rate[5][13] = 0.0999208;
+<i>341</i>&nbsp;		rate[5][14] = 0.933372;rate[5][15] = 1.02887;
+<i>342</i>&nbsp;		rate[5][16] = 0.857928;rate[5][17] = 0.215737;
+<i>343</i>&nbsp;		rate[5][18] = 0.22771;rate[5][19] = 0.301281;
+<i>344</i>&nbsp;
+<i>345</i>&nbsp;
+<i>346</i>&nbsp;		rate[6][7] = 0.567717;rate[6][8] = 0.570025;
+<i>347</i>&nbsp;		rate[6][9] = 0.127395;rate[6][10] = 0.154263;
+<i>348</i>&nbsp;		rate[6][11] = 2.58443;rate[6][12] = 0.315124;
+<i>349</i>&nbsp;		rate[6][13] = 0.0811339;rate[6][14] = 0.682355;
+<i>350</i>&nbsp;		rate[6][15] = 0.704939;rate[6][16] = 0.822765;
+<i>351</i>&nbsp;		rate[6][17] = 0.156557;rate[6][18] = 0.196303;
+<i>352</i>&nbsp;		rate[6][19] = 0.588731;
+<i>353</i>&nbsp;
+<i>354</i>&nbsp;		rate[7][8] = 0.24941;rate[7][9] = 0.0304501;
+<i>355</i>&nbsp;		rate[7][10] = 0.0613037;rate[7][11] = 0.373558;
+<i>356</i>&nbsp;		rate[7][12] = 0.1741;rate[7][13] = 0.049931;
+<i>357</i>&nbsp;		rate[7][14] = 0.24357;rate[7][15] = 1.34182;
+<i>358</i>&nbsp;		rate[7][16] = 0.225833;rate[7][17] = 0.336983;
+<i>359</i>&nbsp;		rate[7][18] = 0.103604;rate[7][19] = 0.187247;
+<i>360</i>&nbsp;
+<i>361</i>&nbsp;
+<i>362</i>&nbsp;		rate[8][9] = 0.13819;rate[8][10] = 0.499462;
+<i>363</i>&nbsp;		rate[8][11] = 0.890432;rate[8][12] = 0.404141;
+<i>364</i>&nbsp;		rate[8][13] = 0.679371;rate[8][14] = 0.696198;
+<i>365</i>&nbsp;		rate[8][15] = 0.740169;rate[8][16] = 0.473307;
+<i>366</i>&nbsp;		rate[8][17] = 0.262569;rate[8][18] = 3.87344;
+<i>367</i>&nbsp;		rate[8][19] = 0.118358;
+<i>368</i>&nbsp;
+<i>369</i>&nbsp;		rate[9][10] = 3.17097;rate[9][11] = 0.323832;
+<i>370</i>&nbsp;		rate[9][12] = 4.25746;rate[9][13] = 1.05947;
+<i>371</i>&nbsp;		rate[9][14] = 0.0999288;rate[9][15] = 0.31944;
+<i>372</i>&nbsp;		rate[9][16] = 1.45816;rate[9][17] = 0.212483;
+<i>373</i>&nbsp;		rate[9][18] = 0.42017;rate[9][19] = 7.8213;
+<i>374</i>&nbsp;
+<i>375</i>&nbsp;
+<i>376</i>&nbsp;		rate[10][11] = 0.257555;rate[10][12] = 4.85402;
+<i>377</i>&nbsp;		rate[10][13] = 2.11517;rate[10][14] = 0.415844;
+<i>378</i>&nbsp;		rate[10][15] = 0.344739;rate[10][16] = 0.326622;
+<i>379</i>&nbsp;		rate[10][17] = 0.665309;rate[10][18] = 0.398618;
+<i>380</i>&nbsp;		rate[10][19] = 1.80034;
+<i>381</i>&nbsp;
+<i>382</i>&nbsp;		rate[11][12] = 0.934276;rate[11][13] = 0.088836;
+<i>383</i>&nbsp;		rate[11][14] = 0.556896;rate[11][15] = 0.96713;
+<i>384</i>&nbsp;		rate[11][16] = 1.38698;rate[11][17] = 0.137505;
+<i>385</i>&nbsp;		rate[11][18] = 0.133264;rate[11][19] = 0.305434;
+<i>386</i>&nbsp;
+<i>387</i>&nbsp;
+<i>388</i>&nbsp;		rate[12][13] = 1.19063;rate[12][14] = 0.171329;
+<i>389</i>&nbsp;		rate[12][15] = 0.493905;rate[12][16] = 1.51612;
+<i>390</i>&nbsp;		rate[12][17] = 0.515706;rate[12][18] = 0.428437;
+<i>391</i>&nbsp;		rate[12][19] = 2.05845;
+<i>392</i>&nbsp;
+<i>393</i>&nbsp;		rate[13][14] = 0.161444;rate[13][15] = 0.545931;
+<i>394</i>&nbsp;		rate[13][16] = 0.171903;rate[13][17] = 1.52964;
+<i>395</i>&nbsp;		rate[13][18] = 6.45428;rate[13][19] = 0.649892;
+<i>396</i>&nbsp;
+<i>397</i>&nbsp;
+<i>398</i>&nbsp;		rate[14][15] = 1.61328;rate[14][16] = 0.795384;
+<i>399</i>&nbsp;		rate[14][17] = 0.139405;rate[14][18] = 0.216046;
+<i>400</i>&nbsp;		rate[14][19] = 0.314887;
+<i>401</i>&nbsp;
+<i>402</i>&nbsp;		rate[15][16] = 4.37802;rate[15][17] = 0.523742;
+<i>403</i>&nbsp;		rate[15][18] = 0.786993;rate[15][19] = 0.232739;
+<i>404</i>&nbsp;
+<i>405</i>&nbsp;
+<i>406</i>&nbsp;		rate[16][17] = 0.110864;rate[16][18] = 0.291148;
+<i>407</i>&nbsp;		rate[16][19] = 1.38823;
+<i>408</i>&nbsp;
+<i>409</i>&nbsp;		rate[17][18] = 2.48539;rate[17][19] = 0.365369;
+<i>410</i>&nbsp;
+<i>411</i>&nbsp;
+<i>412</i>&nbsp;		rate[18][19] = 0.31473;
+<i>413</i>&nbsp;*/
+<i>414</i>&nbsp;
+<i>415</i>&nbsp;
+<i>416</i>&nbsp;////        WAG* matrix, a variant of the WAG matrix from the same paper
+<i>417</i>&nbsp;////		
+<i>418</i>&nbsp;////		0.589718 
+<i>419</i>&nbsp;////		0.514347  0.67416 
+<i>420</i>&nbsp;////		0.731152  0.159054  5.30821 
+<i>421</i>&nbsp;////		1.21324   0.568449  0.233527   0.0379056 
+<i>422</i>&nbsp;////		1.03344   3.02808   1.62299    0.657364   0.0999068 
+<i>423</i>&nbsp;////		1.55788   0.443685  1.00122    6.04299    0.0284956  5.6037 
+<i>424</i>&nbsp;////		1.41993   0.629768  1.12717    0.88357    0.312544   0.346823  0.588609 
+<i>425</i>&nbsp;////		0.317684  2.31211   3.9337     0.958529   0.341479   4.87366   0.599188   0.279542 
+<i>426</i>&nbsp;////		0.214596  0.187262  0.527321   0.0390513  0.198958   0.125999  0.124553   0.0310522  0.162975 
+<i>427</i>&nbsp;////		0.400822  0.51821   0.144354   0.0869637  0.451124   0.873266  0.154936   0.067443   0.508952  3.1554 
+<i>428</i>&nbsp;////		0.881639  5.74119   2.88102    0.480308   0.0719929  4.19125   2.45392    0.381514   0.854485  0.320597  0.255092 
+<i>429</i>&nbsp;////		0.887458  0.660816  0.198404   0.0992829  0.428648   1.64018   0.294481   0.184545   0.40117   3.94646   4.81956   0.877057 
+<i>430</i>&nbsp;////		0.213179  0.122792  0.0848492  0.0458258  0.485001   0.109241  0.0873936  0.0552962  0.631713  1.06458   2.10414   0.0832422  1.14516 
+<i>431</i>&nbsp;////		1.51861   0.711498  0.204905   0.444152   0.109081   0.913179  0.720567   0.254626   0.722123  0.111722  0.422851  0.588203   0.179858  0.165205 
+<i>432</i>&nbsp;////		3.52499   1.35611   3.90127    1.09965    1.35221    0.87908   0.822025   1.33618    0.876688  0.321774  0.351913  1.05314    0.554077  0.563999  1.54694 
+<i>433</i>&nbsp;////		2.24161   0.594177  2.06787    0.395176   0.522957   0.829315  0.889765   0.236489   0.54992   1.48876   0.351564  1.45173    1.56873   0.188237  0.802531  4.02507 
+<i>434</i>&nbsp;////		0.135395  1.24086   0.0746093  0.142159   0.728065   0.208163  0.176397   0.366467   0.261223  0.259584  0.706082  0.159261   0.565299  1.58681   0.135024  0.528249  0.118584 
+<i>435</i>&nbsp;////		0.270321  0.386714  1.05269    0.326191   0.481954   0.210494  0.209621   0.108982   4.31772   0.44009   0.427718  0.155623   0.437069  6.49269   0.212945  0.742154  0.286443  2.42261 
+<i>436</i>&nbsp;////		1.92496   0.282892  0.193323   0.155419   1.10899    0.32893   0.588443   0.190095   0.119749  7.48376   1.82105   0.300343   2.03324   0.653015  0.325745  0.23769   1.4088    0.396884  0.353358 
+<i>437</i>&nbsp;////
+<i>438</i>&nbsp;////		0.0866279 0.043972  0.0390894 0.0570451 0.0193078 0.0367281 0.0580589 0.0832518 0.0244313 0.048466  0.086209  0.0620286 0.0195027 0.0384319 0.0457631 0.0695179 0.0610127 0.0143859 0.0352742 0.0708956
+<i>439</i>&nbsp;////
+<i>440</i>&nbsp;////
+<i>441</i>&nbsp;////		 A   R   N   D   C   Q   E   G   H   I   L   K   M   F   P   S   T   W   Y   V
+<i>442</i>&nbsp;////		Ala Arg Asn Asp Cys Gln Glu Gly His Ile Leu Lys Met Phe Pro Ser Thr Trp Tyr Val
+<i>443</i>&nbsp;////
+<i>444</i>&nbsp;////		  
+<i>445</i>&nbsp;////			Symmetrical part of the WAG* rate matrix and aa frequencies,
+<i>446</i>&nbsp;////		estimated from 3905 globular protein amino acid sequences forming 182
+<i>447</i>&nbsp;////		protein families.
+<i>448</i>&nbsp;////			The first part above indicates the symmetric &#39;exchangeability&#39;
+<i>449</i>&nbsp;////		parameters, where s_ij = s_ji.  The s_ij above are not scaled, but the
+<i>450</i>&nbsp;////		PAML package will perform this scaling.
+<i>451</i>&nbsp;////			The second part gives the amino acid frequencies (pi_i)
+<i>452</i>&nbsp;////		estimated from the 3905 sequences.  The net replacement rate from i to
+<i>453</i>&nbsp;////		j is Q_ij = s_ij*pi_j.
+<i>454</i>&nbsp;////			Prepared by Simon Whelan and Nick Goldman, December 2000.
+<i>455</i>&nbsp;////
+<i>456</i>&nbsp;////		Citation:
+<i>457</i>&nbsp;////		Whelan, S. and N. Goldman.  2001.  A general empirical model of
+<i>458</i>&nbsp;////			protein evolution derived from multiple protein families using
+<i>459</i>&nbsp;////			a maximum likelihood approach.  Molecular Biology and
+<i>460</i>&nbsp;////			Evolution 18:691-699.		
+<i>461</i>&nbsp;//
+<i>462</i>&nbsp;//		rate[0][1] = 0.589718;rate[0][2] = 0.514347;
+<i>463</i>&nbsp;//		rate[0][3] = 0.731152;rate[0][4] = 1.21324;
+<i>464</i>&nbsp;//		rate[0][5] = 1.03344;rate[0][6] = 1.55788;
+<i>465</i>&nbsp;//		rate[0][7] = 1.41993;rate[0][8] = 0.317684;
+<i>466</i>&nbsp;//		rate[0][9] = 0.214596;rate[0][10] = 0.400822;
+<i>467</i>&nbsp;//		rate[0][11] = 0.881639;rate[0][12] = 0.887458;
+<i>468</i>&nbsp;//		rate[0][13] = 0.213179;rate[0][14] = 1.51861;
+<i>469</i>&nbsp;//		rate[0][15] = 3.52499;rate[0][16] = 2.24161;
+<i>470</i>&nbsp;//		rate[0][17] = 0.135395;rate[0][18] = 0.270321;
+<i>471</i>&nbsp;//		rate[0][19] = 1.92496;
+<i>472</i>&nbsp;//
+<i>473</i>&nbsp;//		rate[1][2] = 0.67416;rate[1][3] = 0.159054;
+<i>474</i>&nbsp;//		rate[1][4] = 0.568449;rate[1][5] = 3.02808;
+<i>475</i>&nbsp;//		rate[1][6] = 0.443685;rate[1][7] = 0.629768;
+<i>476</i>&nbsp;//		rate[1][8] = 2.31211;rate[1][9] = 0.187262;
+<i>477</i>&nbsp;//		rate[1][10] = 0.51821;rate[1][11] = 5.74119;
+<i>478</i>&nbsp;//		rate[1][12] = 0.660816;rate[1][13] = 0.122792;
+<i>479</i>&nbsp;//		rate[1][14] = 0.711498;rate[1][15] = 1.35611;
+<i>480</i>&nbsp;//		rate[1][16] = 0.594177;rate[1][17] = 1.24086;
+<i>481</i>&nbsp;//		rate[1][18] = 0.386714;rate[1][19] = 0.282892;
+<i>482</i>&nbsp;//
+<i>483</i>&nbsp;//
+<i>484</i>&nbsp;//		rate[2][3] = 5.30821;rate[2][4] = 0.233527;
+<i>485</i>&nbsp;//		rate[2][5] = 1.62299;rate[2][6] = 1.00122;
+<i>486</i>&nbsp;//		rate[2][7] = 1.12717;rate[2][8] = 3.9337;
+<i>487</i>&nbsp;//		rate[2][9] = 0.527321;rate[2][10] = 0.144354;
+<i>488</i>&nbsp;//		rate[2][11] = 2.88102;rate[2][12] = 0.198404;
+<i>489</i>&nbsp;//		rate[2][13] = 0.0848492;rate[2][14] = 0.204905;
+<i>490</i>&nbsp;//		rate[2][15] = 3.90127;rate[2][16] = 2.06787;
+<i>491</i>&nbsp;//		rate[2][17] = 0.0746093;rate[2][18] = 1.05269;
+<i>492</i>&nbsp;//		rate[2][19] = 0.193323;
+<i>493</i>&nbsp;//
+<i>494</i>&nbsp;//		rate[3][4] = 0.0379056;rate[3][5] = 0.657364;
+<i>495</i>&nbsp;//		rate[3][6] = 6.04299;rate[3][7] = 0.88357;
+<i>496</i>&nbsp;//		rate[3][8] = 0.958529;rate[3][9] = 0.0390513;
+<i>497</i>&nbsp;//		rate[3][10] = 0.0869637;rate[3][11] = 0.480308;
+<i>498</i>&nbsp;//		rate[3][12] = 0.0992829;rate[3][13] = 0.0458258;
+<i>499</i>&nbsp;//		rate[3][14] = 0.444152;rate[3][15] = 1.09965;
+<i>500</i>&nbsp;//		rate[3][16] = 0.395176;rate[3][17] = 0.142159;
+<i>501</i>&nbsp;//		rate[3][18] = 0.326191;rate[3][19] = 0.155419;
+<i>502</i>&nbsp;//
+<i>503</i>&nbsp;//
+<i>504</i>&nbsp;//		rate[4][5] = 0.0999068;rate[4][6] = 0.0284956;
+<i>505</i>&nbsp;//		rate[4][7] = 0.312544;rate[4][8] = 0.341479;
+<i>506</i>&nbsp;//		rate[4][9] = 0.198958;rate[4][10] = 0.451124;
+<i>507</i>&nbsp;//		rate[4][11] = 0.0719929;rate[4][12] = 0.428648;
+<i>508</i>&nbsp;//		rate[4][13] = 0.485001;rate[4][14] = 0.109081;
+<i>509</i>&nbsp;//		rate[4][15] = 1.35221;rate[4][16] = 0.522957;
+<i>510</i>&nbsp;//		rate[4][17] = 0.728065;rate[4][18] = 0.481954;
+<i>511</i>&nbsp;//		rate[4][19] = 1.10899;
+<i>512</i>&nbsp;//
+<i>513</i>&nbsp;//		rate[5][6] = 5.6037;rate[5][7] = 0.346823;
+<i>514</i>&nbsp;//		rate[5][8] = 4.87366;rate[5][9] = 0.125999;
+<i>515</i>&nbsp;//		rate[5][10] = 0.873266;rate[5][11] = 4.19125;
+<i>516</i>&nbsp;//		rate[5][12] = 1.64018;rate[5][13] = 0.109241;
+<i>517</i>&nbsp;//		rate[5][14] = 0.913179;rate[5][15] = 0.87908;
+<i>518</i>&nbsp;//		rate[5][16] = 0.829315;rate[5][17] = 0.208163;
+<i>519</i>&nbsp;//		rate[5][18] = 0.210494;rate[5][19] = 0.32893;
+<i>520</i>&nbsp;//
+<i>521</i>&nbsp;//
+<i>522</i>&nbsp;//		rate[6][7] = 0.588609;rate[6][8] = 0.599188;
+<i>523</i>&nbsp;//		rate[6][9] = 0.124553;rate[6][10] = 0.154936;
+<i>524</i>&nbsp;//		rate[6][11] = 2.45392;rate[6][12] = 0.294481;
+<i>525</i>&nbsp;//		rate[6][13] = 0.0873936;rate[6][14] = 0.720567;
+<i>526</i>&nbsp;//		rate[6][15] = 0.822025;rate[6][16] = 0.889765;
+<i>527</i>&nbsp;//		rate[6][17] = 0.176397;rate[6][18] = 0.209621;
+<i>528</i>&nbsp;//		rate[6][19] = 0.588443;
+<i>529</i>&nbsp;//
+<i>530</i>&nbsp;//		rate[7][8] = 0.279542;rate[7][9] = 0.0310522;
+<i>531</i>&nbsp;//		rate[7][10] = 0.067443;rate[7][11] = 0.381514;
+<i>532</i>&nbsp;//		rate[7][12] = 0.184545;rate[7][13] = 0.0552962;
+<i>533</i>&nbsp;//		rate[7][14] = 0.254626;rate[7][15] = 1.33618;
+<i>534</i>&nbsp;//		rate[7][16] = 0.236489;rate[7][17] = 0.366467;
+<i>535</i>&nbsp;//		rate[7][18] = 0.108982;rate[7][19] = 0.190095;
+<i>536</i>&nbsp;//
+<i>537</i>&nbsp;//
+<i>538</i>&nbsp;//		rate[8][9] = 0.162975;rate[8][10] = 0.508952;
+<i>539</i>&nbsp;//		rate[8][11] = 0.854485;rate[8][12] = 0.40117;
+<i>540</i>&nbsp;//		rate[8][13] = 0.631713;rate[8][14] = 0.722123;
+<i>541</i>&nbsp;//		rate[8][15] = 0.876688;rate[8][16] = 0.54992;
+<i>542</i>&nbsp;//		rate[8][17] = 0.261223;rate[8][18] = 4.31772;
+<i>543</i>&nbsp;//		rate[8][19] = 0.119749;
+<i>544</i>&nbsp;//
+<i>545</i>&nbsp;//		rate[9][10] = 3.1554;rate[9][11] = 0.320597;
+<i>546</i>&nbsp;//		rate[9][12] = 3.94646;rate[9][13] = 1.06458;
+<i>547</i>&nbsp;//		rate[9][14] = 0.111722;rate[9][15] = 0.321774;
+<i>548</i>&nbsp;//		rate[9][16] = 1.48876;rate[9][17] = 0.259584;
+<i>549</i>&nbsp;//		rate[9][18] = 0.44009;rate[9][19] = 7.48376;
+<i>550</i>&nbsp;//
+<i>551</i>&nbsp;//
+<i>552</i>&nbsp;//		rate[10][11] = 0.255092;rate[10][12] = 4.81956;
+<i>553</i>&nbsp;//		rate[10][13] = 2.10414;rate[10][14] = 0.422851;
+<i>554</i>&nbsp;//		rate[10][15] = 0.351913;rate[10][16] = 0.351564;
+<i>555</i>&nbsp;//		rate[10][17] = 0.706082;rate[10][18] = 0.427718;
+<i>556</i>&nbsp;//		rate[10][19] = 1.82105;
+<i>557</i>&nbsp;//
+<i>558</i>&nbsp;//		rate[11][12] = 0.877057;rate[11][13] = 0.0832422;
+<i>559</i>&nbsp;//		rate[11][14] = 0.588203;rate[11][15] = 1.05314;
+<i>560</i>&nbsp;//		rate[11][16] = 1.45173;rate[11][17] = 0.159261;
+<i>561</i>&nbsp;//		rate[11][18] = 0.155623;rate[11][19] = 0.300343;
+<i>562</i>&nbsp;//
+<i>563</i>&nbsp;//
+<i>564</i>&nbsp;//		rate[12][13] = 1.14516;rate[12][14] = 0.179858;
+<i>565</i>&nbsp;//		rate[12][15] = 0.554077;rate[12][16] = 1.56873;
+<i>566</i>&nbsp;//		rate[12][17] = 0.565299;rate[12][18] = 0.437069;
+<i>567</i>&nbsp;//		rate[12][19] = 2.03324;
+<i>568</i>&nbsp;//
+<i>569</i>&nbsp;//		rate[13][14] = 0.165205;rate[13][15] = 0.563999;
+<i>570</i>&nbsp;//		rate[13][16] = 0.188237;rate[13][17] = 1.58681;
+<i>571</i>&nbsp;//		rate[13][18] = 6.49269;rate[13][19] = 0.653015;
+<i>572</i>&nbsp;//
+<i>573</i>&nbsp;//
+<i>574</i>&nbsp;//		rate[14][15] = 1.54694;rate[14][16] = 0.802531;
+<i>575</i>&nbsp;//		rate[14][17] = 0.135024;rate[14][18] = 0.212945;
+<i>576</i>&nbsp;//		rate[14][19] = 0.325745;
+<i>577</i>&nbsp;//
+<i>578</i>&nbsp;//		rate[15][16] = 4.02507;rate[15][17] = 0.528249;
+<i>579</i>&nbsp;//		rate[15][18] = 0.742154;rate[15][19] = 0.23769;
+<i>580</i>&nbsp;//
+<i>581</i>&nbsp;//
+<i>582</i>&nbsp;//		rate[16][17] = 0.118584;rate[16][18] = 0.286443;
+<i>583</i>&nbsp;//		rate[16][19] = 1.4088;
+<i>584</i>&nbsp;//
+<i>585</i>&nbsp;//		rate[17][18] = 2.42261;rate[17][19] = 0.396884;
+<i>586</i>&nbsp;//
+<i>587</i>&nbsp;//
+<i>588</i>&nbsp;//		rate[18][19] = 0.353358;
+<i>589</i>&nbsp;//		
+<i>590</i>&nbsp;
+<b class="fc"><i>591</i>&nbsp;        return rate;</b>
+<i>592</i>&nbsp;    }
+<i>593</i>&nbsp;
+<i>594</i>&nbsp;    @Override
+<i>595</i>&nbsp;    public double[] getEmpiricalFrequencies() {
+<b class="fc"><i>596</i>&nbsp;        double[] f = new double[20];</b>
+<i>597</i>&nbsp;        // frequencies from May 2011
+<b class="fc"><i>598</i>&nbsp;        f[0] = 0.0866279;</b>
+<b class="fc"><i>599</i>&nbsp;        f[1] = 0.043972;</b>
+<b class="fc"><i>600</i>&nbsp;        f[2] = 0.0390894;</b>
+<b class="fc"><i>601</i>&nbsp;        f[3] = 0.0570451;</b>
+<b class="fc"><i>602</i>&nbsp;        f[4] = 0.0193078;</b>
+<b class="fc"><i>603</i>&nbsp;        f[5] = 0.0367281;</b>
+<b class="fc"><i>604</i>&nbsp;        f[6] = 0.0580589;</b>
+<b class="fc"><i>605</i>&nbsp;        f[7] = 0.0832518;</b>
+<b class="fc"><i>606</i>&nbsp;        f[8] = 0.0244313;</b>
+<b class="fc"><i>607</i>&nbsp;        f[9] = 0.048466;</b>
+<b class="fc"><i>608</i>&nbsp;        f[10] = 0.086209;</b>
+<b class="fc"><i>609</i>&nbsp;        f[11] = 0.0620286;</b>
+<b class="fc"><i>610</i>&nbsp;        f[12] = 0.0195027;</b>
+<b class="fc"><i>611</i>&nbsp;        f[13] = 0.0384319;</b>
+<b class="fc"><i>612</i>&nbsp;        f[14] = 0.0457631;</b>
+<b class="fc"><i>613</i>&nbsp;        f[15] = 0.0695179;</b>
+<b class="fc"><i>614</i>&nbsp;        f[16] = 0.0610127;</b>
+<b class="fc"><i>615</i>&nbsp;        f[17] = 0.0143859;</b>
+<b class="fc"><i>616</i>&nbsp;        f[18] = 0.0352742;</b>
+<b class="fc"><i>617</i>&nbsp;        f[19] = 0.0708956;</b>
+<i>618</i>&nbsp;        // frequencies from Beast 1
+<b class="fc"><i>619</i>&nbsp;        f[0] = 0.0866;</b>
+<b class="fc"><i>620</i>&nbsp;        f[1] = 0.0440;</b>
+<b class="fc"><i>621</i>&nbsp;        f[2] = 0.0391;</b>
+<b class="fc"><i>622</i>&nbsp;        f[3] = 0.0570;</b>
+<b class="fc"><i>623</i>&nbsp;        f[4] = 0.0193;</b>
+<b class="fc"><i>624</i>&nbsp;        f[5] = 0.0367;</b>
+<b class="fc"><i>625</i>&nbsp;        f[6] = 0.0581;</b>
+<b class="fc"><i>626</i>&nbsp;        f[7] = 0.0833;</b>
+<b class="fc"><i>627</i>&nbsp;        f[8] = 0.0244;</b>
+<b class="fc"><i>628</i>&nbsp;        f[9] = 0.0485;</b>
+<b class="fc"><i>629</i>&nbsp;        f[10] = 0.0862;</b>
+<b class="fc"><i>630</i>&nbsp;        f[11] = 0.0620;</b>
+<b class="fc"><i>631</i>&nbsp;        f[12] = 0.0195;</b>
+<b class="fc"><i>632</i>&nbsp;        f[13] = 0.0384;</b>
+<b class="fc"><i>633</i>&nbsp;        f[14] = 0.0458;</b>
+<b class="fc"><i>634</i>&nbsp;        f[15] = 0.0695;</b>
+<b class="fc"><i>635</i>&nbsp;        f[16] = 0.0610;</b>
+<b class="fc"><i>636</i>&nbsp;        f[17] = 0.0144;</b>
+<b class="fc"><i>637</i>&nbsp;        f[18] = 0.0353;</b>
+<b class="fc"><i>638</i>&nbsp;        f[19] = 0.0709;</b>
+<b class="fc"><i>639</i>&nbsp;        return f;</b>
+<i>640</i>&nbsp;    }
+<i>641</i>&nbsp;
+<i>642</i>&nbsp;    @Override
+<i>643</i>&nbsp;    public int[] getEncodingOrder() {
+<b class="fc"><i>644</i>&nbsp;        Aminoacid dataType = new Aminoacid();</b>
+<b class="fc"><i>645</i>&nbsp;        String codeMap = dataType.getCodeMap();</b>
+<b class="fc"><i>646</i>&nbsp;        int[] codeMapNrs = new int[dataType.getStateCount()];</b>
+<b class="fc"><i>647</i>&nbsp;        String encoding = &quot;ARNDCQEGHILKMFPSTWYV&quot;;</b>
+<b class="fc"><i>648</i>&nbsp;        for (int i = 0; i &lt; dataType.getStateCount(); i++) {</b>
+<b class="fc"><i>649</i>&nbsp;            codeMapNrs[i] = encoding.indexOf(codeMap.charAt(i));</b>
+<i>650</i>&nbsp;        }
+<b class="fc"><i>651</i>&nbsp;        return codeMapNrs;</b>
+<i>652</i>&nbsp;    }
+<i>653</i>&nbsp;
+<i>654</i>&nbsp;    @Override
+<i>655</i>&nbsp;    public boolean canHandleDataType(DataType dataType) {
+<b class="nc"><i>656</i>&nbsp;        return dataType instanceof Aminoacid;</b>
+<i>657</i>&nbsp;    }
+<i>658</i>&nbsp;
+<i>659</i>&nbsp;    public static void main(String[] args) {
+<i>660</i>&nbsp;
+<b class="nc"><i>661</i>&nbsp;        WAG wag = new WAG();</b>
+<i>662</i>&nbsp;
+<i>663</i>&nbsp;        //String aminoAcids = &quot;ARNDCQEGHILKMFPSTWYV&quot;;
+<b class="nc"><i>664</i>&nbsp;        boolean[] class1 = {false,true,false,false,true,true,true,false,false,true,true,</b>
+<i>665</i>&nbsp;                false,true,false,false,false,false,true,true,true};
+<i>666</i>&nbsp;
+<b class="nc"><i>667</i>&nbsp;        int within1 = 0;</b>
+<b class="nc"><i>668</i>&nbsp;        int within2 = 0;</b>
+<b class="nc"><i>669</i>&nbsp;        int between = 0;</b>
+<b class="nc"><i>670</i>&nbsp;        double[] w1 = new double[45];</b>
+<b class="nc"><i>671</i>&nbsp;        double[] w2 = new double[45];</b>
+<b class="nc"><i>672</i>&nbsp;        double[] b = new double[100];</b>
+<i>673</i>&nbsp;
+<b class="nc"><i>674</i>&nbsp;        double[][] rates = wag.getEmpiricalRates();</b>
+<i>675</i>&nbsp;
+<b class="nc"><i>676</i>&nbsp;        for (int i = 0; i &lt; 20; i++) {</b>
+<b class="nc"><i>677</i>&nbsp;            for (int j = i+1; j &lt; 20; j++) {</b>
+<b class="nc"><i>678</i>&nbsp;                if (class1[i]) {</b>
+<b class="nc"><i>679</i>&nbsp;                    if (class1[j]) {</b>
+<b class="nc"><i>680</i>&nbsp;                        w1[within1] = rates[i][j];</b>
+<b class="nc"><i>681</i>&nbsp;                        within1 += 1;</b>
+<i>682</i>&nbsp;                    } else {
+<b class="nc"><i>683</i>&nbsp;                        b[between] = rates[i][j];</b>
+<b class="nc"><i>684</i>&nbsp;                        between += 1;</b>
+<i>685</i>&nbsp;                    }
+<i>686</i>&nbsp;                } else {
+<b class="nc"><i>687</i>&nbsp;                    if (!class1[j]) {</b>
+<b class="nc"><i>688</i>&nbsp;                        w2[within2] = rates[i][j];</b>
+<b class="nc"><i>689</i>&nbsp;                        within2 += 1;</b>
+<i>690</i>&nbsp;                    } else {
+<b class="nc"><i>691</i>&nbsp;                        b[between] = rates[i][j];</b>
+<b class="nc"><i>692</i>&nbsp;                        between += 1;</b>
+<i>693</i>&nbsp;                    }
+<i>694</i>&nbsp;                }
+<i>695</i>&nbsp;            }
+<i>696</i>&nbsp;        }
+<i>697</i>&nbsp;
+<b class="nc"><i>698</i>&nbsp;        System.out.println(&quot;Within 1 mean rate = &quot; + DiscreteStatistics.mean(w1));</b>
+<b class="nc"><i>699</i>&nbsp;        System.out.println(&quot;Within 2 mean rate = &quot; + DiscreteStatistics.mean(w2));</b>
+<b class="nc"><i>700</i>&nbsp;        System.out.println(&quot;Between mean rate = &quot; + DiscreteStatistics.mean(b));</b>
+<i>701</i>&nbsp;
+<b class="nc"><i>702</i>&nbsp;        System.out.println(&quot;Within 1 rate stdev = &quot; + DiscreteStatistics.stdev(w1));</b>
+<b class="nc"><i>703</i>&nbsp;        System.out.println(&quot;Within 2 rate stdev = &quot; + DiscreteStatistics.stdev(w2));</b>
+<b class="nc"><i>704</i>&nbsp;        System.out.println(&quot;Between rate stdev = &quot; + DiscreteStatistics.stdev(b));</b>
+<i>705</i>&nbsp;
+<b class="nc"><i>706</i>&nbsp;        System.out.println(&quot;Within 1 rate stderr = &quot; + DiscreteStatistics.stdev(w1)/Math.sqrt(within1));</b>
+<b class="nc"><i>707</i>&nbsp;        System.out.println(&quot;Within 2 rate stderr = &quot; + DiscreteStatistics.stdev(w2)/Math.sqrt(within2));</b>
+<b class="nc"><i>708</i>&nbsp;        System.out.println(&quot;Between rate stderr = &quot; + DiscreteStatistics.stdev(b)/Math.sqrt(between));</b>
+<i>709</i>&nbsp;
+<b class="nc"><i>710</i>&nbsp;        double sse = 0;</b>
+<b class="nc"><i>711</i>&nbsp;        double meanb = DiscreteStatistics.mean(b);</b>
+<b class="nc"><i>712</i>&nbsp;        for (int i = 0; i &lt; b.length; i++) {</b>
+<b class="nc"><i>713</i>&nbsp;            sse += (meanb - b[i]) * (meanb - b[i]);</b>
+<i>714</i>&nbsp;        }
+<b class="nc"><i>715</i>&nbsp;        sse /= b.length;</b>
+<b class="nc"><i>716</i>&nbsp;        sse = Math.sqrt(sse);</b>
+<i>717</i>&nbsp;
+<b class="nc"><i>718</i>&nbsp;        System.out.println(&quot;Between rate sse = &quot; + sse);</b>
+<i>719</i>&nbsp;
+<b class="nc"><i>720</i>&nbsp;        System.out.println(&quot;Within 1 count = &quot; + within1);</b>
+<b class="nc"><i>721</i>&nbsp;        System.out.println(&quot;Within 2 count = &quot; + within2);</b>
+<b class="nc"><i>722</i>&nbsp;        System.out.println(&quot;Between count = &quot; +  between);</b>
+<b class="nc"><i>723</i>&nbsp;    }</b>
+<i>724</i>&nbsp;
+<i>725</i>&nbsp;
+<i>726</i>&nbsp;
+<i>727</i>&nbsp;} // class WAG
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

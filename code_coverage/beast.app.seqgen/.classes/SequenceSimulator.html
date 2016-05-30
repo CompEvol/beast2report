@@ -1,0 +1,407 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: SequenceSimulator</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.seqgen</a> ]
+</div>
+
+<h1>Coverage Summary for Class: SequenceSimulator (beast.app.seqgen)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SequenceSimulator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 114)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.seqgen;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import java.io.BufferedReader;
+<i>5</i>&nbsp;import java.io.File;
+<i>6</i>&nbsp;import java.io.FileNotFoundException;
+<i>7</i>&nbsp;import java.io.FileReader;
+<i>8</i>&nbsp;import java.io.IOException;
+<i>9</i>&nbsp;import java.io.PrintStream;
+<i>10</i>&nbsp;import java.util.ArrayList;
+<i>11</i>&nbsp;import java.util.List;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;import beast.core.BEASTInterface;
+<i>14</i>&nbsp;import beast.core.Description;
+<i>15</i>&nbsp;import beast.core.Input;
+<i>16</i>&nbsp;import beast.core.Input.Validate;
+<i>17</i>&nbsp;import beast.evolution.alignment.Alignment;
+<i>18</i>&nbsp;import beast.evolution.alignment.Sequence;
+<i>19</i>&nbsp;import beast.evolution.branchratemodel.BranchRateModel;
+<i>20</i>&nbsp;import beast.evolution.datatype.DataType;
+<i>21</i>&nbsp;import beast.evolution.likelihood.TreeLikelihood;
+<i>22</i>&nbsp;import beast.evolution.sitemodel.SiteModel;
+<i>23</i>&nbsp;import beast.evolution.tree.Node;
+<i>24</i>&nbsp;import beast.evolution.tree.Tree;
+<i>25</i>&nbsp;import beast.util.Randomizer;
+<i>26</i>&nbsp;import beast.util.XMLParser;
+<i>27</i>&nbsp;import beast.util.XMLParserException;
+<i>28</i>&nbsp;import beast.util.XMLProducer;
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;/**
+<i>33</i>&nbsp; * @author remco@cs.waikato.ac.nz
+<i>34</i>&nbsp; */
+<i>35</i>&nbsp;@Description(&quot;Performs random sequence generation for a given site model. &quot; +
+<i>36</i>&nbsp;        &quot;Sequences for the leave nodes in the tree are returned as an alignment.&quot;)
+<b class="nc"><i>37</i>&nbsp;public class SequenceSimulator extends beast.core.Runnable {</b>
+<b class="nc"><i>38</i>&nbsp;    final public Input&lt;Alignment&gt; m_data = new Input&lt;&gt;(&quot;data&quot;, &quot;alignment data which specifies datatype and taxa of the beast.tree&quot;, Validate.REQUIRED);</b>
+<b class="nc"><i>39</i>&nbsp;    final public Input&lt;Tree&gt; m_treeInput = new Input&lt;&gt;(&quot;tree&quot;, &quot;phylogenetic beast.tree with sequence data in the leafs&quot;, Validate.REQUIRED);</b>
+<b class="nc"><i>40</i>&nbsp;    final public Input&lt;SiteModel.Base&gt; m_pSiteModelInput = new Input&lt;&gt;(&quot;siteModel&quot;, &quot;site model for leafs in the beast.tree&quot;, Validate.REQUIRED);</b>
+<b class="nc"><i>41</i>&nbsp;    final public Input&lt;BranchRateModel.Base&gt; m_pBranchRateModelInput = new Input&lt;&gt;(&quot;branchRateModel&quot;,</b>
+<i>42</i>&nbsp;            &quot;A model describing the rates on the branches of the beast.tree.&quot;);
+<b class="nc"><i>43</i>&nbsp;    final public Input&lt;Integer&gt; m_sequenceLengthInput = new Input&lt;&gt;(&quot;sequencelength&quot;, &quot;nr of samples to generate (default 1000).&quot;, 1000);</b>
+<b class="nc"><i>44</i>&nbsp;    final public Input&lt;String&gt; m_outputFileNameInput = new Input&lt;&gt;(</b>
+<i>45</i>&nbsp;            &quot;outputFileName&quot;,
+<i>46</i>&nbsp;            &quot;If provided, simulated alignment is written to this file rather &quot;
+<i>47</i>&nbsp;            + &quot;than to standard out.&quot;);
+<i>48</i>&nbsp;
+<b class="nc"><i>49</i>&nbsp;    final public Input&lt;List&lt;MergeDataWith&gt;&gt; mergeListInput = new Input&lt;&gt;(&quot;merge&quot;, &quot;specifies template used to merge the generated alignment with&quot;, new ArrayList&lt;&gt;());</b>
+<b class="nc"><i>50</i>&nbsp;    final public Input&lt;Integer&gt; iterationsInput = new Input&lt;&gt;(&quot;iterations&quot;,&quot;number of times the data is generated&quot;, 1);</b>
+<i>51</i>&nbsp;    
+<i>52</i>&nbsp;    /**
+<i>53</i>&nbsp;     * nr of samples to generate *
+<i>54</i>&nbsp;     */
+<i>55</i>&nbsp;    protected int m_sequenceLength;
+<i>56</i>&nbsp;    /**
+<i>57</i>&nbsp;     * tree used for generating samples *
+<i>58</i>&nbsp;     */
+<i>59</i>&nbsp;    protected Tree m_tree;
+<i>60</i>&nbsp;    /**
+<i>61</i>&nbsp;     * site model used for generating samples *
+<i>62</i>&nbsp;     */
+<i>63</i>&nbsp;    protected SiteModel.Base m_siteModel;
+<i>64</i>&nbsp;    /**
+<i>65</i>&nbsp;     * branch rate model used for generating samples *
+<i>66</i>&nbsp;     */
+<i>67</i>&nbsp;    protected BranchRateModel m_branchRateModel;
+<i>68</i>&nbsp;    /**
+<i>69</i>&nbsp;     * nr of categories in site model *
+<i>70</i>&nbsp;     */
+<i>71</i>&nbsp;    int m_categoryCount;
+<i>72</i>&nbsp;    /**
+<i>73</i>&nbsp;     * nr of states in site model *
+<i>74</i>&nbsp;     */
+<i>75</i>&nbsp;    int m_stateCount;
+<i>76</i>&nbsp;    
+<i>77</i>&nbsp;    /**
+<i>78</i>&nbsp;     * name of output file *
+<i>79</i>&nbsp;     */
+<i>80</i>&nbsp;    String m_outputFileName;
+<i>81</i>&nbsp;
+<i>82</i>&nbsp;    /**
+<i>83</i>&nbsp;     * an array used to transfer transition probabilities
+<i>84</i>&nbsp;     */
+<i>85</i>&nbsp;    protected double[][] m_probabilities;
+<i>86</i>&nbsp;
+<i>87</i>&nbsp;    @Override
+<i>88</i>&nbsp;    public void initAndValidate() {
+<b class="nc"><i>89</i>&nbsp;        m_tree = m_treeInput.get();</b>
+<b class="nc"><i>90</i>&nbsp;        m_siteModel = m_pSiteModelInput.get();</b>
+<b class="nc"><i>91</i>&nbsp;        m_branchRateModel = m_pBranchRateModelInput.get();</b>
+<b class="nc"><i>92</i>&nbsp;        m_sequenceLength = m_sequenceLengthInput.get();</b>
+<b class="nc"><i>93</i>&nbsp;        m_stateCount = m_data.get().getMaxStateCount();</b>
+<b class="nc"><i>94</i>&nbsp;        m_categoryCount = m_siteModel.getCategoryCount();</b>
+<b class="nc"><i>95</i>&nbsp;        m_probabilities = new double[m_categoryCount][m_stateCount * m_stateCount];</b>
+<b class="nc"><i>96</i>&nbsp;        m_outputFileName = m_outputFileNameInput.get();</b>
+<b class="nc"><i>97</i>&nbsp;    }</b>
+<i>98</i>&nbsp;
+<i>99</i>&nbsp;    @Override
+<i>100</i>&nbsp;    public void run() throws IllegalArgumentException, IllegalAccessException, IOException, XMLParserException {
+<b class="nc"><i>101</i>&nbsp;    	for (int i = 0; i &lt; iterationsInput.get(); i++) {</b>
+<b class="nc"><i>102</i>&nbsp;	        Alignment alignment = simulate();</b>
+<i>103</i>&nbsp;	        
+<i>104</i>&nbsp;	        // Write output to stdout or file
+<i>105</i>&nbsp;	        PrintStream pstream;
+<b class="nc"><i>106</i>&nbsp;	        if (m_outputFileName == null)</b>
+<b class="nc"><i>107</i>&nbsp;	            pstream = System.out;</b>
+<i>108</i>&nbsp;	        else
+<b class="nc"><i>109</i>&nbsp;	            pstream = new PrintStream(m_outputFileName);</b>
+<b class="nc"><i>110</i>&nbsp;	        pstream.println(new XMLProducer().toRawXML(alignment));</b>
+<b class="nc"><i>111</i>&nbsp;	        for (MergeDataWith merge : mergeListInput.get()) {</b>
+<b class="nc"><i>112</i>&nbsp;	        	merge.process(alignment, i);</b>
+<b class="nc"><i>113</i>&nbsp;	        }</b>
+<i>114</i>&nbsp;    	}
+<b class="nc"><i>115</i>&nbsp;    }</b>
+<i>116</i>&nbsp;
+<i>117</i>&nbsp;    /**
+<i>118</i>&nbsp;     * Convert integer representation of sequence into a Sequence
+<i>119</i>&nbsp;     *
+<i>120</i>&nbsp;     * @param seq  integer representation of the sequence
+<i>121</i>&nbsp;     * @param node used to determine taxon for sequence
+<i>122</i>&nbsp;     * @return Sequence
+<i>123</i>&nbsp;     * @
+<i>124</i>&nbsp;     */
+<i>125</i>&nbsp;    Sequence intArray2Sequence(int[] seq, Node node)  {
+<b class="nc"><i>126</i>&nbsp;        DataType dataType = m_data.get().getDataType();</b>
+<b class="nc"><i>127</i>&nbsp;        String seqString = dataType.state2string(seq);</b>
+<i>128</i>&nbsp;//    	StringBuilder seq = new StringBuilder();
+<i>129</i>&nbsp;//    	String map = m_data.get().getMap();
+<i>130</i>&nbsp;//    	if (map != null) {
+<i>131</i>&nbsp;//    		for (int i  = 0; i &lt; m_sequenceLength; i++) {
+<i>132</i>&nbsp;//    			seq.append(map.charAt(seq[i]));
+<i>133</i>&nbsp;//    		}
+<i>134</i>&nbsp;//    	} else {
+<i>135</i>&nbsp;//    		for (int i  = 0; i &lt; m_sequenceLength-1; i++) {
+<i>136</i>&nbsp;//    			seq.append(seq[i] + &quot;,&quot;);
+<i>137</i>&nbsp;//    		}
+<i>138</i>&nbsp;//			seq.append(seq[m_sequenceLength-1] + &quot;&quot;);
+<i>139</i>&nbsp;//    	}
+<b class="nc"><i>140</i>&nbsp;        List&lt;Sequence&gt; taxa = m_data.get().sequenceInput.get();</b>
+<b class="nc"><i>141</i>&nbsp;        String taxon = taxa.get(node.getNr()).taxonInput.get();</b>
+<b class="nc"><i>142</i>&nbsp;        return new Sequence(taxon, seqString);</b>
+<i>143</i>&nbsp;    } // intArray2Sequence
+<i>144</i>&nbsp;
+<i>145</i>&nbsp;    /**
+<i>146</i>&nbsp;     * perform the actual sequence generation
+<i>147</i>&nbsp;     *
+<i>148</i>&nbsp;     * @return alignment containing randomly generated sequences for the nodes in the
+<i>149</i>&nbsp;     *         leaves of the tree
+<i>150</i>&nbsp;     * @
+<i>151</i>&nbsp;     */
+<i>152</i>&nbsp;    public Alignment simulate()  {
+<b class="nc"><i>153</i>&nbsp;        Node root = m_tree.getRoot();</b>
+<i>154</i>&nbsp;
+<i>155</i>&nbsp;
+<b class="nc"><i>156</i>&nbsp;        double[] categoryProbs = m_siteModel.getCategoryProportions(root);</b>
+<b class="nc"><i>157</i>&nbsp;        int[] category = new int[m_sequenceLength];</b>
+<b class="nc"><i>158</i>&nbsp;        for (int i = 0; i &lt; m_sequenceLength; i++) {</b>
+<b class="nc"><i>159</i>&nbsp;            category[i] = Randomizer.randomChoicePDF(categoryProbs);</b>
+<i>160</i>&nbsp;        }
+<i>161</i>&nbsp;
+<b class="nc"><i>162</i>&nbsp;        double[] frequencies = m_siteModel.getSubstitutionModel().getFrequencies();</b>
+<b class="nc"><i>163</i>&nbsp;        int[] seq = new int[m_sequenceLength];</b>
+<b class="nc"><i>164</i>&nbsp;        for (int i = 0; i &lt; m_sequenceLength; i++) {</b>
+<b class="nc"><i>165</i>&nbsp;            seq[i] = Randomizer.randomChoicePDF(frequencies);</b>
+<i>166</i>&nbsp;        }
+<i>167</i>&nbsp;
+<i>168</i>&nbsp;
+<b class="nc"><i>169</i>&nbsp;        Alignment alignment = new Alignment();</b>
+<b class="nc"><i>170</i>&nbsp;        alignment.userDataTypeInput.setValue(m_data.get().getDataType(), alignment);</b>
+<b class="nc"><i>171</i>&nbsp;        alignment.setID(&quot;SequenceSimulator&quot;);</b>
+<i>172</i>&nbsp;
+<b class="nc"><i>173</i>&nbsp;        traverse(root, seq, category, alignment);</b>
+<i>174</i>&nbsp;
+<i>175</i>&nbsp;
+<b class="nc"><i>176</i>&nbsp;        return alignment;</b>
+<i>177</i>&nbsp;    } // simulate
+<i>178</i>&nbsp;
+<i>179</i>&nbsp;    /**
+<i>180</i>&nbsp;     * recursively walk through the tree top down, and add sequence to alignment whenever
+<i>181</i>&nbsp;     * a leave node is reached.
+<i>182</i>&nbsp;     *
+<i>183</i>&nbsp;     * @param node           reference to the current node, for which we visit all children
+<i>184</i>&nbsp;     * @param parentSequence randomly generated sequence of the parent node
+<i>185</i>&nbsp;     * @param category       array of categories for each of the sites
+<i>186</i>&nbsp;     * @param alignment
+<i>187</i>&nbsp;     * @
+<i>188</i>&nbsp;     */
+<i>189</i>&nbsp;    void traverse(Node node, int[] parentSequence, int[] category, Alignment alignment)  {
+<b class="nc"><i>190</i>&nbsp;        for (int childIndex = 0; childIndex &lt; 2; childIndex++) {</b>
+<b class="nc"><i>191</i>&nbsp;            Node child = (childIndex == 0 ? node.getLeft() : node.getRight());</b>
+<b class="nc"><i>192</i>&nbsp;            for (int i = 0; i &lt; m_categoryCount; i++) {</b>
+<b class="nc"><i>193</i>&nbsp;                getTransitionProbabilities(m_tree, child, i, m_probabilities[i]);</b>
+<i>194</i>&nbsp;            }
+<i>195</i>&nbsp;
+<b class="nc"><i>196</i>&nbsp;            int[] seq = new int[m_sequenceLength];</b>
+<b class="nc"><i>197</i>&nbsp;            double[] cProb = new double[m_stateCount];</b>
+<b class="nc"><i>198</i>&nbsp;            for (int i = 0; i &lt; m_sequenceLength; i++) {</b>
+<b class="nc"><i>199</i>&nbsp;                System.arraycopy(m_probabilities[category[i]], parentSequence[i] * m_stateCount, cProb, 0, m_stateCount);</b>
+<b class="nc"><i>200</i>&nbsp;                seq[i] = Randomizer.randomChoicePDF(cProb);</b>
+<i>201</i>&nbsp;            }
+<i>202</i>&nbsp;
+<b class="nc"><i>203</i>&nbsp;            if (child.isLeaf()) {</b>
+<b class="nc"><i>204</i>&nbsp;                alignment.sequenceInput.setValue(intArray2Sequence(seq, child), alignment);</b>
+<i>205</i>&nbsp;            } else {
+<b class="nc"><i>206</i>&nbsp;                traverse(child, seq, category, alignment);</b>
+<i>207</i>&nbsp;            }
+<i>208</i>&nbsp;        }
+<b class="nc"><i>209</i>&nbsp;    } // traverse</b>
+<i>210</i>&nbsp;
+<i>211</i>&nbsp;    /**
+<i>212</i>&nbsp;     * get transition probability matrix for particular rate category *
+<i>213</i>&nbsp;     */
+<i>214</i>&nbsp;    void getTransitionProbabilities(Tree tree, Node node, int rateCategory, double[] probs) {
+<i>215</i>&nbsp;
+<b class="nc"><i>216</i>&nbsp;        Node parent = node.getParent();</b>
+<b class="nc"><i>217</i>&nbsp;        double branchRate = (m_branchRateModel == null ? 1.0 : m_branchRateModel.getRateForBranch(node));</b>
+<b class="nc"><i>218</i>&nbsp;        branchRate *= m_siteModel.getRateForCategory(rateCategory, node);</b>
+<i>219</i>&nbsp;
+<i>220</i>&nbsp;        // Get the operational time of the branch
+<i>221</i>&nbsp;        //final double branchTime = branchRate * (parent.getHeight() - node.getHeight());
+<i>222</i>&nbsp;
+<i>223</i>&nbsp;        //if (branchTime &lt; 0.0) {
+<i>224</i>&nbsp;        //    throw new RuntimeException(&quot;Negative branch length: &quot; + branchTime);
+<i>225</i>&nbsp;        //}
+<i>226</i>&nbsp;
+<i>227</i>&nbsp;        //double branchLength = m_siteModel.getRateForCategory(rateCategory) * branchTime;
+<i>228</i>&nbsp;
+<i>229</i>&nbsp;//        // TODO Hack until SiteRateModel issue is resolved
+<i>230</i>&nbsp;//        if (m_siteModel.getSubstitutionModel() instanceof SubstitutionEpochModel) {
+<i>231</i>&nbsp;//            ((SubstitutionEpochModel)m_siteModel.getSubstitutionModel()).getTransitionProbabilities(tree.getNodeHeight(node),
+<i>232</i>&nbsp;//                    tree.getNodeHeight(parent),branchLength, probs);
+<i>233</i>&nbsp;//            return;
+<i>234</i>&nbsp;//        }
+<i>235</i>&nbsp;        //m_siteModel.getSubstitutionModel().getTransitionProbabilities(branchLength, probs);
+<b class="nc"><i>236</i>&nbsp;        m_siteModel.getSubstitutionModel().getTransitionProbabilities(node, parent.getHeight(), node.getHeight(), branchRate, probs);</b>
+<i>237</i>&nbsp;
+<b class="nc"><i>238</i>&nbsp;    } // getTransitionProbabilities</b>
+<i>239</i>&nbsp;
+<i>240</i>&nbsp;
+<i>241</i>&nbsp;    /**
+<i>242</i>&nbsp;     * find a treelikelihood object among the plug-ins by recursively inspecting plug-ins *
+<i>243</i>&nbsp;     */
+<i>244</i>&nbsp;    static TreeLikelihood getTreeLikelihood(BEASTInterface beastObject)  {
+<b class="nc"><i>245</i>&nbsp;        for (BEASTInterface beastObject2 : beastObject.listActiveBEASTObjects()) {</b>
+<b class="nc"><i>246</i>&nbsp;            if (beastObject2 instanceof TreeLikelihood) {</b>
+<b class="nc"><i>247</i>&nbsp;                return (TreeLikelihood) beastObject2;</b>
+<i>248</i>&nbsp;            } else {
+<b class="nc"><i>249</i>&nbsp;                TreeLikelihood likelihood = getTreeLikelihood(beastObject2);</b>
+<b class="nc"><i>250</i>&nbsp;                if (likelihood != null) {</b>
+<b class="nc"><i>251</i>&nbsp;                    return likelihood;</b>
+<i>252</i>&nbsp;                }
+<i>253</i>&nbsp;            }
+<b class="nc"><i>254</i>&nbsp;        }</b>
+<b class="nc"><i>255</i>&nbsp;        return null;</b>
+<i>256</i>&nbsp;    }
+<i>257</i>&nbsp;
+<i>258</i>&nbsp;    /**
+<i>259</i>&nbsp;     * helper method *
+<i>260</i>&nbsp;     */
+<i>261</i>&nbsp;    public static void printUsageAndExit() {
+<b class="nc"><i>262</i>&nbsp;        System.out.println(&quot;Usage: java &quot; + SequenceSimulator.class.getName() + &quot; &lt;beast file&gt; &lt;nr of instantiations&gt; [&lt;output file&gt;]&quot;);</b>
+<b class="nc"><i>263</i>&nbsp;        System.out.println(&quot;simulates from a treelikelihood specified in the beast file.&quot;);</b>
+<b class="nc"><i>264</i>&nbsp;        System.out.println(&quot;&lt;beast file&gt; is name of the path beast file containing the treelikelihood.&quot;);</b>
+<b class="nc"><i>265</i>&nbsp;        System.out.println(&quot;&lt;nr of instantiations&gt; is the number of instantiations to be replicated.&quot;);</b>
+<b class="nc"><i>266</i>&nbsp;        System.out.println(&quot;&lt;output file&gt; optional name of the file to write the sequence to. By default, the sequence is written to standard output.&quot;);</b>
+<b class="nc"><i>267</i>&nbsp;        System.exit(0);</b>
+<b class="nc"><i>268</i>&nbsp;    } // printUsageAndExit</b>
+<i>269</i>&nbsp;
+<i>270</i>&nbsp;
+<i>271</i>&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+<i>272</i>&nbsp;    public static void main(String[] args) {
+<i>273</i>&nbsp;        try {
+<i>274</i>&nbsp;            // parse arguments
+<b class="nc"><i>275</i>&nbsp;            if (args.length &lt; 2) {</b>
+<b class="nc"><i>276</i>&nbsp;                printUsageAndExit();</b>
+<i>277</i>&nbsp;            }
+<b class="nc"><i>278</i>&nbsp;            String fileName = args[0];</b>
+<b class="nc"><i>279</i>&nbsp;            int replications = Integer.parseInt(args[1]);</b>
+<b class="nc"><i>280</i>&nbsp;            PrintStream out = System.out;</b>
+<b class="nc"><i>281</i>&nbsp;            if (args.length == 3) {</b>
+<b class="nc"><i>282</i>&nbsp;                File file = new File(args[2]);</b>
+<b class="nc"><i>283</i>&nbsp;                out = new PrintStream(file);</b>
+<i>284</i>&nbsp;            }
+<i>285</i>&nbsp;
+<i>286</i>&nbsp;            // grab the file
+<b class="nc"><i>287</i>&nbsp;            String xml = &quot;&quot;;</b>
+<b class="nc"><i>288</i>&nbsp;            BufferedReader fin = new BufferedReader(new FileReader(fileName));</b>
+<b class="nc"><i>289</i>&nbsp;            while (fin.ready()) {</b>
+<b class="nc"><i>290</i>&nbsp;                xml += fin.readLine();</b>
+<i>291</i>&nbsp;            }
+<b class="nc"><i>292</i>&nbsp;            fin.close();</b>
+<i>293</i>&nbsp;
+<i>294</i>&nbsp;            // parse the xml
+<b class="nc"><i>295</i>&nbsp;            XMLParser parser = new XMLParser();</b>
+<b class="nc"><i>296</i>&nbsp;            BEASTInterface beastObject = parser.parseFragment(xml, true);</b>
+<i>297</i>&nbsp;
+<i>298</i>&nbsp;            // find relevant objects from the model
+<b class="nc"><i>299</i>&nbsp;            TreeLikelihood treeLikelihood = getTreeLikelihood(beastObject);</b>
+<b class="nc"><i>300</i>&nbsp;            if (treeLikelihood == null) {</b>
+<b class="nc"><i>301</i>&nbsp;                throw new IllegalArgumentException(&quot;No treelikelihood found in file. Giving up now.&quot;);</b>
+<i>302</i>&nbsp;            }
+<b class="nc"><i>303</i>&nbsp;            Alignment data = ((Input&lt;Alignment&gt;) treeLikelihood.getInput(&quot;data&quot;)).get();</b>
+<b class="nc"><i>304</i>&nbsp;            Tree tree = ((Input&lt;Tree&gt;) treeLikelihood.getInput(&quot;tree&quot;)).get();</b>
+<b class="nc"><i>305</i>&nbsp;            SiteModel pSiteModel = ((Input&lt;SiteModel&gt;) treeLikelihood.getInput(&quot;siteModel&quot;)).get();</b>
+<b class="nc"><i>306</i>&nbsp;            BranchRateModel pBranchRateModel = ((Input&lt;BranchRateModel&gt;) treeLikelihood.getInput(&quot;branchRateModel&quot;)).get();</b>
+<i>307</i>&nbsp;
+<i>308</i>&nbsp;
+<i>309</i>&nbsp;            // feed to sequence simulator and generate leaves
+<b class="nc"><i>310</i>&nbsp;            SequenceSimulator treeSimulator = new SequenceSimulator();</b>
+<b class="nc"><i>311</i>&nbsp;            treeSimulator.init(data, tree, pSiteModel, pBranchRateModel, replications);</b>
+<b class="nc"><i>312</i>&nbsp;            XMLProducer producer = new XMLProducer();</b>
+<b class="nc"><i>313</i>&nbsp;            Alignment alignment = treeSimulator.simulate();</b>
+<b class="nc"><i>314</i>&nbsp;            xml = producer.toRawXML(alignment);</b>
+<b class="nc"><i>315</i>&nbsp;            out.println(&quot;&lt;beast version=&#39;2.0&#39;&gt;&quot;);</b>
+<b class="nc"><i>316</i>&nbsp;            out.println(xml);</b>
+<b class="nc"><i>317</i>&nbsp;            out.println(&quot;&lt;/beast&gt;&quot;);</b>
+<b class="nc"><i>318</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>319</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>320</i>&nbsp;        }</b>
+<b class="nc"><i>321</i>&nbsp;    } // main</b>
+<i>322</i>&nbsp;
+<i>323</i>&nbsp;} // class SequenceSimulator
+<i>324</i>&nbsp;
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

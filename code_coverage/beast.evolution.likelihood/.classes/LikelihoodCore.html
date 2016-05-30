@@ -1,0 +1,265 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: LikelihoodCore</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.likelihood</a> ]
+</div>
+
+<h1>Coverage Summary for Class: LikelihoodCore (beast.evolution.likelihood)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LikelihoodCore</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/ 5)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;* File LikelihoodCore.java
+<i>3</i>&nbsp;*
+<i>4</i>&nbsp;* Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>5</i>&nbsp;*
+<i>6</i>&nbsp;* This file is part of BEAST2.
+<i>7</i>&nbsp;* See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp;* information regarding copyright ownership and licensing.
+<i>9</i>&nbsp;*
+<i>10</i>&nbsp;* BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp;* it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp;* published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp;* of the License, or (at your option) any later version.
+<i>14</i>&nbsp;*
+<i>15</i>&nbsp;*  BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp;*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp;*  GNU Lesser General Public License for more details.
+<i>19</i>&nbsp;*
+<i>20</i>&nbsp;* You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp;* License along with BEAST; if not, write to the
+<i>22</i>&nbsp;* Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp;* Boston, MA  02110-1301  USA
+<i>24</i>&nbsp;*/
+<i>25</i>&nbsp;package beast.evolution.likelihood;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;/**
+<i>28</i>&nbsp; * The likelihood core is the class that performs the calculations
+<i>29</i>&nbsp; * in the peeling algorithm (see Felsenstein, Joseph (1981).
+<i>30</i>&nbsp; * Evolutionary trees from DNA sequences: a maximum likelihood approach.
+<i>31</i>&nbsp; * J Mol Evol 17 (6): 368-376.). It does this by calculating the partial
+<i>32</i>&nbsp; * results for all sites, node by node. The order in which the nodes
+<i>33</i>&nbsp; * are visited is controlled by the TreeLikelihood. T
+<i>34</i>&nbsp; * &lt;p/&gt;
+<i>35</i>&nbsp; * In order to reuse computations of previous likelihood calculations,
+<i>36</i>&nbsp; * a current state, and a stored state are maintained. Again, the TreeLikelihood
+<i>37</i>&nbsp; * controls when to update from current to stored and vice versa. So, in
+<i>38</i>&nbsp; * LikelihoodCore implementations, duplicates need to be kept for all partials.
+<i>39</i>&nbsp; * Also, a set of indices to indicate which of the data is stored state and which
+<i>40</i>&nbsp; * is current state is commonly the most efficient way to sort out which is which.
+<i>41</i>&nbsp; */
+<i>42</i>&nbsp;
+<b class="fc"><i>43</i>&nbsp;abstract public class LikelihoodCore {</b>
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;    /**
+<i>46</i>&nbsp;     * reserve memory for partials, indices and other
+<i>47</i>&nbsp;     * data structures required by the core *
+<i>48</i>&nbsp;     */
+<i>49</i>&nbsp;    abstract public void initialize(int nodeCount, int patternCount, int matrixCount, boolean integrateCategories, boolean useAmbiguities);
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;    /**
+<i>52</i>&nbsp;     * clean up after last likelihood calculation, if at all required *
+<i>53</i>&nbsp;     */
+<i>54</i>&nbsp;    @Override
+<i>55</i>&nbsp;	abstract public void finalize() throws java.lang.Throwable;
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;    /**
+<i>58</i>&nbsp;     * reserve memory for partials for node with number nodeIndex *
+<i>59</i>&nbsp;     */
+<i>60</i>&nbsp;    abstract public void createNodePartials(int nodeIndex);
+<i>61</i>&nbsp;
+<i>62</i>&nbsp;
+<i>63</i>&nbsp;    /**
+<i>64</i>&nbsp;     * indicate that the partials for node
+<i>65</i>&nbsp;     * nodeIndex is about the be changed, that is, that the stored
+<i>66</i>&nbsp;     * state for node nodeIndex cannot be reused *
+<i>67</i>&nbsp;     */
+<i>68</i>&nbsp;    abstract public void setNodePartialsForUpdate(int nodeIndex);
+<i>69</i>&nbsp;
+<i>70</i>&nbsp;    /**
+<i>71</i>&nbsp;     * assign values of partials for node with number nodeIndex *
+<i>72</i>&nbsp;     */
+<i>73</i>&nbsp;    abstract public void setNodePartials(int nodeIndex, double[] partials);
+<i>74</i>&nbsp;
+<i>75</i>&nbsp;    abstract public void getNodePartials(int nodeIndex, double[] partials);
+<i>76</i>&nbsp;    //abstract public void setCurrentNodePartials(int nodeIndex, double[] partials);
+<i>77</i>&nbsp;
+<i>78</i>&nbsp;    /** reserve memory for states for node with number nodeIndex **/
+<i>79</i>&nbsp;    //abstract public void createNodeStates(int nodeIndex);
+<i>80</i>&nbsp;
+<i>81</i>&nbsp;    /**
+<i>82</i>&nbsp;     * assign values of states for node with number nodeIndex *
+<i>83</i>&nbsp;     */
+<i>84</i>&nbsp;    abstract public void setNodeStates(int nodeIndex, int[] states);
+<i>85</i>&nbsp;
+<i>86</i>&nbsp;    abstract public void getNodeStates(int nodeIndex, int[] states);
+<i>87</i>&nbsp;
+<i>88</i>&nbsp;    /**
+<i>89</i>&nbsp;     * indicate that the probability transition matrix for node
+<i>90</i>&nbsp;     * nodeIndex is about the be changed, that is, that the stored
+<i>91</i>&nbsp;     * state for node nodeIndex cannot be reused *
+<i>92</i>&nbsp;     */
+<i>93</i>&nbsp;    abstract public void setNodeMatrixForUpdate(int nodeIndex);
+<i>94</i>&nbsp;
+<i>95</i>&nbsp;    /**
+<i>96</i>&nbsp;     * assign values of states for probability transition matrix for node with number nodeIndex *
+<i>97</i>&nbsp;     */
+<i>98</i>&nbsp;    abstract public void setNodeMatrix(int nodeIndex, int matrixIndex, double[] matrix);
+<i>99</i>&nbsp;
+<i>100</i>&nbsp;    abstract public void getNodeMatrix(int nodeIndex, int matrixIndex, double[] matrix);
+<i>101</i>&nbsp;    /** assign values of states for probability transition matrices 
+<i>102</i>&nbsp;     * padded with 1s for dealing with unknown characters for node with number nodeIndex **/
+<i>103</i>&nbsp;//	abstract public void setPaddedNodeMatrices(int nodeIndex, double[] matrix);
+<i>104</i>&nbsp;
+<i>105</i>&nbsp;
+<i>106</i>&nbsp;    /**
+<i>107</i>&nbsp;     * indicate that the topology of the tree chanced so the cache
+<i>108</i>&nbsp;     * data structures cannot be reused *
+<i>109</i>&nbsp;     */
+<i>110</i>&nbsp;    public void setNodeStatesForUpdate(int nodeIndex) {
+<b class="fc"><i>111</i>&nbsp;    }</b>
+<i>112</i>&nbsp;
+<i>113</i>&nbsp;    ;
+<i>114</i>&nbsp;
+<i>115</i>&nbsp;
+<i>116</i>&nbsp;    /**
+<i>117</i>&nbsp;     * flag to indicate whether scaling should be used in the
+<i>118</i>&nbsp;     * likelihood calculation. Scaling can help in dealing with
+<i>119</i>&nbsp;     * numeric issues (underflow).
+<i>120</i>&nbsp;     */
+<b class="fc"><i>121</i>&nbsp;    boolean m_bUseScaling = false;</b>
+<i>122</i>&nbsp;
+<i>123</i>&nbsp;    abstract public void setUseScaling(double scale);
+<i>124</i>&nbsp;
+<i>125</i>&nbsp;    public boolean getUseScaling() {
+<b class="fc"><i>126</i>&nbsp;        return m_bUseScaling;</b>
+<i>127</i>&nbsp;    }
+<i>128</i>&nbsp;
+<i>129</i>&nbsp;    /**
+<i>130</i>&nbsp;     * return the cumulative scaling effect. Should be zero if no scaling is used *
+<i>131</i>&nbsp;     */
+<i>132</i>&nbsp;    abstract public double getLogScalingFactor(int patternIndex_);
+<i>133</i>&nbsp;
+<i>134</i>&nbsp;    /**
+<i>135</i>&nbsp;     * Calculate partials for node node3, with children node1 and node2Index.
+<i>136</i>&nbsp;     * NB Depending on whether the child nodes contain states or partials, the
+<i>137</i>&nbsp;     * calculation differs-*
+<i>138</i>&nbsp;     */
+<i>139</i>&nbsp;    abstract public void calculatePartials(int node1, int node2Index, int node3);
+<i>140</i>&nbsp;    //abstract public void calculatePartials(int node1, int node2Index, int node3, int[] matrixMap);
+<i>141</i>&nbsp;
+<i>142</i>&nbsp;    /**
+<i>143</i>&nbsp;     * integrate partials over categories (if any). *
+<i>144</i>&nbsp;     */
+<i>145</i>&nbsp;    abstract public void integratePartials(int nodeIndex, double[] proportions, double[] outPartials);
+<i>146</i>&nbsp;
+<i>147</i>&nbsp;    /**
+<i>148</i>&nbsp;     * calculate log likelihoods at the root of the tree,
+<i>149</i>&nbsp;     * using frequencies as root node distribution.
+<i>150</i>&nbsp;     * outLogLikelihoods contains the resulting probabilities for each of
+<i>151</i>&nbsp;     * the patterns *
+<i>152</i>&nbsp;     */
+<i>153</i>&nbsp;    abstract public void calculateLogLikelihoods(double[] partials, double[] frequencies, double[] outLogLikelihoods);
+<i>154</i>&nbsp;
+<i>155</i>&nbsp;
+<i>156</i>&nbsp;    public void processStack() {
+<b class="nc"><i>157</i>&nbsp;    }</b>
+<i>158</i>&nbsp;
+<i>159</i>&nbsp;    abstract protected void calculateIntegratePartials(double[] inPartials, double[] proportions, double[] outPartials);
+<i>160</i>&nbsp;//    abstract public void calcRootPsuedoRootPartials(double[] frequencies, int nodeIndex, double [] pseudoPartials);
+<i>161</i>&nbsp;//    abstract public void calcNodePsuedoRootPartials(double[] inPseudoPartials, int nodeIndex, double [] outPseudoPartials);
+<i>162</i>&nbsp;//    abstract public void calcPsuedoRootPartials(double [] parentPseudoPartials, int nodeIndex, double [] pseudoPartials);
+<i>163</i>&nbsp;//    abstract void integratePartialsP(double [] inPartials, double [] proportions, double [] m_fRootPartials);
+<i>164</i>&nbsp;//    abstract void calculateLogLikelihoodsP(double[] partials,double[] outLogLikelihoods);
+<i>165</i>&nbsp;
+<i>166</i>&nbsp;    /**
+<i>167</i>&nbsp;     * store current state *
+<i>168</i>&nbsp;     */
+<i>169</i>&nbsp;    abstract public void store();
+<i>170</i>&nbsp;
+<i>171</i>&nbsp;    /**
+<i>172</i>&nbsp;     * reset current state to stored state, only used when switching from non-scaled to scaled or vice versa *
+<i>173</i>&nbsp;     */
+<i>174</i>&nbsp;    abstract public void unstore();
+<i>175</i>&nbsp;
+<i>176</i>&nbsp;    /**
+<i>177</i>&nbsp;     * restore state *
+<i>178</i>&nbsp;     */
+<i>179</i>&nbsp;    abstract public void restore();
+<i>180</i>&nbsp;//    /** do internal diagnosics, and suggest an alternative core if appropriate **/ 
+<i>181</i>&nbsp;//    abstract LikelihoodCore feelsGood();
+<i>182</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

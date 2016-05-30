@@ -1,0 +1,405 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: CalibrationLineagesIterator</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.speciation</a> ]
+</div>
+
+<h1>Coverage Summary for Class: CalibrationLineagesIterator (beast.evolution.speciation)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CalibrationLineagesIterator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 65)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CalibrationLineagesIterator$LinsIterator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 69)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 134)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.speciation;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;// Arguably the most complex iterator I have ever written.
+<i>4</i>&nbsp;/**
+<i>5</i>&nbsp;* @author Joseph Heled
+<i>6</i>&nbsp; */
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;
+<b class="nc"><i>9</i>&nbsp;public class CalibrationLineagesIterator {</b>
+<i>10</i>&nbsp;    // taxaPartialOrder[i] contains clades immediately contained in the i&#39;th clade as indices (so, strictly smaller than i)
+<i>11</i>&nbsp;    final int[][] taxaPartialOrder;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;    // Per calibration point, the number of taxa which is not below any other point.
+<i>14</i>&nbsp;    final int[] cladesFreeLins;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;    private final boolean rootCalibrated;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;    // Use iterators 0 to curIters-1 (i.e. iters[0:curIters])
+<i>19</i>&nbsp;    private int curIters;
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;    // per clade Iterator
+<i>22</i>&nbsp;    private final LinsIterator[] iters;
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;    // last returned value from iterators: vals[i] for  iters[i]
+<i>25</i>&nbsp;    private int[][] vals;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;    // Number of taxa not below any calibration point
+<i>28</i>&nbsp;    private int freeLineages;
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;    // indices of maximal clades
+<i>31</i>&nbsp;    private final int[] maximalClades;
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;    CalibrationLineagesIterator(final int[][] clades, final int[][] taxaPartialOrder,
+<b class="nc"><i>34</i>&nbsp;                                final boolean[] maximal, final int leafCount) {</b>
+<b class="nc"><i>35</i>&nbsp;        cladesFreeLins = new int[clades.length];</b>
+<b class="nc"><i>36</i>&nbsp;        for(int k = 0; k &lt; cladesFreeLins.length; ++k) {</b>
+<b class="nc"><i>37</i>&nbsp;            cladesFreeLins[k] = clades[k].length;</b>
+<b class="nc"><i>38</i>&nbsp;            for( final int l : taxaPartialOrder[k] ) {</b>
+<b class="nc"><i>39</i>&nbsp;                cladesFreeLins[k] -= clades[l].length;</b>
+<i>40</i>&nbsp;            }
+<b class="nc"><i>41</i>&nbsp;            assert cladesFreeLins[k] &gt;= 0;</b>
+<i>42</i>&nbsp;        }
+<i>43</i>&nbsp;
+<b class="nc"><i>44</i>&nbsp;        this.taxaPartialOrder = taxaPartialOrder;</b>
+<b class="nc"><i>45</i>&nbsp;        iters = new LinsIterator[clades.length+1];</b>
+<b class="nc"><i>46</i>&nbsp;        vals = new int[iters.length][];</b>
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;        // number of maximal clades
+<b class="nc"><i>49</i>&nbsp;        int max = 0;</b>
+<b class="nc"><i>50</i>&nbsp;        for(final boolean b : maximal) {</b>
+<b class="nc"><i>51</i>&nbsp;           max += b ? 1 : 0;</b>
+<i>52</i>&nbsp;        }
+<i>53</i>&nbsp;
+<i>54</i>&nbsp;        // indices of maximal clades in a list
+<b class="nc"><i>55</i>&nbsp;        maximalClades = new int[max];</b>
+<b class="nc"><i>56</i>&nbsp;        freeLineages = leafCount;</b>
+<i>57</i>&nbsp;
+<b class="nc"><i>58</i>&nbsp;        max = 0;</b>
+<b class="nc"><i>59</i>&nbsp;        for(int m = 0; m &lt; maximal.length; ++m) {</b>
+<b class="nc"><i>60</i>&nbsp;            if( maximal[m] ) {</b>
+<b class="nc"><i>61</i>&nbsp;              maximalClades[max] = m;</b>
+<b class="nc"><i>62</i>&nbsp;              ++max;</b>
+<b class="nc"><i>63</i>&nbsp;              freeLineages -= clades[m].length;</b>
+<i>64</i>&nbsp;            }
+<i>65</i>&nbsp;        }
+<i>66</i>&nbsp;
+<b class="nc"><i>67</i>&nbsp;        rootCalibrated = ( max == 1 &amp;&amp; clades[maximalClades[0]].length == leafCount );</b>
+<i>68</i>&nbsp;
+<b class="nc"><i>69</i>&nbsp;        assert ! (rootCalibrated &amp;&amp;  freeLineages &gt; 0);</b>
+<b class="nc"><i>70</i>&nbsp;        assert freeLineages &gt;= 0;</b>
+<i>71</i>&nbsp;    }
+<i>72</i>&nbsp;
+<i>73</i>&nbsp;    boolean isRootCalibrated() {
+<b class="nc"><i>74</i>&nbsp;        return rootCalibrated;</b>
+<i>75</i>&nbsp;    }
+<i>76</i>&nbsp;
+<i>77</i>&nbsp;    // Prepare to iterate: ranks[i] gives the rank of the i&#39;th clade. ranks is a permutation of (1,2,...,#points)
+<i>78</i>&nbsp;    int setup(final int[] ranks) {
+<b class="nc"><i>79</i>&nbsp;        final int n = cladesFreeLins.length;</b>
+<i>80</i>&nbsp;
+<i>81</i>&nbsp;        // reset iterators used. each call to setOneIterator will increment it by one.
+<b class="nc"><i>82</i>&nbsp;        curIters = 0;</b>
+<i>83</i>&nbsp;
+<b class="nc"><i>84</i>&nbsp;        for(int k = 0; k &lt; n; ++k) {</b>
+<b class="nc"><i>85</i>&nbsp;            setOneIterator(ranks, taxaPartialOrder[k], cladesFreeLins[k], ranks[k]);</b>
+<i>86</i>&nbsp;        }
+<i>87</i>&nbsp;
+<b class="nc"><i>88</i>&nbsp;        if( ! rootCalibrated ) {</b>
+<b class="nc"><i>89</i>&nbsp;          setOneIterator(ranks, maximalClades, freeLineages, n+1);</b>
+<i>90</i>&nbsp;        }
+<i>91</i>&nbsp;        
+<b class="nc"><i>92</i>&nbsp;        for(int k = 0; k &lt; curIters-1; ++k) {</b>
+<b class="nc"><i>93</i>&nbsp;            vals[k] = iters[k].next();</b>
+<i>94</i>&nbsp;        }
+<i>95</i>&nbsp;
+<b class="nc"><i>96</i>&nbsp;        return curIters;</b>
+<i>97</i>&nbsp;    }
+<i>98</i>&nbsp;
+<i>99</i>&nbsp;    private void setOneIterator(final int[] ranks, final int[] joinerClades, final int nl, final int rank) {
+<b class="nc"><i>100</i>&nbsp;        final int subs = joinerClades.length;</b>
+<i>101</i>&nbsp;
+<i>102</i>&nbsp;        LinsIterator itr/* = null*/;
+<b class="nc"><i>103</i>&nbsp;        if( subs == 0 ) {</b>
+<b class="nc"><i>104</i>&nbsp;            itr = new LinsIterator(nl, rank, null);</b>
+<i>105</i>&nbsp;        } else /*if( nl &gt; 0 || subs &gt; 2 ) */ {
+<b class="nc"><i>106</i>&nbsp;            final int[] s = new int[subs];</b>
+<b class="nc"><i>107</i>&nbsp;            for(int i = 0; i &lt; subs; ++i) {</b>
+<b class="nc"><i>108</i>&nbsp;                s[i] = ranks[joinerClades[i]];</b>
+<i>109</i>&nbsp;            }
+<b class="nc"><i>110</i>&nbsp;            itr = new LinsIterator(nl, rank, s);</b>
+<i>111</i>&nbsp;        }
+<i>112</i>&nbsp;
+<i>113</i>&nbsp;        //assert itr != null;
+<i>114</i>&nbsp;        //if( itr != null ) {
+<i>115</i>&nbsp;            // sorted according to rank
+<b class="nc"><i>116</i>&nbsp;            iters[itr.rank-1] = itr;</b>
+<b class="nc"><i>117</i>&nbsp;            itr.startIter();</b>
+<b class="nc"><i>118</i>&nbsp;            ++curIters;</b>
+<i>119</i>&nbsp;        //}
+<i>120</i>&nbsp;    }
+<i>121</i>&nbsp;
+<i>122</i>&nbsp;    int[][] next()
+<i>123</i>&nbsp;    {
+<b class="nc"><i>124</i>&nbsp;        final int[] l = iters[curIters-1].next();</b>
+<i>125</i>&nbsp;
+<b class="nc"><i>126</i>&nbsp;        if( l != null ) {</b>
+<b class="nc"><i>127</i>&nbsp;            vals[curIters-1] = l;</b>
+<b class="nc"><i>128</i>&nbsp;            return vals;</b>
+<i>129</i>&nbsp;        }
+<i>130</i>&nbsp;
+<b class="nc"><i>131</i>&nbsp;        int i = curIters-2;</b>
+<b class="nc"><i>132</i>&nbsp;        for( ; i &gt;= 0; --i) {</b>
+<b class="nc"><i>133</i>&nbsp;            if( (vals[i] = iters[i].next()) != null) {</b>
+<b class="nc"><i>134</i>&nbsp;                break;</b>
+<i>135</i>&nbsp;            }
+<i>136</i>&nbsp;        }
+<i>137</i>&nbsp;
+<b class="nc"><i>138</i>&nbsp;        if( i &lt; 0 ) {</b>
+<b class="nc"><i>139</i>&nbsp;            return null;</b>
+<i>140</i>&nbsp;        }
+<i>141</i>&nbsp;
+<b class="nc"><i>142</i>&nbsp;        ++i;</b>
+<i>143</i>&nbsp;
+<b class="nc"><i>144</i>&nbsp;        for( ; i &lt; curIters; ++i) {</b>
+<b class="nc"><i>145</i>&nbsp;            iters[i].startIter();</b>
+<b class="nc"><i>146</i>&nbsp;            vals[i] = iters[i].next();</b>
+<i>147</i>&nbsp;        }
+<i>148</i>&nbsp;
+<b class="nc"><i>149</i>&nbsp;        return vals;</b>
+<i>150</i>&nbsp;    }
+<i>151</i>&nbsp;
+<i>152</i>&nbsp;    public int[][] allJoiners() {
+<b class="nc"><i>153</i>&nbsp;        final int[][] joiners = new int[curIters][];</b>
+<i>154</i>&nbsp;
+<b class="nc"><i>155</i>&nbsp;        for(int i = 0; i &lt; curIters; ++i) {</b>
+<b class="nc"><i>156</i>&nbsp;            joiners[i] = iters[i].ljoins();</b>
+<i>157</i>&nbsp;        }
+<b class="nc"><i>158</i>&nbsp;        return joiners;</b>
+<i>159</i>&nbsp;    }
+<i>160</i>&nbsp;
+<i>161</i>&nbsp;    public int start(final int i) {
+<b class="nc"><i>162</i>&nbsp;        return iters[i].start;</b>
+<i>163</i>&nbsp;    }
+<i>164</i>&nbsp;
+<b class="nc"><i>165</i>&nbsp;    class LinsIterator {</b>
+<i>166</i>&nbsp;
+<i>167</i>&nbsp;        private final int rank;
+<i>168</i>&nbsp;        private final int start;
+<i>169</i>&nbsp;        private final int[] joiners;
+<i>170</i>&nbsp;        private final int[] aStart;
+<i>171</i>&nbsp;        // Current count of lineages at all relevant time points, from 0 (start) to clade top.
+<i>172</i>&nbsp;        private final int[] lins;
+<i>173</i>&nbsp;        private int lastJoinger;
+<i>174</i>&nbsp;        private boolean stopIter;
+<i>175</i>&nbsp;
+<b class="nc"><i>176</i>&nbsp;        LinsIterator(final int ns, final int r, final int[] jnr) {</b>
+<b class="nc"><i>177</i>&nbsp;            rank = r;</b>
+<b class="nc"><i>178</i>&nbsp;            start = ns;</b>
+<b class="nc"><i>179</i>&nbsp;            joiners = new int [r];</b>
+<i>180</i>&nbsp;
+<b class="nc"><i>181</i>&nbsp;            lastJoinger = -1;</b>
+<i>182</i>&nbsp;
+<i>183</i>&nbsp;            // 2 for start+end, rank-1 intermediate levels
+<b class="nc"><i>184</i>&nbsp;            aStart = new int [2 + rank-1];</b>
+<b class="nc"><i>185</i>&nbsp;            lins = new int [2 + rank-1];</b>
+<i>186</i>&nbsp;
+<b class="nc"><i>187</i>&nbsp;            for(int k = 0; k &lt; rank; ++k) {</b>
+<b class="nc"><i>188</i>&nbsp;                joiners[k] = 0;</b>
+<i>189</i>&nbsp;            }
+<i>190</i>&nbsp;
+<b class="nc"><i>191</i>&nbsp;            if( jnr != null ) {</b>
+<b class="nc"><i>192</i>&nbsp;                for (final int j : jnr) {</b>
+<b class="nc"><i>193</i>&nbsp;                    joiners[j] = 1;</b>
+<b class="nc"><i>194</i>&nbsp;                    if (lastJoinger &lt; j) {</b>
+<b class="nc"><i>195</i>&nbsp;                        lastJoinger = j;</b>
+<i>196</i>&nbsp;                    }
+<i>197</i>&nbsp;                }
+<i>198</i>&nbsp;            }
+<b class="nc"><i>199</i>&nbsp;            aStart[0] = ns;</b>
+<i>200</i>&nbsp;
+<b class="nc"><i>201</i>&nbsp;            if( lastJoinger &lt;= 0 ) {</b>
+<b class="nc"><i>202</i>&nbsp;                for(int i = 1; i &lt; rank+1; ++i) {</b>
+<b class="nc"><i>203</i>&nbsp;                    aStart[i] = 2;</b>
+<i>204</i>&nbsp;                }
+<b class="nc"><i>205</i>&nbsp;                if( rank &gt; 1 ) {</b>
+<i>206</i>&nbsp;                    // first iteration increments this
+<b class="nc"><i>207</i>&nbsp;                    aStart[rank-1] -= 1;</b>
+<i>208</i>&nbsp;                }
+<i>209</i>&nbsp;            } else {
+<i>210</i>&nbsp;                //assert(rank &gt; 1);
+<i>211</i>&nbsp;
+<b class="nc"><i>212</i>&nbsp;                if( start &gt; 0 ) {</b>
+<b class="nc"><i>213</i>&nbsp;                    int i = 1;</b>
+<b class="nc"><i>214</i>&nbsp;                    for(; i &lt; lastJoinger+1; ++i) {</b>
+<b class="nc"><i>215</i>&nbsp;                        aStart[i] = 1;</b>
+<i>216</i>&nbsp;                    }
+<b class="nc"><i>217</i>&nbsp;                    for(; i &lt; rank+1; ++i) {</b>
+<b class="nc"><i>218</i>&nbsp;                        aStart[i] = 2;</b>
+<i>219</i>&nbsp;                    }
+<b class="nc"><i>220</i>&nbsp;                } else {</b>
+<b class="nc"><i>221</i>&nbsp;                    assert jnr != null;</b>
+<b class="nc"><i>222</i>&nbsp;                    int mj = jnr[0];</b>
+<b class="nc"><i>223</i>&nbsp;                    for (int aJnr : jnr) {</b>
+<b class="nc"><i>224</i>&nbsp;                        mj = Math.min(mj, aJnr);</b>
+<i>225</i>&nbsp;                    }
+<b class="nc"><i>226</i>&nbsp;                    int i = 1;</b>
+<b class="nc"><i>227</i>&nbsp;                    for(; i &lt; mj+1; ++i) {</b>
+<b class="nc"><i>228</i>&nbsp;                        aStart[i] = 0;</b>
+<i>229</i>&nbsp;                    }
+<b class="nc"><i>230</i>&nbsp;                    for(; i &lt; lastJoinger+1; ++i) {</b>
+<b class="nc"><i>231</i>&nbsp;                        aStart[i] = 1;</b>
+<i>232</i>&nbsp;                    }
+<b class="nc"><i>233</i>&nbsp;                    for(; i &lt; rank+1; ++i) {</b>
+<b class="nc"><i>234</i>&nbsp;                        aStart[i] = 2;</b>
+<i>235</i>&nbsp;                    }
+<i>236</i>&nbsp;                }
+<i>237</i>&nbsp;                // first iteration increments this
+<b class="nc"><i>238</i>&nbsp;                aStart[rank-1] -= 1;</b>
+<i>239</i>&nbsp;            }
+<i>240</i>&nbsp;
+<i>241</i>&nbsp;        }
+<i>242</i>&nbsp;
+<i>243</i>&nbsp;        void startIter() {
+<b class="nc"><i>244</i>&nbsp;            for(int i = 0; i &lt; rank+1; ++i) {</b>
+<b class="nc"><i>245</i>&nbsp;                lins[i] = aStart[i];</b>
+<i>246</i>&nbsp;            }
+<b class="nc"><i>247</i>&nbsp;            stopIter = false;</b>
+<i>248</i>&nbsp;        }
+<i>249</i>&nbsp;
+<i>250</i>&nbsp;        final int[] next()
+<i>251</i>&nbsp;        {
+<b class="nc"><i>252</i>&nbsp;            int i = rank - 1;</b>
+<b class="nc"><i>253</i>&nbsp;            if( lastJoinger &lt;= 0 ) {</b>
+<b class="nc"><i>254</i>&nbsp;                while( i &gt;= 1 &amp;&amp; lins[i] == lins[i-1]) {</b>
+<b class="nc"><i>255</i>&nbsp;                    --i;</b>
+<i>256</i>&nbsp;                }
+<b class="nc"><i>257</i>&nbsp;                if( i == 0 ) {</b>
+<b class="nc"><i>258</i>&nbsp;                    if( rank == 1 ) {</b>
+<b class="nc"><i>259</i>&nbsp;                        if( !stopIter ) {</b>
+<b class="nc"><i>260</i>&nbsp;                            stopIter = true;</b>
+<b class="nc"><i>261</i>&nbsp;                            return lins;</b>
+<i>262</i>&nbsp;                        }
+<i>263</i>&nbsp;                    }
+<b class="nc"><i>264</i>&nbsp;                    return null;</b>
+<i>265</i>&nbsp;                }
+<b class="nc"><i>266</i>&nbsp;                lins[i] += 1;</b>
+<b class="nc"><i>267</i>&nbsp;                ++i;</b>
+<b class="nc"><i>268</i>&nbsp;                while( i &lt; rank ) {</b>
+<b class="nc"><i>269</i>&nbsp;                    lins[i] = 2;</b>
+<b class="nc"><i>270</i>&nbsp;                    ++i;</b>
+<i>271</i>&nbsp;                }
+<i>272</i>&nbsp;            } else {
+<i>273</i>&nbsp;
+<b class="nc"><i>274</i>&nbsp;                while( i &gt;= 1 &amp;&amp; lins[i] == lins[i-1] + joiners[i-1] ) {</b>
+<b class="nc"><i>275</i>&nbsp;                    --i;</b>
+<i>276</i>&nbsp;                }
+<b class="nc"><i>277</i>&nbsp;                if( i == 0 ) {</b>
+<b class="nc"><i>278</i>&nbsp;                    return null;</b>
+<i>279</i>&nbsp;                }
+<b class="nc"><i>280</i>&nbsp;                lins[i] += 1;</b>
+<b class="nc"><i>281</i>&nbsp;                i++;</b>
+<b class="nc"><i>282</i>&nbsp;                while( i &lt; rank ) {</b>
+<b class="nc"><i>283</i>&nbsp;                    lins[i] = (i &lt;= lastJoinger) ? 1 : 2;</b>
+<b class="nc"><i>284</i>&nbsp;                    i++;</b>
+<i>285</i>&nbsp;                }
+<i>286</i>&nbsp;            }
+<b class="nc"><i>287</i>&nbsp;            return lins;</b>
+<i>288</i>&nbsp;        }
+<i>289</i>&nbsp;
+<i>290</i>&nbsp;        final int[] ljoins()  {
+<b class="nc"><i>291</i>&nbsp;            return joiners;</b>
+<i>292</i>&nbsp;        }
+<i>293</i>&nbsp;    }
+<i>294</i>&nbsp;}
+<i>295</i>&nbsp;
+<i>296</i>&nbsp;
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

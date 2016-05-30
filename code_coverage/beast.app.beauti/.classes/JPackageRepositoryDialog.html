@@ -1,0 +1,355 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: JPackageRepositoryDialog</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.beauti</a> ]
+</div>
+
+<h1>Coverage Summary for Class: JPackageRepositoryDialog (beast.app.beauti)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JPackageRepositoryDialog</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 73)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JPackageRepositoryDialog$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 21)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JPackageRepositoryDialog$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JPackageRepositoryDialog$3</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JPackageRepositoryDialog$RepoTableModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 111)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp; * Copyright (C) 2014 Tim Vaughan &lt;tgvaughan@gmail.com&gt;.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; * This library is free software; you can redistribute it and/or
+<i>5</i>&nbsp; * modify it under the terms of the GNU Lesser General Public
+<i>6</i>&nbsp; * License as published by the Free Software Foundation; either
+<i>7</i>&nbsp; * version 2.1 of the License, or (at your option) any later version.
+<i>8</i>&nbsp; *
+<i>9</i>&nbsp; * This library is distributed in the hope that it will be useful,
+<i>10</i>&nbsp; * but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>11</i>&nbsp; * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+<i>12</i>&nbsp; * Lesser General Public License for more details.
+<i>13</i>&nbsp; *
+<i>14</i>&nbsp; * You should have received a copy of the GNU Lesser General Public
+<i>15</i>&nbsp; * License along with this library; if not, write to the Free Software
+<i>16</i>&nbsp; * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+<i>17</i>&nbsp; * MA 02110-1301  USA
+<i>18</i>&nbsp; */
+<i>19</i>&nbsp;package beast.app.beauti;
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;import java.awt.BorderLayout;
+<i>22</i>&nbsp;import java.awt.Dimension;
+<i>23</i>&nbsp;import java.awt.Point;
+<i>24</i>&nbsp;import java.io.IOException;
+<i>25</i>&nbsp;import java.io.InputStream;
+<i>26</i>&nbsp;import java.net.MalformedURLException;
+<i>27</i>&nbsp;import java.net.URL;
+<i>28</i>&nbsp;import java.util.ArrayList;
+<i>29</i>&nbsp;import java.util.List;
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;import javax.swing.*;
+<i>32</i>&nbsp;import javax.swing.table.AbstractTableModel;
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;import beast.util.AddOnManager;
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;/**
+<i>37</i>&nbsp; * @author Tim Vaughan &lt;tgvaughan@gmail.com&gt;
+<i>38</i>&nbsp; */
+<i>39</i>&nbsp;public class JPackageRepositoryDialog extends JDialog {
+<i>40</i>&nbsp;
+<i>41</i>&nbsp;	private static final long serialVersionUID = 1L;
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;	public JPackageRepositoryDialog(final JFrame frame) {
+<b class="nc"><i>44</i>&nbsp;        super(frame);</b>
+<i>45</i>&nbsp;
+<b class="nc"><i>46</i>&nbsp;        setModal(true);</b>
+<b class="nc"><i>47</i>&nbsp;        setTitle(&quot;BEAST 2 Package Repository Manager&quot;);</b>
+<i>48</i>&nbsp;        
+<i>49</i>&nbsp;        // Get current list of URLs:
+<i>50</i>&nbsp;        List&lt;URL&gt; urls;
+<i>51</i>&nbsp;        try {
+<b class="nc"><i>52</i>&nbsp;            urls = AddOnManager.getRepositoryURLs();</b>
+<b class="nc"><i>53</i>&nbsp;        } catch (MalformedURLException exception) {</b>
+<b class="nc"><i>54</i>&nbsp;            urls = new ArrayList&lt;&gt;();</b>
+<i>55</i>&nbsp;            try {
+<b class="nc"><i>56</i>&nbsp;                urls.add(new URL(AddOnManager.PACKAGES_XML));</b>
+<b class="nc"><i>57</i>&nbsp;            } catch (MalformedURLException e) {</b>
+<i>58</i>&nbsp;                // Hard-coded URL is broken. Should never happen!
+<b class="nc"><i>59</i>&nbsp;                e.printStackTrace();</b>
+<b class="nc"><i>60</i>&nbsp;            }</b>
+<b class="nc"><i>61</i>&nbsp;        }</b>
+<i>62</i>&nbsp;
+<i>63</i>&nbsp;        // Assemble table
+<b class="nc"><i>64</i>&nbsp;        final RepoTableModel repoTableModel = new RepoTableModel(urls);</b>
+<b class="nc"><i>65</i>&nbsp;        final JTable repoTable = new JTable(repoTableModel);</b>
+<b class="nc"><i>66</i>&nbsp;        repoTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);</b>
+<b class="nc"><i>67</i>&nbsp;        JScrollPane scrollPane = new JScrollPane(repoTable);</b>
+<b class="nc"><i>68</i>&nbsp;        getContentPane().add(scrollPane, BorderLayout.CENTER);</b>
+<i>69</i>&nbsp;        
+<i>70</i>&nbsp;        // Add buttons
+<b class="nc"><i>71</i>&nbsp;        Box box = Box.createHorizontalBox();</b>
+<i>72</i>&nbsp;        
+<b class="nc"><i>73</i>&nbsp;        // ADD URL</b>
+<b class="nc"><i>74</i>&nbsp;        JButton addURLButton = new JButton(&quot;Add URL&quot;);</b>
+<b class="nc"><i>75</i>&nbsp;        addURLButton.addActionListener(e -&gt; {</b>
+<b class="nc"><i>76</i>&nbsp;            String newURLString = (String)JOptionPane.showInputDialog(frame,</b>
+<b class="nc"><i>77</i>&nbsp;                    &quot;Enter package repository URL&quot;,</b>
+<i>78</i>&nbsp;                    &quot;Add repository URL&quot;,JOptionPane.PLAIN_MESSAGE, null, null, &quot;http://&quot;);
+<i>79</i>&nbsp;
+<b class="nc"><i>80</i>&nbsp;            if (newURLString == null)</b>
+<b class="nc"><i>81</i>&nbsp;                return; // User canceled</b>
+<b class="nc"><i>82</i>&nbsp;</b>
+<b class="nc"><i>83</i>&nbsp;            URL newURL = null;</b>
+<b class="nc"><i>84</i>&nbsp;            try {</b>
+<b class="nc"><i>85</i>&nbsp;                newURL = new URL(newURLString);</b>
+<b class="nc"><i>86</i>&nbsp;            } catch (MalformedURLException exception) {</b>
+<b class="nc"><i>87</i>&nbsp;                JOptionPane.showMessageDialog(frame, &quot;Invalid URL.&quot;);</b>
+<b class="nc"><i>88</i>&nbsp;                return;</b>
+<b class="nc"><i>89</i>&nbsp;            }</b>
+<b class="nc"><i>90</i>&nbsp;</b>
+<b class="nc"><i>91</i>&nbsp;            if (repoTableModel.urls.contains(newURL)) {</b>
+<b class="nc"><i>92</i>&nbsp;                JOptionPane.showMessageDialog(frame, &quot;Repository already exists!&quot;);</b>
+<b class="nc"><i>93</i>&nbsp;                return;</b>
+<i>94</i>&nbsp;            }
+<b class="nc"><i>95</i>&nbsp;</b>
+<b class="nc"><i>96</i>&nbsp;            try {</b>
+<b class="nc"><i>97</i>&nbsp;                if (newURL.getHost() == null)</b>
+<b class="nc"><i>98</i>&nbsp;                    return;</b>
+<b class="nc"><i>99</i>&nbsp;</b>
+<b class="nc"><i>100</i>&nbsp;                InputStream is = newURL.openStream();</b>
+<b class="nc"><i>101</i>&nbsp;                is.close();</b>
+<i>102</i>&nbsp;
+<b class="nc"><i>103</i>&nbsp;            } catch (IOException ex) {</b>
+<b class="nc"><i>104</i>&nbsp;                JOptionPane.showMessageDialog(frame, &quot;Could not access URL.&quot;);</b>
+<b class="nc"><i>105</i>&nbsp;                return;</b>
+<b class="nc"><i>106</i>&nbsp;            }</b>
+<b class="nc"><i>107</i>&nbsp;</b>
+<i>108</i>&nbsp;            // Add to table:
+<b class="nc"><i>109</i>&nbsp;            repoTableModel.urls.add(newURL);</b>
+<b class="nc"><i>110</i>&nbsp;            repoTableModel.fireTableDataChanged();</b>
+<b class="nc"><i>111</i>&nbsp;        });</b>
+<b class="nc"><i>112</i>&nbsp;        box.add(addURLButton);</b>
+<i>113</i>&nbsp;        
+<i>114</i>&nbsp;        // DELETE URL
+<b class="nc"><i>115</i>&nbsp;        JButton deleteURLButton = new JButton(&quot;Delete selected URL&quot;);</b>
+<b class="nc"><i>116</i>&nbsp;        deleteURLButton.addActionListener(e -&gt; {</b>
+<b class="nc"><i>117</i>&nbsp;            if (JOptionPane.showConfirmDialog(frame, &quot;Really delete this repository?&quot;) ==JOptionPane.YES_OPTION) {</b>
+<b class="nc"><i>118</i>&nbsp;                repoTableModel.urls.remove(repoTable.getSelectedRow());</b>
+<b class="nc"><i>119</i>&nbsp;                repoTableModel.fireTableDataChanged();</b>
+<b class="nc"><i>120</i>&nbsp;            }</b>
+<b class="nc"><i>121</i>&nbsp;        });</b>
+<b class="nc"><i>122</i>&nbsp;        deleteURLButton.setEnabled(false);</b>
+<b class="nc"><i>123</i>&nbsp;        box.add(deleteURLButton);</b>
+<i>124</i>&nbsp;        
+<b class="nc"><i>125</i>&nbsp;        // DONE</b>
+<b class="nc"><i>126</i>&nbsp;        JButton OKButton = new JButton(&quot;Done&quot;);</b>
+<b class="nc"><i>127</i>&nbsp;        OKButton.addActionListener(e -&gt; {</b>
+<b class="nc"><i>128</i>&nbsp;            AddOnManager.saveRepositoryURLs(repoTableModel.urls);</b>
+<b class="nc"><i>129</i>&nbsp;            setVisible(false);</b>
+<b class="nc"><i>130</i>&nbsp;        });</b>
+<b class="nc"><i>131</i>&nbsp;        box.add(OKButton);</b>
+<b class="nc"><i>132</i>&nbsp;        getContentPane().add(box, BorderLayout.PAGE_END);</b>
+<i>133</i>&nbsp;
+<i>134</i>&nbsp;        // Action listeners to disable/enable delete button
+<b class="nc"><i>135</i>&nbsp;        ListSelectionModel listSelectionModel = repoTable.getSelectionModel();</b>
+<b class="nc"><i>136</i>&nbsp;        listSelectionModel.addListSelectionListener(e -&gt; {</b>
+<b class="nc"><i>137</i>&nbsp;            if (e.getValueIsAdjusting())</b>
+<b class="nc"><i>138</i>&nbsp;                return;</b>
+<i>139</i>&nbsp;
+<b class="nc"><i>140</i>&nbsp;            if (listSelectionModel.isSelectedIndex(0))</b>
+<b class="nc"><i>141</i>&nbsp;                deleteURLButton.setEnabled(false);</b>
+<i>142</i>&nbsp;            else
+<b class="nc"><i>143</i>&nbsp;                deleteURLButton.setEnabled(true);</b>
+<b class="nc"><i>144</i>&nbsp;        });</b>
+<i>145</i>&nbsp;
+<i>146</i>&nbsp;        // Set size and location of dialog
+<b class="nc"><i>147</i>&nbsp;        Dimension dim = scrollPane.getPreferredSize();</b>
+<b class="nc"><i>148</i>&nbsp;        Dimension dim2 = box.getPreferredSize();</b>
+<b class="nc"><i>149</i>&nbsp;        setSize(dim.width + 30, dim.height + dim2.height + 30);</b>
+<b class="nc"><i>150</i>&nbsp;        Point frameLocation = frame.getLocation();</b>
+<b class="nc"><i>151</i>&nbsp;        Dimension frameSize = frame.getSize();</b>
+<b class="nc"><i>152</i>&nbsp;        setLocation(frameLocation.x + frameSize.width / 2 - dim.width / 2,</b>
+<i>153</i>&nbsp;                frameLocation.y + frameSize.height / 2 - dim.height / 2);
+<b class="nc"><i>154</i>&nbsp;    }</b>
+<i>155</i>&nbsp;
+<i>156</i>&nbsp;    /**
+<i>157</i>&nbsp;     * Class of tables containing the current list of package repositories.
+<i>158</i>&nbsp;     */
+<i>159</i>&nbsp;    class RepoTableModel extends AbstractTableModel {
+<i>160</i>&nbsp;		private static final long serialVersionUID = 1L;
+<i>161</i>&nbsp;		
+<i>162</i>&nbsp;		public List&lt;URL&gt; urls;
+<i>163</i>&nbsp;
+<b class="nc"><i>164</i>&nbsp;        public RepoTableModel(List&lt;URL&gt; urls) {</b>
+<b class="nc"><i>165</i>&nbsp;            this.urls = urls;</b>
+<b class="nc"><i>166</i>&nbsp;        }</b>
+<i>167</i>&nbsp;
+<i>168</i>&nbsp;        @Override
+<i>169</i>&nbsp;        public int getRowCount() {
+<b class="nc"><i>170</i>&nbsp;            return urls.size();</b>
+<i>171</i>&nbsp;        }
+<i>172</i>&nbsp;
+<i>173</i>&nbsp;        @Override
+<i>174</i>&nbsp;        public int getColumnCount() {
+<b class="nc"><i>175</i>&nbsp;            return 1;</b>
+<i>176</i>&nbsp;        }
+<i>177</i>&nbsp;
+<i>178</i>&nbsp;        @Override
+<i>179</i>&nbsp;        public String getColumnName(int column) {
+<b class="nc"><i>180</i>&nbsp;            return &quot;Package repository URLs&quot;;</b>
+<i>181</i>&nbsp;        }
+<i>182</i>&nbsp;
+<i>183</i>&nbsp;        @Override
+<i>184</i>&nbsp;        public Object getValueAt(int rowIndex, int columnIndex) {
+<b class="nc"><i>185</i>&nbsp;            return urls.get(rowIndex);</b>
+<i>186</i>&nbsp;        }
+<i>187</i>&nbsp;    }
+<i>188</i>&nbsp;
+<i>189</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

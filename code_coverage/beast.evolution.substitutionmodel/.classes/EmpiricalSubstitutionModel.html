@@ -1,0 +1,222 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: EmpiricalSubstitutionModel</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.substitutionmodel</a> ]
+</div>
+
+<h1>Coverage Summary for Class: EmpiricalSubstitutionModel (beast.evolution.substitutionmodel)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EmpiricalSubstitutionModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    73.8%
+  </span>
+  <span class="absValue">
+    (45/ 61)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.substitutionmodel;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.lang.reflect.InvocationTargetException;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import beast.core.Description;
+<i>6</i>&nbsp;import beast.core.Input.Validate;
+<i>7</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>8</i>&nbsp;import beast.evolution.tree.Node;
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;@Description(&quot;A substitution model where the rates and frequencies are obtained from &quot; +
+<i>11</i>&nbsp;        &quot;empirical evidence. Especially, amino acid models like WAG.&quot;)
+<i>12</i>&nbsp;public abstract class EmpiricalSubstitutionModel extends GeneralSubstitutionModel {
+<i>13</i>&nbsp;
+<b class="fc"><i>14</i>&nbsp;    public EmpiricalSubstitutionModel() {</b>
+<b class="fc"><i>15</i>&nbsp;        frequenciesInput.setRule(Validate.OPTIONAL);</b>
+<b class="fc"><i>16</i>&nbsp;        ratesInput.setRule(Validate.OPTIONAL);</b>
+<b class="fc"><i>17</i>&nbsp;    }</b>
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;    double[] m_empiricalRates;
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;    @Override
+<i>22</i>&nbsp;    public void initAndValidate() {
+<b class="fc"><i>23</i>&nbsp;        frequencies = getEmpericalFrequencieValues();</b>
+<b class="fc"><i>24</i>&nbsp;        m_empiricalRates = getEmpericalRateValues();</b>
+<b class="fc"><i>25</i>&nbsp;        int freqs = frequencies.getFreqs().length;</b>
+<b class="fc"><i>26</i>&nbsp;        if (m_empiricalRates.length != freqs * (freqs - 1)) {</b>
+<b class="nc"><i>27</i>&nbsp;            throw new IllegalArgumentException(&quot;The number of empirical rates (&quot; + m_empiricalRates.length + &quot;) should be &quot; +</b>
+<i>28</i>&nbsp;                    &quot;equal to #frequencies * (#frequencies-1) = (&quot; + freqs + &quot;*&quot; + (freqs - 1) + &quot;).&quot;);
+<i>29</i>&nbsp;        }
+<i>30</i>&nbsp;
+<b class="fc"><i>31</i>&nbsp;        updateMatrix = true;</b>
+<b class="fc"><i>32</i>&nbsp;        nrOfStates = frequencies.getFreqs().length;</b>
+<i>33</i>&nbsp;        try {
+<b class="fc"><i>34</i>&nbsp;			eigenSystem = createEigenSystem();</b>
+<b class="nc"><i>35</i>&nbsp;		} catch (SecurityException | ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException</b>
+<i>36</i>&nbsp;				| InvocationTargetException e) {
+<b class="nc"><i>37</i>&nbsp;			throw new IllegalArgumentException(e.getMessage());</b>
+<b class="fc"><i>38</i>&nbsp;		}</b>
+<b class="fc"><i>39</i>&nbsp;        rateMatrix = new double[nrOfStates][nrOfStates];</b>
+<b class="fc"><i>40</i>&nbsp;        relativeRates = new double[m_empiricalRates.length];</b>
+<b class="fc"><i>41</i>&nbsp;        storedRelativeRates = new double[m_empiricalRates.length];</b>
+<b class="fc"><i>42</i>&nbsp;    } // initAndValidate</b>
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;    @Override
+<i>45</i>&nbsp;    protected void setupRelativeRates() {
+<b class="fc"><i>46</i>&nbsp;        System.arraycopy(m_empiricalRates, 0, relativeRates, 0, m_empiricalRates.length);</b>
+<b class="fc"><i>47</i>&nbsp;    }</b>
+<i>48</i>&nbsp;
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;    /**
+<i>51</i>&nbsp;     * convert empirical rates into a RealParameter, only off diagonal entries are recorded *
+<i>52</i>&nbsp;     */
+<i>53</i>&nbsp;    double[] getEmpericalRateValues() {
+<b class="fc"><i>54</i>&nbsp;        double[][] matrix = getEmpiricalRates();</b>
+<b class="fc"><i>55</i>&nbsp;        int[] order = getEncodingOrder();</b>
+<b class="fc"><i>56</i>&nbsp;        int states = matrix.length;</b>
+<i>57</i>&nbsp;
+<b class="fc"><i>58</i>&nbsp;        double[] rates = new double[states * (states - 1)];</b>
+<b class="fc"><i>59</i>&nbsp;        int k = 0;</b>
+<b class="fc"><i>60</i>&nbsp;        for (int i = 0; i &lt; states; i++) {</b>
+<b class="fc"><i>61</i>&nbsp;            int u = order[i];</b>
+<b class="fc"><i>62</i>&nbsp;            for (int j = 0; j &lt; states; j++) {</b>
+<b class="fc"><i>63</i>&nbsp;                int v = order[j];</b>
+<b class="fc"><i>64</i>&nbsp;                if (i != j) {</b>
+<b class="fc"><i>65</i>&nbsp;                    rates[k++] = matrix[Math.min(u, v)][Math.max(u, v)];</b>
+<i>66</i>&nbsp;                }
+<i>67</i>&nbsp;            }
+<i>68</i>&nbsp;        }
+<b class="fc"><i>69</i>&nbsp;        return rates;</b>
+<i>70</i>&nbsp;    }
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;    /**
+<i>73</i>&nbsp;     * convert empirical frequencies into a RealParameter *
+<i>74</i>&nbsp;     */
+<i>75</i>&nbsp;    Frequencies getEmpericalFrequencieValues() {
+<b class="fc"><i>76</i>&nbsp;        double[] freqs = getEmpiricalFrequencies();</b>
+<b class="fc"><i>77</i>&nbsp;        int[] order = getEncodingOrder();</b>
+<b class="fc"><i>78</i>&nbsp;        int states = freqs.length;</b>
+<b class="fc"><i>79</i>&nbsp;        Frequencies freqsParam = new Frequencies();</b>
+<b class="fc"><i>80</i>&nbsp;        String valuesString = &quot;&quot;;</b>
+<i>81</i>&nbsp;
+<b class="fc"><i>82</i>&nbsp;        for (int i = 0; i &lt; states; i++) {</b>
+<b class="fc"><i>83</i>&nbsp;            valuesString += freqs[order[i]] + &quot; &quot;;</b>
+<i>84</i>&nbsp;        }
+<b class="fc"><i>85</i>&nbsp;        RealParameter freqsRParam = new RealParameter();</b>
+<b class="fc"><i>86</i>&nbsp;        freqsRParam.initByName(</b>
+<i>87</i>&nbsp;                &quot;value&quot;, valuesString,
+<b class="fc"><i>88</i>&nbsp;                &quot;lower&quot;, 0.0,</b>
+<b class="fc"><i>89</i>&nbsp;                &quot;upper&quot;, 1.0,</b>
+<b class="fc"><i>90</i>&nbsp;                &quot;dimension&quot;, states</b>
+<i>91</i>&nbsp;        );
+<b class="fc"><i>92</i>&nbsp;        freqsParam.frequenciesInput.setValue(freqsRParam, freqsParam);</b>
+<b class="fc"><i>93</i>&nbsp;        freqsParam.initAndValidate();</b>
+<b class="fc"><i>94</i>&nbsp;        return freqsParam;</b>
+<i>95</i>&nbsp;    }
+<i>96</i>&nbsp;
+<i>97</i>&nbsp;
+<i>98</i>&nbsp;    /**
+<i>99</i>&nbsp;     * return rate matrix (ie two dimensional array) in upper diagonal form *
+<i>100</i>&nbsp;     */
+<i>101</i>&nbsp;    abstract double[][] getEmpiricalRates();
+<i>102</i>&nbsp;
+<i>103</i>&nbsp;    /**
+<i>104</i>&nbsp;     * return empirical frequencies *
+<i>105</i>&nbsp;     */
+<i>106</i>&nbsp;    abstract double[] getEmpiricalFrequencies();
+<i>107</i>&nbsp;
+<i>108</i>&nbsp;    /**
+<i>109</i>&nbsp;     * return character order for getEmpricialRates and getEmpriricalFrequencies
+<i>110</i>&nbsp;     * // The rates may be specified assuming that the amino acids are in this order:
+<i>111</i>&nbsp;     * // ARNDCQEGHILKMFPSTWYV
+<i>112</i>&nbsp;     * // but the AminoAcids dataType wants them in this order:
+<i>113</i>&nbsp;     * // ACDEFGHIKLMNPQRSTVWY
+<i>114</i>&nbsp;     * // This method returns the proper order
+<i>115</i>&nbsp;     */
+<i>116</i>&nbsp;    abstract int[] getEncodingOrder();
+<i>117</i>&nbsp;
+<i>118</i>&nbsp;    @Override
+<i>119</i>&nbsp;    public double[] getRateMatrix(Node node) {
+<b class="nc"><i>120</i>&nbsp;        double[][] matrix = getEmpiricalRates();</b>
+<b class="nc"><i>121</i>&nbsp;        int states = matrix.length;</b>
+<b class="nc"><i>122</i>&nbsp;        double[] rates = new double[states * states];</b>
+<b class="nc"><i>123</i>&nbsp;        for (int i = 0; i &lt; states; i++) {</b>
+<b class="nc"><i>124</i>&nbsp;            for (int j = i + 1; j &lt; states; j++) {</b>
+<b class="nc"><i>125</i>&nbsp;                rates[i * states + j] = matrix[i][j];</b>
+<b class="nc"><i>126</i>&nbsp;                rates[j * states + i] = matrix[i][j];</b>
+<i>127</i>&nbsp;            }
+<i>128</i>&nbsp;        }
+<i>129</i>&nbsp;        // determine diagonal
+<b class="nc"><i>130</i>&nbsp;        for (int i = 0; i &lt; states; i++) {</b>
+<b class="nc"><i>131</i>&nbsp;            double sum = 0;</b>
+<b class="nc"><i>132</i>&nbsp;            for (int j = i + 1; j &lt; states; j++) {</b>
+<b class="nc"><i>133</i>&nbsp;                sum += rates[i * states + j];</b>
+<i>134</i>&nbsp;            }
+<b class="nc"><i>135</i>&nbsp;            rates[i * states + i] = -sum;</b>
+<i>136</i>&nbsp;        }
+<b class="nc"><i>137</i>&nbsp;        return rates;</b>
+<i>138</i>&nbsp;    }
+<i>139</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,621 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: EBSPAnalyser</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.tools</a> ]
+</div>
+
+<h1>Coverage Summary for Class: EBSPAnalyser (beast.app.tools)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EBSPAnalyser</td>
+<td class="coverageStat">
+  <span class="percent">
+    10%
+  </span>
+  <span class="absValue">
+    (1/ 10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0.6%
+  </span>
+  <span class="absValue">
+    (1/ 180)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">EBSPAnalyser$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">EBSPAnalyser$EBSPAnalyserDialog</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 68)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">EBSPAnalyser$EBSPAnalyserDialog$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">EBSPAnalyser$EBSPAnalyserDialog$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    9.5%
+  </span>
+  <span class="absValue">
+    (2/ 21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0.8%
+  </span>
+  <span class="absValue">
+    (2/ 263)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.tools;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.awt.BorderLayout;
+<i>4</i>&nbsp;import java.awt.Font;
+<i>5</i>&nbsp;import java.io.BufferedReader;
+<i>6</i>&nbsp;import java.io.File;
+<i>7</i>&nbsp;import java.io.FileReader;
+<i>8</i>&nbsp;import java.io.IOException;
+<i>9</i>&nbsp;import java.io.PrintStream;
+<i>10</i>&nbsp;import java.util.ArrayList;
+<i>11</i>&nbsp;import java.util.Arrays;
+<i>12</i>&nbsp;import java.util.List;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;import javax.swing.Icon;
+<i>15</i>&nbsp;import javax.swing.JButton;
+<i>16</i>&nbsp;import javax.swing.JComboBox;
+<i>17</i>&nbsp;import javax.swing.JDialog;
+<i>18</i>&nbsp;import javax.swing.JFrame;
+<i>19</i>&nbsp;import javax.swing.JLabel;
+<i>20</i>&nbsp;import javax.swing.JOptionPane;
+<i>21</i>&nbsp;import javax.swing.JPanel;
+<i>22</i>&nbsp;import javax.swing.JTextField;
+<i>23</i>&nbsp;import javax.swing.UIManager;
+<i>24</i>&nbsp;import javax.swing.border.EmptyBorder;
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;import beast.app.BEASTVersion2;
+<i>27</i>&nbsp;import beast.app.util.Utils;
+<i>28</i>&nbsp;import beast.app.util.WholeNumberField;
+<i>29</i>&nbsp;import beast.core.util.Log;
+<i>30</i>&nbsp;import beast.evolution.tree.coalescent.CompoundPopulationFunction;
+<i>31</i>&nbsp;import beast.evolution.tree.coalescent.CompoundPopulationFunction.Type;
+<i>32</i>&nbsp;import beast.math.statistic.DiscreteStatistics;
+<i>33</i>&nbsp;import beast.util.HeapSort;
+<i>34</i>&nbsp;import jam.console.ConsoleApplication;
+<i>35</i>&nbsp;import jam.panels.OptionsPanel;
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;
+<b class="fc"><i>39</i>&nbsp;public class EBSPAnalyser {</b>
+<i>40</i>&nbsp;    String m_sFileOut;
+<b class="nc"><i>41</i>&nbsp;    PrintStream m_out = System.out;</b>
+<b class="nc"><i>42</i>&nbsp;    CompoundPopulationFunction.Type m_type = Type.LINEAR;</b>
+<i>43</i>&nbsp;    String m_sInputFile;
+<b class="nc"><i>44</i>&nbsp;    int m_nBurninPercentage = 10;</b>
+<i>45</i>&nbsp;
+<i>46</i>&nbsp;    private void run() throws IOException {
+<b class="nc"><i>47</i>&nbsp;        parse(m_sInputFile, m_nBurninPercentage, m_type, m_out);</b>
+<b class="nc"><i>48</i>&nbsp;    }</b>
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;    void parse(String fileName, int burnInPercentage, CompoundPopulationFunction.Type type, PrintStream out) throws IOException {
+<b class="nc"><i>51</i>&nbsp;        logln(&quot;Processing &quot; + fileName);</b>
+<b class="nc"><i>52</i>&nbsp;        BufferedReader fin = new BufferedReader(new FileReader(fileName));</b>
+<i>53</i>&nbsp;        String str;
+<b class="nc"><i>54</i>&nbsp;        int data = 0;</b>
+<i>55</i>&nbsp;        // first, sweep through the log file to determine size of the log
+<b class="nc"><i>56</i>&nbsp;        while (fin.ready()) {</b>
+<b class="nc"><i>57</i>&nbsp;            str = fin.readLine();</b>
+<i>58</i>&nbsp;            // terrible hackish code, must improve later
+<b class="nc"><i>59</i>&nbsp;            if( str.charAt(0) == &#39;#&#39; ) {</b>
+<b class="nc"><i>60</i>&nbsp;                int i = str.indexOf(&quot;spec=&quot;);</b>
+<b class="nc"><i>61</i>&nbsp;                if( i &gt; 0 ) {</b>
+<b class="nc"><i>62</i>&nbsp;                   if( str.indexOf(&quot;type=\&quot;stepwise\&quot;&quot;) &gt; 0 ) {</b>
+<b class="nc"><i>63</i>&nbsp;                      m_type = Type.STEPWISE;</b>
+<b class="nc"><i>64</i>&nbsp;                   }  else if( str.indexOf(&quot;type=\&quot;linear\&quot;&quot;) &gt; 0 ) {</b>
+<b class="nc"><i>65</i>&nbsp;                      m_type = Type.LINEAR;</b>
+<i>66</i>&nbsp;                   }
+<i>67</i>&nbsp;                }
+<i>68</i>&nbsp;            }
+<b class="nc"><i>69</i>&nbsp;            if (str.indexOf(&#39;#&#39;) &lt; 0 &amp;&amp; str.matches(&quot;.*[0-9a-zA-Z].*&quot;)) {</b>
+<b class="nc"><i>70</i>&nbsp;                data++;</b>
+<i>71</i>&nbsp;            }
+<i>72</i>&nbsp;        }
+<b class="nc"><i>73</i>&nbsp;        final int burnIn = data * burnInPercentage / 100;</b>
+<b class="nc"><i>74</i>&nbsp;        logln(&quot; skipping &quot; + burnIn + &quot; line\n\n&quot;);</b>
+<b class="nc"><i>75</i>&nbsp;        data = -burnIn - 1;</b>
+<b class="nc"><i>76</i>&nbsp;        fin.close();</b>
+<b class="nc"><i>77</i>&nbsp;        fin = new BufferedReader(new FileReader(fileName));</b>
+<i>78</i>&nbsp;
+<i>79</i>&nbsp;        // process log
+<b class="nc"><i>80</i>&nbsp;        final List&lt;List&lt;Double&gt;&gt; times = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>81</i>&nbsp;        final List&lt;List&lt;Double&gt;&gt; popSizes = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>82</i>&nbsp;        double[] alltimes = null;</b>
+<b class="nc"><i>83</i>&nbsp;        while (fin.ready()) {</b>
+<b class="nc"><i>84</i>&nbsp;            str = fin.readLine();</b>
+<b class="nc"><i>85</i>&nbsp;            if (str.indexOf(&#39;#&#39;) &lt; 0 &amp;&amp; str.matches(&quot;.*[0-9a-zA-Z].*&quot;)) {</b>
+<b class="nc"><i>86</i>&nbsp;                if (++data &gt; 0) {</b>
+<b class="nc"><i>87</i>&nbsp;                    final String[] strs = str.split(&quot;\t&quot;);</b>
+<b class="nc"><i>88</i>&nbsp;                    final List&lt;Double&gt; times2 = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>89</i>&nbsp;                    final List&lt;Double&gt; popSizes2 = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>90</i>&nbsp;                    if (alltimes == null) {</b>
+<b class="nc"><i>91</i>&nbsp;                        alltimes = new double[strs.length - 1];</b>
+<i>92</i>&nbsp;                    }
+<b class="nc"><i>93</i>&nbsp;                    for (int i = 1; i &lt; strs.length; i++) {</b>
+<b class="nc"><i>94</i>&nbsp;                        final String[] strs2 = strs[i].split(&quot;:&quot;);</b>
+<b class="nc"><i>95</i>&nbsp;                        final Double time = Double.parseDouble(strs2[0]);</b>
+<b class="nc"><i>96</i>&nbsp;                        alltimes[i - 1] += time;</b>
+<b class="nc"><i>97</i>&nbsp;                        if (strs2.length &gt; 1) {</b>
+<b class="nc"><i>98</i>&nbsp;                            times2.add(time);</b>
+<b class="nc"><i>99</i>&nbsp;                            popSizes2.add(Double.parseDouble(strs2[1]));</b>
+<i>100</i>&nbsp;                        }
+<i>101</i>&nbsp;                    }
+<b class="nc"><i>102</i>&nbsp;                    times.add(times2);</b>
+<b class="nc"><i>103</i>&nbsp;                    popSizes.add(popSizes2);</b>
+<i>104</i>&nbsp;
+<b class="nc"><i>105</i>&nbsp;                }</b>
+<i>106</i>&nbsp;            }
+<i>107</i>&nbsp;        }
+<i>108</i>&nbsp;
+<b class="nc"><i>109</i>&nbsp;        if (alltimes == null) {</b>
+<i>110</i>&nbsp;            //burn-in too large?
+<b class="nc"><i>111</i>&nbsp;            return;</b>
+<i>112</i>&nbsp;        }
+<i>113</i>&nbsp;
+<i>114</i>&nbsp;        // take average of coalescent times
+<b class="nc"><i>115</i>&nbsp;        for (int i = 0; i &lt; alltimes.length; i++) {</b>
+<b class="nc"><i>116</i>&nbsp;            alltimes[i] /= times.size();</b>
+<i>117</i>&nbsp;        }
+<i>118</i>&nbsp;
+<i>119</i>&nbsp;        // generate output
+<b class="nc"><i>120</i>&nbsp;        out.println(&quot;time\tmean\tmedian\t95HPD lower\t95HPD upper&quot;);</b>
+<b class="nc"><i>121</i>&nbsp;        final double[] popSizeAtTimeT = new double[times.size()];</b>
+<b class="nc"><i>122</i>&nbsp;        int[] indices = new int[times.size()];</b>
+<i>123</i>&nbsp;
+<b class="nc"><i>124</i>&nbsp;        for (final double time : alltimes) {</b>
+<b class="nc"><i>125</i>&nbsp;            for (int j = 0; j &lt; popSizeAtTimeT.length; j++) {</b>
+<b class="nc"><i>126</i>&nbsp;                popSizeAtTimeT[j] = calcPopSize(type, times.get(j), popSizes.get(j), time);</b>
+<i>127</i>&nbsp;            }
+<i>128</i>&nbsp;
+<b class="nc"><i>129</i>&nbsp;            HeapSort.sort(popSizeAtTimeT, indices);</b>
+<i>130</i>&nbsp;
+<b class="nc"><i>131</i>&nbsp;            out.print(time + &quot;\t&quot;);</b>
+<i>132</i>&nbsp;
+<b class="nc"><i>133</i>&nbsp;            out.print(DiscreteStatistics.mean(popSizeAtTimeT) + &quot;\t&quot;);</b>
+<b class="nc"><i>134</i>&nbsp;            out.print(DiscreteStatistics.median(popSizeAtTimeT) + &quot;\t&quot;);</b>
+<i>135</i>&nbsp;
+<b class="nc"><i>136</i>&nbsp;            double[] hpdInterval = DiscreteStatistics.HPDInterval(0.95, popSizeAtTimeT, indices);</b>
+<b class="nc"><i>137</i>&nbsp;            out.println(hpdInterval[0] + &quot;\t&quot; + hpdInterval[1]);</b>
+<i>138</i>&nbsp;        }
+<b class="nc"><i>139</i>&nbsp;    }</b>
+<i>140</i>&nbsp;
+<i>141</i>&nbsp;    private double calcPopSize(CompoundPopulationFunction.Type type, List&lt;Double&gt; xs, List&lt;Double&gt; ys, double d) {
+<i>142</i>&nbsp;        // TODO completely untested
+<i>143</i>&nbsp;        // assume linear
+<i>144</i>&nbsp;        //assert typeName.equals(&quot;Linear&quot;);
+<i>145</i>&nbsp;
+<b class="nc"><i>146</i>&nbsp;        final int n = xs.size();</b>
+<b class="nc"><i>147</i>&nbsp;        final double xn = xs.get(n - 1);</b>
+<b class="nc"><i>148</i>&nbsp;        if (d &gt;= xn) {</b>
+<b class="nc"><i>149</i>&nbsp;            return ys.get(n - 1);</b>
+<i>150</i>&nbsp;        }
+<b class="nc"><i>151</i>&nbsp;        assert d &gt;= xs.get(0);</b>
+<i>152</i>&nbsp;
+<b class="nc"><i>153</i>&nbsp;        int i = 1;</b>
+<b class="nc"><i>154</i>&nbsp;        while (d &gt;= xs.get(i)) {</b>
+<b class="nc"><i>155</i>&nbsp;            ++i;</b>
+<i>156</i>&nbsp;        }
+<i>157</i>&nbsp;        // d &lt; xs.get(i)
+<i>158</i>&nbsp;
+<b class="nc"><i>159</i>&nbsp;        double x0 = xs.get(i-1);</b>
+<b class="nc"><i>160</i>&nbsp;        double x1 = xs.get(i);</b>
+<b class="nc"><i>161</i>&nbsp;        double y0 = ys.get(i-1);</b>
+<b class="nc"><i>162</i>&nbsp;        double y1 = ys.get(i);</b>
+<b class="nc"><i>163</i>&nbsp;        assert x0 &lt;= d &amp;&amp; d &lt;= x1 : &quot;&quot; + x0 + &quot;,&quot; + x1 + &quot;,&quot; + d;</b>
+<b class="pc"><i>164</i>&nbsp;        switch (type) {</b>
+<i>165</i>&nbsp;            case LINEAR:
+<b class="nc"><i>166</i>&nbsp;                final double p = (d * (y1 - y0) + (y0 * x1 - y1 * x0)) / (x1 - x0);</b>
+<b class="nc"><i>167</i>&nbsp;                assert p &gt; 0;</b>
+<b class="nc"><i>168</i>&nbsp;                return p;</b>
+<i>169</i>&nbsp;            case STEPWISE:
+<b class="nc"><i>170</i>&nbsp;                assert y1 &gt; 0;</b>
+<b class="nc"><i>171</i>&nbsp;                return y1;</b>
+<i>172</i>&nbsp;        }
+<b class="nc"><i>173</i>&nbsp;        return 0;</b>
+<i>174</i>&nbsp;    }
+<i>175</i>&nbsp;
+<i>176</i>&nbsp;    private void parseArgs(String[] args) {
+<b class="nc"><i>177</i>&nbsp;        int i = 0;</b>
+<i>178</i>&nbsp;        try {
+<b class="nc"><i>179</i>&nbsp;            while (i &lt; args.length) {</b>
+<b class="nc"><i>180</i>&nbsp;                int old = i;</b>
+<b class="nc"><i>181</i>&nbsp;                if (i &lt; args.length) {</b>
+<b class="nc"><i>182</i>&nbsp;                    if (args[i].equals(&quot;&quot;)) {</b>
+<b class="nc"><i>183</i>&nbsp;                        i += 1;</b>
+<b class="nc"><i>184</i>&nbsp;                    } else if (args[i].equals(&quot;-help&quot;) || args[i].equals(&quot;-h&quot;) || args[i].equals(&quot;--help&quot;)) {</b>
+<b class="nc"><i>185</i>&nbsp;                        System.out.println(getUsage());</b>
+<b class="nc"><i>186</i>&nbsp;                        System.exit(0);</b>
+<b class="nc"><i>187</i>&nbsp;                    } else if (args[i].equals(&quot;-i&quot;)) {</b>
+<b class="nc"><i>188</i>&nbsp;                        m_sInputFile = args[i + 1];</b>
+<b class="nc"><i>189</i>&nbsp;                        i += 2;</b>
+<b class="nc"><i>190</i>&nbsp;                    } else if (args[i].equals(&quot;-o&quot;)) {</b>
+<b class="nc"><i>191</i>&nbsp;                        m_sFileOut = args[i + 1];</b>
+<b class="nc"><i>192</i>&nbsp;                        m_out = new PrintStream(m_sFileOut);</b>
+<b class="nc"><i>193</i>&nbsp;                        i += 2;</b>
+<b class="nc"><i>194</i>&nbsp;                    } else if (args[i].equals(&quot;-type&quot;)) {</b>
+<b class="nc"><i>195</i>&nbsp;                        if (args[i + 1].equals(&quot;linear&quot;)) {</b>
+<b class="nc"><i>196</i>&nbsp;                            m_type = Type.LINEAR;</b>
+<b class="nc"><i>197</i>&nbsp;                        } else if (args[i + 1].equals(&quot;stepwise&quot;)) {</b>
+<b class="nc"><i>198</i>&nbsp;                            m_type = Type.STEPWISE;</b>
+<i>199</i>&nbsp;                        } else {
+<b class="nc"><i>200</i>&nbsp;                            throw new IllegalArgumentException(&quot;Expected linear or stepwise, not &quot; + args[i + 1]);</b>
+<i>201</i>&nbsp;                        }
+<b class="nc"><i>202</i>&nbsp;                        i += 2;</b>
+<b class="nc"><i>203</i>&nbsp;                    } else if (args[i].equals(&quot;-burnin&quot;)) {</b>
+<b class="nc"><i>204</i>&nbsp;                        m_nBurninPercentage = Integer.parseInt(args[i + 1]);</b>
+<b class="nc"><i>205</i>&nbsp;                        i += 2;</b>
+<i>206</i>&nbsp;                    }
+<b class="nc"><i>207</i>&nbsp;                    if (i == old) {</b>
+<b class="nc"><i>208</i>&nbsp;                        throw new IllegalArgumentException(&quot;Unrecognised argument (argument &quot; + i + &quot;: &quot; + args[i] + &quot;)&quot;);</b>
+<i>209</i>&nbsp;                    }
+<i>210</i>&nbsp;                }
+<b class="nc"><i>211</i>&nbsp;            }</b>
+<b class="nc"><i>212</i>&nbsp;        } catch (IllegalArgumentException e) {</b>
+<b class="nc"><i>213</i>&nbsp;        	throw e;</b>
+<b class="nc"><i>214</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>215</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>216</i>&nbsp;            throw new IllegalArgumentException(&quot;Error parsing command line arguments: &quot; + Arrays.toString(args) + &quot;\nArguments ignored\n\n&quot; + getUsage());</b>
+<b class="nc"><i>217</i>&nbsp;        }</b>
+<b class="nc"><i>218</i>&nbsp;        if (m_sFileOut == null) {</b>
+<b class="nc"><i>219</i>&nbsp;        	Log.warning.println(&quot;No output file specified&quot;);</b>
+<i>220</i>&nbsp;        }
+<i>221</i>&nbsp;
+<b class="nc"><i>222</i>&nbsp;    }</b>
+<i>223</i>&nbsp;
+<i>224</i>&nbsp;    static String getUsage() {
+<b class="nc"><i>225</i>&nbsp;        return &quot;EBSPAnalyse -i &lt;inputfile&gt; [options]\n&quot; +</b>
+<i>226</i>&nbsp;                &quot;analyses trace file generated by EBSP analysis\n&quot; +
+<i>227</i>&nbsp;                &quot;Options are:\n&quot; +
+<i>228</i>&nbsp;                &quot;-i &lt;inputfile&gt; name of input file (required)\n&quot; +
+<i>229</i>&nbsp;                &quot;-burnin &lt;percentage&gt; percent of log to consider burn in, default 10\n&quot; +
+<i>230</i>&nbsp;                &quot;-type [linear|step] type of population function\n&quot; +
+<i>231</i>&nbsp;                &quot;-o &lt;outputfile&gt; name of output file, default to output on stdout\n&quot; +
+<i>232</i>&nbsp;                &quot;&quot;;
+<i>233</i>&nbsp;    }
+<i>234</i>&nbsp;
+<i>235</i>&nbsp;    protected void log(String s) {
+<b class="nc"><i>236</i>&nbsp;    	Log.warning.print(s);</b>
+<b class="nc"><i>237</i>&nbsp;    }</b>
+<i>238</i>&nbsp;
+<i>239</i>&nbsp;    protected void logln(String s) {
+<b class="nc"><i>240</i>&nbsp;    	Log.warning.println(s);</b>
+<b class="nc"><i>241</i>&nbsp;    }</b>
+<i>242</i>&nbsp;
+<i>243</i>&nbsp;    private void printTitle(String aboutString) {
+<b class="nc"><i>244</i>&nbsp;        aboutString = &quot;LogCombiner&quot; + aboutString.replaceAll(&quot;&lt;/p&gt;&quot;, &quot;\n\n&quot;);</b>
+<b class="nc"><i>245</i>&nbsp;        aboutString = aboutString.replaceAll(&quot;&lt;br&gt;&quot;, &quot;\n&quot;);</b>
+<b class="nc"><i>246</i>&nbsp;        aboutString = aboutString.replaceAll(&quot;&lt;[^&gt;]*&gt;&quot;, &quot; &quot;);</b>
+<b class="nc"><i>247</i>&nbsp;        String[] strs = aboutString.split(&quot;\n&quot;);</b>
+<b class="nc"><i>248</i>&nbsp;        for (String str : strs) {</b>
+<b class="nc"><i>249</i>&nbsp;            int n = 80 - str.length();</b>
+<b class="nc"><i>250</i>&nbsp;            int n1 = n / 2;</b>
+<b class="nc"><i>251</i>&nbsp;            for (int i = 0; i &lt; n1; i++) {</b>
+<b class="nc"><i>252</i>&nbsp;                log(&quot; &quot;);</b>
+<i>253</i>&nbsp;            }
+<b class="nc"><i>254</i>&nbsp;            logln(str);</b>
+<i>255</i>&nbsp;        }
+<b class="nc"><i>256</i>&nbsp;    }</b>
+<i>257</i>&nbsp;
+<b class="nc"><i>258</i>&nbsp;    public class EBSPAnalyserDialog {</b>
+<i>259</i>&nbsp;        private final JFrame frame;
+<i>260</i>&nbsp;
+<i>261</i>&nbsp;        private final OptionsPanel optionPanel;
+<i>262</i>&nbsp;
+<b class="nc"><i>263</i>&nbsp;        private final JTextField inputFileNameText = new JTextField(&quot;not selected&quot;, 16);</b>
+<b class="nc"><i>264</i>&nbsp;        private final JComboBox&lt;String&gt; typeCombo = new JComboBox&lt;&gt;(new String[]{&quot;linear&quot;, &quot;stepwise&quot;});</b>
+<i>265</i>&nbsp;
+<b class="nc"><i>266</i>&nbsp;        final WholeNumberField burninText = new WholeNumberField(0, Long.MAX_VALUE);</b>
+<b class="nc"><i>267</i>&nbsp;        private final JTextField outputFileNameText = new JTextField(&quot;not selected&quot;, 16);</b>
+<i>268</i>&nbsp;
+<b class="nc"><i>269</i>&nbsp;        private File outputFile = null;</b>
+<b class="nc"><i>270</i>&nbsp;        private File inputFile = null;</b>
+<i>271</i>&nbsp;
+<b class="nc"><i>272</i>&nbsp;        public EBSPAnalyserDialog(final JFrame frame, String titleString, Icon icon) {</b>
+<b class="nc"><i>273</i>&nbsp;            this.frame = frame;</b>
+<i>274</i>&nbsp;
+<b class="nc"><i>275</i>&nbsp;            optionPanel = new OptionsPanel(12, 12);</b>
+<i>276</i>&nbsp;
+<b class="nc"><i>277</i>&nbsp;            final JLabel titleText = new JLabel(titleString);</b>
+<b class="nc"><i>278</i>&nbsp;            titleText.setIcon(icon);</b>
+<b class="nc"><i>279</i>&nbsp;            optionPanel.addSpanningComponent(titleText);</b>
+<b class="nc"><i>280</i>&nbsp;            Font font = UIManager.getFont(&quot;Label.font&quot;);</b>
+<b class="nc"><i>281</i>&nbsp;            titleText.setFont(new Font(&quot;sans-serif&quot;, font.getStyle(), font.getSize()));</b>
+<b class="nc"><i>282</i>&nbsp;</b>
+<b class="nc"><i>283</i>&nbsp;            JPanel panel = new JPanel(new BorderLayout());</b>
+<b class="nc"><i>284</i>&nbsp;            panel.setOpaque(false);</b>
+<b class="nc"><i>285</i>&nbsp;</b>
+<b class="nc"><i>286</i>&nbsp;            JButton button = new JButton(&quot;Choose Input File...&quot;);</b>
+<b class="nc"><i>287</i>&nbsp;            button.addActionListener(ae -&gt; {</b>
+<b class="nc"><i>288</i>&nbsp;                    File file = Utils.getLoadFile(&quot;Select input file...&quot;);</b>
+<b class="nc"><i>289</i>&nbsp;                    if (file == null) {</b>
+<i>290</i>&nbsp;                        // the dialog was cancelled...
+<b class="nc"><i>291</i>&nbsp;                        return;</b>
+<i>292</i>&nbsp;                    }
+<b class="nc"><i>293</i>&nbsp;</b>
+<b class="nc"><i>294</i>&nbsp;                    inputFile = file;</b>
+<b class="nc"><i>295</i>&nbsp;                    inputFileNameText.setText(inputFile.getName());</b>
+<b class="nc"><i>296</i>&nbsp;</b>
+<b class="nc"><i>297</i>&nbsp;                });</b>
+<b class="nc"><i>298</i>&nbsp;            inputFileNameText.setEditable(false);</b>
+<i>299</i>&nbsp;
+<b class="nc"><i>300</i>&nbsp;            JButton button2 = new JButton(&quot;Choose Output File...&quot;);</b>
+<b class="nc"><i>301</i>&nbsp;            button2.addActionListener(ae -&gt; {</b>
+<b class="nc"><i>302</i>&nbsp;                    File file = Utils.getSaveFile(&quot;Select output file...&quot;);</b>
+<b class="nc"><i>303</i>&nbsp;                    if (file == null) {</b>
+<b class="nc"><i>304</i>&nbsp;                        // the dialog was cancelled...</b>
+<b class="nc"><i>305</i>&nbsp;                        return;</b>
+<i>306</i>&nbsp;                    }
+<i>307</i>&nbsp;
+<b class="nc"><i>308</i>&nbsp;                    outputFile = file;</b>
+<b class="nc"><i>309</i>&nbsp;                    outputFileNameText.setText(outputFile.getName());</b>
+<i>310</i>&nbsp;
+<b class="nc"><i>311</i>&nbsp;                });</b>
+<b class="nc"><i>312</i>&nbsp;            outputFileNameText.setEditable(false);</b>
+<i>313</i>&nbsp;
+<b class="nc"><i>314</i>&nbsp;            JPanel panel1 = new JPanel(new BorderLayout(0, 0));</b>
+<b class="nc"><i>315</i>&nbsp;            panel1.add(inputFileNameText, BorderLayout.CENTER);</b>
+<b class="nc"><i>316</i>&nbsp;            panel1.add(button, BorderLayout.EAST);</b>
+<b class="nc"><i>317</i>&nbsp;            optionPanel.addComponentWithLabel(&quot;Input File: &quot;, panel1);</b>
+<i>318</i>&nbsp;
+<b class="nc"><i>319</i>&nbsp;            optionPanel.addComponentWithLabel(&quot;File type: &quot;, typeCombo);</b>
+<i>320</i>&nbsp;
+<b class="nc"><i>321</i>&nbsp;            burninText.setColumns(12);</b>
+<b class="nc"><i>322</i>&nbsp;            burninText.setValue(10);</b>
+<b class="nc"><i>323</i>&nbsp;            optionPanel.addComponentWithLabel(&quot;Burn in percentage: &quot;, burninText);</b>
+<i>324</i>&nbsp;
+<b class="nc"><i>325</i>&nbsp;            optionPanel.addSpanningComponent(panel);</b>
+<i>326</i>&nbsp;
+<b class="nc"><i>327</i>&nbsp;            JPanel panel3 = new JPanel(new BorderLayout(0, 0));</b>
+<b class="nc"><i>328</i>&nbsp;            panel3.add(outputFileNameText, BorderLayout.CENTER);</b>
+<b class="nc"><i>329</i>&nbsp;            panel3.add(button2, BorderLayout.EAST);</b>
+<b class="nc"><i>330</i>&nbsp;            optionPanel.addComponentWithLabel(&quot;Output File: &quot;, panel3);</b>
+<b class="nc"><i>331</i>&nbsp;        }</b>
+<i>332</i>&nbsp;
+<i>333</i>&nbsp;        public boolean showDialog(String title) {
+<i>334</i>&nbsp;
+<b class="nc"><i>335</i>&nbsp;            JOptionPane optionPane = new JOptionPane(optionPanel,</b>
+<i>336</i>&nbsp;                    JOptionPane.PLAIN_MESSAGE,
+<i>337</i>&nbsp;                    JOptionPane.OK_CANCEL_OPTION,
+<i>338</i>&nbsp;                    null,
+<i>339</i>&nbsp;                    new String[]{&quot;Run&quot;, &quot;Quit&quot;},
+<i>340</i>&nbsp;                    null);
+<b class="nc"><i>341</i>&nbsp;            optionPane.setBorder(new EmptyBorder(12, 12, 12, 12));</b>
+<i>342</i>&nbsp;
+<b class="nc"><i>343</i>&nbsp;            final JDialog dialog = optionPane.createDialog(frame, title);</b>
+<i>344</i>&nbsp;            //dialog.setResizable(true);
+<b class="nc"><i>345</i>&nbsp;            dialog.pack();</b>
+<i>346</i>&nbsp;
+<b class="nc"><i>347</i>&nbsp;            dialog.setVisible(true);</b>
+<i>348</i>&nbsp;
+<b class="nc"><i>349</i>&nbsp;            return optionPane.getValue().equals(&quot;Run&quot;);</b>
+<i>350</i>&nbsp;        }
+<i>351</i>&nbsp;
+<i>352</i>&nbsp;        public String getOutputFileName() {
+<b class="nc"><i>353</i>&nbsp;            if (outputFile == null) return null;</b>
+<b class="nc"><i>354</i>&nbsp;            return outputFile.getPath();</b>
+<i>355</i>&nbsp;        }
+<i>356</i>&nbsp;
+<i>357</i>&nbsp;        public String[] getArgs() {
+<b class="nc"><i>358</i>&nbsp;            java.util.List&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>359</i>&nbsp;            if (inputFile != null) {</b>
+<b class="nc"><i>360</i>&nbsp;                args.add(&quot;-i&quot;);</b>
+<b class="nc"><i>361</i>&nbsp;                args.add(inputFile.getPath());</b>
+<i>362</i>&nbsp;            }
+<b class="nc"><i>363</i>&nbsp;            args.add(&quot;-burnin&quot;);</b>
+<b class="nc"><i>364</i>&nbsp;            args.add(burninText.getText());</b>
+<b class="nc"><i>365</i>&nbsp;            args.add(&quot;-type&quot;);</b>
+<b class="nc"><i>366</i>&nbsp;            args.add(typeCombo.getSelectedItem().toString());</b>
+<b class="nc"><i>367</i>&nbsp;            if (outputFile != null) {</b>
+<b class="nc"><i>368</i>&nbsp;                args.add(&quot;-o&quot;);</b>
+<b class="nc"><i>369</i>&nbsp;                args.add(outputFile.getPath());</b>
+<i>370</i>&nbsp;            }
+<b class="nc"><i>371</i>&nbsp;            return args.toArray(new String[0]);</b>
+<i>372</i>&nbsp;        }
+<i>373</i>&nbsp;
+<i>374</i>&nbsp;    }
+<i>375</i>&nbsp;
+<i>376</i>&nbsp;
+<i>377</i>&nbsp;    /**
+<i>378</i>&nbsp;     * @param args
+<i>379</i>&nbsp;     */
+<i>380</i>&nbsp;    public static void main(String[] args) {
+<b class="nc"><i>381</i>&nbsp;        BEASTVersion2 version = new BEASTVersion2();</b>
+<b class="nc"><i>382</i>&nbsp;        final String versionString = version.getVersionString();</b>
+<b class="nc"><i>383</i>&nbsp;        String nameString = &quot;EBSP Analyser &quot; + versionString;</b>
+<b class="nc"><i>384</i>&nbsp;        String aboutString = &quot;&lt;html&gt;&lt;center&gt;&lt;p&gt;&quot; + versionString + &quot;, &quot; + version.getDateString() + &quot;&lt;/p&gt;&quot; +</b>
+<i>385</i>&nbsp;                &quot;&lt;p&gt;by&lt;br&gt;&quot; +
+<i>386</i>&nbsp;                &quot;&lt;p&gt;Joseph Heled and Remco Bouckaert&lt;/p&gt;&quot; +
+<i>387</i>&nbsp;                &quot;&lt;p&gt;Department of Computer Science, University of Auckland&lt;br&gt;&quot; +
+<i>388</i>&nbsp;                &quot;&lt;a href=\&quot;mailto:jheled@gmail.com\&quot;&gt;jheled@gmail.com&lt;/a&gt;&lt;/p&gt;&quot; +
+<i>389</i>&nbsp;                &quot;&lt;a href=\&quot;mailto:remco@cs.auckland.ac.nz\&quot;&gt;remco@cs.auckland.ac.nz&lt;/a&gt;&lt;/p&gt;&quot; +
+<i>390</i>&nbsp;                &quot;&lt;p&gt;Part of the BEAST 2 package:&lt;br&gt;&quot; +
+<i>391</i>&nbsp;                &quot;&lt;a href=\&quot;http://beast2.cs.auckland.ac.nz/\&quot;&gt;http://beast2.cs.auckland.ac.nz/&lt;/a&gt;&lt;/p&gt;&quot; +
+<i>392</i>&nbsp;                &quot;&lt;/center&gt;&lt;/html&gt;&quot;;
+<i>393</i>&nbsp;
+<i>394</i>&nbsp;
+<i>395</i>&nbsp;        try {
+<b class="nc"><i>396</i>&nbsp;            EBSPAnalyser analyser = new EBSPAnalyser();</b>
+<b class="nc"><i>397</i>&nbsp;            if (args.length == 0) {</b>
+<b class="nc"><i>398</i>&nbsp;            	Utils.loadUIManager();</b>
+<i>399</i>&nbsp;
+<b class="nc"><i>400</i>&nbsp;            	System.setProperty(&quot;com.apple.macos.useScreenMenuBar&quot;, &quot;true&quot;);</b>
+<b class="nc"><i>401</i>&nbsp;                System.setProperty(&quot;apple.laf.useScreenMenuBar&quot;, &quot;true&quot;);</b>
+<b class="nc"><i>402</i>&nbsp;                System.setProperty(&quot;apple.awt.showGrowBox&quot;, &quot;true&quot;);</b>
+<i>403</i>&nbsp;
+<i>404</i>&nbsp;                // TODO: set up ICON
+<b class="nc"><i>405</i>&nbsp;                java.net.URL url = EBSPAnalyser.class.getResource(&quot;images/EBSPAnalyser.png&quot;);</b>
+<b class="nc"><i>406</i>&nbsp;                javax.swing.Icon icon = null;</b>
+<i>407</i>&nbsp;
+<b class="nc"><i>408</i>&nbsp;                if (url != null) {</b>
+<b class="nc"><i>409</i>&nbsp;                    icon = new javax.swing.ImageIcon(url);</b>
+<i>410</i>&nbsp;                }
+<i>411</i>&nbsp;
+<i>412</i>&nbsp;
+<i>413</i>&nbsp;                //ConsoleApplication consoleApp =
+<b class="nc"><i>414</i>&nbsp;                new ConsoleApplication(nameString, aboutString, icon, true);</b>
+<i>415</i>&nbsp;
+<b class="nc"><i>416</i>&nbsp;                analyser.printTitle(aboutString);</b>
+<i>417</i>&nbsp;
+<b class="nc"><i>418</i>&nbsp;                String titleString = &quot;&lt;html&gt;&lt;center&gt;&lt;p&gt;EBSPAnalyser&lt;br&gt;&quot; +</b>
+<b class="nc"><i>419</i>&nbsp;                        &quot;Version &quot; + version.getVersionString() + &quot;, &quot; + version.getDateString() + &quot;&lt;/p&gt;&lt;/center&gt;&lt;/html&gt;&quot;;</b>
+<i>420</i>&nbsp;
+<b class="nc"><i>421</i>&nbsp;                EBSPAnalyserDialog dialog = analyser.new EBSPAnalyserDialog(new JFrame(), titleString, icon);</b>
+<i>422</i>&nbsp;
+<b class="nc"><i>423</i>&nbsp;                if (!dialog.showDialog(nameString)) {</b>
+<b class="nc"><i>424</i>&nbsp;                    return;</b>
+<i>425</i>&nbsp;                }
+<b class="nc"><i>426</i>&nbsp;                String[] args2 = dialog.getArgs();</b>
+<i>427</i>&nbsp;
+<i>428</i>&nbsp;                try {
+<b class="nc"><i>429</i>&nbsp;                    analyser.parseArgs(args2);</b>
+<b class="nc"><i>430</i>&nbsp;                    analyser.run();</b>
+<i>431</i>&nbsp;
+<b class="nc"><i>432</i>&nbsp;                } catch (Exception ex) {</b>
+<b class="nc"><i>433</i>&nbsp;                    Log.err.println(&quot;Exception: &quot; + ex.getMessage());</b>
+<b class="nc"><i>434</i>&nbsp;                    ex.printStackTrace();</b>
+<b class="nc"><i>435</i>&nbsp;                }</b>
+<b class="nc"><i>436</i>&nbsp;                System.out.println(&quot;Finished - Quit program to exit.&quot;);</b>
+<i>437</i>&nbsp;                while (true) {
+<i>438</i>&nbsp;                    try {
+<b class="nc"><i>439</i>&nbsp;                        Thread.sleep(1000);</b>
+<b class="nc"><i>440</i>&nbsp;                    } catch (InterruptedException e) {</b>
+<b class="nc"><i>441</i>&nbsp;                        e.printStackTrace();</b>
+<b class="nc"><i>442</i>&nbsp;                    }</b>
+<i>443</i>&nbsp;                }
+<i>444</i>&nbsp;            } else {
+<b class="nc"><i>445</i>&nbsp;                analyser.printTitle(aboutString);</b>
+<b class="nc"><i>446</i>&nbsp;                analyser.parseArgs(args);</b>
+<b class="nc"><i>447</i>&nbsp;                analyser.run();</b>
+<i>448</i>&nbsp;            }
+<b class="nc"><i>449</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>450</i>&nbsp;            System.out.println(getUsage());</b>
+<b class="nc"><i>451</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>452</i>&nbsp;        }</b>
+<i>453</i>&nbsp;
+<b class="nc"><i>454</i>&nbsp;    }</b>
+<i>455</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

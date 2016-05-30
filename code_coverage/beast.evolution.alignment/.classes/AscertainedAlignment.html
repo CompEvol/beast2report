@@ -1,0 +1,180 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: AscertainedAlignment</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.alignment</a> ]
+</div>
+
+<h1>Coverage Summary for Class: AscertainedAlignment (beast.evolution.alignment)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AscertainedAlignment</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 22)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.alignment;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.util.HashSet;
+<i>4</i>&nbsp;import java.util.Set;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;import beast.core.Description;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;@Description(&quot;Alignemnt that allows ascertainment correction&quot;)
+<i>11</i>&nbsp;/**
+<i>12</i>&nbsp; * This class has merged with Alignment
+<i>13</i>&nbsp; * @deprecated use Alignment() instead setting isAscertainedInput to true.
+<i>14</i>&nbsp; */
+<i>15</i>&nbsp;@Deprecated
+<b class="nc"><i>16</i>&nbsp;public class AscertainedAlignment extends Alignment {</b>
+<i>17</i>&nbsp;//    public Input&lt;Integer&gt; excludefromInput = new Input&lt;&gt;(&quot;excludefrom&quot;, &quot;first site to condition on, default 0&quot;, 0);
+<i>18</i>&nbsp;//    public Input&lt;Integer&gt; excludetoInput = new Input&lt;&gt;(&quot;excludeto&quot;, &quot;last site to condition on (but excluding this site), default 0&quot;, 0);
+<i>19</i>&nbsp;//    public Input&lt;Integer&gt; excludeeveryInput = new Input&lt;&gt;(&quot;excludeevery&quot;, &quot;interval between sites to condition on (default 1)&quot;, 1);
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;// RRB: Note that all commented code is stuff to support inclusion-sites,
+<i>22</i>&nbsp;// so don&#39;t delete them.
+<i>23</i>&nbsp;//	public Input&lt;Integer&gt; m_includefrom = new Input&lt;&gt;(&quot;includefrom&quot;,&quot;first site to condition on, default 0&quot;, 0);
+<i>24</i>&nbsp;//	public Input&lt;Integer&gt; m_includeto = new Input&lt;&gt;(&quot;includeto&quot;,&quot;last site to condition on, default 0&quot;, 0);
+<i>25</i>&nbsp;//	public Input&lt;Integer&gt; m_includeevery = new Input&lt;&gt;(&quot;includeevery&quot;,&quot;interval between sites to condition on (default 1)&quot;, 1);
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;    /**
+<i>28</i>&nbsp;     * indices of patterns that are excluded from the likelihood calculation
+<i>29</i>&nbsp;     * and used for ascertainment correction
+<i>30</i>&nbsp;     */
+<i>31</i>&nbsp;    Set&lt;Integer&gt; excludedPatterns;
+<i>32</i>&nbsp;//	List&lt;Integer&gt; m_nIncluded;
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;    @Override
+<i>35</i>&nbsp;    public void initAndValidate() {
+<b class="nc"><i>36</i>&nbsp;        super.initAndValidate();</b>
+<i>37</i>&nbsp;
+<b class="nc"><i>38</i>&nbsp;        int from = excludefromInput.get();</b>
+<b class="nc"><i>39</i>&nbsp;        int to = excludetoInput.get();</b>
+<b class="nc"><i>40</i>&nbsp;        int every = excludeeveryInput.get();</b>
+<b class="nc"><i>41</i>&nbsp;        excludedPatterns = new HashSet&lt;&gt;();</b>
+<b class="nc"><i>42</i>&nbsp;        for (int i = from; i &lt; to; i += every) {</b>
+<b class="nc"><i>43</i>&nbsp;            int patternIndex_ = patternIndex[i];</b>
+<i>44</i>&nbsp;            // reduce weight, so it does not confuse the tree likelihood
+<b class="nc"><i>45</i>&nbsp;            patternWeight[patternIndex_] = 0;</b>
+<b class="nc"><i>46</i>&nbsp;            excludedPatterns.add(patternIndex_);</b>
+<i>47</i>&nbsp;        }
+<i>48</i>&nbsp;
+<i>49</i>&nbsp;//		from = m_includefrom.get();
+<i>50</i>&nbsp;//		to = m_includeto.get();
+<i>51</i>&nbsp;//		every = m_includeevery.get();
+<i>52</i>&nbsp;//		m_nIncluded = new ArrayList&lt;&gt;();
+<i>53</i>&nbsp;//		for (int i = from; i &lt; to; i += every) {
+<i>54</i>&nbsp;//			int patternIndex_ = m_nPatternIndex[i];
+<i>55</i>&nbsp;//			// reduce weight, so it does not confuse the tree likelihood
+<i>56</i>&nbsp;//			m_nWeight[patternIndex_] = 0;
+<i>57</i>&nbsp;//			m_nIncluded.add(patternIndex_);
+<i>58</i>&nbsp;//		}
+<i>59</i>&nbsp;    } // initAndValidate
+<i>60</i>&nbsp;
+<i>61</i>&nbsp;    @Override
+<i>62</i>&nbsp;	public Set&lt;Integer&gt; getExcludedPatternIndices() {
+<b class="nc"><i>63</i>&nbsp;        return excludedPatterns;</b>
+<i>64</i>&nbsp;    }
+<i>65</i>&nbsp;
+<i>66</i>&nbsp;    @Override
+<i>67</i>&nbsp;	public int getExcludedPatternCount() {
+<b class="nc"><i>68</i>&nbsp;        return excludedPatterns.size();</b>
+<i>69</i>&nbsp;    }
+<i>70</i>&nbsp;
+<i>71</i>&nbsp;//	public List&lt;Integer&gt; getIncludesIndices() {
+<i>72</i>&nbsp;//		return m_nIncluded;
+<i>73</i>&nbsp;//	}
+<i>74</i>&nbsp;
+<i>75</i>&nbsp;    @Override
+<i>76</i>&nbsp;	public double getAscertainmentCorrection(double[] patternLogProbs) {
+<b class="nc"><i>77</i>&nbsp;        double excludeProb = 0, includeProb = 0, returnProb = 1.0;</b>
+<i>78</i>&nbsp;
+<i>79</i>&nbsp;//        for (int i = 0; i &lt; m_nIncluded.size(); i++) {
+<i>80</i>&nbsp;//        	includeProb += Math.exp(patternLogProbs[m_nIncluded.get(i)]);
+<i>81</i>&nbsp;//        }
+<i>82</i>&nbsp;
+<b class="nc"><i>83</i>&nbsp;        for (int i : excludedPatterns) {</b>
+<b class="nc"><i>84</i>&nbsp;            excludeProb += Math.exp(patternLogProbs[i]);</b>
+<b class="nc"><i>85</i>&nbsp;        }</b>
+<i>86</i>&nbsp;
+<b class="nc"><i>87</i>&nbsp;        if (includeProb == 0.0) {</b>
+<b class="nc"><i>88</i>&nbsp;            returnProb -= excludeProb;</b>
+<b class="nc"><i>89</i>&nbsp;        } else if (excludeProb == 0.0) {</b>
+<b class="nc"><i>90</i>&nbsp;            returnProb = includeProb;</b>
+<i>91</i>&nbsp;        } else {
+<b class="nc"><i>92</i>&nbsp;            returnProb = includeProb - excludeProb;</b>
+<i>93</i>&nbsp;        }
+<b class="nc"><i>94</i>&nbsp;        return Math.log(returnProb);</b>
+<i>95</i>&nbsp;    } // getAscertainmentCorrection
+<i>96</i>&nbsp;
+<i>97</i>&nbsp;} // class AscertainedAlignment
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

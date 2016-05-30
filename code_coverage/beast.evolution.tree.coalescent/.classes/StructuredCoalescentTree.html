@@ -1,0 +1,362 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: StructuredCoalescentTree</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.tree.coalescent</a> ]
+</div>
+
+<h1>Coverage Summary for Class: StructuredCoalescentTree (beast.evolution.tree.coalescent)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StructuredCoalescentTree</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 105)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">StructuredCoalescentTree$EventType</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">StructuredCoalescentTree$SCEvent</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 107)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.tree.coalescent;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import java.util.ArrayList;
+<i>5</i>&nbsp;import java.util.List;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import beast.core.Description;
+<i>8</i>&nbsp;import beast.core.Input;
+<i>9</i>&nbsp;import beast.core.parameter.IntegerParameter;
+<i>10</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>11</i>&nbsp;import beast.evolution.tree.Node;
+<i>12</i>&nbsp;import beast.evolution.tree.Tree;
+<i>13</i>&nbsp;import beast.math.Binomial;
+<i>14</i>&nbsp;import beast.util.Randomizer;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;/**
+<i>18</i>&nbsp; * @author Alexei Drummond
+<i>19</i>&nbsp; */
+<i>20</i>&nbsp;@Description(&quot;A tree generated randomly from the structured coalescent process, with the given population sizes, migration rates and per-deme sample sizes.&quot;)
+<i>21</i>&nbsp;public class StructuredCoalescentTree extends Tree {
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;    // off-diagonal migration rates are in units of expected migrants per generation
+<b class="nc"><i>24</i>&nbsp;    public Input&lt;RealParameter&gt; popSizesMigrationRates = new Input&lt;RealParameter&gt;(&quot;popSizesMigrationRates&quot;, &quot;A matrix of migration rates and population sizes. Population sizes occupy the diagonal and migration rates occupy the off-diagonals&quot;);</b>
+<b class="nc"><i>25</i>&nbsp;    public Input&lt;IntegerParameter&gt; sampleSizes = new Input&lt;IntegerParameter&gt;(&quot;sampleSizes&quot;, &quot;The sample sizes for each population&quot;);</b>
+<i>26</i>&nbsp;
+<b class="nc"><i>27</i>&nbsp;    public StructuredCoalescentTree() {</b>
+<i>28</i>&nbsp;    }
+<i>29</i>&nbsp;
+<b class="nc"><i>30</i>&nbsp;    public StructuredCoalescentTree(RealParameter popSizesMigrationRatesParameter, IntegerParameter sampleSizesParameter) throws Exception {</b>
+<b class="nc"><i>31</i>&nbsp;        popSizesMigrationRates.setValue(popSizesMigrationRatesParameter, this);</b>
+<b class="nc"><i>32</i>&nbsp;        sampleSizes.setValue(sampleSizesParameter, this);</b>
+<b class="nc"><i>33</i>&nbsp;        initAndValidate();</b>
+<i>34</i>&nbsp;    }
+<i>35</i>&nbsp;
+<b class="nc"><i>36</i>&nbsp;    enum EventType {coalescent, migration}</b>
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;    public void initAndValidate() {
+<i>39</i>&nbsp;
+<b class="nc"><i>40</i>&nbsp;        int count = 0;</b>
+<b class="nc"><i>41</i>&nbsp;        List&lt;List&lt;Node&gt;&gt; nodes = new ArrayList&lt;List&lt;Node&gt;&gt;();</b>
+<b class="nc"><i>42</i>&nbsp;        for (int i = 0; i &lt; sampleSizes.get().getDimension(); i++) {</b>
+<b class="nc"><i>43</i>&nbsp;            nodes.add(new ArrayList&lt;Node&gt;());</b>
+<b class="nc"><i>44</i>&nbsp;            for (int j = 0; j &lt; sampleSizes.get().getValue(i); j++) {</b>
+<b class="nc"><i>45</i>&nbsp;                Node node = new Node();</b>
+<b class="nc"><i>46</i>&nbsp;                node.setNr(count);</b>
+<b class="nc"><i>47</i>&nbsp;                node.setID(count + &quot;&quot;);</b>
+<b class="nc"><i>48</i>&nbsp;                node.setMetaData(&quot;deme&quot;, i);</b>
+<b class="nc"><i>49</i>&nbsp;                node.setHeight(0);</b>
+<b class="nc"><i>50</i>&nbsp;                nodes.get(i).add(node);</b>
+<b class="nc"><i>51</i>&nbsp;                count += 1;</b>
+<i>52</i>&nbsp;            }
+<i>53</i>&nbsp;        }
+<b class="nc"><i>54</i>&nbsp;        setRoot(simulateStructuredCoalescentForest(nodes, popSizesMigrationRates.get(), Double.POSITIVE_INFINITY).get(0));</b>
+<b class="nc"><i>55</i>&nbsp;        initArrays();</b>
+<i>56</i>&nbsp;    }
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;    private List&lt;Node&gt; simulateStructuredCoalescentForest(List&lt;List&lt;Node&gt;&gt; nodes, RealParameter popSizesMigrationRates, double stopTime) {
+<i>59</i>&nbsp;
+<i>60</i>&nbsp;        //diagonals are coalescent rates, off-diagonals are migration rates
+<b class="nc"><i>61</i>&nbsp;        double[][] rates = new double[nodes.size()][nodes.size()];</b>
+<b class="nc"><i>62</i>&nbsp;        double totalRate = populateRateMatrix(nodes, popSizesMigrationRates, rates);</b>
+<i>63</i>&nbsp;
+<b class="nc"><i>64</i>&nbsp;        double time = 0.0;</b>
+<i>65</i>&nbsp;
+<b class="nc"><i>66</i>&nbsp;        int nodeNumber = getTotalNodeCount(nodes);</b>
+<i>67</i>&nbsp;
+<b class="nc"><i>68</i>&nbsp;        while (time &lt; stopTime &amp;&amp; getTotalNodeCount(nodes) &gt; 1) {</b>
+<i>69</i>&nbsp;
+<b class="nc"><i>70</i>&nbsp;            SCEvent event = selectRandomEvent(rates, totalRate, time);</b>
+<b class="nc"><i>71</i>&nbsp;            if (event.type == EventType.coalescent) {</b>
+<i>72</i>&nbsp;                // coalescent
+<b class="nc"><i>73</i>&nbsp;                Node node1 = selectRandomNode(nodes.get(event.pop));</b>
+<b class="nc"><i>74</i>&nbsp;                Node node2 = selectRandomNode(nodes.get(event.pop));</b>
+<i>75</i>&nbsp;
+<b class="nc"><i>76</i>&nbsp;                if (node1.getMetaData(&quot;deme&quot;) != node2.getMetaData(&quot;deme&quot;)) {</b>
+<b class="nc"><i>77</i>&nbsp;                    throw new RuntimeException(&quot;demes must match for coalescing nodes!&quot;);</b>
+<i>78</i>&nbsp;                }
+<i>79</i>&nbsp;
+<b class="nc"><i>80</i>&nbsp;                Node parent = new Node();</b>
+<b class="nc"><i>81</i>&nbsp;                parent.setNr(nodeNumber);</b>
+<b class="nc"><i>82</i>&nbsp;                parent.setHeight(event.time);</b>
+<b class="nc"><i>83</i>&nbsp;                parent.setMetaData(&quot;deme&quot;, node1.getMetaData(&quot;deme&quot;));</b>
+<b class="nc"><i>84</i>&nbsp;                parent.addChild(node1);</b>
+<b class="nc"><i>85</i>&nbsp;                parent.addChild(node2);</b>
+<i>86</i>&nbsp;
+<b class="nc"><i>87</i>&nbsp;                time = event.time;</b>
+<i>88</i>&nbsp;
+<b class="nc"><i>89</i>&nbsp;                nodes.get(event.pop).remove(node1);</b>
+<b class="nc"><i>90</i>&nbsp;                nodes.get(event.pop).remove(node1);</b>
+<b class="nc"><i>91</i>&nbsp;                nodes.get(event.pop).add(parent);</b>
+<i>92</i>&nbsp;
+<b class="nc"><i>93</i>&nbsp;            } else {</b>
+<i>94</i>&nbsp;                // migration
+<i>95</i>&nbsp;
+<b class="nc"><i>96</i>&nbsp;                Node migrant = selectRandomNode(nodes.get(event.pop));</b>
+<i>97</i>&nbsp;
+<b class="nc"><i>98</i>&nbsp;                Node migrantsParent = new Node();</b>
+<b class="nc"><i>99</i>&nbsp;                migrantsParent.setNr(nodeNumber);</b>
+<b class="nc"><i>100</i>&nbsp;                migrantsParent.setHeight(event.time);</b>
+<b class="nc"><i>101</i>&nbsp;                migrantsParent.setMetaData(&quot;deme&quot;, event.toPop);</b>
+<i>102</i>&nbsp;
+<b class="nc"><i>103</i>&nbsp;                migrantsParent.addChild(migrant);</b>
+<i>104</i>&nbsp;
+<b class="nc"><i>105</i>&nbsp;                time = event.time;</b>
+<i>106</i>&nbsp;
+<b class="nc"><i>107</i>&nbsp;                nodes.get(event.pop).remove(migrant);</b>
+<b class="nc"><i>108</i>&nbsp;                nodes.get(event.toPop).add(migrantsParent);</b>
+<i>109</i>&nbsp;            }
+<b class="nc"><i>110</i>&nbsp;            totalRate = populateRateMatrix(nodes, popSizesMigrationRates, rates);</b>
+<b class="nc"><i>111</i>&nbsp;            nodeNumber += 1;</b>
+<b class="nc"><i>112</i>&nbsp;        }</b>
+<i>113</i>&nbsp;
+<b class="nc"><i>114</i>&nbsp;        List&lt;Node&gt; rootNodes = new ArrayList&lt;Node&gt;();</b>
+<b class="nc"><i>115</i>&nbsp;        for (List&lt;Node&gt; nodeList : nodes) {</b>
+<b class="nc"><i>116</i>&nbsp;            rootNodes.addAll(nodeList);</b>
+<b class="nc"><i>117</i>&nbsp;        }</b>
+<i>118</i>&nbsp;
+<i>119</i>&nbsp;        //System.out.println(rootNodes.size() + &quot; root nodes remain&quot;);
+<i>120</i>&nbsp;        //System.out.println(&quot; rootNodes.get(0).getNodeCount() == &quot; + rootNodes.get(0).getNodeCount());
+<i>121</i>&nbsp;
+<i>122</i>&nbsp;
+<b class="nc"><i>123</i>&nbsp;        return rootNodes;</b>
+<i>124</i>&nbsp;    }
+<i>125</i>&nbsp;
+<i>126</i>&nbsp;    private int getTotalNodeCount(List&lt;List&lt;Node&gt;&gt; nodes) {
+<b class="nc"><i>127</i>&nbsp;        int count = 0;</b>
+<b class="nc"><i>128</i>&nbsp;        for (List&lt;Node&gt; nodeList : nodes) {</b>
+<b class="nc"><i>129</i>&nbsp;            count += nodeList.size();</b>
+<b class="nc"><i>130</i>&nbsp;        }</b>
+<b class="nc"><i>131</i>&nbsp;        return count;</b>
+<i>132</i>&nbsp;    }
+<i>133</i>&nbsp;
+<i>134</i>&nbsp;    private Node selectRandomNode(List&lt;Node&gt; nodes) {
+<b class="nc"><i>135</i>&nbsp;        int index = Randomizer.nextInt(nodes.size());</b>
+<b class="nc"><i>136</i>&nbsp;        Node node = nodes.remove(index);</b>
+<b class="nc"><i>137</i>&nbsp;        return node;</b>
+<i>138</i>&nbsp;    }
+<i>139</i>&nbsp;
+<i>140</i>&nbsp;    private SCEvent selectRandomEvent(double[][] rates, double totalRate, double time) {
+<i>141</i>&nbsp;
+<b class="nc"><i>142</i>&nbsp;        double U = Randomizer.nextDouble() * totalRate;</b>
+<i>143</i>&nbsp;
+<b class="nc"><i>144</i>&nbsp;        for (int i = 0; i &lt; rates.length; i++) {</b>
+<b class="nc"><i>145</i>&nbsp;            for (int j = 0; j &lt; rates.length; j++) {</b>
+<b class="nc"><i>146</i>&nbsp;                if (U &gt; rates[i][j]) {</b>
+<b class="nc"><i>147</i>&nbsp;                    U -= rates[i][j];</b>
+<i>148</i>&nbsp;                } else {
+<b class="nc"><i>149</i>&nbsp;                    SCEvent event = new SCEvent();</b>
+<b class="nc"><i>150</i>&nbsp;                    event.pop = i;</b>
+<b class="nc"><i>151</i>&nbsp;                    event.toPop = j;</b>
+<b class="nc"><i>152</i>&nbsp;                    if (i == j) {</b>
+<b class="nc"><i>153</i>&nbsp;                        event.type = EventType.coalescent;</b>
+<i>154</i>&nbsp;                    } else {
+<b class="nc"><i>155</i>&nbsp;                        event.type = EventType.migration;</b>
+<i>156</i>&nbsp;                    }
+<i>157</i>&nbsp;
+<i>158</i>&nbsp;                    // I use below instead of &quot;double V = Randomizer.nextDouble();&quot; for speed
+<b class="nc"><i>159</i>&nbsp;                    double V = U / rates[i][j];</b>
+<i>160</i>&nbsp;
+<b class="nc"><i>161</i>&nbsp;                    event.time = time + (-Math.log(V) / totalRate);</b>
+<i>162</i>&nbsp;
+<b class="nc"><i>163</i>&nbsp;                    return event;</b>
+<i>164</i>&nbsp;                }
+<i>165</i>&nbsp;            }
+<i>166</i>&nbsp;        }
+<b class="nc"><i>167</i>&nbsp;        throw new RuntimeException();</b>
+<i>168</i>&nbsp;    }
+<i>169</i>&nbsp;
+<i>170</i>&nbsp;    private double populateRateMatrix(List&lt;List&lt;Node&gt;&gt; nodes, RealParameter popSizesMigrationRates, double[][] rates) {
+<i>171</i>&nbsp;
+<b class="nc"><i>172</i>&nbsp;        double totalRate = 0;</b>
+<i>173</i>&nbsp;
+<i>174</i>&nbsp;        // coalescent rates
+<b class="nc"><i>175</i>&nbsp;        for (int i = 0; i &lt; rates.length; i++) {</b>
+<b class="nc"><i>176</i>&nbsp;            double popSizei = popSizesMigrationRates.getMatrixValue(i, i);</b>
+<b class="nc"><i>177</i>&nbsp;            for (int j = 0; j &lt; rates.length; j++) {</b>
+<b class="nc"><i>178</i>&nbsp;                double popSizej = popSizesMigrationRates.getMatrixValue(j, j);</b>
+<b class="nc"><i>179</i>&nbsp;                if (i == j) {</b>
+<b class="nc"><i>180</i>&nbsp;                    rates[i][i] = Binomial.choose2(nodes.get(i).size()) / popSizei;</b>
+<i>181</i>&nbsp;                } else {
+<i>182</i>&nbsp;                    // off-diagonal migration rates are in units of expected migrants per generation (thus division by popSizei)
+<b class="nc"><i>183</i>&nbsp;                    rates[i][j] = nodes.get(i).size() * (popSizesMigrationRates.getMatrixValue(i, j) * popSizej) / popSizei;</b>
+<i>184</i>&nbsp;                }
+<b class="nc"><i>185</i>&nbsp;                totalRate += rates[i][j];</b>
+<i>186</i>&nbsp;            }
+<i>187</i>&nbsp;        }
+<b class="nc"><i>188</i>&nbsp;        return totalRate;</b>
+<i>189</i>&nbsp;    }
+<i>190</i>&nbsp;
+<b class="nc"><i>191</i>&nbsp;    private class SCEvent {</b>
+<i>192</i>&nbsp;
+<i>193</i>&nbsp;        int pop;
+<i>194</i>&nbsp;
+<i>195</i>&nbsp;        // if the event is a migration this is the population the parent node is in 
+<i>196</i>&nbsp;        // (i.e. the deme that the lineage migrates to when going backwards in time)
+<i>197</i>&nbsp;        int toPop;
+<i>198</i>&nbsp;
+<i>199</i>&nbsp;        EventType type;
+<i>200</i>&nbsp;        double time;
+<i>201</i>&nbsp;
+<i>202</i>&nbsp;    }
+<i>203</i>&nbsp;
+<i>204</i>&nbsp;    public static void main(String[] args) throws Exception {
+<i>205</i>&nbsp;
+<i>206</i>&nbsp;        //List&lt;Tree&gt; trees = new ArrayList&lt;Tree&gt;();
+<i>207</i>&nbsp;
+<b class="nc"><i>208</i>&nbsp;        int reps = 10000;</b>
+<i>209</i>&nbsp;
+<b class="nc"><i>210</i>&nbsp;        double[] popSize1 = new double[]{1, 1, 1, 1, 1};</b>
+<b class="nc"><i>211</i>&nbsp;        double[] popSize2 = new double[]{1, 2, 4, 8, 16};</b>
+<i>212</i>&nbsp;
+<i>213</i>&nbsp;
+<b class="nc"><i>214</i>&nbsp;        for (double m = 0.125; m &lt; 32; m *= 2) {</b>
+<b class="nc"><i>215</i>&nbsp;            for (int i = 0; i &lt; popSize1.length; i++) {</b>
+<b class="nc"><i>216</i>&nbsp;                int count = 0;</b>
+<b class="nc"><i>217</i>&nbsp;                for (int j = 0; j &lt; reps; j++) {</b>
+<i>218</i>&nbsp;
+<b class="nc"><i>219</i>&nbsp;                    Tree tree = new StructuredCoalescentTree(</b>
+<b class="nc"><i>220</i>&nbsp;                            new RealParameter(new Double[]{popSize1[i], m, popSize2[i], m}),</b>
+<b class="nc"><i>221</i>&nbsp;                            new IntegerParameter(new Integer[]{2, 2})</b>
+<i>222</i>&nbsp;                    );
+<i>223</i>&nbsp;
+<i>224</i>&nbsp;                    //trees.add(tree);
+<i>225</i>&nbsp;
+<b class="nc"><i>226</i>&nbsp;                    if ((Integer) tree.getRoot().getMetaData(&quot;deme&quot;) == 0) count += 1;</b>
+<i>227</i>&nbsp;
+<i>228</i>&nbsp;                }
+<b class="nc"><i>229</i>&nbsp;                System.out.println(popSize1[i] + &quot;\t&quot; + popSize2[i] + &quot;\t&quot; + m + &quot;\t&quot; + ((double) count / (double) reps));</b>
+<i>230</i>&nbsp;            }
+<i>231</i>&nbsp;        }
+<i>232</i>&nbsp;
+<i>233</i>&nbsp;    }
+<i>234</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

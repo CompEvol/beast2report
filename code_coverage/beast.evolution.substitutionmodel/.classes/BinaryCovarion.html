@@ -1,0 +1,468 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: BinaryCovarion</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.substitutionmodel</a> ]
+</div>
+
+<h1>Coverage Summary for Class: BinaryCovarion (beast.evolution.substitutionmodel)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BinaryCovarion</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.9%
+  </span>
+  <span class="absValue">
+    (8/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    61.7%
+  </span>
+  <span class="absValue">
+    (92/ 149)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BinaryCovarion$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BinaryCovarion$MODE</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    90.9%
+  </span>
+  <span class="absValue">
+    (10/ 11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.3%
+  </span>
+  <span class="absValue">
+    (94/ 151)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.substitutionmodel;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.lang.reflect.InvocationTargetException;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import beast.core.Description;
+<i>6</i>&nbsp;import beast.core.Input;
+<i>7</i>&nbsp;import beast.core.Input.Validate;
+<i>8</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>9</i>&nbsp;import beast.core.util.Log;
+<i>10</i>&nbsp;import beast.evolution.datatype.DataType;
+<i>11</i>&nbsp;import beast.evolution.datatype.TwoStateCovarion;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;/**
+<i>15</i>&nbsp; * &lt;p/&gt;
+<i>16</i>&nbsp; * a	the rate of the slow rate class
+<i>17</i>&nbsp; * 1	the rate of the fast rate class
+<i>18</i>&nbsp; * p0	the equilibrium frequency of zero states
+<i>19</i>&nbsp; * p1	1 - p0, the equilibrium frequency of one states
+<i>20</i>&nbsp; * f0	the equilibrium frequency of slow rate class
+<i>21</i>&nbsp; * f1	1 - f0, the equilibrium frequency of fast rate class
+<i>22</i>&nbsp; * s, s1, s2 the rate of switching
+<i>23</i>&nbsp; * &lt;p/&gt;
+<i>24</i>&nbsp; * then the (unnormalized) instantaneous rate matrix (unnormalized Q) should be (depending on mode)
+<i>25</i>&nbsp; * &lt;p/&gt;
+<i>26</i>&nbsp; * 
+<i>27</i>&nbsp; * mode = BEAST -- using classic BEAST implementation, reversible iff hfrequencies = (0.5, 0.5)
+<i>28</i>&nbsp; * FLAGS: reversible = false, TSParameterisation = false
+<i>29</i>&nbsp; * 
+<i>30</i>&nbsp; * [ -(a*p1)-s ,   a*p1    ,    s   ,   0   ]
+<i>31</i>&nbsp; * [   a*p0    , -(a*p0)-s ,    0   ,   s   ]
+<i>32</i>&nbsp; * [    s      ,     0     ,  -p1-s ,  p1   ]
+<i>33</i>&nbsp; * [    0      ,     s     ,    p0  , -p0-s ]
+<i>34</i>&nbsp; *
+<i>35</i>&nbsp; * equilibrium frequencies
+<i>36</i>&nbsp; * [ p0 * f0, p1, * f0, p0 * f1, p1, * f1 ]
+<i>37</i>&nbsp; *
+<i>38</i>&nbsp; * mode = REVERSIBLE -- brings in hfrequencies in rate matrix
+<i>39</i>&nbsp; * reversible = true, TSParameterisation = false
+<i>40</i>&nbsp; * [ - , a , s , 0 ]
+<i>41</i>&nbsp; * [ a , - , 0 , s ]
+<i>42</i>&nbsp; * [ s , 0 , - , 1 ]
+<i>43</i>&nbsp; * [ 0 , s , 1 , - ]
+<i>44</i>&nbsp; * 
+<i>45</i>&nbsp; * which with frequencies becomes
+<i>46</i>&nbsp; * 
+<i>47</i>&nbsp; * [ -(a*p1*f0)-s*f0 ,   a*p1*f0       ,    s*f0      ,   0         ]
+<i>48</i>&nbsp; * [   a*p0*f0       , -(a*p0*f0)-s*f0 ,    0         ,   s*f0      ]
+<i>49</i>&nbsp; * [    s*f1         ,     0           ,  -p1*f1-s*f1 ,  p1*f1      ]
+<i>50</i>&nbsp; * [    0            ,     s*f1        ,    p0*f1     , -p0*f1-s*f1 ]
+<i>51</i>&nbsp; * 
+<i>52</i>&nbsp; * equilibrium frequencies
+<i>53</i>&nbsp; * [ p0 * f0, p1, * f0, p0 * f1, p1, * f1 ]
+<i>54</i>&nbsp; * 
+<i>55</i>&nbsp; * mode = TUFFLEYSTEEL uses alternative parameterisation: hfrequencies is ignored, and switch parameter is set to dimension = 2
+<i>56</i>&nbsp; * [ -(a*p1)-s1 ,   a*p1     ,    s1   ,   0    ]
+<i>57</i>&nbsp; * [   a*p0     , -(a*p0)-s1 ,    0    ,   s1   ]
+<i>58</i>&nbsp; * [    s2      ,     0      ,  -p1-s2 ,  p1    ]
+<i>59</i>&nbsp; * [    0       ,     s2     ,    p0   , -p0-s2 ]
+<i>60</i>&nbsp; *
+<i>61</i>&nbsp; * equilibrium frequencies
+<i>62</i>&nbsp; * [ f0 * s2/(s1+s2), f1, * s2/(s1+s2), f0 * s1/(s1+s2), f1, * s1/(s1+s2) ]
+<i>63</i>&nbsp; *
+<i>64</i>&nbsp; *
+<i>65</i>&nbsp; * Note: to use Tuffley &amp; Steel&#39;s methods, set a = 0.
+<i>66</i>&nbsp; */
+<b class="fc"><i>67</i>&nbsp;@Description(&quot;Covarion model for Binary data&quot;)</b>
+<i>68</i>&nbsp;public class BinaryCovarion extends GeneralSubstitutionModel {
+<b class="fc"><i>69</i>&nbsp;    final public Input&lt;RealParameter&gt; alphaInput = new Input&lt;&gt;(&quot;alpha&quot;, &quot;the rate of evolution in slow mode&quot;, Validate.REQUIRED);</b>
+<b class="fc"><i>70</i>&nbsp;    final public Input&lt;RealParameter&gt; switchRateInput = new Input&lt;&gt;(&quot;switchRate&quot;, &quot;the rate of flipping between slow and fast modes&quot;, Validate.REQUIRED);</b>
+<b class="fc"><i>71</i>&nbsp;    final public Input&lt;RealParameter&gt; frequenciesInput = new Input&lt;&gt;(&quot;vfrequencies&quot;, &quot;the frequencies of the visible states&quot;, Validate.REQUIRED);</b>
+<b class="fc"><i>72</i>&nbsp;    final public Input&lt;RealParameter&gt; hfrequenciesInput = new Input&lt;&gt;(&quot;hfrequencies&quot;, &quot;the frequencies of the hidden rates&quot;);</b>
+<i>73</i>&nbsp;
+<b class="fc"><i>74</i>&nbsp;    public enum MODE {BEAST, REVERSIBLE, TUFFLEYSTEEL};</b>
+<b class="fc"><i>75</i>&nbsp;	final public Input&lt;MODE&gt; modeInput = new Input&lt;&gt;(&quot;mode&quot;,&quot;one of BEAST, REVERSIBLE, TUFFLESTEEL &quot;</b>
+<i>76</i>&nbsp;			+ &quot;BEAST = implementation as in BEAST 1 &quot;
+<i>77</i>&nbsp;			+ &quot;REVERSIBLE = like BEAST 1 implementation, but using frequencies to make it reversible &quot;
+<b class="fc"><i>78</i>&nbsp;			+ &quot;TUFFLEYSTEEL = Tuffley &amp; Steel (1996) impementation (no rates for &quot;, MODE.BEAST,MODE.values());</b>
+<i>79</i>&nbsp;
+<i>80</i>&nbsp;    private RealParameter alpha;
+<i>81</i>&nbsp;    private RealParameter switchRate;
+<i>82</i>&nbsp;    private RealParameter frequencies;
+<i>83</i>&nbsp;    private RealParameter hiddenFrequencies;
+<i>84</i>&nbsp;
+<i>85</i>&nbsp;    protected double[][] unnormalizedQ;
+<i>86</i>&nbsp;    protected double[][] storedUnnormalizedQ;
+<i>87</i>&nbsp;    int stateCount;
+<b class="fc"><i>88</i>&nbsp;    MODE mode  = modeInput.get();</b>
+<i>89</i>&nbsp;
+<b class="fc"><i>90</i>&nbsp;    public BinaryCovarion() {</b>
+<b class="fc"><i>91</i>&nbsp;        ratesInput.setRule(Validate.OPTIONAL);</b>
+<b class="fc"><i>92</i>&nbsp;        frequenciesInput.setRule(Validate.OPTIONAL);</b>
+<b class="fc"><i>93</i>&nbsp;    }</b>
+<i>94</i>&nbsp;
+<i>95</i>&nbsp;    @Override
+<i>96</i>&nbsp;    public void initAndValidate() {
+<b class="fc"><i>97</i>&nbsp;        alpha = alphaInput.get();</b>
+<b class="fc"><i>98</i>&nbsp;        switchRate = switchRateInput.get();</b>
+<b class="fc"><i>99</i>&nbsp;        frequencies = frequenciesInput.get();</b>
+<b class="fc"><i>100</i>&nbsp;        hiddenFrequencies = hfrequenciesInput.get();</b>
+<i>101</i>&nbsp;
+<i>102</i>&nbsp;        
+<b class="fc"><i>103</i>&nbsp;        if (mode.equals(MODE.BEAST) || mode.equals(MODE.REVERSIBLE)) {</b>
+<b class="fc"><i>104</i>&nbsp;        	if (switchRate.getDimension() != 1) {</b>
+<b class="nc"><i>105</i>&nbsp;        		throw new IllegalArgumentException(&quot;switchRate should have dimension 1&quot;);</b>
+<i>106</i>&nbsp;        	}
+<i>107</i>&nbsp;        } else {
+<b class="nc"><i>108</i>&nbsp;        	if (switchRate.getDimension() != 2) {</b>
+<b class="nc"><i>109</i>&nbsp;        		throw new IllegalArgumentException(&quot;switchRate should have dimension 2&quot;);</b>
+<i>110</i>&nbsp;        	}
+<i>111</i>&nbsp;        }
+<b class="fc"><i>112</i>&nbsp;        if (alpha.getDimension() != 1) {</b>
+<b class="nc"><i>113</i>&nbsp;            throw new IllegalArgumentException(&quot;alpha should have dimension 1&quot;);</b>
+<i>114</i>&nbsp;        }
+<b class="fc"><i>115</i>&nbsp;        if (frequencies.getDimension() != 2) {</b>
+<b class="nc"><i>116</i>&nbsp;            throw new IllegalArgumentException(&quot;frequencies should have dimension 2&quot;);</b>
+<i>117</i>&nbsp;        }
+<b class="fc"><i>118</i>&nbsp;        if (mode.equals(MODE.BEAST) || mode.equals(MODE.REVERSIBLE)) {</b>
+<b class="fc"><i>119</i>&nbsp;        	if (hfrequenciesInput.get() == null) {</b>
+<b class="nc"><i>120</i>&nbsp;        		throw new IllegalArgumentException(&quot;hiddenFrequenciesshould should be specified&quot;);</b>
+<i>121</i>&nbsp;        	}
+<b class="fc"><i>122</i>&nbsp;            if (hiddenFrequencies.getDimension() != 2) {</b>
+<b class="nc"><i>123</i>&nbsp;                throw new IllegalArgumentException(&quot;hiddenFrequenciesshould have dimension 2&quot;);</b>
+<i>124</i>&nbsp;            }
+<i>125</i>&nbsp;        } else {
+<b class="nc"><i>126</i>&nbsp;        	if (hfrequenciesInput.get() != null) {</b>
+<b class="nc"><i>127</i>&nbsp;        		Log.warning.println(&quot;WARNING: hfrequencies is specified, but the BinaryCovarion model ignores it.&quot;);</b>
+<i>128</i>&nbsp;        	}
+<i>129</i>&nbsp;        }
+<i>130</i>&nbsp;
+<i>131</i>&nbsp;        
+<i>132</i>&nbsp;        
+<b class="fc"><i>133</i>&nbsp;        nrOfStates = 4;</b>
+<b class="fc"><i>134</i>&nbsp;        unnormalizedQ = new double[4][4];</b>
+<b class="fc"><i>135</i>&nbsp;        storedUnnormalizedQ = new double[4][4];</b>
+<i>136</i>&nbsp;
+<b class="fc"><i>137</i>&nbsp;        updateMatrix = true;</b>
+<i>138</i>&nbsp;        try {
+<b class="fc"><i>139</i>&nbsp;			eigenSystem = createEigenSystem();</b>
+<b class="nc"><i>140</i>&nbsp;		} catch (SecurityException | ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException</b>
+<i>141</i>&nbsp;				| InvocationTargetException e) {
+<b class="nc"><i>142</i>&nbsp;			throw new IllegalArgumentException(e.getMessage());</b>
+<b class="fc"><i>143</i>&nbsp;		}</b>
+<b class="fc"><i>144</i>&nbsp;        rateMatrix = new double[nrOfStates][nrOfStates];</b>
+<b class="fc"><i>145</i>&nbsp;        relativeRates = new double[4 * 3];</b>
+<b class="fc"><i>146</i>&nbsp;        storedRelativeRates = new double[4 * 3];</b>
+<b class="fc"><i>147</i>&nbsp;    }</b>
+<i>148</i>&nbsp;
+<i>149</i>&nbsp;
+<i>150</i>&nbsp;    @Override
+<i>151</i>&nbsp;    public boolean canHandleDataType(DataType dataType) {
+<b class="nc"><i>152</i>&nbsp;        return dataType.getClass().equals(TwoStateCovarion.class);</b>
+<i>153</i>&nbsp;    }
+<i>154</i>&nbsp;
+<i>155</i>&nbsp;
+<i>156</i>&nbsp;    @Override
+<i>157</i>&nbsp;    protected void setupRelativeRates() {
+<b class="fc"><i>158</i>&nbsp;    }</b>
+<i>159</i>&nbsp;
+<i>160</i>&nbsp;
+<i>161</i>&nbsp;    @Override
+<i>162</i>&nbsp;    protected void setupRateMatrix() {
+<b class="fc"><i>163</i>&nbsp;        setupUnnormalizedQMatrix();</b>
+<i>164</i>&nbsp;
+<b class="fc"><i>165</i>&nbsp;        for (int i = 0; i &lt; 4; i++) {</b>
+<b class="fc"><i>166</i>&nbsp;            for (int j = 0; j &lt; 4; j++) {</b>
+<b class="fc"><i>167</i>&nbsp;                rateMatrix[i][j] = unnormalizedQ[i][j];</b>
+<i>168</i>&nbsp;            }
+<i>169</i>&nbsp;        }
+<i>170</i>&nbsp;        // bring in frequencies
+<i>171</i>&nbsp;//        for (int i = 0; i &lt; m_nStates; i++) {
+<i>172</i>&nbsp;//            for (int j = i + 1; j &lt; m_nStates; j++) {
+<i>173</i>&nbsp;//            	m_rateMatrix[i][j] *= freqs[j];
+<i>174</i>&nbsp;//            	m_rateMatrix[j][i] *= freqs[i];
+<i>175</i>&nbsp;//            }
+<i>176</i>&nbsp;//        }
+<i>177</i>&nbsp;        // set up diagonal
+<b class="fc"><i>178</i>&nbsp;        for (int i = 0; i &lt; nrOfStates; i++) {</b>
+<b class="fc"><i>179</i>&nbsp;            double sum = 0.0;</b>
+<b class="fc"><i>180</i>&nbsp;            for (int j = 0; j &lt; nrOfStates; j++) {</b>
+<b class="fc"><i>181</i>&nbsp;                if (i != j)</b>
+<b class="fc"><i>182</i>&nbsp;                    sum += rateMatrix[i][j];</b>
+<i>183</i>&nbsp;            }
+<b class="fc"><i>184</i>&nbsp;            rateMatrix[i][i] = -sum;</b>
+<i>185</i>&nbsp;        }
+<i>186</i>&nbsp;        // normalise rate matrix to one expected substitution per unit time
+<b class="fc"><i>187</i>&nbsp;        normalize(rateMatrix, getFrequencies());</b>
+<b class="fc"><i>188</i>&nbsp;    } // setupRateMatrix</b>
+<i>189</i>&nbsp;
+<i>190</i>&nbsp;    @Override
+<i>191</i>&nbsp;    public double[] getFrequencies() {
+<b class="fc"><i>192</i>&nbsp;        double[] freqs = new double[4];</b>
+<b class="fc"><i>193</i>&nbsp;        if (mode.equals(MODE.BEAST) || mode.equals(MODE.REVERSIBLE)) {</b>
+<b class="fc"><i>194</i>&nbsp;	        freqs[0] = frequencies.getValue(0) * hiddenFrequencies.getValue(0);</b>
+<b class="fc"><i>195</i>&nbsp;	        freqs[1] = frequencies.getValue(1) * hiddenFrequencies.getValue(0);</b>
+<b class="fc"><i>196</i>&nbsp;	        freqs[2] = frequencies.getValue(0) * hiddenFrequencies.getValue(1);</b>
+<b class="fc"><i>197</i>&nbsp;	        freqs[3] = frequencies.getValue(1) * hiddenFrequencies.getValue(1);</b>
+<i>198</i>&nbsp;        } else {
+<b class="nc"><i>199</i>&nbsp;        	double h0 = alpha.getValue(1) * (alpha.getValue(0) + alpha.getValue(1));</b>
+<b class="nc"><i>200</i>&nbsp;        	double h1 = alpha.getValue(0) * (alpha.getValue(0) + alpha.getValue(1));</b>
+<b class="nc"><i>201</i>&nbsp;	        freqs[0] = frequencies.getValue(0) * h0;</b>
+<b class="nc"><i>202</i>&nbsp;	        freqs[1] = frequencies.getValue(1) * h0;</b>
+<b class="nc"><i>203</i>&nbsp;	        freqs[2] = frequencies.getValue(0) * h1;</b>
+<b class="nc"><i>204</i>&nbsp;	        freqs[3] = frequencies.getValue(1) * h1;        	</b>
+<i>205</i>&nbsp;        }
+<b class="fc"><i>206</i>&nbsp;        return freqs;</b>
+<i>207</i>&nbsp;    }
+<i>208</i>&nbsp;
+<i>209</i>&nbsp;
+<i>210</i>&nbsp;    protected void setupUnnormalizedQMatrix() {
+<i>211</i>&nbsp;
+<b class="fc"><i>212</i>&nbsp;        switch (mode) {</b>
+<i>213</i>&nbsp;        case BEAST: {
+<i>214</i>&nbsp;
+<b class="fc"><i>215</i>&nbsp;            double a = alpha.getValue(0);</b>
+<b class="fc"><i>216</i>&nbsp;            double s = switchRate.getValue(0);</b>
+<b class="fc"><i>217</i>&nbsp;            double f0 = hiddenFrequencies.getValue(0);</b>
+<b class="fc"><i>218</i>&nbsp;            double f1 = hiddenFrequencies.getValue(1);</b>
+<b class="fc"><i>219</i>&nbsp;            double p0 = frequencies.getValue(0);</b>
+<b class="fc"><i>220</i>&nbsp;            double p1 = frequencies.getValue(1);</b>
+<i>221</i>&nbsp;
+<b class="fc"><i>222</i>&nbsp;            assert Math.abs(1.0 - f0 - f1) &lt; 1e-8;</b>
+<b class="fc"><i>223</i>&nbsp;            assert Math.abs(1.0 - p0 - p1) &lt; 1e-8;</b>
+<i>224</i>&nbsp;
+<b class="fc"><i>225</i>&nbsp;            unnormalizedQ[0][1] = a * p1;</b>
+<b class="fc"><i>226</i>&nbsp;            unnormalizedQ[0][2] = s;</b>
+<b class="fc"><i>227</i>&nbsp;            unnormalizedQ[0][3] = 0.0;</b>
+<i>228</i>&nbsp;
+<b class="fc"><i>229</i>&nbsp;            unnormalizedQ[1][0] = a * p0;</b>
+<b class="fc"><i>230</i>&nbsp;            unnormalizedQ[1][2] = 0.0;</b>
+<b class="fc"><i>231</i>&nbsp;            unnormalizedQ[1][3] = s;</b>
+<i>232</i>&nbsp;
+<b class="fc"><i>233</i>&nbsp;            unnormalizedQ[2][0] = s;</b>
+<b class="fc"><i>234</i>&nbsp;            unnormalizedQ[2][1] = 0.0;</b>
+<b class="fc"><i>235</i>&nbsp;            unnormalizedQ[2][3] = p1;</b>
+<i>236</i>&nbsp;
+<b class="fc"><i>237</i>&nbsp;            unnormalizedQ[3][0] = 0.0;</b>
+<b class="fc"><i>238</i>&nbsp;            unnormalizedQ[3][1] = s;</b>
+<b class="fc"><i>239</i>&nbsp;            unnormalizedQ[3][2] = p0;</b>
+<i>240</i>&nbsp;        }
+<b class="fc"><i>241</i>&nbsp;        break;</b>
+<i>242</i>&nbsp;        case REVERSIBLE: {
+<i>243</i>&nbsp;
+<b class="nc"><i>244</i>&nbsp;            double a = alpha.getValue(0);</b>
+<b class="nc"><i>245</i>&nbsp;            double s = switchRate.getValue(0);</b>
+<b class="nc"><i>246</i>&nbsp;            double f0 = hiddenFrequencies.getValue(0);</b>
+<b class="nc"><i>247</i>&nbsp;            double f1 = hiddenFrequencies.getValue(1);</b>
+<b class="nc"><i>248</i>&nbsp;            double p0 = frequencies.getValue(0);</b>
+<b class="nc"><i>249</i>&nbsp;            double p1 = frequencies.getValue(1);</b>
+<i>250</i>&nbsp;
+<b class="nc"><i>251</i>&nbsp;            assert Math.abs(1.0 - f0 - f1) &lt; 1e-8;</b>
+<b class="nc"><i>252</i>&nbsp;            assert Math.abs(1.0 - p0 - p1) &lt; 1e-8;</b>
+<i>253</i>&nbsp;
+<b class="nc"><i>254</i>&nbsp;            unnormalizedQ[0][1] = a * p1 * f0;</b>
+<b class="nc"><i>255</i>&nbsp;            unnormalizedQ[0][2] = s * f0;</b>
+<b class="nc"><i>256</i>&nbsp;            unnormalizedQ[0][3] = 0.0;</b>
+<i>257</i>&nbsp;
+<b class="nc"><i>258</i>&nbsp;            unnormalizedQ[1][0] = a * p0 * f0;</b>
+<b class="nc"><i>259</i>&nbsp;            unnormalizedQ[1][2] = 0.0;</b>
+<b class="nc"><i>260</i>&nbsp;            unnormalizedQ[1][3] = s * f0;</b>
+<i>261</i>&nbsp;
+<b class="nc"><i>262</i>&nbsp;            unnormalizedQ[2][0] = s * f1;</b>
+<b class="nc"><i>263</i>&nbsp;            unnormalizedQ[2][1] = 0.0;</b>
+<b class="nc"><i>264</i>&nbsp;            unnormalizedQ[2][3] = p1 * f1;</b>
+<i>265</i>&nbsp;
+<b class="nc"><i>266</i>&nbsp;            unnormalizedQ[3][0] = 0.0;</b>
+<b class="nc"><i>267</i>&nbsp;            unnormalizedQ[3][1] = s * f1;</b>
+<b class="nc"><i>268</i>&nbsp;            unnormalizedQ[3][2] = p0 * f1;</b>
+<i>269</i>&nbsp;        }
+<b class="nc"><i>270</i>&nbsp;    	break;</b>
+<i>271</i>&nbsp;        case TUFFLEYSTEEL: {
+<b class="nc"><i>272</i>&nbsp;            double a = alpha.getValue(0);</b>
+<b class="nc"><i>273</i>&nbsp;            double s1 = switchRate.getValue(0);</b>
+<b class="nc"><i>274</i>&nbsp;            double s2 = switchRate.getValue(0);</b>
+<b class="nc"><i>275</i>&nbsp;            double p0 = frequencies.getValue(0);</b>
+<b class="nc"><i>276</i>&nbsp;            double p1 = frequencies.getValue(1);</b>
+<i>277</i>&nbsp;
+<b class="nc"><i>278</i>&nbsp;            assert Math.abs(1.0 - p0 - p1) &lt; 1e-8;</b>
+<i>279</i>&nbsp;
+<b class="nc"><i>280</i>&nbsp;            unnormalizedQ[0][1] = a * p1;</b>
+<b class="nc"><i>281</i>&nbsp;            unnormalizedQ[0][2] = s1;</b>
+<b class="nc"><i>282</i>&nbsp;            unnormalizedQ[0][3] = 0.0;</b>
+<i>283</i>&nbsp;
+<b class="nc"><i>284</i>&nbsp;            unnormalizedQ[1][0] = a * p0;</b>
+<b class="nc"><i>285</i>&nbsp;            unnormalizedQ[1][2] = 0.0;</b>
+<b class="nc"><i>286</i>&nbsp;            unnormalizedQ[1][3] = s1;</b>
+<i>287</i>&nbsp;
+<b class="nc"><i>288</i>&nbsp;            unnormalizedQ[2][0] = s2;</b>
+<b class="nc"><i>289</i>&nbsp;            unnormalizedQ[2][1] = 0.0;</b>
+<b class="nc"><i>290</i>&nbsp;            unnormalizedQ[2][3] = p1;</b>
+<i>291</i>&nbsp;
+<b class="nc"><i>292</i>&nbsp;            unnormalizedQ[3][0] = 0.0;</b>
+<b class="nc"><i>293</i>&nbsp;            unnormalizedQ[3][1] = s2;</b>
+<b class="nc"><i>294</i>&nbsp;            unnormalizedQ[3][2] = p0;</b>
+<i>295</i>&nbsp;        }
+<i>296</i>&nbsp;       	break;
+<i>297</i>&nbsp;        }
+<i>298</i>&nbsp;
+<b class="fc"><i>299</i>&nbsp;    }</b>
+<i>300</i>&nbsp;
+<i>301</i>&nbsp;    /**
+<i>302</i>&nbsp;     * Normalize rate matrix to one expected substitution per unit time
+<i>303</i>&nbsp;     *
+<i>304</i>&nbsp;     * @param matrix the matrix to normalize to one expected substitution
+<i>305</i>&nbsp;     * @param pi     the equilibrium distribution of states
+<i>306</i>&nbsp;     */
+<i>307</i>&nbsp;    private void normalize(double[][] matrix, double[] pi) {
+<i>308</i>&nbsp;
+<b class="fc"><i>309</i>&nbsp;        double subst = 0.0;</b>
+<b class="fc"><i>310</i>&nbsp;        int dimension = pi.length;</b>
+<i>311</i>&nbsp;
+<b class="fc"><i>312</i>&nbsp;        for (int i = 0; i &lt; dimension; i++) {</b>
+<b class="fc"><i>313</i>&nbsp;            subst += -matrix[i][i] * pi[i];</b>
+<i>314</i>&nbsp;        }
+<i>315</i>&nbsp;
+<i>316</i>&nbsp;        // normalize, including switches
+<b class="fc"><i>317</i>&nbsp;        for (int i = 0; i &lt; dimension; i++) {</b>
+<b class="fc"><i>318</i>&nbsp;            for (int j = 0; j &lt; dimension; j++) {</b>
+<b class="fc"><i>319</i>&nbsp;                matrix[i][j] = matrix[i][j] / subst;</b>
+<i>320</i>&nbsp;            }
+<i>321</i>&nbsp;        }
+<i>322</i>&nbsp;
+<b class="fc"><i>323</i>&nbsp;        double switchingProportion = 0.0;</b>
+<b class="fc"><i>324</i>&nbsp;        switchingProportion += matrix[0][2] * pi[2];</b>
+<b class="fc"><i>325</i>&nbsp;        switchingProportion += matrix[2][0] * pi[0];</b>
+<b class="fc"><i>326</i>&nbsp;        switchingProportion += matrix[1][3] * pi[3];</b>
+<b class="fc"><i>327</i>&nbsp;        switchingProportion += matrix[3][1] * pi[1];</b>
+<i>328</i>&nbsp;
+<i>329</i>&nbsp;        //System.out.println(&quot;switchingProportion=&quot; + switchingProportion);
+<i>330</i>&nbsp;
+<i>331</i>&nbsp;        // normalize, removing switches
+<b class="fc"><i>332</i>&nbsp;        for (int i = 0; i &lt; dimension; i++) {</b>
+<b class="fc"><i>333</i>&nbsp;            for (int j = 0; j &lt; dimension; j++) {</b>
+<b class="fc"><i>334</i>&nbsp;                matrix[i][j] = matrix[i][j] / (1.0 - switchingProportion);</b>
+<i>335</i>&nbsp;            }
+<i>336</i>&nbsp;        }
+<b class="fc"><i>337</i>&nbsp;    }</b>
+<i>338</i>&nbsp;
+<i>339</i>&nbsp;
+<i>340</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

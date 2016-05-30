@@ -1,0 +1,250 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: LogNormalDistributionModel</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.math.distributions</a> ]
+</div>
+
+<h1>Coverage Summary for Class: LogNormalDistributionModel (beast.math.distributions)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LogNormalDistributionModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    81.6%
+  </span>
+  <span class="absValue">
+    (31/ 38)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LogNormalDistributionModel$LogNormalImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    57.1%
+  </span>
+  <span class="absValue">
+    (4/ 7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    72.2%
+  </span>
+  <span class="absValue">
+    (13/ 18)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (9/ 12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    78.6%
+  </span>
+  <span class="absValue">
+    (44/ 56)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.math.distributions;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.apache.commons.math.MathException;
+<i>4</i>&nbsp;import org.apache.commons.math.distribution.ContinuousDistribution;
+<i>5</i>&nbsp;import org.apache.commons.math.distribution.Distribution;
+<i>6</i>&nbsp;import org.apache.commons.math.distribution.NormalDistributionImpl;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import beast.core.Description;
+<i>9</i>&nbsp;import beast.core.Input;
+<i>10</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;/**
+<i>15</i>&nbsp; * @author Alexei Drummond
+<i>16</i>&nbsp; */
+<i>17</i>&nbsp;@Description(&quot;A log-normal distribution with mean and variance parameters.&quot;)
+<b class="fc"><i>18</i>&nbsp;public class LogNormalDistributionModel extends ParametricDistribution {</b>
+<b class="fc"><i>19</i>&nbsp;    final public Input&lt;RealParameter&gt; MParameterInput = new Input&lt;&gt;(&quot;M&quot;, &quot;M parameter of lognormal distribution. Equal to the mean of the log-transformed distribution.&quot;);</b>
+<b class="fc"><i>20</i>&nbsp;    final public Input&lt;RealParameter&gt; SParameterInput = new Input&lt;&gt;(&quot;S&quot;, &quot;S parameter of lognormal distribution. Equal to the standard deviation of the log-transformed distribution.&quot;);</b>
+<b class="fc"><i>21</i>&nbsp;    final public Input&lt;Boolean&gt; hasMeanInRealSpaceInput = new Input&lt;&gt;(&quot;meanInRealSpace&quot;, &quot;Whether the M parameter is in real space, or in log-transformed space. Default false = log-transformed.&quot;, false);</b>
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;    boolean hasMeanInRealSpace;
+<b class="fc"><i>24</i>&nbsp;    LogNormalImpl dist = new LogNormalImpl(0, 1);</b>
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;    @Override
+<i>27</i>&nbsp;	public void initAndValidate() {
+<b class="fc"><i>28</i>&nbsp;        hasMeanInRealSpace = hasMeanInRealSpaceInput.get();</b>
+<b class="fc"><i>29</i>&nbsp;        if (MParameterInput.get() != null) {</b>
+<b class="fc"><i>30</i>&nbsp;            if (MParameterInput.get().getLower() == null) {</b>
+<b class="nc"><i>31</i>&nbsp;                MParameterInput.get().setLower(Double.NEGATIVE_INFINITY);</b>
+<i>32</i>&nbsp;            }
+<b class="fc"><i>33</i>&nbsp;            if (MParameterInput.get().getUpper() == null) {</b>
+<b class="nc"><i>34</i>&nbsp;                MParameterInput.get().setUpper(Double.POSITIVE_INFINITY);</b>
+<i>35</i>&nbsp;            }
+<i>36</i>&nbsp;        }
+<i>37</i>&nbsp;
+<b class="fc"><i>38</i>&nbsp;        if (SParameterInput.get() != null) {</b>
+<b class="fc"><i>39</i>&nbsp;            if (SParameterInput.get().getLower() == null) {</b>
+<b class="nc"><i>40</i>&nbsp;                SParameterInput.get().setLower(0.0);</b>
+<i>41</i>&nbsp;            }
+<b class="fc"><i>42</i>&nbsp;            if (SParameterInput.get().getUpper() == null) {</b>
+<b class="nc"><i>43</i>&nbsp;                SParameterInput.get().setUpper(Double.POSITIVE_INFINITY);</b>
+<i>44</i>&nbsp;            }
+<i>45</i>&nbsp;        }
+<b class="fc"><i>46</i>&nbsp;        refresh();</b>
+<b class="fc"><i>47</i>&nbsp;    }</b>
+<i>48</i>&nbsp;
+<i>49</i>&nbsp;    /**
+<i>50</i>&nbsp;     * make sure internal state is up to date *
+<i>51</i>&nbsp;     */
+<i>52</i>&nbsp;    void refresh() {
+<i>53</i>&nbsp;        double mean;
+<i>54</i>&nbsp;        double sigma;
+<b class="fc"><i>55</i>&nbsp;        if (SParameterInput.get() == null) {</b>
+<b class="nc"><i>56</i>&nbsp;            sigma = 1;</b>
+<i>57</i>&nbsp;        } else {
+<b class="fc"><i>58</i>&nbsp;            sigma = SParameterInput.get().getValue();</b>
+<i>59</i>&nbsp;        }
+<b class="fc"><i>60</i>&nbsp;        if (MParameterInput.get() == null) {</b>
+<b class="nc"><i>61</i>&nbsp;            mean = 0;</b>
+<i>62</i>&nbsp;        } else {
+<b class="fc"><i>63</i>&nbsp;            mean = MParameterInput.get().getValue();</b>
+<i>64</i>&nbsp;        }
+<b class="fc"><i>65</i>&nbsp;        if (hasMeanInRealSpace) {</b>
+<b class="fc"><i>66</i>&nbsp;            mean = Math.log(mean) - (0.5 * sigma * sigma);</b>
+<i>67</i>&nbsp;        }
+<b class="fc"><i>68</i>&nbsp;        dist.setMeanAndStdDev(mean, sigma);</b>
+<b class="fc"><i>69</i>&nbsp;    }</b>
+<i>70</i>&nbsp;
+<i>71</i>&nbsp;    @Override
+<i>72</i>&nbsp;    public Distribution getDistribution() {
+<b class="fc"><i>73</i>&nbsp;        refresh();</b>
+<b class="fc"><i>74</i>&nbsp;        return dist;</b>
+<i>75</i>&nbsp;    }
+<i>76</i>&nbsp;
+<b class="fc"><i>77</i>&nbsp;    public class LogNormalImpl implements ContinuousDistribution {</b>
+<i>78</i>&nbsp;        double m_fMean;
+<i>79</i>&nbsp;        double m_fStdDev;
+<b class="fc"><i>80</i>&nbsp;        NormalDistributionImpl m_normal = new NormalDistributionImpl(0, 1);</b>
+<i>81</i>&nbsp;
+<b class="fc"><i>82</i>&nbsp;        public LogNormalImpl(double mean, double stdDev) {</b>
+<b class="fc"><i>83</i>&nbsp;            setMeanAndStdDev(mean, stdDev);</b>
+<b class="fc"><i>84</i>&nbsp;        }</b>
+<i>85</i>&nbsp;
+<i>86</i>&nbsp;        @SuppressWarnings(&quot;deprecation&quot;)
+<i>87</i>&nbsp;		void setMeanAndStdDev(double mean, double stdDev) {
+<b class="fc"><i>88</i>&nbsp;            m_fMean = mean;</b>
+<b class="fc"><i>89</i>&nbsp;            m_fStdDev = stdDev;</b>
+<b class="fc"><i>90</i>&nbsp;            m_normal.setMean(mean);</b>
+<b class="fc"><i>91</i>&nbsp;            m_normal.setStandardDeviation(stdDev);</b>
+<b class="fc"><i>92</i>&nbsp;        }</b>
+<i>93</i>&nbsp;
+<i>94</i>&nbsp;        @Override
+<i>95</i>&nbsp;        public double cumulativeProbability(double x) throws MathException {
+<b class="nc"><i>96</i>&nbsp;            return m_normal.cumulativeProbability(Math.log(x));</b>
+<i>97</i>&nbsp;        }
+<i>98</i>&nbsp;
+<i>99</i>&nbsp;        @Override
+<i>100</i>&nbsp;        public double cumulativeProbability(double x0, double x1) throws MathException {
+<b class="nc"><i>101</i>&nbsp;            return cumulativeProbability(x1) - cumulativeProbability(x0);</b>
+<i>102</i>&nbsp;        }
+<i>103</i>&nbsp;
+<i>104</i>&nbsp;        @Override
+<i>105</i>&nbsp;        public double inverseCumulativeProbability(double p) throws MathException {
+<b class="nc"><i>106</i>&nbsp;            return Math.exp(m_normal.inverseCumulativeProbability(p));</b>
+<i>107</i>&nbsp;        }
+<i>108</i>&nbsp;
+<i>109</i>&nbsp;        @Override
+<i>110</i>&nbsp;        public double density(double x) {
+<b class="fc"><i>111</i>&nbsp;            if( x &lt;= 0 ) {</b>
+<b class="nc"><i>112</i>&nbsp;                return 0;</b>
+<i>113</i>&nbsp;            }
+<b class="fc"><i>114</i>&nbsp;            return m_normal.density(Math.log(x)) / x;</b>
+<i>115</i>&nbsp;        }
+<i>116</i>&nbsp;
+<i>117</i>&nbsp;        @Override
+<i>118</i>&nbsp;        public double logDensity(double x) {
+<b class="fc"><i>119</i>&nbsp;            if( x &lt;= 0 ) {</b>
+<b class="nc"><i>120</i>&nbsp;                return  Double.NEGATIVE_INFINITY;</b>
+<i>121</i>&nbsp;            }
+<b class="fc"><i>122</i>&nbsp;            return m_normal.logDensity(Math.log(x)) - Math.log(x);</b>
+<i>123</i>&nbsp;        }
+<i>124</i>&nbsp;    } // class LogNormalImpl
+<i>125</i>&nbsp;
+<i>126</i>&nbsp;    @Override
+<i>127</i>&nbsp;    public double getMean() {
+<b class="fc"><i>128</i>&nbsp;    	if (hasMeanInRealSpace) {</b>
+<b class="fc"><i>129</i>&nbsp;    		if (MParameterInput.get() != null) {</b>
+<b class="fc"><i>130</i>&nbsp;    			return offsetInput.get() + MParameterInput.get().getValue();</b>
+<i>131</i>&nbsp;    		} else {
+<b class="nc"><i>132</i>&nbsp;    			return offsetInput.get();</b>
+<i>133</i>&nbsp;    		}
+<i>134</i>&nbsp;    	} else {
+<b class="fc"><i>135</i>&nbsp;    		double s = SParameterInput.get().getValue();</b>
+<b class="fc"><i>136</i>&nbsp;    		double m = MParameterInput.get().getValue();</b>
+<b class="fc"><i>137</i>&nbsp;    		return Math.exp(m + s * s/2.0);</b>
+<i>138</i>&nbsp;    		//throw new RuntimeException(&quot;Not implemented yet&quot;);
+<i>139</i>&nbsp;    	}
+<i>140</i>&nbsp;    }
+<i>141</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

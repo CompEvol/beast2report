@@ -1,0 +1,1062 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Tree</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.tree</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Tree (beast.evolution.tree)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Tree</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    43.1%
+  </span>
+  <span class="absValue">
+    (25/ 58)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    34.3%
+  </span>
+  <span class="absValue">
+    (140/ 408)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.tree;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.io.PrintStream;
+<i>4</i>&nbsp;import java.util.ArrayList;
+<i>5</i>&nbsp;import java.util.Collections;
+<i>6</i>&nbsp;import java.util.List;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import beast.core.Description;
+<i>9</i>&nbsp;import beast.core.Input;
+<i>10</i>&nbsp;import beast.core.Operator;
+<i>11</i>&nbsp;import beast.core.StateNode;
+<i>12</i>&nbsp;import beast.core.StateNodeInitialiser;
+<i>13</i>&nbsp;import beast.core.util.Log;
+<i>14</i>&nbsp;import beast.evolution.alignment.TaxonSet;
+<i>15</i>&nbsp;import beast.util.TreeParser;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;@Description(&quot;Tree (the T in BEAST) representing gene beast.tree, species&quot;
+<i>19</i>&nbsp;        + &quot; beast.tree, language history, or other time-beast.tree&quot;
+<i>20</i>&nbsp;        + &quot; relationships among sequence data.&quot;)
+<i>21</i>&nbsp;public class Tree extends StateNode implements TreeInterface {
+<b class="fc"><i>22</i>&nbsp;    final public Input&lt;Tree&gt; m_initial = new Input&lt;&gt;(&quot;initial&quot;, &quot;tree to start with&quot;);</b>
+<b class="fc"><i>23</i>&nbsp;    final public Input&lt;List&lt;TraitSet&gt;&gt; m_traitList = new Input&lt;&gt;(&quot;trait&quot;,</b>
+<i>24</i>&nbsp;            &quot;trait information for initializing traits (like node dates) in the tree&quot;,
+<i>25</i>&nbsp;            new ArrayList&lt;&gt;());
+<b class="fc"><i>26</i>&nbsp;    final public Input&lt;TaxonSet&gt; m_taxonset = new Input&lt;&gt;(&quot;taxonset&quot;,</b>
+<i>27</i>&nbsp;            &quot;set of taxa that correspond to the leafs in the tree&quot;);
+<b class="fc"><i>28</i>&nbsp;    final public Input&lt;String&gt; nodeTypeInput = new Input&lt;&gt;(&quot;nodetype&quot;,</b>
+<b class="fc"><i>29</i>&nbsp;            &quot;type of the nodes in the beast.tree&quot;, Node.class.getName());</b>
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;    /**
+<i>32</i>&nbsp;     * state of dirtiness of a node in the tree
+<i>33</i>&nbsp;     * DIRTY means a property on the node has changed, but not the topology. &quot;property&quot; includes the node height
+<i>34</i>&nbsp;     *       and that branch length to its parent.
+<i>35</i>&nbsp;     * FILTHY means the nodes&#39; parent or child has changed.
+<i>36</i>&nbsp;     */
+<i>37</i>&nbsp;    public static final int IS_CLEAN = 0, IS_DIRTY = 1, IS_FILTHY = 2;
+<i>38</i>&nbsp;
+<i>39</i>&nbsp;    /**
+<i>40</i>&nbsp;     * counters of number of nodes, nodeCount = internalNodeCount + leafNodeCount *
+<i>41</i>&nbsp;     */
+<b class="fc"><i>42</i>&nbsp;    protected int nodeCount = -1;</b>
+<b class="fc"><i>43</i>&nbsp;    protected int internalNodeCount = -1;</b>
+<b class="fc"><i>44</i>&nbsp;    protected int leafNodeCount = -1;</b>
+<i>45</i>&nbsp;
+<i>46</i>&nbsp;    /**
+<i>47</i>&nbsp;     * node representation of the beast.tree *
+<i>48</i>&nbsp;     */
+<i>49</i>&nbsp;    protected beast.evolution.tree.Node root;
+<i>50</i>&nbsp;    protected beast.evolution.tree.Node storedRoot;
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;    /**
+<i>53</i>&nbsp;     * array of all nodes in the tree *
+<i>54</i>&nbsp;     */
+<b class="fc"><i>55</i>&nbsp;    protected Node[] m_nodes = null;</b>
+<i>56</i>&nbsp;
+<b class="fc"><i>57</i>&nbsp;    protected Node[] m_storedNodes = null;</b>
+<i>58</i>&nbsp;
+<i>59</i>&nbsp;    /**
+<i>60</i>&nbsp;     * array of taxa names for the nodes in the tree
+<i>61</i>&nbsp;     * such that m_sTaxaNames[node.getNr()] == node.getID()*
+<i>62</i>&nbsp;     */
+<b class="fc"><i>63</i>&nbsp;    String[] m_sTaxaNames = null;</b>
+<i>64</i>&nbsp;
+<i>65</i>&nbsp;    /**
+<i>66</i>&nbsp;     * Trait set which specifies leaf node times.
+<i>67</i>&nbsp;     */
+<b class="fc"><i>68</i>&nbsp;    protected TraitSet timeTraitSet = null;</b>
+<i>69</i>&nbsp;
+<i>70</i>&nbsp;    /*
+<i>71</i>&nbsp;     * Whether or not TraitSets have been processed.
+<i>72</i>&nbsp;     */
+<b class="fc"><i>73</i>&nbsp;    protected boolean traitsProcessed = false;</b>
+<i>74</i>&nbsp;
+<i>75</i>&nbsp;    @Override
+<i>76</i>&nbsp;    public void initAndValidate() {
+<b class="fc"><i>77</i>&nbsp;        if (m_initial.get() != null &amp;&amp; !(this instanceof StateNodeInitialiser)) {</b>
+<b class="nc"><i>78</i>&nbsp;        	throw new RuntimeException(&quot;initial-input should be specified for tree that is not a StateNodeInitialiser&quot;);</b>
+<i>79</i>&nbsp;//            final Tree other = m_initial.get();
+<i>80</i>&nbsp;//            root = other.root.copy();
+<i>81</i>&nbsp;//            nodeCount = other.nodeCount;
+<i>82</i>&nbsp;//            internalNodeCount = other.internalNodeCount;
+<i>83</i>&nbsp;//            leafNodeCount = other.leafNodeCount;
+<i>84</i>&nbsp;        }
+<i>85</i>&nbsp;
+<b class="fc"><i>86</i>&nbsp;        if (nodeCount &lt; 0) {</b>
+<b class="nc"><i>87</i>&nbsp;            if (m_taxonset.get() != null) {</b>
+<b class="nc"><i>88</i>&nbsp;                makeCaterpillar(0, 1, false);</b>
+<i>89</i>&nbsp;            } else {
+<i>90</i>&nbsp;                // make dummy tree with a single root node
+<b class="nc"><i>91</i>&nbsp;                root = newNode();</b>
+<b class="nc"><i>92</i>&nbsp;                root.labelNr = 0;</b>
+<b class="nc"><i>93</i>&nbsp;                root.height = 0;</b>
+<b class="nc"><i>94</i>&nbsp;                root.m_tree = this;</b>
+<b class="nc"><i>95</i>&nbsp;                nodeCount = 1;</b>
+<b class="nc"><i>96</i>&nbsp;                internalNodeCount = 0;</b>
+<b class="nc"><i>97</i>&nbsp;                leafNodeCount = 1;</b>
+<i>98</i>&nbsp;            }
+<i>99</i>&nbsp;        }
+<i>100</i>&nbsp;
+<b class="fc"><i>101</i>&nbsp;        if (nodeCount &gt;= 0) {</b>
+<b class="fc"><i>102</i>&nbsp;            initArrays();</b>
+<i>103</i>&nbsp;        }
+<i>104</i>&nbsp;
+<b class="fc"><i>105</i>&nbsp;        processTraits(m_traitList.get());</b>
+<i>106</i>&nbsp;
+<i>107</i>&nbsp;        // Ensure tree is compatible with time trait.
+<b class="fc"><i>108</i>&nbsp;        if (timeTraitSet != null)</b>
+<b class="fc"><i>109</i>&nbsp;            adjustTreeNodeHeights(root);</b>
+<i>110</i>&nbsp;        
+<i>111</i>&nbsp;        // ensure all nodes have their taxon names set up
+<b class="fc"><i>112</i>&nbsp;        String [] taxa = getTaxaNames();</b>
+<b class="fc"><i>113</i>&nbsp;        for (int i = 0; i &lt; getNodeCount() &amp;&amp; i &lt; taxa.length; i++) {</b>
+<b class="fc"><i>114</i>&nbsp;        	if (taxa[i] != null)</b>
+<b class="fc"><i>115</i>&nbsp;        		m_nodes[i].setID(taxa[i]);</b>
+<i>116</i>&nbsp;        }
+<b class="fc"><i>117</i>&nbsp;    }</b>
+<i>118</i>&nbsp;
+<i>119</i>&nbsp;    public void makeCaterpillar(final double minInternalHeight, final double step, final boolean finalize) {
+<i>120</i>&nbsp;        // make a caterpillar
+<b class="nc"><i>121</i>&nbsp;        final List&lt;String&gt; taxa = m_taxonset.get().asStringList();</b>
+<b class="nc"><i>122</i>&nbsp;        Node left = newNode();</b>
+<b class="nc"><i>123</i>&nbsp;        left.labelNr = 0;</b>
+<b class="nc"><i>124</i>&nbsp;        left.height = 0;</b>
+<b class="nc"><i>125</i>&nbsp;        left.setID(taxa.get(0));</b>
+<b class="nc"><i>126</i>&nbsp;        for (int i = 1; i &lt; taxa.size(); i++) {</b>
+<b class="nc"><i>127</i>&nbsp;            final Node right = newNode();</b>
+<b class="nc"><i>128</i>&nbsp;            right.labelNr = i;</b>
+<b class="nc"><i>129</i>&nbsp;            right.height = 0;</b>
+<b class="nc"><i>130</i>&nbsp;            right.setID(taxa.get(i));</b>
+<b class="nc"><i>131</i>&nbsp;            final Node parent = newNode();</b>
+<b class="nc"><i>132</i>&nbsp;            parent.labelNr = taxa.size() + i - 1;</b>
+<b class="nc"><i>133</i>&nbsp;            parent.height = minInternalHeight + i * step;</b>
+<b class="nc"><i>134</i>&nbsp;            left.parent = parent;</b>
+<b class="nc"><i>135</i>&nbsp;            parent.setLeft(left);</b>
+<b class="nc"><i>136</i>&nbsp;            right.parent = parent;</b>
+<b class="nc"><i>137</i>&nbsp;            parent.setRight(right);</b>
+<b class="nc"><i>138</i>&nbsp;            left = parent;</b>
+<i>139</i>&nbsp;        }
+<b class="nc"><i>140</i>&nbsp;        root = left;</b>
+<b class="nc"><i>141</i>&nbsp;        leafNodeCount = taxa.size();</b>
+<b class="nc"><i>142</i>&nbsp;        nodeCount = leafNodeCount * 2 - 1;</b>
+<b class="nc"><i>143</i>&nbsp;        internalNodeCount = leafNodeCount - 1;</b>
+<i>144</i>&nbsp;
+<b class="nc"><i>145</i>&nbsp;        if (finalize) {</b>
+<b class="nc"><i>146</i>&nbsp;            initArrays();</b>
+<i>147</i>&nbsp;        }
+<b class="nc"><i>148</i>&nbsp;    }</b>
+<i>149</i>&nbsp;
+<i>150</i>&nbsp;    /**
+<i>151</i>&nbsp;     * Process trait sets.
+<i>152</i>&nbsp;     *
+<i>153</i>&nbsp;     * @param traitList List of trait sets.
+<i>154</i>&nbsp;     */
+<i>155</i>&nbsp;    protected void processTraits(List&lt;TraitSet&gt; traitList) {
+<b class="fc"><i>156</i>&nbsp;        for (TraitSet traitSet : traitList) {</b>
+<b class="fc"><i>157</i>&nbsp;            for (Node node : getExternalNodes()) {</b>
+<b class="fc"><i>158</i>&nbsp;            	String id = node.getID();</b>
+<b class="fc"><i>159</i>&nbsp;            	if (id != null) {</b>
+<b class="fc"><i>160</i>&nbsp;                    node.setMetaData(traitSet.getTraitName(), traitSet.getValue(id));</b>
+<i>161</i>&nbsp;            	}
+<b class="fc"><i>162</i>&nbsp;            }</b>
+<b class="fc"><i>163</i>&nbsp;            if (traitSet.isDateTrait())</b>
+<b class="fc"><i>164</i>&nbsp;                timeTraitSet = traitSet;</b>
+<b class="fc"><i>165</i>&nbsp;        }</b>
+<b class="fc"><i>166</i>&nbsp;        traitsProcessed = true;</b>
+<b class="fc"><i>167</i>&nbsp;    }</b>
+<i>168</i>&nbsp;
+<i>169</i>&nbsp;    /**
+<i>170</i>&nbsp;     * Overridable method to construct new node object of the specific type
+<i>171</i>&nbsp;     * defined by nodeTypeInput.
+<i>172</i>&nbsp;     *
+<i>173</i>&nbsp;     * @return new node object.
+<i>174</i>&nbsp;     */
+<i>175</i>&nbsp;    protected Node newNode() {
+<i>176</i>&nbsp;        try {
+<b class="fc"><i>177</i>&nbsp;            return (Node) Class.forName(nodeTypeInput.get()).newInstance();</b>
+<b class="nc"><i>178</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>179</i>&nbsp;            throw new RuntimeException(&quot;Cannot create node of type &quot;</b>
+<b class="nc"><i>180</i>&nbsp;                    + nodeTypeInput.get() + &quot;: &quot; + e.getMessage());</b>
+<i>181</i>&nbsp;        }
+<i>182</i>&nbsp;        //return new NodeData();
+<i>183</i>&nbsp;    }
+<i>184</i>&nbsp;
+<i>185</i>&nbsp;    protected void initArrays() {
+<i>186</i>&nbsp;        // initialise tree-as-array representation + its stored variant
+<b class="fc"><i>187</i>&nbsp;        m_nodes = new Node[nodeCount];</b>
+<b class="fc"><i>188</i>&nbsp;        listNodes(root, m_nodes);</b>
+<b class="fc"><i>189</i>&nbsp;        m_storedNodes = new Node[nodeCount];</b>
+<b class="fc"><i>190</i>&nbsp;        final Node copy = root.copy();</b>
+<b class="fc"><i>191</i>&nbsp;        listNodes(copy, m_storedNodes);</b>
+<b class="fc"><i>192</i>&nbsp;    }</b>
+<i>193</i>&nbsp;
+<i>194</i>&nbsp;
+<b class="fc"><i>195</i>&nbsp;    public Tree() {</b>
+<b class="fc"><i>196</i>&nbsp;    }</b>
+<i>197</i>&nbsp;
+<b class="fc"><i>198</i>&nbsp;    public Tree(final Node rootNode) {</b>
+<b class="fc"><i>199</i>&nbsp;        setRoot(rootNode);</b>
+<b class="fc"><i>200</i>&nbsp;        initArrays();</b>
+<b class="fc"><i>201</i>&nbsp;    }</b>
+<i>202</i>&nbsp;
+<i>203</i>&nbsp;    /**
+<i>204</i>&nbsp;     * Construct a tree from newick string -- will not automatically adjust tips to zero.
+<i>205</i>&nbsp;     */
+<i>206</i>&nbsp;    public Tree(final String newick) {
+<b class="fc"><i>207</i>&nbsp;        this(new TreeParser(newick).getRoot());</b>
+<b class="fc"><i>208</i>&nbsp;    }</b>
+<i>209</i>&nbsp;
+<i>210</i>&nbsp;    /**
+<i>211</i>&nbsp;     * Ensure no negative branch lengths exist in tree.  This can occur if
+<i>212</i>&nbsp;     * leaf heights given as a trait are incompatible with the existing tree.
+<i>213</i>&nbsp;     */
+<i>214</i>&nbsp;    final static double EPSILON = 0.0000001;
+<i>215</i>&nbsp;
+<i>216</i>&nbsp;    protected void adjustTreeNodeHeights(final Node node) {
+<b class="fc"><i>217</i>&nbsp;        if (!node.isLeaf()) {</b>
+<b class="fc"><i>218</i>&nbsp;            for (final Node child : node.getChildren()) {</b>
+<b class="fc"><i>219</i>&nbsp;                adjustTreeNodeHeights(child);</b>
+<b class="fc"><i>220</i>&nbsp;            }</b>
+<b class="fc"><i>221</i>&nbsp;            for (final Node child : node.getChildren()) {</b>
+<b class="fc"><i>222</i>&nbsp;                final double minHeight = child.getHeight() + EPSILON;</b>
+<b class="fc"><i>223</i>&nbsp;                if (node.height &lt; minHeight) {</b>
+<b class="nc"><i>224</i>&nbsp;                    node.height = minHeight;</b>
+<i>225</i>&nbsp;                }
+<b class="fc"><i>226</i>&nbsp;            }</b>
+<i>227</i>&nbsp;        }
+<b class="fc"><i>228</i>&nbsp;    }</b>
+<i>229</i>&nbsp;
+<i>230</i>&nbsp;
+<i>231</i>&nbsp;    /**
+<i>232</i>&nbsp;     * getters and setters
+<i>233</i>&nbsp;     *
+<i>234</i>&nbsp;     * @return the number of nodes in the beast.tree
+<i>235</i>&nbsp;     */
+<i>236</i>&nbsp;    @Override
+<i>237</i>&nbsp;	public int getNodeCount() {
+<b class="fc"><i>238</i>&nbsp;        if (nodeCount &lt; 0) {</b>
+<b class="nc"><i>239</i>&nbsp;            nodeCount = this.root.getNodeCount();</b>
+<i>240</i>&nbsp;        }
+<i>241</i>&nbsp;
+<i>242</i>&nbsp;        //System.out.println(&quot;nodeCount=&quot; + nodeCount);
+<b class="fc"><i>243</i>&nbsp;        return nodeCount;</b>
+<i>244</i>&nbsp;    }
+<i>245</i>&nbsp;
+<i>246</i>&nbsp;    @Override
+<i>247</i>&nbsp;	public int getInternalNodeCount() {
+<b class="fc"><i>248</i>&nbsp;        if (internalNodeCount &lt; 0) {</b>
+<b class="fc"><i>249</i>&nbsp;            internalNodeCount = root.getInternalNodeCount();</b>
+<i>250</i>&nbsp;        }
+<b class="fc"><i>251</i>&nbsp;        return internalNodeCount;</b>
+<i>252</i>&nbsp;    }
+<i>253</i>&nbsp;
+<i>254</i>&nbsp;    @Override
+<i>255</i>&nbsp;	public int getLeafNodeCount() {
+<i>256</i>&nbsp;        //TODO will this caching work if trees can have random numbers of tips during MCMC
+<b class="fc"><i>257</i>&nbsp;        if (leafNodeCount &lt; 0) {</b>
+<b class="fc"><i>258</i>&nbsp;            leafNodeCount = root.getLeafNodeCount();</b>
+<i>259</i>&nbsp;        }
+<b class="fc"><i>260</i>&nbsp;        return leafNodeCount;</b>
+<i>261</i>&nbsp;    }
+<i>262</i>&nbsp;
+<i>263</i>&nbsp;    /**
+<i>264</i>&nbsp;     * @return a list of external (leaf) nodes contained in this tree
+<i>265</i>&nbsp;     */
+<i>266</i>&nbsp;    @Override
+<i>267</i>&nbsp;	public List&lt;Node&gt; getExternalNodes() {
+<b class="fc"><i>268</i>&nbsp;        final ArrayList&lt;Node&gt; externalNodes = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>269</i>&nbsp;        for (int i = 0; i &lt; getNodeCount(); i++) {</b>
+<b class="fc"><i>270</i>&nbsp;            final Node node = getNode(i);</b>
+<b class="fc"><i>271</i>&nbsp;            if (node.isLeaf()) externalNodes.add(node);</b>
+<i>272</i>&nbsp;        }
+<b class="fc"><i>273</i>&nbsp;        return externalNodes;</b>
+<i>274</i>&nbsp;    }
+<i>275</i>&nbsp;
+<i>276</i>&nbsp;    /**
+<i>277</i>&nbsp;     * @return a list of internal (ancestral) nodes contained in this tree, including the root node
+<i>278</i>&nbsp;     */
+<i>279</i>&nbsp;    @Override
+<i>280</i>&nbsp;	public List&lt;Node&gt; getInternalNodes() {
+<b class="nc"><i>281</i>&nbsp;        final ArrayList&lt;Node&gt; internalNodes = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>282</i>&nbsp;        for (int i = 0; i &lt; getNodeCount(); i++) {</b>
+<b class="nc"><i>283</i>&nbsp;            final Node node = getNode(i);</b>
+<b class="nc"><i>284</i>&nbsp;            if (!node.isLeaf()) internalNodes.add(node);</b>
+<i>285</i>&nbsp;        }
+<b class="nc"><i>286</i>&nbsp;        return internalNodes;</b>
+<i>287</i>&nbsp;    }
+<i>288</i>&nbsp;
+<i>289</i>&nbsp;    @Override
+<i>290</i>&nbsp;	public Node getRoot() {
+<b class="fc"><i>291</i>&nbsp;        return root;</b>
+<i>292</i>&nbsp;    }
+<i>293</i>&nbsp;
+<i>294</i>&nbsp;    public void setRoot(final Node root) {
+<b class="fc"><i>295</i>&nbsp;        this.root = root;</b>
+<b class="fc"><i>296</i>&nbsp;        nodeCount = this.root.getNodeCount();</b>
+<i>297</i>&nbsp;        // ensure root is the last node
+<b class="fc"><i>298</i>&nbsp;        if (m_nodes != null &amp;&amp; root.labelNr != m_nodes.length - 1) {</b>
+<b class="nc"><i>299</i>&nbsp;            final int rootPos = m_nodes.length - 1;</b>
+<b class="nc"><i>300</i>&nbsp;            Node tmp = m_nodes[rootPos];</b>
+<b class="nc"><i>301</i>&nbsp;            m_nodes[rootPos] = root;</b>
+<b class="nc"><i>302</i>&nbsp;            m_nodes[root.labelNr] = tmp;</b>
+<b class="nc"><i>303</i>&nbsp;            tmp.labelNr = root.labelNr;</b>
+<b class="nc"><i>304</i>&nbsp;            m_nodes[rootPos].labelNr = rootPos;</b>
+<i>305</i>&nbsp;        }
+<b class="fc"><i>306</i>&nbsp;    }</b>
+<i>307</i>&nbsp;
+<i>308</i>&nbsp;    /**
+<i>309</i>&nbsp;     * Sets root without recalculating nodeCount or ensuring that root is the last node in the internal array.
+<i>310</i>&nbsp;     * Currently only used by sampled ancestor tree operators. Use carefully!
+<i>311</i>&nbsp;     *
+<i>312</i>&nbsp;     * @param root the new root node
+<i>313</i>&nbsp;     */
+<i>314</i>&nbsp;    public void setRootOnly(final Node root) {
+<i>315</i>&nbsp;        //TODO should we flag this with startEditing since it is an operator call?
+<i>316</i>&nbsp;
+<b class="nc"><i>317</i>&nbsp;        this.root = root;</b>
+<b class="nc"><i>318</i>&nbsp;    }</b>
+<i>319</i>&nbsp;
+<i>320</i>&nbsp;    @Override
+<i>321</i>&nbsp;	public Node getNode(final int nodeNr) {
+<b class="fc"><i>322</i>&nbsp;        return m_nodes[nodeNr];</b>
+<i>323</i>&nbsp;        //return getNode(nodeNr, root);
+<i>324</i>&nbsp;    }
+<i>325</i>&nbsp;
+<i>326</i>&nbsp;    /**
+<i>327</i>&nbsp;     * @returns an array of taxon names in order of their node numbers.
+<i>328</i>&nbsp;     * Note that in general no special order of taxa is assumed, just the order
+<i>329</i>&nbsp;     * assumed in this tree. Consider using tree.m_taxonset.get().asStringList()
+<i>330</i>&nbsp;     * instead.
+<i>331</i>&nbsp;     */
+<i>332</i>&nbsp;    public String [] getTaxaNames() {
+<b class="fc"><i>333</i>&nbsp;         if (m_sTaxaNames == null || (m_sTaxaNames.length == 1 &amp;&amp; m_sTaxaNames[0] == null) || m_sTaxaNames.length == 0) {</b>
+<b class="fc"><i>334</i>&nbsp;            final TaxonSet taxonSet = m_taxonset.get();</b>
+<b class="fc"><i>335</i>&nbsp;            if (taxonSet != null) {</b>
+<b class="nc"><i>336</i>&nbsp;                final List&lt;String&gt; txs = taxonSet.asStringList();</b>
+<b class="nc"><i>337</i>&nbsp;                m_sTaxaNames = txs.toArray(new String[txs.size()]);</b>
+<b class="nc"><i>338</i>&nbsp;            } else {</b>
+<b class="fc"><i>339</i>&nbsp;                m_sTaxaNames = new String[getNodeCount()];</b>
+<b class="fc"><i>340</i>&nbsp;                collectTaxaNames(getRoot());</b>
+<b class="fc"><i>341</i>&nbsp;                List&lt;String&gt; taxaNames = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>342</i>&nbsp;                for (String name : m_sTaxaNames) {</b>
+<b class="fc"><i>343</i>&nbsp;                	if (name != null) {</b>
+<b class="fc"><i>344</i>&nbsp;                		taxaNames.add(name);</b>
+<i>345</i>&nbsp;                	}
+<i>346</i>&nbsp;                }
+<b class="fc"><i>347</i>&nbsp;                m_sTaxaNames = taxaNames.toArray(new String[]{});</b>
+<i>348</i>&nbsp;                
+<i>349</i>&nbsp;            }
+<i>350</i>&nbsp;        }
+<i>351</i>&nbsp;
+<i>352</i>&nbsp;        // sanity check
+<b class="fc"><i>353</i>&nbsp;        if (m_sTaxaNames.length == 1 &amp;&amp; m_sTaxaNames[0] == null) {</b>
+<b class="nc"><i>354</i>&nbsp;            Log.warning.println(&quot;WARNING: tree interrogated for taxa, but the tree was not initialised properly. To fix this, specify the taxonset input&quot;);</b>
+<i>355</i>&nbsp;        }
+<b class="fc"><i>356</i>&nbsp;        return m_sTaxaNames;</b>
+<i>357</i>&nbsp;    }
+<i>358</i>&nbsp;
+<i>359</i>&nbsp;    void collectTaxaNames(final Node node) {
+<b class="fc"><i>360</i>&nbsp;        if (node.getID() != null) {</b>
+<b class="fc"><i>361</i>&nbsp;            m_sTaxaNames[node.getNr()] = node.getID();</b>
+<i>362</i>&nbsp;        }
+<b class="fc"><i>363</i>&nbsp;        if (node.isLeaf()) {</b>
+<b class="fc"><i>364</i>&nbsp;            if (node.getID() == null) {</b>
+<b class="nc"><i>365</i>&nbsp;            	node.setID(&quot;node&quot; + node.getNr());</b>
+<i>366</i>&nbsp;            }
+<i>367</i>&nbsp;        } else {
+<b class="fc"><i>368</i>&nbsp;        	for (Node child : node.getChildren()) {</b>
+<b class="fc"><i>369</i>&nbsp;        		collectTaxaNames(child);</b>
+<b class="fc"><i>370</i>&nbsp;        	}</b>
+<i>371</i>&nbsp;        }
+<b class="fc"><i>372</i>&nbsp;    }</b>
+<i>373</i>&nbsp;
+<i>374</i>&nbsp;
+<i>375</i>&nbsp;    /**
+<i>376</i>&nbsp;     * copy meta data matching pattern to double array
+<i>377</i>&nbsp;     *
+<i>378</i>&nbsp;     * @param node     the node
+<i>379</i>&nbsp;     * @param t       the double array to be filled with meta data
+<i>380</i>&nbsp;     * @param pattern the name of the meta data
+<i>381</i>&nbsp;     */
+<i>382</i>&nbsp;    @Override
+<i>383</i>&nbsp;	public void getMetaData(final Node node, final Double[] t, final String pattern) {
+<b class="nc"><i>384</i>&nbsp;        t[Math.abs(node.getNr())] = (Double) node.getMetaData(pattern);</b>
+<b class="nc"><i>385</i>&nbsp;        if (!node.isLeaf()) {</b>
+<b class="nc"><i>386</i>&nbsp;            getMetaData(node.getLeft(), t, pattern);</b>
+<b class="nc"><i>387</i>&nbsp;            if (node.getRight() != null) {</b>
+<b class="nc"><i>388</i>&nbsp;                getMetaData(node.getRight(), t, pattern);</b>
+<i>389</i>&nbsp;            }
+<i>390</i>&nbsp;        }
+<b class="nc"><i>391</i>&nbsp;    }</b>
+<i>392</i>&nbsp;
+<i>393</i>&nbsp;    /**
+<i>394</i>&nbsp;     * copy meta data matching pattern to double array
+<i>395</i>&nbsp;     *
+<i>396</i>&nbsp;     * @param node     the node
+<i>397</i>&nbsp;     * @param t       the integer array to be filled with meta data
+<i>398</i>&nbsp;     * @param pattern the name of the meta data
+<i>399</i>&nbsp;     */
+<i>400</i>&nbsp;    public void getMetaData(final Node node, final Integer[] t, final String pattern) {
+<b class="nc"><i>401</i>&nbsp;        t[Math.abs(node.getNr())] = (Integer) node.getMetaData(pattern);</b>
+<b class="nc"><i>402</i>&nbsp;        if (!node.isLeaf()) {</b>
+<b class="nc"><i>403</i>&nbsp;            getMetaData(node.getLeft(), t, pattern);</b>
+<b class="nc"><i>404</i>&nbsp;            if (node.getRight() != null) {</b>
+<b class="nc"><i>405</i>&nbsp;                getMetaData(node.getRight(), t, pattern);</b>
+<i>406</i>&nbsp;            }
+<i>407</i>&nbsp;        }
+<b class="nc"><i>408</i>&nbsp;    }</b>
+<i>409</i>&nbsp;
+<i>410</i>&nbsp;
+<i>411</i>&nbsp;    /**
+<i>412</i>&nbsp;     * traverse tree and assign meta-data values in t to nodes in the
+<i>413</i>&nbsp;     * tree to the meta-data field represented by the given pattern.
+<i>414</i>&nbsp;     * This only has an effect when setMetadata() in a subclass
+<i>415</i>&nbsp;     * of Node know how to process such value.
+<i>416</i>&nbsp;     */
+<i>417</i>&nbsp;    @Override
+<i>418</i>&nbsp;	public void setMetaData(final Node node, final Double[] t, final String pattern) {
+<b class="nc"><i>419</i>&nbsp;        node.setMetaData(pattern, t[Math.abs(node.getNr())]);</b>
+<b class="nc"><i>420</i>&nbsp;        if (!node.isLeaf()) {</b>
+<b class="nc"><i>421</i>&nbsp;            setMetaData(node.getLeft(), t, pattern);</b>
+<b class="nc"><i>422</i>&nbsp;            if (node.getRight() != null) {</b>
+<b class="nc"><i>423</i>&nbsp;                setMetaData(node.getRight(), t, pattern);</b>
+<i>424</i>&nbsp;            }
+<i>425</i>&nbsp;        }
+<b class="nc"><i>426</i>&nbsp;    }</b>
+<i>427</i>&nbsp;
+<i>428</i>&nbsp;
+<i>429</i>&nbsp;    /**
+<i>430</i>&nbsp;     * convert tree to array representation *
+<i>431</i>&nbsp;     */
+<i>432</i>&nbsp;    void listNodes(final Node node, final Node[] nodes) {
+<b class="fc"><i>433</i>&nbsp;        nodes[node.getNr()] = node;</b>
+<b class="fc"><i>434</i>&nbsp;        node.m_tree = this;  //(JH) I don&#39;t understand this code</b>
+<i>435</i>&nbsp;
+<i>436</i>&nbsp;        // (JH) why not  node.children, we don&#39;t keep it around??
+<b class="fc"><i>437</i>&nbsp;        for (final Node child : node.getChildren()) {</b>
+<b class="fc"><i>438</i>&nbsp;            listNodes(child, nodes);</b>
+<b class="fc"><i>439</i>&nbsp;        }</b>
+<b class="fc"><i>440</i>&nbsp;    }</b>
+<i>441</i>&nbsp;
+<i>442</i>&nbsp;//    private int
+<i>443</i>&nbsp;//    getNodesPostOrder(final Node node, final Node[] nodes, int pos) {
+<i>444</i>&nbsp;//        node.m_tree = this;
+<i>445</i>&nbsp;//        for (final Node child : node.children) {
+<i>446</i>&nbsp;//            pos = getNodesPostOrder(child, nodes, pos);
+<i>447</i>&nbsp;//        }
+<i>448</i>&nbsp;//        nodes[pos] = node;
+<i>449</i>&nbsp;//        return pos + 1;
+<i>450</i>&nbsp;//    }
+<i>451</i>&nbsp;
+<i>452</i>&nbsp;//    /**
+<i>453</i>&nbsp;//     * @param node  top of tree/sub tree (null defaults to whole tree)
+<i>454</i>&nbsp;//     * @param nodes array to fill (null will result in creating a new one)
+<i>455</i>&nbsp;//     * @return tree nodes in post-order, children before parents
+<i>456</i>&nbsp;//     */
+<i>457</i>&nbsp;//    public Node[] listNodesPostOrder(Node node, Node[] nodes) {
+<i>458</i>&nbsp;//        if (node == null) {
+<i>459</i>&nbsp;//            node = root;
+<i>460</i>&nbsp;//        }
+<i>461</i>&nbsp;//        if (nodes == null) {
+<i>462</i>&nbsp;//            final int n = (node == root) ? nodeCount : node.getNodeCount();
+<i>463</i>&nbsp;//            nodes = new Node[n];
+<i>464</i>&nbsp;//        }
+<i>465</i>&nbsp;//        getNodesPostOrder(node, nodes, 0);
+<i>466</i>&nbsp;//        return nodes;
+<i>467</i>&nbsp;//    }
+<i>468</i>&nbsp;
+<b class="fc"><i>469</i>&nbsp;    protected Node[] postCache = null;</b>
+<i>470</i>&nbsp;    @Override
+<i>471</i>&nbsp;	public Node[] listNodesPostOrder(Node node, Node[] nodes) {
+<b class="nc"><i>472</i>&nbsp;        if( node != null ) {</b>
+<b class="nc"><i>473</i>&nbsp;            return TreeInterface.super.listNodesPostOrder(node, nodes);</b>
+<i>474</i>&nbsp;        }
+<b class="nc"><i>475</i>&nbsp;        if( postCache == null ) {</b>
+<b class="nc"><i>476</i>&nbsp;            postCache = TreeInterface.super.listNodesPostOrder(node, nodes);</b>
+<i>477</i>&nbsp;        }
+<b class="nc"><i>478</i>&nbsp;        return postCache;</b>
+<i>479</i>&nbsp;    }
+<i>480</i>&nbsp;
+<i>481</i>&nbsp;    /**
+<i>482</i>&nbsp;     * @return list of nodes in array format.
+<i>483</i>&nbsp;     *         *
+<i>484</i>&nbsp;     */
+<i>485</i>&nbsp;    @Override
+<i>486</i>&nbsp;	public Node[] getNodesAsArray() {
+<b class="fc"><i>487</i>&nbsp;        return m_nodes;</b>
+<i>488</i>&nbsp;    }
+<i>489</i>&nbsp;
+<i>490</i>&nbsp;    /**
+<i>491</i>&nbsp;     * deep copy, returns a completely new tree
+<i>492</i>&nbsp;     *
+<i>493</i>&nbsp;     * @return a deep copy of this beast.tree.
+<i>494</i>&nbsp;     */
+<i>495</i>&nbsp;    @Override
+<i>496</i>&nbsp;    public Tree copy() {
+<b class="fc"><i>497</i>&nbsp;        Tree tree = new Tree();</b>
+<b class="fc"><i>498</i>&nbsp;        tree.setID(getID());</b>
+<b class="fc"><i>499</i>&nbsp;        tree.index = index;</b>
+<b class="fc"><i>500</i>&nbsp;        tree.root = root.copy();</b>
+<b class="fc"><i>501</i>&nbsp;        tree.nodeCount = nodeCount;</b>
+<b class="fc"><i>502</i>&nbsp;        tree.internalNodeCount = internalNodeCount;</b>
+<b class="fc"><i>503</i>&nbsp;        tree.leafNodeCount = leafNodeCount;</b>
+<b class="fc"><i>504</i>&nbsp;        return tree;</b>
+<i>505</i>&nbsp;    }
+<i>506</i>&nbsp;
+<i>507</i>&nbsp;    /**
+<i>508</i>&nbsp;     * copy of all values into existing tree *
+<i>509</i>&nbsp;     */
+<i>510</i>&nbsp;    @Override
+<i>511</i>&nbsp;    public void assignTo(final StateNode other) {
+<b class="nc"><i>512</i>&nbsp;        final Tree tree = (Tree) other;</b>
+<b class="nc"><i>513</i>&nbsp;        final Node[] nodes = new Node[nodeCount];</b>
+<b class="nc"><i>514</i>&nbsp;        listNodes(tree.root, nodes);</b>
+<b class="nc"><i>515</i>&nbsp;        tree.setID(getID());</b>
+<i>516</i>&nbsp;        //tree.index = index;
+<b class="nc"><i>517</i>&nbsp;        root.assignTo(nodes);</b>
+<b class="nc"><i>518</i>&nbsp;        tree.root = nodes[root.getNr()];</b>
+<b class="nc"><i>519</i>&nbsp;        tree.nodeCount = nodeCount;</b>
+<b class="nc"><i>520</i>&nbsp;        tree.internalNodeCount = internalNodeCount;</b>
+<b class="nc"><i>521</i>&nbsp;        tree.leafNodeCount = leafNodeCount;</b>
+<b class="nc"><i>522</i>&nbsp;    }</b>
+<i>523</i>&nbsp;
+<i>524</i>&nbsp;    /**
+<i>525</i>&nbsp;     * copy of all values from existing tree *
+<i>526</i>&nbsp;     */
+<i>527</i>&nbsp;    @Override
+<i>528</i>&nbsp;    public void assignFrom(final StateNode other) {
+<b class="nc"><i>529</i>&nbsp;        final Tree tree = (Tree) other;</b>
+<b class="nc"><i>530</i>&nbsp;        final Node[] nodes = new Node[tree.getNodeCount()];//tree.getNodesAsArray();</b>
+<b class="nc"><i>531</i>&nbsp;        for (int i = 0; i &lt; tree.getNodeCount(); i++) {</b>
+<b class="nc"><i>532</i>&nbsp;            nodes[i] = newNode();</b>
+<i>533</i>&nbsp;        }
+<b class="nc"><i>534</i>&nbsp;        setID(tree.getID());</b>
+<i>535</i>&nbsp;        //index = tree.index;
+<b class="nc"><i>536</i>&nbsp;        root = nodes[tree.root.getNr()];</b>
+<b class="nc"><i>537</i>&nbsp;        root.assignFrom(nodes, tree.root);</b>
+<b class="nc"><i>538</i>&nbsp;        root.parent = null;</b>
+<b class="nc"><i>539</i>&nbsp;        nodeCount = tree.nodeCount;</b>
+<b class="nc"><i>540</i>&nbsp;        internalNodeCount = tree.internalNodeCount;</b>
+<b class="nc"><i>541</i>&nbsp;        leafNodeCount = tree.leafNodeCount;</b>
+<b class="nc"><i>542</i>&nbsp;        initArrays();</b>
+<b class="nc"><i>543</i>&nbsp;    }</b>
+<i>544</i>&nbsp;
+<i>545</i>&nbsp;    /**
+<i>546</i>&nbsp;     * as assignFrom, but only copy tree structure *
+<i>547</i>&nbsp;     */
+<i>548</i>&nbsp;    @Override
+<i>549</i>&nbsp;    public void assignFromFragile(final StateNode other) {
+<b class="nc"><i>550</i>&nbsp;        final Tree tree = (Tree) other;</b>
+<b class="nc"><i>551</i>&nbsp;        if (m_nodes == null) {</b>
+<b class="nc"><i>552</i>&nbsp;            initArrays();</b>
+<i>553</i>&nbsp;        }
+<b class="nc"><i>554</i>&nbsp;        root = m_nodes[tree.root.getNr()];</b>
+<b class="nc"><i>555</i>&nbsp;        final Node[] otherNodes = tree.m_nodes;</b>
+<b class="nc"><i>556</i>&nbsp;        final int rootNr = root.getNr();</b>
+<b class="nc"><i>557</i>&nbsp;        assignFrom(0, rootNr, otherNodes);</b>
+<b class="nc"><i>558</i>&nbsp;        root.height = otherNodes[rootNr].height;</b>
+<b class="nc"><i>559</i>&nbsp;        root.parent = null;</b>
+<b class="nc"><i>560</i>&nbsp;        if (otherNodes[rootNr].getLeft() != null) {</b>
+<b class="nc"><i>561</i>&nbsp;            root.setLeft(m_nodes[otherNodes[rootNr].getLeft().getNr()]);</b>
+<i>562</i>&nbsp;        } else {
+<b class="nc"><i>563</i>&nbsp;            root.setLeft(null);</b>
+<i>564</i>&nbsp;        }
+<b class="nc"><i>565</i>&nbsp;        if (otherNodes[rootNr].getRight() != null) {</b>
+<b class="nc"><i>566</i>&nbsp;            root.setRight(m_nodes[otherNodes[rootNr].getRight().getNr()]);</b>
+<i>567</i>&nbsp;        } else {
+<b class="nc"><i>568</i>&nbsp;            root.setRight(null);</b>
+<i>569</i>&nbsp;        }
+<b class="nc"><i>570</i>&nbsp;        assignFrom(rootNr + 1, nodeCount, otherNodes);</b>
+<b class="nc"><i>571</i>&nbsp;    }</b>
+<i>572</i>&nbsp;
+<i>573</i>&nbsp;    /**
+<i>574</i>&nbsp;     * helper to assignFromFragile *
+<i>575</i>&nbsp;     */
+<i>576</i>&nbsp;    private void assignFrom(final int start, final int end, final Node[] otherNodes) {
+<b class="nc"><i>577</i>&nbsp;        for (int i = start; i &lt; end; i++) {</b>
+<b class="nc"><i>578</i>&nbsp;            Node sink = m_nodes[i];</b>
+<b class="nc"><i>579</i>&nbsp;            Node src = otherNodes[i];</b>
+<b class="nc"><i>580</i>&nbsp;            sink.height = src.height;</b>
+<b class="nc"><i>581</i>&nbsp;            sink.parent = m_nodes[src.parent.getNr()];</b>
+<b class="nc"><i>582</i>&nbsp;            if (src.getLeft() != null) {</b>
+<b class="nc"><i>583</i>&nbsp;                sink.setLeft(m_nodes[src.getLeft().getNr()]);</b>
+<b class="nc"><i>584</i>&nbsp;                if (src.getRight() != null) {</b>
+<b class="nc"><i>585</i>&nbsp;                    sink.setRight(m_nodes[src.getRight().getNr()]);</b>
+<i>586</i>&nbsp;                } else {
+<b class="nc"><i>587</i>&nbsp;                    sink.setRight(null);</b>
+<i>588</i>&nbsp;                }
+<i>589</i>&nbsp;            }
+<i>590</i>&nbsp;        }
+<b class="nc"><i>591</i>&nbsp;    }</b>
+<i>592</i>&nbsp;
+<i>593</i>&nbsp;
+<i>594</i>&nbsp;    @Override
+<i>595</i>&nbsp;	public String toString() {
+<b class="fc"><i>596</i>&nbsp;        return root.toString();</b>
+<i>597</i>&nbsp;    }
+<i>598</i>&nbsp;
+<i>599</i>&nbsp;
+<i>600</i>&nbsp;    /**
+<i>601</i>&nbsp;     * StateNode implementation
+<i>602</i>&nbsp;     */
+<i>603</i>&nbsp;    @Override
+<i>604</i>&nbsp;    public void setEverythingDirty(final boolean isDirty) {
+<b class="nc"><i>605</i>&nbsp;        setSomethingIsDirty(isDirty);</b>
+<b class="nc"><i>606</i>&nbsp;        if (!isDirty) {</b>
+<b class="nc"><i>607</i>&nbsp;            for( Node n : m_nodes ) {</b>
+<b class="nc"><i>608</i>&nbsp;                n.isDirty = IS_CLEAN;</b>
+<i>609</i>&nbsp;            }
+<i>610</i>&nbsp;          //  root.makeAllDirty(IS_CLEAN);
+<i>611</i>&nbsp;        } else {
+<b class="nc"><i>612</i>&nbsp;            for( Node n : m_nodes ) {</b>
+<b class="nc"><i>613</i>&nbsp;                n.isDirty = IS_FILTHY;</b>
+<i>614</i>&nbsp;            }
+<i>615</i>&nbsp;        //    root.makeAllDirty(IS_FILTHY);
+<i>616</i>&nbsp;        }
+<b class="nc"><i>617</i>&nbsp;    }</b>
+<i>618</i>&nbsp;
+<i>619</i>&nbsp;    @Override
+<i>620</i>&nbsp;    public int scale(final double scale) {
+<b class="nc"><i>621</i>&nbsp;        root.scale(scale);</b>
+<b class="nc"><i>622</i>&nbsp;        return getInternalNodeCount()- getDirectAncestorNodeCount();</b>
+<i>623</i>&nbsp;    }
+<i>624</i>&nbsp;
+<i>625</i>&nbsp;
+<i>626</i>&nbsp;//    /**
+<i>627</i>&nbsp;//     * The same as scale but with option to scale all sampled nodes
+<i>628</i>&nbsp;//     * @param scale
+<i>629</i>&nbsp;//     * @param scaleSNodes if true all sampled nodes are scaled. Note, the most recent node is considered to
+<i>630</i>&nbsp;//     *                    have height 0.
+<i>631</i>&nbsp;//     * @return
+<i>632</i>&nbsp;//     */
+<i>633</i>&nbsp;//    public int scale(double scale, boolean scaleSNodes) {
+<i>634</i>&nbsp;//        ((ZeroBranchSANode)root).scale(scale, scaleSNodes);
+<i>635</i>&nbsp;//        if (scaleSNodes) {
+<i>636</i>&nbsp;//            return getNodeCount() - 1 - getDirectAncestorNodeCount();
+<i>637</i>&nbsp;//        } else {
+<i>638</i>&nbsp;//            return getInternalNodeCount() - getDirectAncestorNodeCount();
+<i>639</i>&nbsp;//        }
+<i>640</i>&nbsp;//    }
+<i>641</i>&nbsp;
+<i>642</i>&nbsp;    /** Loggable interface implementation follows **/
+<i>643</i>&nbsp;
+<i>644</i>&nbsp;    /**
+<i>645</i>&nbsp;     * print translate block for NEXUS beast.tree file
+<i>646</i>&nbsp;     */
+<i>647</i>&nbsp;    public static void printTranslate(final Node node, final PrintStream out, final int nodeCount) {
+<b class="nc"><i>648</i>&nbsp;        final List&lt;String&gt; translateLines = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>649</i>&nbsp;        printTranslate(node, translateLines, nodeCount);</b>
+<b class="nc"><i>650</i>&nbsp;        Collections.sort(translateLines);</b>
+<b class="nc"><i>651</i>&nbsp;        for (final String line : translateLines) {</b>
+<b class="nc"><i>652</i>&nbsp;            out.println(line);</b>
+<b class="nc"><i>653</i>&nbsp;        }</b>
+<b class="nc"><i>654</i>&nbsp;    }</b>
+<i>655</i>&nbsp;
+<b class="fc"><i>656</i>&nbsp;    static public int taxaTranslationOffset = 1;</b>
+<i>657</i>&nbsp;
+<i>658</i>&nbsp;    /**
+<i>659</i>&nbsp;     * need this helper so that we can sort list of entries *
+<i>660</i>&nbsp;     */
+<i>661</i>&nbsp;    static void printTranslate(Node node, List&lt;String&gt; translateLines, int nodeCount) {
+<b class="nc"><i>662</i>&nbsp;        if (node.isLeaf()) {</b>
+<b class="nc"><i>663</i>&nbsp;            final String nr = (node.getNr() + taxaTranslationOffset) + &quot;&quot;;</b>
+<b class="nc"><i>664</i>&nbsp;            String line = &quot;\t\t&quot; + &quot;    &quot;.substring(nr.length()) + nr + &quot; &quot; + node.getID();</b>
+<b class="nc"><i>665</i>&nbsp;            if (node.getNr() &lt; nodeCount) {</b>
+<b class="nc"><i>666</i>&nbsp;                line += &quot;,&quot;;</b>
+<i>667</i>&nbsp;            }
+<b class="nc"><i>668</i>&nbsp;            translateLines.add(line);</b>
+<b class="nc"><i>669</i>&nbsp;        } else {</b>
+<b class="nc"><i>670</i>&nbsp;            printTranslate(node.getLeft(), translateLines, nodeCount);</b>
+<b class="nc"><i>671</i>&nbsp;            if (node.getRight() != null) {</b>
+<b class="nc"><i>672</i>&nbsp;                printTranslate(node.getRight(), translateLines, nodeCount);</b>
+<i>673</i>&nbsp;            }
+<i>674</i>&nbsp;        }
+<b class="nc"><i>675</i>&nbsp;    }</b>
+<i>676</i>&nbsp;
+<i>677</i>&nbsp;    public static void printTaxa(final Node node, final PrintStream out, final int nodeCount) {
+<b class="nc"><i>678</i>&nbsp;        final List&lt;String&gt; translateLines = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>679</i>&nbsp;        printTranslate(node, translateLines, nodeCount);</b>
+<b class="nc"><i>680</i>&nbsp;        Collections.sort(translateLines);</b>
+<b class="nc"><i>681</i>&nbsp;        for (String line : translateLines) {</b>
+<b class="nc"><i>682</i>&nbsp;            line = line.split(&quot;\\s+&quot;)[2];</b>
+<b class="nc"><i>683</i>&nbsp;            out.println(&quot;\t\t\t&quot; + line.replace(&#39;,&#39;, &#39; &#39;));</b>
+<b class="nc"><i>684</i>&nbsp;        }</b>
+<b class="nc"><i>685</i>&nbsp;    }</b>
+<i>686</i>&nbsp;
+<i>687</i>&nbsp;    @Override
+<i>688</i>&nbsp;	public void init(PrintStream out) {
+<b class="nc"><i>689</i>&nbsp;        Node node = getRoot();</b>
+<b class="nc"><i>690</i>&nbsp;        out.println(&quot;#NEXUS\n&quot;);</b>
+<b class="nc"><i>691</i>&nbsp;        out.println(&quot;Begin taxa;&quot;);</b>
+<b class="nc"><i>692</i>&nbsp;        out.println(&quot;\tDimensions ntax=&quot; + getLeafNodeCount() + &quot;;&quot;);</b>
+<b class="nc"><i>693</i>&nbsp;        out.println(&quot;\t\tTaxlabels&quot;);</b>
+<b class="nc"><i>694</i>&nbsp;        printTaxa(node, out, getNodeCount() / 2);</b>
+<b class="nc"><i>695</i>&nbsp;        out.println(&quot;\t\t\t;&quot;);</b>
+<b class="nc"><i>696</i>&nbsp;        out.println(&quot;End;&quot;);</b>
+<i>697</i>&nbsp;
+<b class="nc"><i>698</i>&nbsp;        out.println(&quot;Begin trees;&quot;);</b>
+<b class="nc"><i>699</i>&nbsp;        out.println(&quot;\tTranslate&quot;);</b>
+<b class="nc"><i>700</i>&nbsp;        printTranslate(node, out, getNodeCount() / 2);</b>
+<b class="nc"><i>701</i>&nbsp;        out.print(&quot;;&quot;);</b>
+<b class="nc"><i>702</i>&nbsp;    }</b>
+<i>703</i>&nbsp;
+<i>704</i>&nbsp;    @Override
+<i>705</i>&nbsp;	public void log(int sample, PrintStream out) {
+<b class="nc"><i>706</i>&nbsp;        Tree tree = (Tree) getCurrent();</b>
+<b class="nc"><i>707</i>&nbsp;        out.print(&quot;tree STATE_&quot; + sample + &quot; = &quot;);</b>
+<i>708</i>&nbsp;        // Don&#39;t sort, this can confuse CalculationNodes relying on the tree
+<i>709</i>&nbsp;        //tree.getRoot().sort();
+<b class="nc"><i>710</i>&nbsp;        final int[] dummy = new int[1];</b>
+<b class="nc"><i>711</i>&nbsp;        final String newick = tree.getRoot().toSortedNewick(dummy);</b>
+<b class="nc"><i>712</i>&nbsp;        out.print(newick);</b>
+<b class="nc"><i>713</i>&nbsp;        out.print(&quot;;&quot;);</b>
+<b class="nc"><i>714</i>&nbsp;    }</b>
+<i>715</i>&nbsp;
+<i>716</i>&nbsp;    /**
+<i>717</i>&nbsp;     * @see beast.core.Loggable *
+<i>718</i>&nbsp;     */
+<i>719</i>&nbsp;    @Override
+<i>720</i>&nbsp;	public void close(PrintStream out) {
+<b class="nc"><i>721</i>&nbsp;        out.print(&quot;End;&quot;);</b>
+<b class="nc"><i>722</i>&nbsp;    }</b>
+<i>723</i>&nbsp;
+<i>724</i>&nbsp;    /**
+<i>725</i>&nbsp;     * reconstruct tree from XML fragment in the form of a DOM node *
+<i>726</i>&nbsp;     */
+<i>727</i>&nbsp;    @Override
+<i>728</i>&nbsp;    public void fromXML(final org.w3c.dom.Node node) {
+<b class="nc"><i>729</i>&nbsp;        final String newick = node.getTextContent();</b>
+<b class="nc"><i>730</i>&nbsp;        final TreeParser parser = new TreeParser();</b>
+<i>731</i>&nbsp;        try {
+<b class="nc"><i>732</i>&nbsp;            parser.thresholdInput.setValue(1e-10, parser);</b>
+<b class="nc"><i>733</i>&nbsp;        } catch (Exception e1) {</b>
+<b class="nc"><i>734</i>&nbsp;            e1.printStackTrace();</b>
+<b class="nc"><i>735</i>&nbsp;        }</b>
+<i>736</i>&nbsp;        try {
+<b class="nc"><i>737</i>&nbsp;            parser.offsetInput.setValue(0, parser);</b>
+<b class="nc"><i>738</i>&nbsp;            setRoot(parser.parseNewick(newick));</b>
+<b class="nc"><i>739</i>&nbsp;        } catch (Exception e) {</b>
+<i>740</i>&nbsp;            // TODO Auto-generated catch block
+<b class="nc"><i>741</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>742</i>&nbsp;        }</b>
+<b class="nc"><i>743</i>&nbsp;        initArrays();</b>
+<b class="nc"><i>744</i>&nbsp;    }</b>
+<i>745</i>&nbsp;
+<i>746</i>&nbsp;    /**
+<i>747</i>&nbsp;     * Valuable implementation *
+<i>748</i>&nbsp;     */
+<i>749</i>&nbsp;    @Override
+<i>750</i>&nbsp;	public int getDimension() {
+<b class="nc"><i>751</i>&nbsp;        return getNodeCount();</b>
+<i>752</i>&nbsp;    }
+<i>753</i>&nbsp;
+<i>754</i>&nbsp;    @Override
+<i>755</i>&nbsp;	public double getArrayValue() {
+<b class="nc"><i>756</i>&nbsp;        return root.height;</b>
+<i>757</i>&nbsp;    }
+<i>758</i>&nbsp;
+<i>759</i>&nbsp;    @Override
+<i>760</i>&nbsp;	public double getArrayValue(int value) {
+<b class="nc"><i>761</i>&nbsp;        return m_nodes[value].height;</b>
+<i>762</i>&nbsp;    }
+<i>763</i>&nbsp;
+<i>764</i>&nbsp;    /**
+<i>765</i>&nbsp;     * StateNode implementation *
+<i>766</i>&nbsp;     */
+<i>767</i>&nbsp;    @Override
+<i>768</i>&nbsp;    protected void store() {
+<i>769</i>&nbsp;
+<i>770</i>&nbsp;        // this condition can only be true for sampled ancestor trees
+<b class="fc"><i>771</i>&nbsp;        if (m_storedNodes.length != nodeCount) {</b>
+<b class="nc"><i>772</i>&nbsp;            final Node[] tmp = new Node[nodeCount];</b>
+<b class="nc"><i>773</i>&nbsp;            System.arraycopy(m_storedNodes, 0, tmp, 0, m_storedNodes.length - 1);</b>
+<b class="nc"><i>774</i>&nbsp;            if (nodeCount &gt; m_storedNodes.length) {</b>
+<b class="nc"><i>775</i>&nbsp;                tmp[m_storedNodes.length - 1] = m_storedNodes[m_storedNodes.length - 1];</b>
+<b class="nc"><i>776</i>&nbsp;                tmp[nodeCount - 1] = newNode();</b>
+<b class="nc"><i>777</i>&nbsp;                tmp[nodeCount - 1].setNr(nodeCount - 1);</b>
+<i>778</i>&nbsp;            }
+<b class="nc"><i>779</i>&nbsp;            m_storedNodes = tmp;</b>
+<i>780</i>&nbsp;        }
+<i>781</i>&nbsp;
+<b class="fc"><i>782</i>&nbsp;        storeNodes(0, nodeCount);</b>
+<b class="fc"><i>783</i>&nbsp;        storedRoot = m_storedNodes[root.getNr()];</b>
+<b class="fc"><i>784</i>&nbsp;    }</b>
+<i>785</i>&nbsp;
+<i>786</i>&nbsp;
+<i>787</i>&nbsp;    /**
+<i>788</i>&nbsp;     * Stores nodes with index i, for start &lt;= i &lt; end
+<i>789</i>&nbsp;     * (i.e. including start but not including end)
+<i>790</i>&nbsp;     *
+<i>791</i>&nbsp;     * @param start the first index to be stored
+<i>792</i>&nbsp;     * @param end   nodes are stored up to but not including this index
+<i>793</i>&nbsp;     */
+<i>794</i>&nbsp;    private void storeNodes(final int start, final int end) {
+<i>795</i>&nbsp;        // Use direct members for speed (we are talking 5-7% or more from total time for large trees :)
+<b class="fc"><i>796</i>&nbsp;        for (int i = start; i &lt; end; i++) {</b>
+<b class="fc"><i>797</i>&nbsp;            final Node sink = m_storedNodes[i];</b>
+<b class="fc"><i>798</i>&nbsp;            final Node src = m_nodes[i];</b>
+<b class="fc"><i>799</i>&nbsp;            sink.height = src.height;</b>
+<i>800</i>&nbsp;
+<b class="fc"><i>801</i>&nbsp;            if ( src.parent != null ) {</b>
+<b class="fc"><i>802</i>&nbsp;                sink.parent = m_storedNodes[src.parent.getNr()];</b>
+<i>803</i>&nbsp;            } else {
+<i>804</i>&nbsp;                // currently only called in the case of sampled ancestor trees
+<i>805</i>&nbsp;                // where root node is not always last in the list
+<b class="fc"><i>806</i>&nbsp;                sink.parent = null;</b>
+<i>807</i>&nbsp;            }
+<i>808</i>&nbsp;
+<b class="fc"><i>809</i>&nbsp;            final List&lt;Node&gt; children = sink.children;</b>
+<b class="fc"><i>810</i>&nbsp;            final List&lt;Node&gt; srcChildren = src.children;</b>
+<i>811</i>&nbsp;
+<b class="fc"><i>812</i>&nbsp;            if( children.size() == srcChildren.size() ) {</b>
+<i>813</i>&nbsp;               // shave some more time by avoiding list clear and add
+<b class="fc"><i>814</i>&nbsp;               for (int k = 0; k &lt; children.size(); ++k) {</b>
+<b class="fc"><i>815</i>&nbsp;                   final Node srcChild = srcChildren.get(k);</b>
+<i>816</i>&nbsp;                   // don&#39;t call addChild, which calls  setParent(..., true);
+<b class="fc"><i>817</i>&nbsp;                   final Node c = m_storedNodes[srcChild.getNr()];</b>
+<b class="fc"><i>818</i>&nbsp;                   c.parent = sink;</b>
+<b class="fc"><i>819</i>&nbsp;                   children.set(k, c);</b>
+<i>820</i>&nbsp;               }
+<i>821</i>&nbsp;            } else {
+<b class="nc"><i>822</i>&nbsp;                children.clear();</b>
+<i>823</i>&nbsp;                //sink.removeAllChildren(false);
+<b class="nc"><i>824</i>&nbsp;                for (final Node srcChild : srcChildren) {</b>
+<i>825</i>&nbsp;                    // don&#39;t call addChild, which calls  setParent(..., true);
+<b class="nc"><i>826</i>&nbsp;                    final Node c = m_storedNodes[srcChild.getNr()];</b>
+<b class="nc"><i>827</i>&nbsp;                    c.parent = sink;</b>
+<b class="nc"><i>828</i>&nbsp;                    children.add(c);</b>
+<i>829</i>&nbsp;                    //sink.addChild(c);
+<b class="nc"><i>830</i>&nbsp;                }</b>
+<i>831</i>&nbsp;            }
+<i>832</i>&nbsp;        }
+<b class="fc"><i>833</i>&nbsp;    }</b>
+<i>834</i>&nbsp;
+<i>835</i>&nbsp;    @Override
+<i>836</i>&nbsp;    public void startEditing(final Operator operator) {
+<b class="fc"><i>837</i>&nbsp;        super.startEditing(operator);</b>
+<b class="fc"><i>838</i>&nbsp;        postCache = null;</b>
+<b class="fc"><i>839</i>&nbsp;    }</b>
+<i>840</i>&nbsp;
+<i>841</i>&nbsp;    @Override
+<i>842</i>&nbsp;    public void restore() {
+<i>843</i>&nbsp;
+<i>844</i>&nbsp;        // necessary for sampled ancestor trees
+<b class="nc"><i>845</i>&nbsp;        nodeCount = m_storedNodes.length;</b>
+<i>846</i>&nbsp;
+<b class="nc"><i>847</i>&nbsp;        final Node[] tmp = m_storedNodes;</b>
+<b class="nc"><i>848</i>&nbsp;        m_storedNodes = m_nodes;</b>
+<b class="nc"><i>849</i>&nbsp;        m_nodes = tmp;</b>
+<b class="nc"><i>850</i>&nbsp;        root = m_nodes[storedRoot.getNr()];</b>
+<i>851</i>&nbsp;
+<i>852</i>&nbsp;        // necessary for sampled ancestor trees,
+<i>853</i>&nbsp;        // we have the nodes, no need for expensive recursion
+<b class="nc"><i>854</i>&nbsp;        leafNodeCount = 0;</b>
+<b class="nc"><i>855</i>&nbsp;        for( Node n : m_nodes ) {</b>
+<b class="nc"><i>856</i>&nbsp;            leafNodeCount += n.isLeaf() ? 1 : 0;</b>
+<i>857</i>&nbsp;        }
+<i>858</i>&nbsp;
+<i>859</i>&nbsp;        //leafNodeCount = root.getLeafNodeCount();
+<i>860</i>&nbsp;
+<b class="nc"><i>861</i>&nbsp;        hasStartedEditing = false;</b>
+<i>862</i>&nbsp;
+<b class="nc"><i>863</i>&nbsp;        for( Node n : m_nodes ) {</b>
+<b class="nc"><i>864</i>&nbsp;            n.isDirty = Tree.IS_CLEAN;</b>
+<i>865</i>&nbsp;        }
+<i>866</i>&nbsp;
+<b class="nc"><i>867</i>&nbsp;        postCache = null;</b>
+<b class="nc"><i>868</i>&nbsp;    }</b>
+<i>869</i>&nbsp;
+<i>870</i>&nbsp;    /**
+<i>871</i>&nbsp;     * @return Date trait set if available, null otherwise.
+<i>872</i>&nbsp;     */
+<i>873</i>&nbsp;    public TraitSet getDateTrait() {
+<b class="nc"><i>874</i>&nbsp;        if (!traitsProcessed)</b>
+<b class="nc"><i>875</i>&nbsp;            processTraits(m_traitList.get());</b>
+<i>876</i>&nbsp;
+<b class="nc"><i>877</i>&nbsp;        return timeTraitSet;</b>
+<i>878</i>&nbsp;    }
+<i>879</i>&nbsp;
+<i>880</i>&nbsp;    /**
+<i>881</i>&nbsp;     * Determine whether tree has a date/time trait set associated with it.
+<i>882</i>&nbsp;     *
+<i>883</i>&nbsp;     * @return true if so
+<i>884</i>&nbsp;     */
+<i>885</i>&nbsp;    public boolean hasDateTrait() {
+<b class="nc"><i>886</i>&nbsp;        return getDateTrait() != null;</b>
+<i>887</i>&nbsp;    }
+<i>888</i>&nbsp;
+<i>889</i>&nbsp;    /**
+<i>890</i>&nbsp;     * Specifically set the date trait set for this tree. A null value simply
+<i>891</i>&nbsp;     * removes the existing trait set.
+<i>892</i>&nbsp;     *
+<i>893</i>&nbsp;     * @param traitSet
+<i>894</i>&nbsp;     */
+<i>895</i>&nbsp;    public void setDateTrait(TraitSet traitSet) {
+<b class="nc"><i>896</i>&nbsp;        if (hasDateTrait()) {</b>
+<b class="nc"><i>897</i>&nbsp;            m_traitList.get().remove(timeTraitSet);</b>
+<i>898</i>&nbsp;        }
+<i>899</i>&nbsp;
+<b class="nc"><i>900</i>&nbsp;        if (traitSet != null)</b>
+<b class="nc"><i>901</i>&nbsp;            m_traitList.get().add(traitSet);</b>
+<i>902</i>&nbsp;
+<b class="nc"><i>903</i>&nbsp;        timeTraitSet = traitSet;</b>
+<b class="nc"><i>904</i>&nbsp;    }</b>
+<i>905</i>&nbsp;
+<i>906</i>&nbsp;    /**
+<i>907</i>&nbsp;     * Convert age/height to the date time scale given by a trait set,
+<i>908</i>&nbsp;     * if one exists.  Otherwise just return the unconverted height.
+<i>909</i>&nbsp;     *
+<i>910</i>&nbsp;     * @param height
+<i>911</i>&nbsp;     * @return date specified by height
+<i>912</i>&nbsp;     */
+<i>913</i>&nbsp;    public double getDate(final double height) {
+<b class="nc"><i>914</i>&nbsp;        if (hasDateTrait()) {</b>
+<b class="nc"><i>915</i>&nbsp;            return timeTraitSet.getDate(height);</b>
+<i>916</i>&nbsp;        } else
+<b class="nc"><i>917</i>&nbsp;            return height;</b>
+<i>918</i>&nbsp;    }
+<i>919</i>&nbsp;
+<i>920</i>&nbsp;    /**
+<i>921</i>&nbsp;     * This method allows the retrieval of the taxon label of a node without using the node number.
+<i>922</i>&nbsp;     *
+<i>923</i>&nbsp;     * @param node
+<i>924</i>&nbsp;     * @return the name of the given node, or null if the node is unlabelled
+<i>925</i>&nbsp;     */
+<i>926</i>&nbsp;    public String getTaxonId(final Node node) {
+<i>927</i>&nbsp;        //TODO should be implemented to avoid using deprecated methods
+<b class="nc"><i>928</i>&nbsp;        return getTaxaNames()[node.getNr()];  //To change body of created methods use File | Settings | File Templates.</b>
+<i>929</i>&nbsp;    }
+<i>930</i>&nbsp;
+<i>931</i>&nbsp;    /**
+<i>932</i>&nbsp;     * Removes the i&#39;th node in the tree. Results in a renumbering of the remaining nodes so that their numbers
+<i>933</i>&nbsp;     * faithfully describe their new position in the array. nodeCount and leafNodeCount are recalculated.
+<i>934</i>&nbsp;     * Use with care!
+<i>935</i>&nbsp;     *
+<i>936</i>&nbsp;     * @param i the index of the node to be removed.
+<i>937</i>&nbsp;     */
+<i>938</i>&nbsp;    public void removeNode(final int i) {
+<b class="nc"><i>939</i>&nbsp;        final Node[] tmp = new Node[nodeCount - 1];</b>
+<b class="nc"><i>940</i>&nbsp;        System.arraycopy(m_nodes, 0, tmp, 0, i);</b>
+<b class="nc"><i>941</i>&nbsp;        for (int j = i; j &lt; nodeCount - 1; j++) {</b>
+<b class="nc"><i>942</i>&nbsp;            tmp[j] = m_nodes[j + 1];</b>
+<b class="nc"><i>943</i>&nbsp;            tmp[j].setNr(j);</b>
+<i>944</i>&nbsp;        }
+<b class="nc"><i>945</i>&nbsp;        m_nodes = tmp;</b>
+<b class="nc"><i>946</i>&nbsp;        nodeCount--;</b>
+<b class="nc"><i>947</i>&nbsp;        leafNodeCount--;</b>
+<b class="nc"><i>948</i>&nbsp;    }</b>
+<i>949</i>&nbsp;
+<i>950</i>&nbsp;    /**
+<i>951</i>&nbsp;     * Adds a node to the end of the node array. nodeCount and leafNodeCount are recalculated.
+<i>952</i>&nbsp;     * Use with care!
+<i>953</i>&nbsp;     */
+<i>954</i>&nbsp;    public void addNode(final Node newNode) {
+<b class="nc"><i>955</i>&nbsp;        final Node[] tmp = new Node[nodeCount + 1];</b>
+<b class="nc"><i>956</i>&nbsp;        System.arraycopy(m_nodes, 0, tmp, 0, nodeCount);</b>
+<b class="nc"><i>957</i>&nbsp;        tmp[nodeCount] = newNode;</b>
+<b class="nc"><i>958</i>&nbsp;        newNode.setNr(nodeCount);</b>
+<b class="nc"><i>959</i>&nbsp;        m_nodes = tmp;</b>
+<b class="nc"><i>960</i>&nbsp;        nodeCount++;</b>
+<b class="nc"><i>961</i>&nbsp;        leafNodeCount++;</b>
+<b class="nc"><i>962</i>&nbsp;    }</b>
+<i>963</i>&nbsp;
+<i>964</i>&nbsp;    public int getDirectAncestorNodeCount() {
+<b class="nc"><i>965</i>&nbsp;        int directAncestorNodeCount = 0;</b>
+<b class="nc"><i>966</i>&nbsp;        for (int i = 0; i &lt; leafNodeCount; i++) {</b>
+<b class="nc"><i>967</i>&nbsp;            if (this.getNode(i).isDirectAncestor()) {</b>
+<b class="nc"><i>968</i>&nbsp;                directAncestorNodeCount += 1;</b>
+<i>969</i>&nbsp;            }
+<i>970</i>&nbsp;        }
+<b class="nc"><i>971</i>&nbsp;        return directAncestorNodeCount;</b>
+<i>972</i>&nbsp;    }
+<i>973</i>&nbsp;
+<i>974</i>&nbsp;
+<i>975</i>&nbsp;    @Override
+<i>976</i>&nbsp;    public TaxonSet getTaxonset() {
+<b class="nc"><i>977</i>&nbsp;        return m_taxonset.get();</b>
+<i>978</i>&nbsp;    }
+<i>979</i>&nbsp;} // class Tree
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,163 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: FileInputEditor</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.beauti</a> ]
+</div>
+
+<h1>Coverage Summary for Class: FileInputEditor (beast.app.beauti)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+</tr>
+  <tr>
+    <td class="name">FileInputEditor$1</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.beauti;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import java.awt.event.ActionEvent;
+<i>5</i>&nbsp;import java.awt.event.ActionListener;
+<i>6</i>&nbsp;import java.io.File;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import javax.swing.JButton;
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;import beast.app.draw.InputEditor;
+<i>11</i>&nbsp;import beast.app.util.Utils;
+<i>12</i>&nbsp;import beast.core.BEASTInterface;
+<i>13</i>&nbsp;import beast.core.Input;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;/** for opening files for reading
+<i>17</i>&nbsp; * use OutFile when you need a file for writing
+<i>18</i>&nbsp; */
+<i>19</i>&nbsp;public class FileInputEditor extends InputEditor.Base {
+<i>20</i>&nbsp;	final static String SEPARATOR = Utils.isWindows() ? &quot;\\\\&quot; : &quot;/&quot;;
+<i>21</i>&nbsp;	
+<i>22</i>&nbsp;	private static final long serialVersionUID = 1L;
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;	@Override
+<i>25</i>&nbsp;	public Class&lt;?&gt; type() {
+<i>26</i>&nbsp;		return File.class;
+<i>27</i>&nbsp;	}
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;	public FileInputEditor(BeautiDoc doc) {
+<i>30</i>&nbsp;		super(doc);
+<i>31</i>&nbsp;	}
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;	@Override
+<i>34</i>&nbsp;	public void init(Input&lt;?&gt; input, BEASTInterface plugin, int itemNr, ExpandOption bExpandOption, boolean bAddButtons) {
+<i>35</i>&nbsp;		init(input, plugin, itemNr, bExpandOption, bAddButtons, &quot;All files&quot;, &quot;&quot;);
+<i>36</i>&nbsp;	}
+<i>37</i>&nbsp;	
+<i>38</i>&nbsp;	protected void init(Input&lt;?&gt; input, BEASTInterface plugin, int itemNr, ExpandOption bExpandOption, boolean bAddButtons, String fileDescription, String fileType) {
+<i>39</i>&nbsp;		super.init(input, plugin, itemNr, bExpandOption, bAddButtons);
+<i>40</i>&nbsp;		if (input.get() == null) {
+<i>41</i>&nbsp;			m_entry.setText(&quot;[[none]]&quot;);
+<i>42</i>&nbsp;		} else {
+<i>43</i>&nbsp;			m_entry.setText(((File) m_input.get()).getName());
+<i>44</i>&nbsp;		}
+<i>45</i>&nbsp;		
+<i>46</i>&nbsp;		JButton button = new JButton(&quot;browse&quot;);
+<i>47</i>&nbsp;		button.addActionListener(new ActionListener() {
+<i>48</i>&nbsp;			
+<i>49</i>&nbsp;			@Override
+<i>50</i>&nbsp;			public void actionPerformed(ActionEvent arg0) {
+<i>51</i>&nbsp;				File defaultFile = getDefaultFile((File) m_input.get());
+<i>52</i>&nbsp;				File file = Utils.getLoadFile(m_input.getTipText(), defaultFile, &quot;All files&quot;, &quot;&quot;);
+<i>53</i>&nbsp;				try {
+<i>54</i>&nbsp;					m_entry.setText(file.getName());
+<i>55</i>&nbsp;					m_input.setValue(file, m_beastObject);
+<i>56</i>&nbsp;					String path = file.getPath();
+<i>57</i>&nbsp;					Beauti.g_sDir = path;
+<i>58</i>&nbsp;				} catch (Exception e) {
+<i>59</i>&nbsp;					// TODO Auto-generated catch block
+<i>60</i>&nbsp;					e.printStackTrace();
+<i>61</i>&nbsp;				}
+<i>62</i>&nbsp;			}
+<i>63</i>&nbsp;		});
+<i>64</i>&nbsp;		add(button);
+<i>65</i>&nbsp;	}
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;	@Override
+<i>68</i>&nbsp;	protected void setValue(Object o) {
+<i>69</i>&nbsp;		String file = o.toString();
+<i>70</i>&nbsp;		if (file.equals(&quot;&quot;)) {
+<i>71</i>&nbsp;			return;
+<i>72</i>&nbsp;		}
+<i>73</i>&nbsp;		String fileSep = System.getProperty(&quot;file.separator&quot;);
+<i>74</i>&nbsp;		String origFile = null;
+<i>75</i>&nbsp;		try {
+<i>76</i>&nbsp;			origFile = ((File) m_input.get()).getAbsolutePath();
+<i>77</i>&nbsp;		} catch (Exception e) {
+<i>78</i>&nbsp;			origFile = null;
+<i>79</i>&nbsp;		}
+<i>80</i>&nbsp;		if (origFile != null &amp;&amp; origFile.indexOf(fileSep) &gt;= 0 &amp;&amp; file.indexOf(fileSep) &lt; 0) {
+<i>81</i>&nbsp;			if (origFile.contains(origFile)) {
+<i>82</i>&nbsp;				file = origFile.substring(0, origFile.lastIndexOf(fileSep) + 1) + file;
+<i>83</i>&nbsp;			}
+<i>84</i>&nbsp;		}
+<i>85</i>&nbsp;		m_input.setValue(file, m_beastObject);	
+<i>86</i>&nbsp;   	}
+<i>87</i>&nbsp;	
+<i>88</i>&nbsp;
+<i>89</i>&nbsp;	static File getDefaultFile(File file) {
+<i>90</i>&nbsp;		File defaultFile;
+<i>91</i>&nbsp;		if (file.exists()) {
+<i>92</i>&nbsp;			defaultFile = file;
+<i>93</i>&nbsp;			if (defaultFile.getParent() == null) {
+<i>94</i>&nbsp;				defaultFile = new File(Beauti.g_sDir);
+<i>95</i>&nbsp;				if (defaultFile.isDirectory()) {
+<i>96</i>&nbsp;					defaultFile = new File(Beauti.g_sDir + FileInputEditor.SEPARATOR + file.getName());
+<i>97</i>&nbsp;				} else {
+<i>98</i>&nbsp;					defaultFile = new File(new File(Beauti.g_sDir).getParent() + FileInputEditor.SEPARATOR + file.getName());
+<i>99</i>&nbsp;				}
+<i>100</i>&nbsp;			}
+<i>101</i>&nbsp;		} else {
+<i>102</i>&nbsp;			defaultFile = new File(Beauti.g_sDir);
+<i>103</i>&nbsp;			if (defaultFile.isDirectory()) {
+<i>104</i>&nbsp;				defaultFile = new File(Beauti.g_sDir + FileInputEditor.SEPARATOR + file.getName());
+<i>105</i>&nbsp;			} else {
+<i>106</i>&nbsp;				defaultFile = new File(new File(Beauti.g_sDir).getParent() + FileInputEditor.SEPARATOR + file.getName());
+<i>107</i>&nbsp;			}
+<i>108</i>&nbsp;		}
+<i>109</i>&nbsp;		return defaultFile;
+<i>110</i>&nbsp;	}
+<i>111</i>&nbsp;
+<i>112</i>&nbsp;
+<i>113</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,193 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: UserDataType</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.datatype</a> ]
+</div>
+
+<h1>Coverage Summary for Class: UserDataType (beast.evolution.datatype)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserDataType</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (3/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    56.9%
+  </span>
+  <span class="absValue">
+    (33/ 58)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.datatype;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import java.util.ArrayList;
+<i>5</i>&nbsp;import java.util.List;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import beast.core.Description;
+<i>8</i>&nbsp;import beast.core.Input;
+<i>9</i>&nbsp;import beast.core.Input.Validate;
+<i>10</i>&nbsp;import beast.evolution.datatype.DataType.Base;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;@Description(&quot;User defined datatype. Allows custom symbols to map onto statesets.&quot;)
+<i>15</i>&nbsp;public class UserDataType extends Base {
+<b class="fc"><i>16</i>&nbsp;    final public Input&lt;Integer&gt; stateCountInput = new Input&lt;&gt;(&quot;states&quot;, &quot;total number of states&quot;, Validate.REQUIRED);</b>
+<b class="fc"><i>17</i>&nbsp;    final public Input&lt;Integer&gt; codeLengthInput = new Input&lt;&gt;(&quot;codelength&quot;, &quot;length of code, if negative a variable length code is assumed, default 1&quot;, 1);</b>
+<b class="fc"><i>18</i>&nbsp;    final public Input&lt;String&gt; codeMapInput = new Input&lt;&gt;(&quot;codeMap&quot;, &quot;mapping of codes to states. &quot; +</b>
+<i>19</i>&nbsp;            &quot;A comma separated string of codes with a subset of states. &quot; +
+<i>20</i>&nbsp;            &quot;A state set is a space separates list of zero based integers, up to the number of states, &quot; +
+<i>21</i>&nbsp;            &quot;e.g. A=0, C=1, R=0 2, ? = 0 1 2 3&quot;, Validate.REQUIRED);
+<i>22</i>&nbsp;    
+<b class="fc"><i>23</i>&nbsp;    final public Input&lt;String&gt; characterNameInput = new Input&lt;&gt;(&quot;characterName&quot;, &quot;the name of the character&quot;);</b>
+<b class="fc"><i>24</i>&nbsp;    final public Input&lt;String&gt; stateNamesInput = new Input&lt;&gt;(&quot;value&quot;, &quot;the list of the state names ordered &quot; +</b>
+<i>25</i>&nbsp;    		&quot;according to codes given, that is the first in the list is coded by 0, second, by 1 and so forth.&quot;);
+<i>26</i>&nbsp;
+<b class="fc"><i>27</i>&nbsp;    public UserDataType() {} // default c&#39;tor</b>
+<b class="nc"><i>28</i>&nbsp;    public UserDataType(String newCharName, ArrayList&lt;String&gt; newStateNames) {</b>
+<b class="nc"><i>29</i>&nbsp;        characterNameInput.setValue(newCharName, this);</b>
+<b class="nc"><i>30</i>&nbsp;        if (newStateNames.size() &gt; 0) {</b>
+<b class="nc"><i>31</i>&nbsp;            StringBuilder buf = new StringBuilder();</b>
+<b class="nc"><i>32</i>&nbsp;            for (int i = 0; i &lt; newStateNames.size(); i++) {</b>
+<b class="nc"><i>33</i>&nbsp;                buf.append(i + &quot;=&quot; + i +&quot;, &quot;);</b>
+<i>34</i>&nbsp;            }
+<b class="nc"><i>35</i>&nbsp;            buf.append(&quot;? =&quot;);</b>
+<b class="nc"><i>36</i>&nbsp;            for (int i = 0; i &lt; newStateNames.size(); i++) {</b>
+<b class="nc"><i>37</i>&nbsp;                buf.append(i +&quot; &quot;);</b>
+<i>38</i>&nbsp;            }
+<b class="nc"><i>39</i>&nbsp;            codeMapInput.setValue(buf.toString(), this);</b>
+<b class="nc"><i>40</i>&nbsp;            buf = new StringBuilder();</b>
+<b class="nc"><i>41</i>&nbsp;            for (int i = 0; i &lt; newStateNames.size(); i++) {</b>
+<b class="nc"><i>42</i>&nbsp;                buf.append(newStateNames.get(i) +&quot;, &quot;);</b>
+<i>43</i>&nbsp;            }
+<b class="nc"><i>44</i>&nbsp;            buf.delete(buf.length()-2, buf.length());</b>
+<b class="nc"><i>45</i>&nbsp;            stateNamesInput.setValue(buf.toString(), this);</b>
+<b class="nc"><i>46</i>&nbsp;            stateCountInput.setValue(newStateNames.size(), this);</b>
+<b class="nc"><i>47</i>&nbsp;        } else {</b>
+<b class="nc"><i>48</i>&nbsp;            codeMapInput.setValue(&quot;&quot;, this);</b>
+<b class="nc"><i>49</i>&nbsp;            stateNamesInput.setValue(&quot;&quot;, this);</b>
+<b class="nc"><i>50</i>&nbsp;            stateCountInput.setValue(-1, this);</b>
+<i>51</i>&nbsp;        }
+<b class="nc"><i>52</i>&nbsp;    }</b>
+<i>53</i>&nbsp;    
+<i>54</i>&nbsp;    @Override
+<i>55</i>&nbsp;    public void initAndValidate() {
+<b class="fc"><i>56</i>&nbsp;        stateCount = stateCountInput.get();</b>
+<b class="fc"><i>57</i>&nbsp;        codeLength = codeLengthInput.get();</b>
+<i>58</i>&nbsp;
+<b class="fc"><i>59</i>&nbsp;        String codeMapString = codeMapInput.get();</b>
+<b class="fc"><i>60</i>&nbsp;        if (!codeMapInput.get().equals(&quot;&quot;)) {</b>
+<b class="fc"><i>61</i>&nbsp;            String[] strs = codeMapString.split(&quot;,&quot;);</b>
+<b class="fc"><i>62</i>&nbsp;            codeMap = &quot;&quot;;</b>
+<b class="fc"><i>63</i>&nbsp;            mapCodeToStateSet = new int[strs.length][];</b>
+<b class="fc"><i>64</i>&nbsp;            int k = 0;</b>
+<b class="fc"><i>65</i>&nbsp;            for (String str : strs) {</b>
+<b class="fc"><i>66</i>&nbsp;                String[] strs2 = str.split(&quot;=&quot;);</b>
+<i>67</i>&nbsp;                // parse the code
+<b class="fc"><i>68</i>&nbsp;                String code = strs2[0].replaceAll(&quot;\\s&quot;, &quot;&quot;);</b>
+<i>69</i>&nbsp;
+<b class="fc"><i>70</i>&nbsp;                codeMap += code;</b>
+<b class="fc"><i>71</i>&nbsp;                if (codeLength &gt; 0) {</b>
+<b class="fc"><i>72</i>&nbsp;                    if (code.length() != codeLength) {</b>
+<b class="nc"><i>73</i>&nbsp;                        throw new IllegalArgumentException(&quot;Invalide code &#39;&quot; + code + &quot;&#39;. Expected code of length &quot; + codeLength);</b>
+<i>74</i>&nbsp;                    }
+<i>75</i>&nbsp;                } else {
+<b class="nc"><i>76</i>&nbsp;                    codeMap += &quot;,&quot;;</b>
+<i>77</i>&nbsp;                }
+<i>78</i>&nbsp;                // parse the state set
+<b class="fc"><i>79</i>&nbsp;                List&lt;Integer&gt; stateSet = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>80</i>&nbsp;                strs2 = strs2[1].split(&quot;\\s+&quot;);</b>
+<b class="fc"><i>81</i>&nbsp;                for (String str2 : strs2) {</b>
+<b class="fc"><i>82</i>&nbsp;                    if (str2.length() &gt; 0) {</b>
+<b class="fc"><i>83</i>&nbsp;                        int i = Integer.parseInt(str2);</b>
+<b class="fc"><i>84</i>&nbsp;                        if (i &lt; 0 || (stateCount &gt; 0 &amp;&amp; i &gt;= stateCount)) {</b>
+<b class="nc"><i>85</i>&nbsp;                            throw new IllegalArgumentException(&quot;state index should be from 0 to statecount, not &quot; + i);</b>
+<i>86</i>&nbsp;                        }
+<b class="fc"><i>87</i>&nbsp;                        stateSet.add(i);</b>
+<i>88</i>&nbsp;                    }
+<i>89</i>&nbsp;                }
+<i>90</i>&nbsp;
+<b class="fc"><i>91</i>&nbsp;                int[] stateSet2 = new int[stateSet.size()];</b>
+<b class="fc"><i>92</i>&nbsp;                for (int i = 0; i &lt; stateSet.size(); i++) {</b>
+<b class="fc"><i>93</i>&nbsp;                    stateSet2[i] = stateSet.get(i);</b>
+<i>94</i>&nbsp;                }
+<b class="fc"><i>95</i>&nbsp;                mapCodeToStateSet[k++] = stateSet2;</b>
+<i>96</i>&nbsp;            }
+<i>97</i>&nbsp;        }
+<b class="fc"><i>98</i>&nbsp;    }</b>
+<i>99</i>&nbsp;
+<i>100</i>&nbsp;    @Override
+<i>101</i>&nbsp;    public String getCode(int state) {
+<b class="nc"><i>102</i>&nbsp;        return String.valueOf(codeMap.split(&quot;,&quot;)[state]);</b>
+<i>103</i>&nbsp;    }
+<i>104</i>&nbsp;
+<i>105</i>&nbsp;    @Override
+<i>106</i>&nbsp;    public String getTypeDescription() {
+<b class="fc"><i>107</i>&nbsp;        return &quot;user defined&quot;;</b>
+<i>108</i>&nbsp;    }
+<i>109</i>&nbsp;
+<i>110</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

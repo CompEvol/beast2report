@@ -1,0 +1,151 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: MyAction</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.draw</a> ]
+</div>
+
+<h1>Coverage Summary for Class: MyAction (beast.app.draw)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MyAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    68.8%
+  </span>
+  <span class="absValue">
+    (11/ 16)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.draw;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.awt.Toolkit;
+<i>4</i>&nbsp;import java.awt.event.ActionEvent;
+<i>5</i>&nbsp;import java.awt.image.BufferedImage;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import javax.swing.AbstractAction;
+<i>8</i>&nbsp;import javax.swing.Action;
+<i>9</i>&nbsp;import javax.swing.ImageIcon;
+<i>10</i>&nbsp;import javax.swing.KeyStroke;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;import beast.app.util.Utils;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;/**
+<i>17</i>&nbsp; * Base class used for definining actions with a name, tool tip text, possibly
+<i>18</i>&nbsp; * an icon and accelerator key.
+<i>19</i>&nbsp; */
+<i>20</i>&nbsp;public abstract class MyAction extends AbstractAction {
+<i>21</i>&nbsp;    /**
+<i>22</i>&nbsp;     * for serialisation
+<i>23</i>&nbsp;     */
+<i>24</i>&nbsp;    private static final long serialVersionUID = -1L;
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;    /**
+<i>27</i>&nbsp;     * path for icons
+<i>28</i>&nbsp;     */
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;    public MyAction(String name, String toolTipText, String icon, int acceleratorKey) {
+<b class="fc"><i>31</i>&nbsp;        this(name, toolTipText, icon, KeyStroke.getKeyStroke(acceleratorKey, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));</b>
+<b class="fc"><i>32</i>&nbsp;    } // c&#39;tor</b>
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;    public MyAction(String name, String toolTipText, String icon, String acceleratorKey) {
+<b class="nc"><i>35</i>&nbsp;        this(name, toolTipText, icon, KeyStroke.getKeyStroke(acceleratorKey));</b>
+<b class="nc"><i>36</i>&nbsp;    } // c&#39;tor</b>
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;    public MyAction(String name, String toolTipText, String icon, KeyStroke acceleratorKeystroke) {
+<b class="fc"><i>39</i>&nbsp;        super(name);</b>
+<i>40</i>&nbsp;        // setToolTipText(toolTipText);
+<b class="fc"><i>41</i>&nbsp;        putValue(Action.SHORT_DESCRIPTION, toolTipText);</b>
+<b class="fc"><i>42</i>&nbsp;        putValue(Action.LONG_DESCRIPTION, toolTipText);</b>
+<b class="fc"><i>43</i>&nbsp;        if (acceleratorKeystroke != null &amp;&amp; acceleratorKeystroke.getKeyCode() &gt;= 0) {</b>
+<b class="fc"><i>44</i>&nbsp;            putValue(Action.ACCELERATOR_KEY, acceleratorKeystroke);</b>
+<i>45</i>&nbsp;        }
+<b class="fc"><i>46</i>&nbsp;        putValue(Action.MNEMONIC_KEY, new Integer(name.charAt(0)));</b>
+<b class="fc"><i>47</i>&nbsp;        java.net.URL tempURL = ClassLoader.getSystemResource(ModelBuilder.ICONPATH + icon + &quot;.png&quot;);</b>
+<b class="fc"><i>48</i>&nbsp;        if (!Utils.isMac()) {</b>
+<b class="nc"><i>49</i>&nbsp;	        if (tempURL != null) {</b>
+<b class="nc"><i>50</i>&nbsp;	            putValue(Action.SMALL_ICON, new ImageIcon(tempURL));</b>
+<i>51</i>&nbsp;	        } else {
+<b class="nc"><i>52</i>&nbsp;	            putValue(Action.SMALL_ICON, new ImageIcon(new BufferedImage(20, 20, BufferedImage.TYPE_4BYTE_ABGR)));</b>
+<i>53</i>&nbsp;	        }
+<i>54</i>&nbsp;        }
+<b class="fc"><i>55</i>&nbsp;    } // c&#39;tor</b>
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;
+<i>59</i>&nbsp;    /*
+<i>60</i>&nbsp;      * Place holder. Should be implemented by derived classes. (non-Javadoc)
+<i>61</i>&nbsp;      * @see
+<i>62</i>&nbsp;      * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent
+<i>63</i>&nbsp;      * )
+<i>64</i>&nbsp;      */
+<i>65</i>&nbsp;    @Override
+<i>66</i>&nbsp;	abstract public void actionPerformed(ActionEvent ae);
+<i>67</i>&nbsp;
+<i>68</i>&nbsp;} // class MyAction
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

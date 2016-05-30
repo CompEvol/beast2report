@@ -1,0 +1,393 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: NodeReheight</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.operators</a> ]
+</div>
+
+<h1>Coverage Summary for Class: NodeReheight (beast.evolution.operators)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NodeReheight</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 146)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.operators;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.util.ArrayList;
+<i>4</i>&nbsp;import java.util.Arrays;
+<i>5</i>&nbsp;import java.util.HashMap;
+<i>6</i>&nbsp;import java.util.List;
+<i>7</i>&nbsp;import java.util.Map;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;import beast.core.Description;
+<i>10</i>&nbsp;import beast.core.Input;
+<i>11</i>&nbsp;import beast.core.Input.Validate;
+<i>12</i>&nbsp;import beast.core.util.Log;
+<i>13</i>&nbsp;import beast.evolution.alignment.Taxon;
+<i>14</i>&nbsp;import beast.evolution.alignment.TaxonSet;
+<i>15</i>&nbsp;import beast.evolution.tree.Node;
+<i>16</i>&nbsp;import beast.evolution.tree.Tree;
+<i>17</i>&nbsp;import beast.util.Randomizer;
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;
+<b class="nc"><i>21</i>&nbsp;@Description(&quot;Tree operator which randomly changes the height of a node, &quot; +</b>
+<i>22</i>&nbsp;        &quot;then reconstructs the tree from node heights.&quot;)
+<b class="nc"><i>23</i>&nbsp;public class NodeReheight extends TreeOperator {</b>
+<b class="nc"><i>24</i>&nbsp;    public final Input&lt;TaxonSet&gt; taxonSetInput = new Input&lt;&gt;(&quot;taxonset&quot;, &quot;taxon set describing species tree taxa and their gene trees&quot;, Validate.REQUIRED);</b>
+<b class="nc"><i>25</i>&nbsp;    public final Input&lt;List&lt;Tree&gt;&gt; geneTreesInput = new Input&lt;&gt;(&quot;genetree&quot;, &quot;list of gene trees that constrain species tree movement&quot;, new ArrayList&lt;&gt;());</b>
+<i>26</i>&nbsp;    Node[] m_nodes;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;    /**
+<i>30</i>&nbsp;     * map node number of leafs in gene trees to leaf nr in species tree *
+<i>31</i>&nbsp;     */
+<i>32</i>&nbsp;    List&lt;Map&lt;Integer, Integer&gt;&gt; m_taxonMap;
+<i>33</i>&nbsp;    int nrOfGeneTrees;
+<i>34</i>&nbsp;    int nrOfSpecies;
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;    @Override
+<i>37</i>&nbsp;    public void initAndValidate() {
+<i>38</i>&nbsp;        /** maps gene taxa names to species number **/
+<b class="nc"><i>39</i>&nbsp;        final Map&lt;String, Integer&gt; taxonMap = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>40</i>&nbsp;        final List&lt;Taxon&gt; list = taxonSetInput.get().taxonsetInput.get();</b>
+<i>41</i>&nbsp;        
+<b class="nc"><i>42</i>&nbsp;        if (list.size() &lt;= 1) {</b>
+<b class="nc"><i>43</i>&nbsp;        	Log.warning.println(&quot;NodeReheight operator requires at least 2 taxa while the taxon set (id=&quot; + taxonSetInput.get().getID() +&quot;) has only &quot; + list.size() + &quot; taxa. &quot;</b>
+<i>44</i>&nbsp;        			+ &quot;If the XML file was set up in BEAUti, this probably means a taxon assignment needs to be set up in the taxonset panel.&quot;);
+<i>45</i>&nbsp;        	// assume we are in BEAUti, back off for now
+<i>46</i>&nbsp;        	return;
+<i>47</i>&nbsp;        }
+<i>48</i>&nbsp;        
+<b class="nc"><i>49</i>&nbsp;        for (int i = 0; i &lt; list.size(); i++) {</b>
+<b class="nc"><i>50</i>&nbsp;            final Taxon taxa = list.get(i);</b>
+<i>51</i>&nbsp;            // cast should be ok if taxon-set is the set for the species tree
+<b class="nc"><i>52</i>&nbsp;            final TaxonSet set = (TaxonSet) taxa;</b>
+<b class="nc"><i>53</i>&nbsp;            for (final Taxon taxon : set.taxonsetInput.get()) {</b>
+<b class="nc"><i>54</i>&nbsp;                taxonMap.put(taxon.getID(), i);</b>
+<b class="nc"><i>55</i>&nbsp;            }</b>
+<i>56</i>&nbsp;        }
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;        /** build the taxon map for each gene tree **/
+<b class="nc"><i>59</i>&nbsp;        m_taxonMap = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>60</i>&nbsp;        for (final Tree tree : geneTreesInput.get()) {</b>
+<b class="nc"><i>61</i>&nbsp;            final Map&lt;Integer, Integer&gt; map = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>62</i>&nbsp;            setupTaxaMap(tree.getRoot(), map, taxonMap);</b>
+<b class="nc"><i>63</i>&nbsp;            m_taxonMap.add(map);</b>
+<b class="nc"><i>64</i>&nbsp;        }</b>
+<i>65</i>&nbsp;
+<b class="nc"><i>66</i>&nbsp;        nrOfGeneTrees = geneTreesInput.get().size();</b>
+<b class="nc"><i>67</i>&nbsp;        nrOfSpecies = treeInput.get().getLeafNodeCount();</b>
+<i>68</i>&nbsp;    }
+<i>69</i>&nbsp;
+<i>70</i>&nbsp;    // initialisation code: create node number in gene tree to node number in species tree map
+<i>71</i>&nbsp;    private void setupTaxaMap(final Node node, final Map&lt;Integer, Integer&gt; map, final Map&lt;String, Integer&gt; taxonMap) {
+<b class="nc"><i>72</i>&nbsp;        if (node.isLeaf()) {</b>
+<b class="nc"><i>73</i>&nbsp;            map.put(node.getNr(), taxonMap.get(node.getID()));</b>
+<i>74</i>&nbsp;        } else {
+<b class="nc"><i>75</i>&nbsp;            setupTaxaMap(node.getLeft(), map, taxonMap);</b>
+<b class="nc"><i>76</i>&nbsp;            setupTaxaMap(node.getRight(), map, taxonMap);</b>
+<i>77</i>&nbsp;        }
+<i>78</i>&nbsp;    }
+<i>79</i>&nbsp;
+<i>80</i>&nbsp;    @Override
+<i>81</i>&nbsp;    public double proposal() {
+<b class="nc"><i>82</i>&nbsp;        final Tree tree = treeInput.get();</b>
+<b class="nc"><i>83</i>&nbsp;        m_nodes = tree.getNodesAsArray();</b>
+<b class="nc"><i>84</i>&nbsp;        final int nodeCount = tree.getNodeCount();</b>
+<i>85</i>&nbsp;        // randomly change left/right order
+<b class="nc"><i>86</i>&nbsp;        tree.startEditing(this);  // we change the tree</b>
+<b class="nc"><i>87</i>&nbsp;        reorder(tree.getRoot());</b>
+<i>88</i>&nbsp;        // collect heights
+<b class="nc"><i>89</i>&nbsp;        final double[] heights = new double[nodeCount];</b>
+<b class="nc"><i>90</i>&nbsp;        final int[] reverseOrder = new int[nodeCount];</b>
+<b class="nc"><i>91</i>&nbsp;        collectHeights(tree.getRoot(), heights, reverseOrder, 0);</b>
+<i>92</i>&nbsp;        // change height of an internal node
+<b class="nc"><i>93</i>&nbsp;        int nodeIndex = Randomizer.nextInt(heights.length);</b>
+<b class="nc"><i>94</i>&nbsp;        while (m_nodes[reverseOrder[nodeIndex]].isLeaf()) {</b>
+<b class="nc"><i>95</i>&nbsp;            nodeIndex = Randomizer.nextInt(heights.length);</b>
+<i>96</i>&nbsp;        }
+<b class="nc"><i>97</i>&nbsp;        final double maxHeight = calcMaxHeight(reverseOrder, nodeIndex);</b>
+<b class="nc"><i>98</i>&nbsp;        heights[nodeIndex] = Randomizer.nextDouble() * maxHeight;</b>
+<b class="nc"><i>99</i>&nbsp;        m_nodes[reverseOrder[nodeIndex]].setHeight(heights[nodeIndex]);</b>
+<i>100</i>&nbsp;        // reconstruct tree from heights
+<b class="nc"><i>101</i>&nbsp;        final Node root = reconstructTree(heights, reverseOrder, 0, heights.length, new boolean[heights.length]);</b>
+<i>102</i>&nbsp;
+<b class="nc"><i>103</i>&nbsp;        assert checkConsistency(root, new boolean[heights.length]) ;</b>
+<i>104</i>&nbsp;//            System.err.println(&quot;Inconsisten tree&quot;);
+<i>105</i>&nbsp;//        }
+<b class="nc"><i>106</i>&nbsp;        root.setParent(null);</b>
+<b class="nc"><i>107</i>&nbsp;        tree.setRoot(root);</b>
+<b class="nc"><i>108</i>&nbsp;        return 0;</b>
+<i>109</i>&nbsp;    }
+<i>110</i>&nbsp;
+<i>111</i>&nbsp;    private boolean checkConsistency(final Node node, final boolean[] used) {
+<b class="nc"><i>112</i>&nbsp;        if (used[node.getNr()]) {</b>
+<i>113</i>&nbsp;            // used twice? tha&#39;s bad
+<b class="nc"><i>114</i>&nbsp;            return false;</b>
+<i>115</i>&nbsp;        }
+<b class="nc"><i>116</i>&nbsp;        used[node.getNr()] = true;</b>
+<b class="nc"><i>117</i>&nbsp;        if ( node.isLeaf() ) {</b>
+<b class="nc"><i>118</i>&nbsp;            return true;</b>
+<i>119</i>&nbsp;        }
+<b class="nc"><i>120</i>&nbsp;        return checkConsistency(node.getLeft(), used) &amp;&amp; checkConsistency(node.getRight(), used);</b>
+<i>121</i>&nbsp;    }
+<i>122</i>&nbsp;
+<i>123</i>&nbsp;    /**
+<i>124</i>&nbsp;     * calculate maximum height that node nodeIndex can become restricted
+<i>125</i>&nbsp;     * by nodes on the left and right
+<i>126</i>&nbsp;     */
+<i>127</i>&nbsp;    private double calcMaxHeight(final int[] reverseOrder, final int nodeIndex) {
+<i>128</i>&nbsp;        // find maximum height between two species. Only upper right part is populated
+<b class="nc"><i>129</i>&nbsp;        final double[][] maxHeight = new double[nrOfSpecies][nrOfSpecies];</b>
+<b class="nc"><i>130</i>&nbsp;        for (int i = 0; i &lt; nrOfSpecies; i++) {</b>
+<b class="nc"><i>131</i>&nbsp;            Arrays.fill(maxHeight[i], Double.POSITIVE_INFINITY);</b>
+<i>132</i>&nbsp;        }
+<i>133</i>&nbsp;
+<i>134</i>&nbsp;        // calculate for every species tree the maximum allowable merge point
+<b class="nc"><i>135</i>&nbsp;        for (int i = 0; i &lt; nrOfGeneTrees; i++) {</b>
+<b class="nc"><i>136</i>&nbsp;            final Tree tree = geneTreesInput.get().get(i);</b>
+<b class="nc"><i>137</i>&nbsp;            findMaximaInGeneTree(tree.getRoot(), new boolean[nrOfSpecies], m_taxonMap.get(i), maxHeight);</b>
+<i>138</i>&nbsp;        }
+<i>139</i>&nbsp;
+<i>140</i>&nbsp;        // find species on the left of selected node
+<b class="nc"><i>141</i>&nbsp;        final boolean[] isLowerSpecies = new boolean[nrOfSpecies];</b>
+<b class="nc"><i>142</i>&nbsp;        final Node[] nodes = treeInput.get().getNodesAsArray();</b>
+<b class="nc"><i>143</i>&nbsp;        for (int i = 0; i &lt; nodeIndex; i++) {</b>
+<b class="nc"><i>144</i>&nbsp;            final Node node = nodes[reverseOrder[i]];</b>
+<b class="nc"><i>145</i>&nbsp;            if (node.isLeaf()) {</b>
+<b class="nc"><i>146</i>&nbsp;                isLowerSpecies[node.getNr()] = true;</b>
+<i>147</i>&nbsp;            }
+<i>148</i>&nbsp;        }
+<i>149</i>&nbsp;        // find species on the right of selected node
+<b class="nc"><i>150</i>&nbsp;        final boolean[] isUpperSpecies = new boolean[nrOfSpecies];</b>
+<b class="nc"><i>151</i>&nbsp;        for (int i = nodeIndex + 1; i &lt; nodes.length; i++) {</b>
+<b class="nc"><i>152</i>&nbsp;            final Node node = nodes[reverseOrder[i]];</b>
+<b class="nc"><i>153</i>&nbsp;            if (node.isLeaf()) {</b>
+<b class="nc"><i>154</i>&nbsp;                isUpperSpecies[node.getNr()] = true;</b>
+<i>155</i>&nbsp;            }
+<i>156</i>&nbsp;        }
+<i>157</i>&nbsp;
+<i>158</i>&nbsp;        // find max
+<b class="nc"><i>159</i>&nbsp;        double max = Double.POSITIVE_INFINITY;</b>
+<b class="nc"><i>160</i>&nbsp;        for (int i = 0; i &lt; nrOfSpecies; i++) {</b>
+<b class="nc"><i>161</i>&nbsp;            if (isLowerSpecies[i]) {</b>
+<b class="nc"><i>162</i>&nbsp;                for (int j = 0; j &lt; nrOfSpecies; j++) {</b>
+<b class="nc"><i>163</i>&nbsp;                    if (j != i &amp;&amp; isUpperSpecies[j]) {</b>
+<b class="nc"><i>164</i>&nbsp;                        final int x = Math.min(i, j);</b>
+<b class="nc"><i>165</i>&nbsp;                        final int y = Math.max(i, j);</b>
+<b class="nc"><i>166</i>&nbsp;                        max = Math.min(max, maxHeight[x][y]);</b>
+<i>167</i>&nbsp;                    }
+<i>168</i>&nbsp;                }
+<i>169</i>&nbsp;            }
+<i>170</i>&nbsp;        }
+<b class="nc"><i>171</i>&nbsp;        return max;</b>
+<i>172</i>&nbsp;    } // calcMaxHeight
+<i>173</i>&nbsp;
+<i>174</i>&nbsp;
+<i>175</i>&nbsp;    /**
+<i>176</i>&nbsp;     * for every species in the left on the gene tree and for every species in the right
+<i>177</i>&nbsp;     * cap the maximum join height by the lowest place the two join in the gene tree
+<i>178</i>&nbsp;     */
+<i>179</i>&nbsp;    private void findMaximaInGeneTree(final Node node, final boolean[] taxonSet, final Map&lt;Integer, Integer&gt; taxonMap, final double[][] maxHeight) {
+<b class="nc"><i>180</i>&nbsp;        if (node.isLeaf()) {</b>
+<b class="nc"><i>181</i>&nbsp;            final int species = taxonMap.get(node.getNr());</b>
+<b class="nc"><i>182</i>&nbsp;            taxonSet[species] = true;</b>
+<b class="nc"><i>183</i>&nbsp;        } else {</b>
+<b class="nc"><i>184</i>&nbsp;            final boolean[] isLeftTaxonSet = new boolean[nrOfSpecies];</b>
+<b class="nc"><i>185</i>&nbsp;            findMaximaInGeneTree(node.getLeft(), isLeftTaxonSet, taxonMap, maxHeight);</b>
+<b class="nc"><i>186</i>&nbsp;            final boolean[] isRightTaxonSet = new boolean[nrOfSpecies];</b>
+<b class="nc"><i>187</i>&nbsp;            findMaximaInGeneTree(node.getRight(), isRightTaxonSet, taxonMap, maxHeight);</b>
+<b class="nc"><i>188</i>&nbsp;            for (int i = 0; i &lt; nrOfSpecies; i++) {</b>
+<b class="nc"><i>189</i>&nbsp;                if (isLeftTaxonSet[i]) {</b>
+<b class="nc"><i>190</i>&nbsp;                    for (int j = 0; j &lt; nrOfSpecies; j++) {</b>
+<b class="nc"><i>191</i>&nbsp;                        if (j != i &amp;&amp; isRightTaxonSet[j]) {</b>
+<b class="nc"><i>192</i>&nbsp;                            final int x = Math.min(i, j);</b>
+<b class="nc"><i>193</i>&nbsp;                            final int y = Math.max(i, j);</b>
+<b class="nc"><i>194</i>&nbsp;                            maxHeight[x][y] = Math.min(maxHeight[x][y], node.getHeight());</b>
+<i>195</i>&nbsp;                        }
+<i>196</i>&nbsp;                    }
+<i>197</i>&nbsp;                }
+<i>198</i>&nbsp;            }
+<b class="nc"><i>199</i>&nbsp;            for (int i = 0; i &lt; nrOfSpecies; i++) {</b>
+<b class="nc"><i>200</i>&nbsp;                taxonSet[i] = isLeftTaxonSet[i] | isRightTaxonSet[i];</b>
+<i>201</i>&nbsp;            }
+<i>202</i>&nbsp;        }
+<i>203</i>&nbsp;    }
+<i>204</i>&nbsp;
+<i>205</i>&nbsp;    /**
+<i>206</i>&nbsp;     * construct tree top down by joining heighest left and right nodes *
+<i>207</i>&nbsp;     */
+<i>208</i>&nbsp;
+<i>209</i>&nbsp;
+<i>210</i>&nbsp;    private Node reconstructTree(final double[] heights, final int[] reverseOrder, final int from, final int to, final boolean[] hasParent) {
+<i>211</i>&nbsp;        //nodeIndex = maxIndex(heights, 0, heights.length);
+<b class="nc"><i>212</i>&nbsp;        int nodeIndex = -1;</b>
+<b class="nc"><i>213</i>&nbsp;        double max = Double.NEGATIVE_INFINITY;</b>
+<b class="nc"><i>214</i>&nbsp;        for (int j = from; j &lt; to; j++) {</b>
+<b class="nc"><i>215</i>&nbsp;            if (max &lt; heights[j] &amp;&amp; !m_nodes[reverseOrder[j]].isLeaf()) {</b>
+<b class="nc"><i>216</i>&nbsp;                max = heights[j];</b>
+<b class="nc"><i>217</i>&nbsp;                nodeIndex = j;</b>
+<i>218</i>&nbsp;            }
+<i>219</i>&nbsp;        }
+<b class="nc"><i>220</i>&nbsp;        if (nodeIndex &lt; 0) {</b>
+<b class="nc"><i>221</i>&nbsp;            return null;</b>
+<i>222</i>&nbsp;        }
+<b class="nc"><i>223</i>&nbsp;        final Node node = m_nodes[reverseOrder[nodeIndex]];</b>
+<i>224</i>&nbsp;
+<i>225</i>&nbsp;        //int left = maxIndex(heights, 0, nodeIndex);
+<b class="nc"><i>226</i>&nbsp;        int left = -1;</b>
+<b class="nc"><i>227</i>&nbsp;        max = Double.NEGATIVE_INFINITY;</b>
+<b class="nc"><i>228</i>&nbsp;        for (int j = from; j &lt; nodeIndex; j++) {</b>
+<b class="nc"><i>229</i>&nbsp;            if (max &lt; heights[j] &amp;&amp; !hasParent[j]) {</b>
+<b class="nc"><i>230</i>&nbsp;                max = heights[j];</b>
+<b class="nc"><i>231</i>&nbsp;                left = j;</b>
+<i>232</i>&nbsp;            }
+<i>233</i>&nbsp;        }
+<i>234</i>&nbsp;
+<i>235</i>&nbsp;        //int right = maxIndex(heights, nodeIndex+1, heights.length);
+<b class="nc"><i>236</i>&nbsp;        int right = -1;</b>
+<b class="nc"><i>237</i>&nbsp;        max = Double.NEGATIVE_INFINITY;</b>
+<b class="nc"><i>238</i>&nbsp;        for (int j = nodeIndex + 1; j &lt; to; j++) {</b>
+<b class="nc"><i>239</i>&nbsp;            if (max &lt; heights[j] &amp;&amp; !hasParent[j]) {</b>
+<b class="nc"><i>240</i>&nbsp;                max = heights[j];</b>
+<b class="nc"><i>241</i>&nbsp;                right = j;</b>
+<i>242</i>&nbsp;            }
+<i>243</i>&nbsp;        }
+<i>244</i>&nbsp;
+<b class="nc"><i>245</i>&nbsp;        node.setLeft(m_nodes[reverseOrder[left]]);</b>
+<b class="nc"><i>246</i>&nbsp;        node.getLeft().setParent(node);</b>
+<b class="nc"><i>247</i>&nbsp;        node.setRight(m_nodes[reverseOrder[right]]);</b>
+<b class="nc"><i>248</i>&nbsp;        node.getRight().setParent(node);</b>
+<b class="nc"><i>249</i>&nbsp;        if (node.getLeft().isLeaf()) {</b>
+<b class="nc"><i>250</i>&nbsp;            heights[left] = Double.NEGATIVE_INFINITY;</b>
+<i>251</i>&nbsp;        }
+<b class="nc"><i>252</i>&nbsp;        if (node.getRight().isLeaf()) {</b>
+<b class="nc"><i>253</i>&nbsp;            heights[right] = Double.NEGATIVE_INFINITY;</b>
+<i>254</i>&nbsp;        }
+<b class="nc"><i>255</i>&nbsp;        hasParent[left] = true;</b>
+<b class="nc"><i>256</i>&nbsp;        hasParent[right] = true;</b>
+<b class="nc"><i>257</i>&nbsp;        heights[nodeIndex] = Double.NEGATIVE_INFINITY;</b>
+<i>258</i>&nbsp;
+<i>259</i>&nbsp;
+<b class="nc"><i>260</i>&nbsp;        reconstructTree(heights, reverseOrder, from, nodeIndex, hasParent);</b>
+<b class="nc"><i>261</i>&nbsp;        reconstructTree(heights, reverseOrder, nodeIndex, to, hasParent);</b>
+<b class="nc"><i>262</i>&nbsp;        return node;</b>
+<i>263</i>&nbsp;    }
+<i>264</i>&nbsp;
+<i>265</i>&nbsp;    // helper for reconstructTree, to find maximum in range
+<i>266</i>&nbsp;//    private int maxIndex(final double[] heights, final int from, final int to) {
+<i>267</i>&nbsp;//        int maxIndex = -1;
+<i>268</i>&nbsp;//        double max = Double.NEGATIVE_INFINITY;
+<i>269</i>&nbsp;//        for (int i = from; i &lt; to; i++) {
+<i>270</i>&nbsp;//            if (max &lt; heights[i]) {
+<i>271</i>&nbsp;//                max = heights[i];
+<i>272</i>&nbsp;//                maxIndex = i;
+<i>273</i>&nbsp;//            }
+<i>274</i>&nbsp;//        }
+<i>275</i>&nbsp;//        return maxIndex;
+<i>276</i>&nbsp;//    }
+<i>277</i>&nbsp;
+<i>278</i>&nbsp;   /**
+<i>279</i>&nbsp;      ** gather height of each node, and the node index associated with the height.*
+<i>280</i>&nbsp;      **/
+<i>281</i>&nbsp;    private int collectHeights(final Node node, final double[] heights, final int[] reverseOrder, int current) {
+<b class="nc"><i>282</i>&nbsp;        if (node.isLeaf()) {</b>
+<b class="nc"><i>283</i>&nbsp;            heights[current] = node.getHeight();</b>
+<b class="nc"><i>284</i>&nbsp;            reverseOrder[current] = node.getNr();</b>
+<b class="nc"><i>285</i>&nbsp;            current++;</b>
+<i>286</i>&nbsp;        } else {
+<b class="nc"><i>287</i>&nbsp;            current = collectHeights(node.getLeft(), heights, reverseOrder, current);</b>
+<b class="nc"><i>288</i>&nbsp;            heights[current] = node.getHeight();</b>
+<b class="nc"><i>289</i>&nbsp;            reverseOrder[current] = node.getNr();</b>
+<b class="nc"><i>290</i>&nbsp;            current++;</b>
+<b class="nc"><i>291</i>&nbsp;            current = collectHeights(node.getRight(), heights, reverseOrder, current);</b>
+<i>292</i>&nbsp;        }
+<b class="nc"><i>293</i>&nbsp;        return current;</b>
+<i>294</i>&nbsp;    }
+<i>295</i>&nbsp;
+<i>296</i>&nbsp;    /**
+<i>297</i>&nbsp;     * randomly changes left and right children in every internal node *
+<i>298</i>&nbsp;     */
+<i>299</i>&nbsp;    private void reorder(final Node node) {
+<b class="nc"><i>300</i>&nbsp;        if (!node.isLeaf()) {</b>
+<b class="nc"><i>301</i>&nbsp;            if (Randomizer.nextBoolean()) {</b>
+<b class="nc"><i>302</i>&nbsp;                final Node tmp = node.getLeft();</b>
+<b class="nc"><i>303</i>&nbsp;                node.setLeft(node.getRight());</b>
+<b class="nc"><i>304</i>&nbsp;                node.setRight(tmp);</b>
+<i>305</i>&nbsp;            }
+<b class="nc"><i>306</i>&nbsp;            reorder(node.getLeft());</b>
+<b class="nc"><i>307</i>&nbsp;            reorder(node.getRight());</b>
+<i>308</i>&nbsp;        }
+<i>309</i>&nbsp;    }
+<i>310</i>&nbsp;} // class NodeReheight
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

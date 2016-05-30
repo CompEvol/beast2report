@@ -1,0 +1,129 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: ConsoleApp</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.util</a> ]
+</div>
+
+<h1>Coverage Summary for Class: ConsoleApp (beast.app.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+</tr>
+  <tr>
+    <td class="name">ConsoleApp$1</td>
+  </tr>
+  <tr>
+    <td class="name">ConsoleApp$PathSampleConsoleApp</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.util;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.io.IOException;
+<i>4</i>&nbsp;import java.util.logging.Filter;
+<i>5</i>&nbsp;import java.util.logging.Handler;
+<i>6</i>&nbsp;import java.util.logging.Level;
+<i>7</i>&nbsp;import java.util.logging.LogRecord;
+<i>8</i>&nbsp;import java.util.logging.Logger;
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;import javax.swing.Icon;
+<i>11</i>&nbsp;import javax.swing.WindowConstants;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;import beast.app.BEASTVersion;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;public class ConsoleApp {
+<i>16</i>&nbsp;	PathSampleConsoleApp consoleApp = null;
+<i>17</i>&nbsp;	
+<i>18</i>&nbsp;	
+<i>19</i>&nbsp;	public ConsoleApp(String nameString, String title, Icon icon) throws IOException {
+<i>20</i>&nbsp;        Utils.loadUIManager();
+<i>21</i>&nbsp;        System.setProperty(&quot;com.apple.macos.useScreenMenuBar&quot;, &quot;true&quot;);
+<i>22</i>&nbsp;        System.setProperty(&quot;apple.laf.useScreenMenuBar&quot;, &quot;true&quot;);
+<i>23</i>&nbsp;        System.setProperty(&quot;apple.awt.showGrowBox&quot;, &quot;true&quot;);
+<i>24</i>&nbsp;        System.setProperty(&quot;beast.useWindow&quot;, &quot;true&quot;);
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;        int maxErrorCount = 100;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;        BEASTVersion version = new BEASTVersion();
+<i>29</i>&nbsp;        
+<i>30</i>&nbsp;        final String aboutString = &quot;&lt;html&gt;&lt;div style=\&quot;font-family:sans-serif;\&quot;&gt;&lt;center&gt;&quot; +
+<i>31</i>&nbsp;                &quot;&lt;div style=\&quot;font-size:12;\&quot;&gt;&lt;p&gt;Bayesian Evolutionary Analysis Sampling Trees&lt;br&gt;&quot; +
+<i>32</i>&nbsp;                &quot;Version &quot; + version.getVersionString() + &quot;, &quot; + version.getDateString() + &quot;&lt;/p&gt;&quot; +
+<i>33</i>&nbsp;                version.getHTMLCredits() +
+<i>34</i>&nbsp;                &quot;&lt;/div&gt;&lt;/center&gt;&lt;/div&gt;&lt;/html&gt;&quot;;
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;        consoleApp = new PathSampleConsoleApp(nameString, aboutString, icon);
+<i>37</i>&nbsp;		
+<i>38</i>&nbsp;        consoleApp.setTitle(title);
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;        // Add a handler to handle warnings and errors. This is a ConsoleHandler
+<i>41</i>&nbsp;        // so the messages will go to StdOut..
+<i>42</i>&nbsp;        final Logger logger = Logger.getLogger(&quot;beast&quot;);
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;        Handler handler = new MessageLogHandler();
+<i>45</i>&nbsp;        handler.setFilter(new Filter() {
+<i>46</i>&nbsp;            @Override
+<i>47</i>&nbsp;            public boolean isLoggable(final LogRecord record) {
+<i>48</i>&nbsp;                return record.getLevel().intValue() &lt; Level.SEVERE.intValue();
+<i>49</i>&nbsp;            }
+<i>50</i>&nbsp;        });
+<i>51</i>&nbsp;        logger.addHandler(handler);
+<i>52</i>&nbsp;        logger.setUseParentHandlers(false);
+<i>53</i>&nbsp;
+<i>54</i>&nbsp;        handler = new ErrorLogHandler(maxErrorCount);
+<i>55</i>&nbsp;        handler.setLevel(Level.ALL);//INFO);
+<i>56</i>&nbsp;        logger.addHandler(handler);
+<i>57</i>&nbsp;	}
+<i>58</i>&nbsp;
+<i>59</i>&nbsp;	
+<i>60</i>&nbsp;    static class PathSampleConsoleApp extends jam.console.ConsoleApplication {
+<i>61</i>&nbsp;
+<i>62</i>&nbsp;        public PathSampleConsoleApp(final String nameString, final String aboutString, final javax.swing.Icon icon) throws IOException {
+<i>63</i>&nbsp;            super(nameString, aboutString, icon, false);
+<i>64</i>&nbsp;            getDefaultFrame().setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+<i>65</i>&nbsp;        }
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;        @Override
+<i>68</i>&nbsp;        public void doStop() {
+<i>69</i>&nbsp;            // thread.stop is deprecated so need to send a message to running threads...
+<i>70</i>&nbsp;        }
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;        public void setTitle(final String title) {
+<i>73</i>&nbsp;            getDefaultFrame().setTitle(title);
+<i>74</i>&nbsp;        }
+<i>75</i>&nbsp;    }
+<i>76</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

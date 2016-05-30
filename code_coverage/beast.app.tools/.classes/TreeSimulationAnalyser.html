@@ -1,0 +1,162 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TreeSimulationAnalyser</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.tools</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TreeSimulationAnalyser (beast.app.tools)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">TreeSimulationAnalyser</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.tools;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import beast.app.BEASTVersion;
+<i>4</i>&nbsp;import beast.app.util.Arguments;
+<i>5</i>&nbsp;import beast.app.util.Version;
+<i>6</i>&nbsp;import beast.evolution.tree.BranchScoreMetric;
+<i>7</i>&nbsp;import beast.evolution.tree.Tree;
+<i>8</i>&nbsp;import beast.evolution.tree.TreeTraceAnalysis;
+<i>9</i>&nbsp;import beast.util.FrequencySet;
+<i>10</i>&nbsp;import beast.util.NexusParser;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;import java.io.File;
+<i>13</i>&nbsp;import java.util.ArrayList;
+<i>14</i>&nbsp;import java.util.List;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;/**
+<i>17</i>&nbsp; * TreeSimulationAnalyser, analyse list of trees simulated from a true tree
+<i>18</i>&nbsp; *
+<i>19</i>&nbsp; * @author Walter Xie
+<i>20</i>&nbsp; */
+<i>21</i>&nbsp;public class TreeSimulationAnalyser extends TreeTraceAnalysis {
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;    protected final Tree trueTree;
+<i>24</i>&nbsp;    protected List&lt;Double&gt; branchScoreMetricList;
+<i>25</i>&nbsp;    protected int numTrueTree = 0;
+<i>26</i>&nbsp;    protected int numTopsInCred=0;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;    private final static Version version = new BEASTVersion();
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;    public TreeSimulationAnalyser(Tree trueTree, List&lt;Tree&gt; posteriorTreeList) {
+<i>32</i>&nbsp;        this(trueTree, posteriorTreeList, DEFAULT_BURN_IN_FRACTION);
+<i>33</i>&nbsp;    }
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;    public TreeSimulationAnalyser(Tree trueTree, List&lt;Tree&gt; posteriorTreeList, double burninFraction) {
+<i>36</i>&nbsp;        super(posteriorTreeList, burninFraction);
+<i>37</i>&nbsp;        this.trueTree = trueTree;
+<i>38</i>&nbsp;    }
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;    @Override
+<i>41</i>&nbsp;    public void analyze(double credSetProbability) {
+<i>42</i>&nbsp;        // set credSetProbability
+<i>43</i>&nbsp;        topologiesFrequencySet = new FrequencySet&lt;String&gt;(credSetProbability);
+<i>44</i>&nbsp;        branchScoreMetricList = new ArrayList&lt;Double&gt;();
+<i>45</i>&nbsp;        BranchScoreMetric branchScoreMetric = new BranchScoreMetric();
+<i>46</i>&nbsp;        String trueTopology = uniqueNewick(trueTree.getRoot());
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;        for (Tree tree : treeInTrace) {
+<i>49</i>&nbsp;            String topology = uniqueNewick(tree.getRoot());
+<i>50</i>&nbsp;            topologiesFrequencySet.add(topology, 1);
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;//            double branchScore = branchScoreMetric.getMetric(trueTree, tree); TODO
+<i>53</i>&nbsp;//            branchScoreMetricList.add(branchScore);
+<i>54</i>&nbsp;        }
+<i>55</i>&nbsp;
+<i>56</i>&nbsp;        credibleSet = topologiesFrequencySet.getCredibleSet(trueTopology);
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;        numTrueTree = topologiesFrequencySet.getFrequency(trueTopology);
+<i>59</i>&nbsp;        numTopsInCred = credibleSet.credibleSetList.size();
+<i>60</i>&nbsp;    }
+<i>61</i>&nbsp;
+<i>62</i>&nbsp;    public static void centreLine(String line, int pageWidth) {
+<i>63</i>&nbsp;        int n = pageWidth - line.length();
+<i>64</i>&nbsp;        int n1 = n / 2;
+<i>65</i>&nbsp;        for (int i = 0; i &lt; n1; i++) {
+<i>66</i>&nbsp;            System.out.print(&quot; &quot;);
+<i>67</i>&nbsp;        }
+<i>68</i>&nbsp;        System.out.println(line);
+<i>69</i>&nbsp;    }
+<i>70</i>&nbsp;
+<i>71</i>&nbsp;    public static void printTitle() {
+<i>72</i>&nbsp;        System.out.println();
+<i>73</i>&nbsp;        centreLine(&quot;BEAST &quot; + version.getVersionString() + &quot;, &quot; + version.getDateString(), 60);
+<i>74</i>&nbsp;        centreLine(&quot;Tree Simulation Analyser&quot;, 60);
+<i>75</i>&nbsp;        for (String creditLine : version.getCredits()) {
+<i>76</i>&nbsp;            centreLine(creditLine, 60);
+<i>77</i>&nbsp;        }
+<i>78</i>&nbsp;        System.out.println();
+<i>79</i>&nbsp;
+<i>80</i>&nbsp;    }
+<i>81</i>&nbsp;
+<i>82</i>&nbsp;    public static void printUsage(Arguments arguments) {
+<i>83</i>&nbsp;        arguments.printUsage(&quot;TreeSimulationAnalyser&quot;, &quot;[&lt;input-file-name&gt;]&quot;);
+<i>84</i>&nbsp;        System.exit(0);
+<i>85</i>&nbsp;    }
+<i>86</i>&nbsp;
+<i>87</i>&nbsp;    //Main method
+<i>88</i>&nbsp;    public static void main(String[] args) {
+<i>89</i>&nbsp;
+<i>90</i>&nbsp;        File trueTreesLog = new File(&quot;&quot;);
+<i>91</i>&nbsp;        NexusParser parser = new NexusParser();
+<i>92</i>&nbsp;        try {
+<i>93</i>&nbsp;            parser.parseFile(trueTreesLog);
+<i>94</i>&nbsp;        } catch (Exception e) {
+<i>95</i>&nbsp;            e.printStackTrace();
+<i>96</i>&nbsp;        }
+<i>97</i>&nbsp;        List&lt;Tree&gt; trueTreeList = parser.trees;
+<i>98</i>&nbsp;
+<i>99</i>&nbsp;        File posteriorTreesLog = new File(&quot;&quot;);
+<i>100</i>&nbsp;        parser = new NexusParser();
+<i>101</i>&nbsp;        try {
+<i>102</i>&nbsp;            parser.parseFile(posteriorTreesLog);
+<i>103</i>&nbsp;        } catch (Exception e) {
+<i>104</i>&nbsp;            e.printStackTrace();
+<i>105</i>&nbsp;        }
+<i>106</i>&nbsp;
+<i>107</i>&nbsp;        for (Tree trueTree : trueTreeList) {
+<i>108</i>&nbsp;            TreeSimulationAnalyser treeSimulationAnalyser = new TreeSimulationAnalyser(trueTree, parser.trees);
+<i>109</i>&nbsp;            treeSimulationAnalyser.analyze();
+<i>110</i>&nbsp;        }
+<i>111</i>&nbsp;
+<i>112</i>&nbsp;    }
+<i>113</i>&nbsp;}
+<i>114</i>&nbsp;
+<i>115</i>&nbsp;
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

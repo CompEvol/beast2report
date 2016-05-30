@@ -1,0 +1,251 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: LogComparator</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.util</a> ]
+</div>
+
+<h1>Coverage Summary for Class: LogComparator (beast.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LogComparator</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (1/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    1.2%
+  </span>
+  <span class="absValue">
+    (1/ 85)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.util;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import static beast.util.OutputUtils.format;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;import java.io.File;
+<i>7</i>&nbsp;import java.io.PrintStream;
+<i>8</i>&nbsp;import java.util.ArrayList;
+<i>9</i>&nbsp;import java.util.List;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;import beast.app.BEASTVersion2;
+<i>12</i>&nbsp;import beast.app.util.Utils;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;/**
+<i>15</i>&nbsp; * Compare log files to find the set of parameters same between logs but having significantly different value.
+<i>16</i>&nbsp; * Z score = 2 * |mean1 - mean2| / (stdError1 + stdError2), If Z score &gt; 2 it is significant.
+<i>17</i>&nbsp; * It is limited to 2 logs at a time at moment.
+<i>18</i>&nbsp; *
+<i>19</i>&nbsp; * @author Walter Xie
+<i>20</i>&nbsp; */
+<b class="fc"><i>21</i>&nbsp;public class LogComparator {</b>
+<i>22</i>&nbsp;    /**
+<i>23</i>&nbsp;     * matched column labels in log files
+<i>24</i>&nbsp;     */
+<i>25</i>&nbsp;    protected List&lt;String&gt; matchedLabels;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;    protected Double[] zScore; // Z score
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;    protected LogAnalyser analyser1, analyser2;
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;    /**
+<i>32</i>&nbsp;     * at least 2 logs
+<i>33</i>&nbsp;     * @param analyser1
+<i>34</i>&nbsp;     * @param analyser2
+<i>35</i>&nbsp;     */
+<b class="nc"><i>36</i>&nbsp;    public LogComparator (LogAnalyser analyser1, LogAnalyser analyser2) {</b>
+<b class="nc"><i>37</i>&nbsp;        assert analyser1 != null;</b>
+<b class="nc"><i>38</i>&nbsp;        assert analyser2 != null;</b>
+<i>39</i>&nbsp;
+<b class="nc"><i>40</i>&nbsp;        this.analyser1 = analyser1;</b>
+<b class="nc"><i>41</i>&nbsp;        this.analyser2 = analyser2;</b>
+<b class="nc"><i>42</i>&nbsp;        compareLogs();</b>
+<b class="nc"><i>43</i>&nbsp;    }</b>
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;    public double getZScore(String label) {
+<b class="nc"><i>46</i>&nbsp;        int index = matchedLabels.indexOf(label);</b>
+<b class="nc"><i>47</i>&nbsp;        if (index &lt; 0)</b>
+<b class="nc"><i>48</i>&nbsp;            throw new IllegalArgumentException(&quot;Cannot find &quot; + label + &quot; from matched parameter list !&quot;);</b>
+<i>49</i>&nbsp;
+<b class="nc"><i>50</i>&nbsp;        return zScore[index];</b>
+<i>51</i>&nbsp;    }
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;    protected void compareLogs() {
+<b class="nc"><i>54</i>&nbsp;        matchedLabels = CollectionUtils.intersection(analyser1.getLabels(), analyser2.getLabels());</b>
+<i>55</i>&nbsp;
+<b class="nc"><i>56</i>&nbsp;        if (matchedLabels.size() &lt; 1)</b>
+<b class="nc"><i>57</i>&nbsp;            throw new IllegalArgumentException(&quot;There is no parameter name matched between log files !&quot;);</b>
+<i>58</i>&nbsp;
+<b class="nc"><i>59</i>&nbsp;        zScore = new Double[matchedLabels.size()];</b>
+<i>60</i>&nbsp;
+<b class="nc"><i>61</i>&nbsp;        for (String mLabel : matchedLabels) {</b>
+<b class="nc"><i>62</i>&nbsp;            int index1 = analyser1.indexof(mLabel);</b>
+<b class="nc"><i>63</i>&nbsp;            double m1 = analyser1.getMean(index1);</b>
+<b class="nc"><i>64</i>&nbsp;            double se1 = analyser1.getStdError(index1);</b>
+<i>65</i>&nbsp;
+<b class="nc"><i>66</i>&nbsp;            int index2 = analyser2.indexof(mLabel);</b>
+<b class="nc"><i>67</i>&nbsp;            double m2 = analyser2.getMean(index2);</b>
+<b class="nc"><i>68</i>&nbsp;            double se2 = analyser2.getStdError(index2);</b>
+<i>69</i>&nbsp;
+<b class="nc"><i>70</i>&nbsp;            int index = matchedLabels.indexOf(mLabel);</b>
+<i>71</i>&nbsp;            // Z score = 2 * |m1 - m2| / (se1 + se2), If Z score &gt; 2 it is significant
+<b class="nc"><i>72</i>&nbsp;            zScore[index] = 2 * Math.abs(m1 - m2) / (se1 + se2);</b>
+<b class="nc"><i>73</i>&nbsp;        }</b>
+<b class="nc"><i>74</i>&nbsp;    }</b>
+<i>75</i>&nbsp;
+<b class="nc"><i>76</i>&nbsp;    final String SPACE = OutputUtils.SPACE;</b>
+<b class="nc"><i>77</i>&nbsp;    final String STAR = &quot;* &quot;;</b>
+<b class="nc"><i>78</i>&nbsp;    final String NON_STAR = &quot;  &quot;;</b>
+<i>79</i>&nbsp;    public void print(PrintStream out, boolean verbose) {
+<i>80</i>&nbsp;        // set up header for prefix, if any is specified
+<b class="nc"><i>81</i>&nbsp;        String prefix = System.getProperty(&quot;prefix&quot;);</b>
+<b class="nc"><i>82</i>&nbsp;        String prefixHead = (prefix == null ? &quot;&quot; : &quot;prefix &quot;);</b>
+<b class="nc"><i>83</i>&nbsp;        if (prefix != null) {</b>
+<b class="nc"><i>84</i>&nbsp;            String [] p = prefix.trim().split(&quot;\\s+&quot;);</b>
+<b class="nc"><i>85</i>&nbsp;            if (p.length &gt; 1) {</b>
+<b class="nc"><i>86</i>&nbsp;                prefixHead = &quot;&quot;;</b>
+<b class="nc"><i>87</i>&nbsp;                for (int i = 0; i &lt; p.length; i++) {</b>
+<b class="nc"><i>88</i>&nbsp;                    prefixHead += &quot;prefix&quot; + i + &quot; &quot;;</b>
+<i>89</i>&nbsp;                }
+<i>90</i>&nbsp;            }
+<i>91</i>&nbsp;        }
+<i>92</i>&nbsp;
+<b class="nc"><i>93</i>&nbsp;        int max = 0;</b>
+<b class="nc"><i>94</i>&nbsp;        for (int i = 1; i &lt; matchedLabels.size(); i++)</b>
+<b class="nc"><i>95</i>&nbsp;            max = Math.max(matchedLabels.get(i).length(), max);</b>
+<b class="nc"><i>96</i>&nbsp;        String space = &quot;&quot;;</b>
+<b class="nc"><i>97</i>&nbsp;        for (int i = 0; i &lt; max; i++)</b>
+<b class="nc"><i>98</i>&nbsp;            space += &quot; &quot;;</b>
+<i>99</i>&nbsp;
+<b class="nc"><i>100</i>&nbsp;        out.println(&quot;Comparing log &quot; + analyser1.getLogFile() + &quot; and &quot; + analyser2.getLogFile() + &quot;\n&quot;);</b>
+<i>101</i>&nbsp;
+<b class="nc"><i>102</i>&nbsp;        List&lt;String&gt; significantLabels = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>103</i>&nbsp;        if (verbose) {</b>
+<b class="nc"><i>104</i>&nbsp;            out.println(&quot;item&quot; + space.substring(4) + &quot; &quot; + prefixHead + &quot;   &quot; + format(&quot;ZScore&quot;) +</b>
+<b class="nc"><i>105</i>&nbsp;                    format(&quot;mean1&quot;) + format(&quot;stderr1&quot;) + format(&quot;mean2&quot;) + format(&quot;stderr2&quot;));</b>
+<i>106</i>&nbsp;
+<b class="nc"><i>107</i>&nbsp;            for (int i = 1; i &lt; matchedLabels.size(); i++) {</b>
+<b class="nc"><i>108</i>&nbsp;                String mLabel = matchedLabels.get(i);</b>
+<i>109</i>&nbsp;
+<b class="nc"><i>110</i>&nbsp;                int index1 = analyser1.indexof(mLabel);</b>
+<b class="nc"><i>111</i>&nbsp;                double m1 = analyser1.getMean(index1);</b>
+<b class="nc"><i>112</i>&nbsp;                double se1 = analyser1.getStdError(index1);</b>
+<i>113</i>&nbsp;
+<b class="nc"><i>114</i>&nbsp;                int index2 = analyser2.indexof(mLabel);</b>
+<b class="nc"><i>115</i>&nbsp;                double m2 = analyser2.getMean(index2);</b>
+<b class="nc"><i>116</i>&nbsp;                double se2 = analyser2.getStdError(index2);</b>
+<i>117</i>&nbsp;
+<b class="nc"><i>118</i>&nbsp;                out.println(mLabel + space.substring(mLabel.length()) + SPACE + (prefix == null ? &quot;&quot; : prefix + SPACE) +</b>
+<b class="nc"><i>119</i>&nbsp;                        (zScore[i] &gt; 2 ? STAR : NON_STAR) + SPACE + format(zScore[i]) + SPACE +</b>
+<b class="nc"><i>120</i>&nbsp;                        format(m1) + SPACE + format(se1) + SPACE + format(m2) + SPACE + format(se2));</b>
+<i>121</i>&nbsp;
+<b class="nc"><i>122</i>&nbsp;                if (zScore[i] &gt; 2) significantLabels.add(mLabel);</b>
+<i>123</i>&nbsp;            }
+<i>124</i>&nbsp;        }
+<i>125</i>&nbsp;
+<b class="nc"><i>126</i>&nbsp;        out.println(&quot;\nThere are &quot; + significantLabels.size() + &quot; parameters having significantly different value : &quot; +</b>
+<b class="nc"><i>127</i>&nbsp;                OutputUtils.toString(significantLabels) + &quot;\n\n&quot;);</b>
+<b class="nc"><i>128</i>&nbsp;    }</b>
+<i>129</i>&nbsp;
+<i>130</i>&nbsp;    /**
+<i>131</i>&nbsp;     * main
+<i>132</i>&nbsp;     */
+<i>133</i>&nbsp;    public static void main(String[] args) {
+<b class="nc"><i>134</i>&nbsp;        LogAnalyser analyser1 = null;</b>
+<b class="nc"><i>135</i>&nbsp;        LogAnalyser analyser2 = null;</b>
+<i>136</i>&nbsp;        try {
+<b class="nc"><i>137</i>&nbsp;            if (args.length == 0) {</b>
+<b class="nc"><i>138</i>&nbsp;                BEASTVersion2 version = new BEASTVersion2();</b>
+<b class="nc"><i>139</i>&nbsp;                File file = Utils.getLoadFile(&quot;LogComparator &quot; + version.getVersionString() + &quot; - Select first log file to analyse&quot;,</b>
+<i>140</i>&nbsp;                        null, &quot;BEAST log (*.log) Files&quot;, &quot;log&quot;, &quot;txt&quot;);
+<b class="nc"><i>141</i>&nbsp;                if (file == null) {</b>
+<b class="nc"><i>142</i>&nbsp;                    return;</b>
+<i>143</i>&nbsp;                }
+<b class="nc"><i>144</i>&nbsp;                analyser1 = new LogAnalyser(file.getAbsolutePath());</b>
+<i>145</i>&nbsp;
+<b class="nc"><i>146</i>&nbsp;                file = Utils.getLoadFile(&quot;LogComparator &quot; + version.getVersionString() + &quot; - Select second log file to analyse&quot;,</b>
+<i>147</i>&nbsp;                        null, &quot;BEAST log (*.log) Files&quot;, &quot;log&quot;, &quot;txt&quot;);
+<b class="nc"><i>148</i>&nbsp;                if (file == null) {</b>
+<b class="nc"><i>149</i>&nbsp;                    return;</b>
+<i>150</i>&nbsp;                }
+<b class="nc"><i>151</i>&nbsp;                analyser2 = new LogAnalyser(file.getAbsolutePath());</b>
+<i>152</i>&nbsp;
+<b class="nc"><i>153</i>&nbsp;            } else {</b>
+<b class="nc"><i>154</i>&nbsp;                analyser1 = new LogAnalyser(args[0]);</b>
+<b class="nc"><i>155</i>&nbsp;                analyser2 = new LogAnalyser(args[1]);</b>
+<i>156</i>&nbsp;            }
+<i>157</i>&nbsp;
+<b class="nc"><i>158</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>159</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>160</i>&nbsp;        }</b>
+<i>161</i>&nbsp;
+<b class="nc"><i>162</i>&nbsp;        LogComparator logComparator = new LogComparator(analyser1, analyser2);</b>
+<b class="nc"><i>163</i>&nbsp;        logComparator.print(System.out, true);</b>
+<i>164</i>&nbsp;
+<b class="nc"><i>165</i>&nbsp;    } // main</b>
+<i>166</i>&nbsp;
+<i>167</i>&nbsp;
+<i>168</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

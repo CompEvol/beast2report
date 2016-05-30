@@ -1,0 +1,282 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: BeerLikelihoodCoreNative</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.likelihood</a> ]
+</div>
+
+<h1>Coverage Summary for Class: BeerLikelihoodCoreNative (beast.evolution.likelihood)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BeerLikelihoodCoreNative</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 35)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;
+<i>2</i>&nbsp;/*
+<i>3</i>&nbsp; * File BeerLikelihoodCore.java
+<i>4</i>&nbsp; *
+<i>5</i>&nbsp; * Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>6</i>&nbsp; *
+<i>7</i>&nbsp; * This file is part of BEAST2.
+<i>8</i>&nbsp; * See the NOTICE file distributed with this work for additional
+<i>9</i>&nbsp; * information regarding copyright ownership and licensing.
+<i>10</i>&nbsp; *
+<i>11</i>&nbsp; * BEAST is free software; you can redistribute it and/or modify
+<i>12</i>&nbsp; * it under the terms of the GNU Lesser General Public License as
+<i>13</i>&nbsp; * published by the Free Software Foundation; either version 2
+<i>14</i>&nbsp; * of the License, or (at your option) any later version.
+<i>15</i>&nbsp; *
+<i>16</i>&nbsp; *  BEAST is distributed in the hope that it will be useful,
+<i>17</i>&nbsp; *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>18</i>&nbsp; *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>19</i>&nbsp; *  GNU Lesser General Public License for more details.
+<i>20</i>&nbsp; *
+<i>21</i>&nbsp; * You should have received a copy of the GNU Lesser General Public
+<i>22</i>&nbsp; * License along with BEAST; if not, write to the
+<i>23</i>&nbsp; * Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>24</i>&nbsp; * Boston, MA  02110-1301  USA
+<i>25</i>&nbsp; */
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;/** likelihood core that uses a cache mechanism so that only local
+<i>28</i>&nbsp; * patterns for leaves need to be calculated.
+<i>29</i>&nbsp; * Takes GORED trees in account
+<i>30</i>&nbsp; * Switches off cache mechanism if it does not help.
+<i>31</i>&nbsp; */
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;package beast.evolution.likelihood;
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;public class BeerLikelihoodCoreNative extends ExperimentalLikelihoodCore {
+<i>37</i>&nbsp;	int m_nPatterns;
+<i>38</i>&nbsp;	int m_nStates;
+<i>39</i>&nbsp;	int m_nNodes;
+<b class="nc"><i>40</i>&nbsp;	double SCALE = 1;</b>
+<i>41</i>&nbsp;	
+<i>42</i>&nbsp;
+<b class="nc"><i>43</i>&nbsp;    long m_pBEER = 0;</b>
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;    native long createCppBEERObject(int nStateCount);
+<i>46</i>&nbsp;
+<b class="nc"><i>47</i>&nbsp;    public BeerLikelihoodCoreNative(int nStateCount) {</b>
+<b class="nc"><i>48</i>&nbsp;        System.loadLibrary(&quot;BEER&quot;);</b>
+<b class="nc"><i>49</i>&nbsp;    	m_nStates = nStateCount;</b>
+<b class="nc"><i>50</i>&nbsp;        m_pBEER = createCppBEERObject(nStateCount);</b>
+<i>51</i>&nbsp;    } // c&#39;tor
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;	@Override
+<i>54</i>&nbsp;	public boolean initialize(int nNodeCount, int nPatternCount, int nMatrixCount, boolean bIntegrateCategories, boolean bUseAmbiguities) {
+<b class="nc"><i>55</i>&nbsp;		m_nPatterns = nPatternCount;</b>
+<b class="nc"><i>56</i>&nbsp;		m_nNodes = nNodeCount;</b>
+<b class="nc"><i>57</i>&nbsp;		return initializeC(m_pBEER, nNodeCount, nPatternCount, nMatrixCount, bIntegrateCategories);</b>
+<i>58</i>&nbsp;	}
+<i>59</i>&nbsp;	native boolean initializeC(long pBeer, int nNodeCount, int nPatternCount, int nMatrixCount, boolean bIntegrateCategories);
+<i>60</i>&nbsp;
+<i>61</i>&nbsp;	@Override
+<i>62</i>&nbsp;	public void finalize() throws Throwable {
+<b class="nc"><i>63</i>&nbsp;		finalizeC(m_pBEER);</b>
+<i>64</i>&nbsp;	}
+<i>65</i>&nbsp;	native void finalizeC(long pBeer);
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;	@Override
+<i>68</i>&nbsp;	public void createNodePartials(int iNode) {
+<b class="nc"><i>69</i>&nbsp;		createNodePartialsC(m_pBEER, iNode);</b>
+<i>70</i>&nbsp;	}
+<i>71</i>&nbsp;	native void createNodePartialsC(long pBeer, int iNode);
+<i>72</i>&nbsp;
+<i>73</i>&nbsp;	@Override
+<i>74</i>&nbsp;	public void setNodePartialsForUpdate(int iNode) {
+<b class="nc"><i>75</i>&nbsp;		setNodePartialsForUpdateC(m_pBEER, iNode);</b>
+<i>76</i>&nbsp;	}
+<i>77</i>&nbsp;	native void setNodePartialsForUpdateC(long pBeer, int iNode);
+<i>78</i>&nbsp;
+<i>79</i>&nbsp;	@Override
+<i>80</i>&nbsp;    public void setNodeStatesForUpdate(int iNode) {
+<b class="nc"><i>81</i>&nbsp;		setNodeStatesForUpdateC(m_pBEER, iNode);</b>
+<i>82</i>&nbsp;    }
+<i>83</i>&nbsp;	native void setNodeStatesForUpdateC(long m_pBEER, int iNode);
+<i>84</i>&nbsp;	
+<i>85</i>&nbsp;	@Override
+<i>86</i>&nbsp;	public void setNodeStates(int iNode, int[] iStates) {
+<b class="nc"><i>87</i>&nbsp;		setNodeStatesC(m_pBEER, iNode, iStates);</b>
+<i>88</i>&nbsp;	}
+<i>89</i>&nbsp;	native void setNodeStatesC(long pBeer, int iNode, int[] iStates);
+<i>90</i>&nbsp;
+<i>91</i>&nbsp;	@Override
+<i>92</i>&nbsp;	public void setNodeMatrixForUpdate(int iNode) {
+<b class="nc"><i>93</i>&nbsp;		setNodeMatrixForUpdateC(m_pBEER, iNode);</b>
+<i>94</i>&nbsp;	}
+<i>95</i>&nbsp;	native void setNodeMatrixForUpdateC(long pBeer, int iNode);
+<i>96</i>&nbsp;
+<i>97</i>&nbsp;	@Override
+<i>98</i>&nbsp;	public void setNodeMatrix(int iNode, int iMatrixIndex, double[] fMatrix) {
+<b class="nc"><i>99</i>&nbsp;		setNodeMatrixC(m_pBEER, iNode, iMatrixIndex, fMatrix);</b>
+<i>100</i>&nbsp;	}
+<i>101</i>&nbsp;	native void setNodeMatrixC(long pBeer, int iNode, int iMatrixIndex, double[] fMatrix);
+<i>102</i>&nbsp;
+<i>103</i>&nbsp;//	@Override
+<i>104</i>&nbsp;//	public void setPaddedNodeMatrices(int iNode, double[] fMatrix) {
+<i>105</i>&nbsp;//		setPaddedMatricesC(m_pBEER, iNode, fMatrix);
+<i>106</i>&nbsp;//	}
+<i>107</i>&nbsp;//	native void setPaddedMatricesC(long pBeer, int iNode, double[] fMatrix);
+<i>108</i>&nbsp;	
+<i>109</i>&nbsp;	
+<i>110</i>&nbsp;	@Override
+<i>111</i>&nbsp;	public void setUseScaling(double fScale) {
+<b class="nc"><i>112</i>&nbsp;		m_bUseScaling = (fScale != 1.0);</b>
+<b class="nc"><i>113</i>&nbsp;		SCALE = fScale;</b>
+<b class="nc"><i>114</i>&nbsp;		setUseScalingC(m_pBEER, fScale);</b>
+<i>115</i>&nbsp;	}
+<i>116</i>&nbsp;	native void setUseScalingC(long pBeer, double fScale);
+<i>117</i>&nbsp;	
+<i>118</i>&nbsp;	@Override
+<i>119</i>&nbsp;	public void calculatePartials(int iNode1, int iNode2, int iNode3) {
+<b class="nc"><i>120</i>&nbsp;		calculatePartialsC(m_pBEER, iNode1, iNode2, iNode3);</b>
+<i>121</i>&nbsp;	}
+<i>122</i>&nbsp;	native void calculatePartialsC(long pBeer, int iNode1, int iNode2, int iNode3);
+<i>123</i>&nbsp;
+<i>124</i>&nbsp;	public void integratePartials(int iNode, double[] fProportions, double[] fOutPartials) {
+<b class="nc"><i>125</i>&nbsp;		integratePartialsC(m_pBEER, iNode, fProportions, fOutPartials);</b>
+<i>126</i>&nbsp;	}
+<i>127</i>&nbsp;	native void integratePartialsC(long pBeer, int iNode, double[] fProportions, double[] fOutPartials);
+<i>128</i>&nbsp;	
+<i>129</i>&nbsp;	public void calculateLogLikelihoods(double[] fPartials,	double[] fFrequencies, double[] fOutLogLikelihoods) {
+<b class="nc"><i>130</i>&nbsp;        int v = 0;</b>
+<b class="nc"><i>131</i>&nbsp;		for (int k = 0; k &lt; m_nPatterns; k++) {</b>
+<i>132</i>&nbsp;
+<b class="nc"><i>133</i>&nbsp;            double sum = 0.0;</b>
+<b class="nc"><i>134</i>&nbsp;			for (int i = 0; i &lt; m_nStates; i++) {</b>
+<b class="nc"><i>135</i>&nbsp;				sum += fFrequencies[i] * fPartials[v];</b>
+<b class="nc"><i>136</i>&nbsp;				v++;</b>
+<i>137</i>&nbsp;			}
+<b class="nc"><i>138</i>&nbsp;            fOutLogLikelihoods[k] = Math.log(sum) + getLogScalingFactor(k);</b>
+<i>139</i>&nbsp;		}
+<i>140</i>&nbsp;	}
+<i>141</i>&nbsp;    public double getLogScalingFactor(int iPattern) {
+<b class="nc"><i>142</i>&nbsp;    	if (m_bUseScaling) {</b>
+<b class="nc"><i>143</i>&nbsp;    		return -(m_nNodes/2) * Math.log(SCALE);</b>
+<i>144</i>&nbsp;    	} else {
+<b class="nc"><i>145</i>&nbsp;    		return 0;</b>
+<i>146</i>&nbsp;    	}
+<i>147</i>&nbsp;    }
+<i>148</i>&nbsp;    
+<i>149</i>&nbsp;	@Override
+<i>150</i>&nbsp;	public void store() {
+<b class="nc"><i>151</i>&nbsp;		storeC(m_pBEER);</b>
+<i>152</i>&nbsp;	}
+<i>153</i>&nbsp;	native void storeC(long pBeer);
+<i>154</i>&nbsp;
+<i>155</i>&nbsp;	@Override
+<i>156</i>&nbsp;	public void unstore() {
+<b class="nc"><i>157</i>&nbsp;		unstoreC(m_pBEER);</b>
+<i>158</i>&nbsp;	}
+<i>159</i>&nbsp;	native void unstoreC(long pBeer);
+<i>160</i>&nbsp;
+<i>161</i>&nbsp;	@Override
+<i>162</i>&nbsp;	public void restore() {
+<b class="nc"><i>163</i>&nbsp;		restoreC(m_pBEER);</b>
+<i>164</i>&nbsp;	}
+<i>165</i>&nbsp;	native void restoreC(long pBeer);
+<i>166</i>&nbsp;
+<i>167</i>&nbsp;
+<i>168</i>&nbsp;	@Override
+<i>169</i>&nbsp;	public void setNodePartials(int iNode, double[] fPartials) {
+<i>170</i>&nbsp;		// TODO Auto-generated method stub
+<i>171</i>&nbsp;		
+<i>172</i>&nbsp;	}
+<i>173</i>&nbsp;
+<i>174</i>&nbsp;	@Override
+<i>175</i>&nbsp;	public double calcLogP(int iNode, double[] fProportions, double[] fFrequencies) {
+<i>176</i>&nbsp;		// TODO Auto-generated method stub
+<b class="nc"><i>177</i>&nbsp;		return 0;</b>
+<i>178</i>&nbsp;	}
+<i>179</i>&nbsp;
+<i>180</i>&nbsp;	@Override
+<i>181</i>&nbsp;	public void setPatternWeights(int[] nPatterWeights) {
+<i>182</i>&nbsp;		// TODO Auto-generated method stub
+<i>183</i>&nbsp;		
+<i>184</i>&nbsp;	}
+<i>185</i>&nbsp;
+<i>186</i>&nbsp;	@Override
+<i>187</i>&nbsp;	public void setProportionInvariant(double fProportianInvariant, int[] iConstantPatterns) {
+<i>188</i>&nbsp;		// TODO Auto-generated method stub
+<i>189</i>&nbsp;		
+<i>190</i>&nbsp;	}
+<i>191</i>&nbsp;
+<i>192</i>&nbsp;	@Override
+<i>193</i>&nbsp;	public void getPatternLogLikelihoods(double[] fPatternLogLikelihoods) {
+<i>194</i>&nbsp;		// TODO Auto-generated method stub
+<i>195</i>&nbsp;		
+<i>196</i>&nbsp;	}
+<i>197</i>&nbsp;
+<i>198</i>&nbsp;
+<i>199</i>&nbsp;} // class BeerLikelihoodCoreMixed
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

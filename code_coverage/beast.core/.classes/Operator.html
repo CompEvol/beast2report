@@ -1,0 +1,405 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Operator</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.core</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Operator (beast.core)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Operator</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    5%
+  </span>
+  <span class="absValue">
+    (1/ 20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    11.6%
+  </span>
+  <span class="absValue">
+    (10/ 86)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;* File Operator.java
+<i>3</i>&nbsp;*
+<i>4</i>&nbsp;* Copyright (C) 2011 BEAST2 Core Team
+<i>5</i>&nbsp;*
+<i>6</i>&nbsp;* This file is part of BEAST2.
+<i>7</i>&nbsp;* See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp;* information regarding copyright ownership and licensing.
+<i>9</i>&nbsp;*
+<i>10</i>&nbsp;* BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp;* it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp;* published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp;* of the License, or (at your option) any later version.
+<i>14</i>&nbsp;*
+<i>15</i>&nbsp;*  BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp;*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp;*  GNU Lesser General Public License for more details.
+<i>19</i>&nbsp;*
+<i>20</i>&nbsp;* You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp;* License along with BEAST; if not, write to the
+<i>22</i>&nbsp;* Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp;* Boston, MA  02110-1301  USA
+<i>24</i>&nbsp;*/
+<i>25</i>&nbsp;package beast.core;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;import java.io.PrintWriter;
+<i>29</i>&nbsp;import java.util.ArrayList;
+<i>30</i>&nbsp;import java.util.List;
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;import org.json.JSONException;
+<i>33</i>&nbsp;import org.json.JSONObject;
+<i>34</i>&nbsp;//import org.json.JSONWriter;
+<i>35</i>&nbsp;import org.json.JSONStringer;
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;import beast.core.Input.Validate;
+<i>38</i>&nbsp;import beast.core.util.Evaluator;
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;@Description(&quot;Proposes a move in state space.&quot;)
+<b class="fc"><i>41</i>&nbsp;public abstract class Operator extends BEASTObject {</b>
+<b class="fc"><i>42</i>&nbsp;    final public Input&lt;Double&gt; m_pWeight = new Input&lt;&gt;(&quot;weight&quot;, &quot;weight with which this operator is selected&quot;, Validate.REQUIRED);</b>
+<i>43</i>&nbsp;
+<b class="fc"><i>44</i>&nbsp;    private final String STANDARD_OPERATOR_PACKAGE = &quot;beast.evolution.operators&quot;;</b>
+<i>45</i>&nbsp;
+<i>46</i>&nbsp;    /**
+<i>47</i>&nbsp;     * the schedule used for auto optimisation *
+<i>48</i>&nbsp;     */
+<i>49</i>&nbsp;    OperatorSchedule operatorSchedule;
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;    public void setOperatorSchedule(final OperatorSchedule operatorSchedule) {
+<b class="nc"><i>52</i>&nbsp;        this.operatorSchedule = operatorSchedule;</b>
+<b class="nc"><i>53</i>&nbsp;    }</b>
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;    /**
+<i>56</i>&nbsp;     * Implement this for proposing new states based on evaluations of
+<i>57</i>&nbsp;     * a distribution. By default it returns null but can be overridden
+<i>58</i>&nbsp;     * to implement more complex proposals.
+<i>59</i>&nbsp;     *
+<i>60</i>&nbsp;     * @return a distribution or null if not required
+<i>61</i>&nbsp;     */
+<i>62</i>&nbsp;    public Distribution getEvaluatorDistribution() {
+<b class="nc"><i>63</i>&nbsp;        return null;</b>
+<i>64</i>&nbsp;    }
+<i>65</i>&nbsp;
+<i>66</i>&nbsp;    /**
+<i>67</i>&nbsp;     * Implement this for proposing a new State.
+<i>68</i>&nbsp;     * The proposal is responsible for keeping the State valid,
+<i>69</i>&nbsp;     * and if the State becomes invalid (e.g. a parameter goes out
+<i>70</i>&nbsp;     * of its range) Double.NEGATIVE_INFINITY should be returned.
+<i>71</i>&nbsp;     * &lt;p&gt;
+<i>72</i>&nbsp;     * If the operator is a Gibbs operator, hence the proposal should
+<i>73</i>&nbsp;     * always be accepted, the method should return Double.POSITIVE_INFINITY.
+<i>74</i>&nbsp;     *
+<i>75</i>&nbsp;     * @param evaluator An evaluator object that can be use to repetitively
+<i>76</i>&nbsp;     *                  used to evaluate the distribution returned by getEvaluatorDistribution().
+<i>77</i>&nbsp;     * @return log of Hastings Ratio, or Double.NEGATIVE_INFINITY if proposal
+<i>78</i>&nbsp;     * should not be accepted (because the proposal is invalid) or
+<i>79</i>&nbsp;     * Double.POSITIVE_INFINITY if the proposal should always be accepted
+<i>80</i>&nbsp;     * (for Gibbs operators).
+<i>81</i>&nbsp;     */
+<i>82</i>&nbsp;    public double proposal(final Evaluator evaluator) {
+<b class="nc"><i>83</i>&nbsp;        return proposal();</b>
+<i>84</i>&nbsp;    }
+<i>85</i>&nbsp;
+<i>86</i>&nbsp;    /**
+<i>87</i>&nbsp;     * Implement this for proposing a new State.
+<i>88</i>&nbsp;     * The proposal is responsible for keeping the State valid,
+<i>89</i>&nbsp;     * and if the State becomes invalid (e.g. a parameter goes out
+<i>90</i>&nbsp;     * of its range) Double.NEGATIVE_INFINITY should be returned.
+<i>91</i>&nbsp;     * &lt;p&gt;
+<i>92</i>&nbsp;     * If the operator is a Gibbs operator, hence the proposal should
+<i>93</i>&nbsp;     * always be accepted, the method should return Double.POSITIVE_INFINITY.
+<i>94</i>&nbsp;     *
+<i>95</i>&nbsp;     * @return log of Hastings Ratio, or Double.NEGATIVE_INFINITY if proposal
+<i>96</i>&nbsp;     * should not be accepted (because the proposal is invalid) or
+<i>97</i>&nbsp;     * Double.POSITIVE_INFINITY if the proposal should always be accepted
+<i>98</i>&nbsp;     * (for Gibbs operators).
+<i>99</i>&nbsp;     */
+<i>100</i>&nbsp;    abstract public double proposal();
+<i>101</i>&nbsp;
+<i>102</i>&nbsp;    /**
+<i>103</i>&nbsp;     * @return the relative weight which determines the probability this proposal is chosen
+<i>104</i>&nbsp;     * from among all the available proposals
+<i>105</i>&nbsp;     */
+<i>106</i>&nbsp;    public double getWeight() {
+<b class="nc"><i>107</i>&nbsp;        return m_pWeight.get();</b>
+<i>108</i>&nbsp;    }
+<i>109</i>&nbsp;
+<i>110</i>&nbsp;    public String getName() {
+<i>111</i>&nbsp;
+<b class="nc"><i>112</i>&nbsp;        String className = this.getClass().getName();</b>
+<b class="nc"><i>113</i>&nbsp;        if (className.startsWith(STANDARD_OPERATOR_PACKAGE)) {</b>
+<b class="nc"><i>114</i>&nbsp;            className = className.substring(STANDARD_OPERATOR_PACKAGE.length() + 1);</b>
+<i>115</i>&nbsp;        }
+<b class="nc"><i>116</i>&nbsp;        return className + &quot;(&quot; + (getID() != null ? getID() : &quot;&quot;) + &quot;)&quot;;</b>
+<i>117</i>&nbsp;    }
+<i>118</i>&nbsp;
+<i>119</i>&nbsp;    /**
+<i>120</i>&nbsp;     * keep statistics of how often this operator was used, accepted or rejected *
+<i>121</i>&nbsp;     */
+<b class="fc"><i>122</i>&nbsp;    protected int m_nNrRejected = 0;</b>
+<b class="fc"><i>123</i>&nbsp;    protected int m_nNrAccepted = 0;</b>
+<b class="fc"><i>124</i>&nbsp;    protected int m_nNrRejectedForCorrection = 0;</b>
+<b class="fc"><i>125</i>&nbsp;    protected int m_nNrAcceptedForCorrection = 0;</b>
+<i>126</i>&nbsp;
+<b class="fc"><i>127</i>&nbsp;    private final boolean detailedRejection = false;</b>
+<i>128</i>&nbsp;    // rejected because likelihood is infinite
+<b class="fc"><i>129</i>&nbsp;    protected int m_nNrRejectedInvalid = 0;</b>
+<i>130</i>&nbsp;    // rejected because operator failed (sub-group of above)
+<b class="fc"><i>131</i>&nbsp;    protected int m_nNrRejectedOperator = 0;</b>
+<i>132</i>&nbsp;
+<i>133</i>&nbsp;    public void accept() {
+<b class="nc"><i>134</i>&nbsp;        m_nNrAccepted++;</b>
+<b class="nc"><i>135</i>&nbsp;        if (operatorSchedule.autoOptimizeDelayCount &gt;= operatorSchedule.autoOptimizeDelay) {</b>
+<b class="nc"><i>136</i>&nbsp;            m_nNrAcceptedForCorrection++;</b>
+<i>137</i>&nbsp;        }
+<b class="nc"><i>138</i>&nbsp;    }</b>
+<i>139</i>&nbsp;
+<i>140</i>&nbsp;    public void reject() {
+<b class="nc"><i>141</i>&nbsp;        reject(0); // silly hack</b>
+<b class="nc"><i>142</i>&nbsp;    }</b>
+<i>143</i>&nbsp;
+<i>144</i>&nbsp;    // 0 like finite  -1 like -inf -2 operator failed
+<i>145</i>&nbsp;    public void reject(final int reason) {
+<b class="nc"><i>146</i>&nbsp;        m_nNrRejected++;</b>
+<b class="nc"><i>147</i>&nbsp;        if (reason &lt; 0) {</b>
+<b class="nc"><i>148</i>&nbsp;            ++m_nNrRejectedInvalid;</b>
+<b class="nc"><i>149</i>&nbsp;            if (reason == -2) {</b>
+<b class="nc"><i>150</i>&nbsp;                ++m_nNrRejectedOperator;</b>
+<i>151</i>&nbsp;            }
+<i>152</i>&nbsp;        }
+<b class="nc"><i>153</i>&nbsp;        if (operatorSchedule.autoOptimizeDelayCount &gt;= operatorSchedule.autoOptimizeDelay) {</b>
+<b class="nc"><i>154</i>&nbsp;            m_nNrRejectedForCorrection++;</b>
+<i>155</i>&nbsp;        }
+<b class="nc"><i>156</i>&nbsp;    }</b>
+<i>157</i>&nbsp;
+<i>158</i>&nbsp;    /**
+<i>159</i>&nbsp;     * called after every invocation of this operator to see whether
+<i>160</i>&nbsp;     * a parameter can be optimised for better acceptance hence faster
+<i>161</i>&nbsp;     * mixing
+<i>162</i>&nbsp;     *
+<i>163</i>&nbsp;     * @param logAlpha difference in posterior between previous state &amp; proposed state + hasting ratio
+<i>164</i>&nbsp;     */
+<i>165</i>&nbsp;    public void optimize(final double logAlpha) {
+<i>166</i>&nbsp;        // must be overridden by operator implementation to have an effect
+<b class="nc"><i>167</i>&nbsp;    }</b>
+<i>168</i>&nbsp;
+<i>169</i>&nbsp;    /**
+<i>170</i>&nbsp;     * @param logAlpha difference in posterior between previous state &amp; proposed state + hasting ratio
+<i>171</i>&nbsp;     * @return change of value of a parameter for MCMC chain optimisation
+<i>172</i>&nbsp;     */
+<i>173</i>&nbsp;    protected double calcDelta(final double logAlpha) {
+<b class="nc"><i>174</i>&nbsp;        return operatorSchedule.calcDelta(this, logAlpha);</b>
+<i>175</i>&nbsp;    } // calcDelta
+<i>176</i>&nbsp;
+<i>177</i>&nbsp;    /**
+<i>178</i>&nbsp;     * @return target for automatic operator optimisation
+<i>179</i>&nbsp;     */
+<i>180</i>&nbsp;    public double getTargetAcceptanceProbability() {
+<b class="nc"><i>181</i>&nbsp;        return 0.234;</b>
+<i>182</i>&nbsp;    }
+<i>183</i>&nbsp;
+<i>184</i>&nbsp;    /**
+<i>185</i>&nbsp;     * @return value changed through automatic operator optimisation
+<i>186</i>&nbsp;     */
+<i>187</i>&nbsp;    public double getCoercableParameterValue() {
+<b class="nc"><i>188</i>&nbsp;        return Double.NaN;</b>
+<i>189</i>&nbsp;    }
+<i>190</i>&nbsp;
+<i>191</i>&nbsp;    /**
+<i>192</i>&nbsp;     * set value that changed through automatic operator optimisation
+<i>193</i>&nbsp;     *
+<i>194</i>&nbsp;     * @param value
+<i>195</i>&nbsp;     */
+<i>196</i>&nbsp;    public void setCoercableParameterValue(final double value) {
+<b class="nc"><i>197</i>&nbsp;    }</b>
+<i>198</i>&nbsp;
+<i>199</i>&nbsp;    /**
+<i>200</i>&nbsp;     * return directions on how to set operator parameters, if any *
+<i>201</i>&nbsp;     *
+<i>202</i>&nbsp;     * @return
+<i>203</i>&nbsp;     */
+<i>204</i>&nbsp;    public String getPerformanceSuggestion() {
+<b class="nc"><i>205</i>&nbsp;        return &quot;&quot;;</b>
+<i>206</i>&nbsp;    }
+<i>207</i>&nbsp;
+<i>208</i>&nbsp;    /**
+<i>209</i>&nbsp;     * return list of state nodes that this operator operates on.
+<i>210</i>&nbsp;     * state nodes that are input to the operator but are never changed
+<i>211</i>&nbsp;     * in a proposal should not be listed
+<i>212</i>&nbsp;     */
+<i>213</i>&nbsp;    public List&lt;StateNode&gt; listStateNodes() {
+<i>214</i>&nbsp;        // pick up all inputs that are stateNodes that are estimated
+<b class="nc"><i>215</i>&nbsp;        final List&lt;StateNode&gt; list = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>216</i>&nbsp;        for (BEASTInterface o : listActiveBEASTObjects()) {</b>
+<b class="nc"><i>217</i>&nbsp;            if (o instanceof StateNode) {</b>
+<b class="nc"><i>218</i>&nbsp;                final StateNode stateNode = (StateNode) o;</b>
+<b class="nc"><i>219</i>&nbsp;                if (stateNode.isEstimatedInput.get()) {</b>
+<b class="nc"><i>220</i>&nbsp;                    list.add(stateNode);</b>
+<i>221</i>&nbsp;                }
+<i>222</i>&nbsp;            }
+<b class="nc"><i>223</i>&nbsp;        }</b>
+<b class="nc"><i>224</i>&nbsp;        return list;</b>
+<i>225</i>&nbsp;    }
+<i>226</i>&nbsp;
+<i>227</i>&nbsp;    @Override
+<i>228</i>&nbsp;	public String toString() {
+<b class="nc"><i>229</i>&nbsp;        return OperatorSchedule.prettyPrintOperator(this, 70, 10, 4, 0.0, detailedRejection);</b>
+<i>230</i>&nbsp;    }
+<i>231</i>&nbsp;
+<i>232</i>&nbsp;    /**
+<i>233</i>&nbsp;     * Store to state file, so on resume the parameter tuning is restored.
+<i>234</i>&nbsp;     * By default, it stores information in JSON for example
+<i>235</i>&nbsp;     * &lt;p&gt;
+<i>236</i>&nbsp;     * {&quot;id&quot;:&quot;kappaScaler&quot;, &quot;p&quot;:0.5, &quot;accept&quot;:39, &quot;reject&quot;:35, &quot;acceptFC&quot;:0, &quot;rejectFC&quot;:0}
+<i>237</i>&nbsp;     * &lt;p&gt;
+<i>238</i>&nbsp;     * Meta-operators (operators that have one or more operators as inputs)
+<i>239</i>&nbsp;     * need to override this method to store the tuning information associated
+<i>240</i>&nbsp;     * with their sub-operators by generating nested JSON, for example
+<i>241</i>&nbsp;     * &lt;p&gt;
+<i>242</i>&nbsp;     * {&quot;id&quot;:&quot;metaOperator&quot;, &quot;p&quot;:0.5, &quot;accept&quot;:396, &quot;reject&quot;:355, &quot;acceptFC&quot;:50, &quot;rejectFC&quot;:45,
+<i>243</i>&nbsp;     * operators [
+<i>244</i>&nbsp;     * {&quot;id&quot;:&quot;kappaScaler1&quot;, &quot;p&quot;:0.5, &quot;accept&quot;:39, &quot;reject&quot;:35, &quot;acceptFC&quot;:0, &quot;rejectFC&quot;:0}
+<i>245</i>&nbsp;     * {&quot;id&quot;:&quot;kappaScaler2&quot;, &quot;p&quot;:0.5, &quot;accept&quot;:39, &quot;reject&quot;:35, &quot;acceptFC&quot;:0, &quot;rejectFC&quot;:0}
+<i>246</i>&nbsp;     * ]
+<i>247</i>&nbsp;     * }
+<i>248</i>&nbsp;     * *
+<i>249</i>&nbsp;     */
+<i>250</i>&nbsp;    public void storeToFile(final PrintWriter out) {
+<i>251</i>&nbsp;    	try {
+<b class="nc"><i>252</i>&nbsp;	        JSONStringer json = new JSONStringer();</b>
+<b class="nc"><i>253</i>&nbsp;	        json.object();</b>
+<i>254</i>&nbsp;	
+<b class="nc"><i>255</i>&nbsp;	        if (getID()==null)</b>
+<b class="nc"><i>256</i>&nbsp;	           setID(&quot;unknown&quot;);</b>
+<i>257</i>&nbsp;	
+<b class="nc"><i>258</i>&nbsp;	        json.key(&quot;id&quot;).value(getID());</b>
+<i>259</i>&nbsp;	
+<b class="nc"><i>260</i>&nbsp;	        double p = getCoercableParameterValue();</b>
+<b class="nc"><i>261</i>&nbsp;	        if (Double.isNaN(p)) {</b>
+<b class="nc"><i>262</i>&nbsp;	            json.key(&quot;p&quot;).value(&quot;NaN&quot;);</b>
+<b class="nc"><i>263</i>&nbsp;	        } else if (Double.isInfinite(p)) {</b>
+<b class="nc"><i>264</i>&nbsp;	        	if (p &gt; 0) {</b>
+<b class="nc"><i>265</i>&nbsp;	        		json.key(&quot;p&quot;).value(&quot;Infinity&quot;);</b>
+<i>266</i>&nbsp;	        	} else {
+<b class="nc"><i>267</i>&nbsp;	        		json.key(&quot;p&quot;).value(&quot;-Infinity&quot;);</b>
+<i>268</i>&nbsp;	        	}
+<i>269</i>&nbsp;	        } else {
+<b class="nc"><i>270</i>&nbsp;	            json.key(&quot;p&quot;).value(p);</b>
+<i>271</i>&nbsp;	        }
+<b class="nc"><i>272</i>&nbsp;	        json.key(&quot;accept&quot;).value(m_nNrAccepted);</b>
+<b class="nc"><i>273</i>&nbsp;	        json.key(&quot;reject&quot;).value(m_nNrRejected);</b>
+<b class="nc"><i>274</i>&nbsp;	        json.key(&quot;acceptFC&quot;).value(m_nNrAcceptedForCorrection);</b>
+<b class="nc"><i>275</i>&nbsp;	        json.key(&quot;rejectFC&quot;).value(m_nNrRejectedForCorrection);</b>
+<b class="nc"><i>276</i>&nbsp;	        json.key(&quot;rejectIv&quot;).value(m_nNrRejectedInvalid);</b>
+<b class="nc"><i>277</i>&nbsp;	        json.key(&quot;rejectOp&quot;).value(m_nNrRejectedOperator);</b>
+<b class="nc"><i>278</i>&nbsp;	        json.endObject();</b>
+<b class="nc"><i>279</i>&nbsp;	        out.print(json.toString());</b>
+<b class="nc"><i>280</i>&nbsp;    	} catch (JSONException e) {</b>
+<i>281</i>&nbsp;    		// failed to log operator in state file
+<i>282</i>&nbsp;    		// report and continue
+<b class="nc"><i>283</i>&nbsp;    		e.printStackTrace();</b>
+<b class="nc"><i>284</i>&nbsp;    	}</b>
+<b class="nc"><i>285</i>&nbsp;    }</b>
+<i>286</i>&nbsp;
+<i>287</i>&nbsp;    /**
+<i>288</i>&nbsp;     * Restore tuning information from file
+<i>289</i>&nbsp;     * Override this method for meta-operators (see also storeToFile).
+<i>290</i>&nbsp;     */
+<i>291</i>&nbsp;    public void restoreFromFile(JSONObject o) {
+<i>292</i>&nbsp;    	try {
+<b class="nc"><i>293</i>&nbsp;	        if (!Double.isNaN(o.getDouble(&quot;p&quot;))) {</b>
+<b class="nc"><i>294</i>&nbsp;	            setCoercableParameterValue(o.getDouble(&quot;p&quot;));</b>
+<i>295</i>&nbsp;	        }
+<b class="nc"><i>296</i>&nbsp;	        m_nNrAccepted = o.getInt(&quot;accept&quot;);</b>
+<b class="nc"><i>297</i>&nbsp;	        m_nNrRejected = o.getInt(&quot;reject&quot;);</b>
+<b class="nc"><i>298</i>&nbsp;	        m_nNrAcceptedForCorrection = o.getInt(&quot;acceptFC&quot;);</b>
+<b class="nc"><i>299</i>&nbsp;	        m_nNrRejectedForCorrection = o.getInt(&quot;rejectFC&quot;);</b>
+<i>300</i>&nbsp;	
+<b class="nc"><i>301</i>&nbsp;	        m_nNrRejectedInvalid = o.has(&quot;rejectIv&quot;) ? o.getInt(&quot;rejectIv&quot;) : 0;</b>
+<b class="nc"><i>302</i>&nbsp;	        m_nNrRejectedOperator = o.has(&quot;rejectOp&quot;) ? o.getInt(&quot;rejectOp&quot;) : 0;</b>
+<b class="nc"><i>303</i>&nbsp;    	} catch (JSONException e) {</b>
+<i>304</i>&nbsp;    		// failed to restore from state file
+<i>305</i>&nbsp;    		// report and continue
+<b class="nc"><i>306</i>&nbsp;    		e.printStackTrace();</b>
+<b class="nc"><i>307</i>&nbsp;    	}</b>
+<b class="nc"><i>308</i>&nbsp;    }</b>
+<i>309</i>&nbsp;
+<i>310</i>&nbsp;
+<i>311</i>&nbsp;    /**
+<i>312</i>&nbsp;     * indicates that the state needs to be initialised so that
+<i>313</i>&nbsp;     * BEASTObjects can be identified that need updating. This
+<i>314</i>&nbsp;     * almost always needs to happen, except for cases where the
+<i>315</i>&nbsp;     * operator already initialised the state, e.g. for delayed
+<i>316</i>&nbsp;     * acceptance operators.
+<i>317</i>&nbsp;     */
+<i>318</i>&nbsp;    public boolean requiresStateInitialisation() {
+<b class="nc"><i>319</i>&nbsp;        return true;</b>
+<i>320</i>&nbsp;    }
+<i>321</i>&nbsp;
+<i>322</i>&nbsp;} // class Operator
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

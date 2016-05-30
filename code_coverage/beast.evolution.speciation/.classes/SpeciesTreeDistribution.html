@@ -1,0 +1,183 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: SpeciesTreeDistribution</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.speciation</a> ]
+</div>
+
+<h1>Coverage Summary for Class: SpeciesTreeDistribution (beast.evolution.speciation)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpeciesTreeDistribution</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    40%
+  </span>
+  <span class="absValue">
+    (2/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    57.1%
+  </span>
+  <span class="absValue">
+    (4/ 7)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp; * SpeciationLikelihood.java
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; * Copyright (C) 2002-2009 Alexei Drummond and Andrew Rambaut
+<i>5</i>&nbsp; *
+<i>6</i>&nbsp; * This file is part of BEAST.
+<i>7</i>&nbsp; * See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp; * information regarding copyright ownership and licensing.
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; * BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp; * it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp; * published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp; * of the License, or (at your option) any later version.
+<i>14</i>&nbsp; *
+<i>15</i>&nbsp; * BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp; * but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp; * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp; * GNU Lesser General Public License for more details.
+<i>19</i>&nbsp; *
+<i>20</i>&nbsp; * You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp; * License along with BEAST; if not, write to the
+<i>22</i>&nbsp; * Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp; * Boston, MA  02110-1301  USA
+<i>24</i>&nbsp; */
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;package beast.evolution.speciation;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;import java.util.List;
+<i>31</i>&nbsp;import java.util.Random;
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;import beast.core.Description;
+<i>34</i>&nbsp;import beast.core.State;
+<i>35</i>&nbsp;import beast.evolution.tree.TreeDistribution;
+<i>36</i>&nbsp;import beast.evolution.tree.TreeInterface;
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;
+<i>39</i>&nbsp;/**
+<i>40</i>&nbsp; * Ported from Beast 1.6
+<i>41</i>&nbsp; *
+<i>42</i>&nbsp; * @author Andrew Rambaut
+<i>43</i>&nbsp; * @author Alexei Drummond
+<i>44</i>&nbsp; * @version $Id: SpeciationLikelihood.java,v 1.10 2005/05/18 09:51:11 rambaut Exp $
+<i>45</i>&nbsp; */
+<i>46</i>&nbsp;@Description(&quot;A likelihood function for speciation processes.&quot;)
+<b class="fc"><i>47</i>&nbsp;abstract public class SpeciesTreeDistribution extends TreeDistribution {</b>
+<i>48</i>&nbsp;//	SpeciesTreeDistribution extends TreeDistribution
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;    /**
+<i>51</i>&nbsp;     * Calculates the log likelihood of this set of coalescent intervals,
+<i>52</i>&nbsp;     * given a demographic model.
+<i>53</i>&nbsp;     *
+<i>54</i>&nbsp;     * @return the log likelihood
+<i>55</i>&nbsp;     */
+<i>56</i>&nbsp;    @Override
+<i>57</i>&nbsp;    public double calculateLogP() {
+<i>58</i>&nbsp;        // (Q2R): what if tree intervals?
+<i>59</i>&nbsp;        // (Q2R): always the same tree, no? so why pass in argument
+<b class="fc"><i>60</i>&nbsp;        final TreeInterface tree = treeInput.get();</b>
+<b class="fc"><i>61</i>&nbsp;        logP = calculateTreeLogLikelihood(tree);</b>
+<b class="fc"><i>62</i>&nbsp;        return logP;</b>
+<i>63</i>&nbsp;    } // calculateLogP
+<i>64</i>&nbsp;
+<i>65</i>&nbsp;
+<i>66</i>&nbsp;    /**
+<i>67</i>&nbsp;     * Generic likelihood calculation
+<i>68</i>&nbsp;     *
+<i>69</i>&nbsp;     * @param tree
+<i>70</i>&nbsp;     * @return log-likelihood of density
+<i>71</i>&nbsp;     */
+<i>72</i>&nbsp;    public abstract double calculateTreeLogLikelihood(TreeInterface tree);
+<i>73</i>&nbsp;
+<i>74</i>&nbsp;    // ****************************************************************
+<i>75</i>&nbsp;    // Private and protected stuff
+<i>76</i>&nbsp;    // ****************************************************************
+<i>77</i>&nbsp;
+<i>78</i>&nbsp;
+<i>79</i>&nbsp;    /*****************************************/
+<i>80</i>&nbsp;    /** Distribution implementation follows **/
+<i>81</i>&nbsp;    /**
+<i>82</i>&nbsp;     * *************************************
+<i>83</i>&nbsp;     */
+<i>84</i>&nbsp;    @Override
+<i>85</i>&nbsp;    public List&lt;String&gt; getArguments() {
+<i>86</i>&nbsp;        // TODO Auto-generated method stub
+<b class="nc"><i>87</i>&nbsp;        return null;</b>
+<i>88</i>&nbsp;    }
+<i>89</i>&nbsp;
+<i>90</i>&nbsp;    @Override
+<i>91</i>&nbsp;    public List&lt;String&gt; getConditions() {
+<i>92</i>&nbsp;        // TODO Auto-generated method stub
+<b class="nc"><i>93</i>&nbsp;        return null;</b>
+<i>94</i>&nbsp;    }
+<i>95</i>&nbsp;
+<i>96</i>&nbsp;    @Override
+<i>97</i>&nbsp;    public void sample(State state, Random random) {
+<b class="nc"><i>98</i>&nbsp;        throw new UnsupportedOperationException(&quot;This should eventually sample a tree conditional on provided speciation model.&quot;);</b>
+<i>99</i>&nbsp;    }
+<i>100</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

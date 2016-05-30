@@ -1,0 +1,183 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: BEASTObject</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.core</a> ]
+</div>
+
+<h1>Coverage Summary for Class: BEASTObject (beast.core)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BEASTObject</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    68.4%
+  </span>
+  <span class="absValue">
+    (13/ 19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;*
+<i>3</i>&nbsp;* Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>4</i>&nbsp;*
+<i>5</i>&nbsp;* This file is part of BEAST2.
+<i>6</i>&nbsp;* See the NOTICE file distributed with this work for additional
+<i>7</i>&nbsp;* information regarding copyright ownership and licensing.
+<i>8</i>&nbsp;*
+<i>9</i>&nbsp;* BEAST is free software; you can redistribute it and/or modify
+<i>10</i>&nbsp;* it under the terms of the GNU Lesser General Public License as
+<i>11</i>&nbsp;* published by the Free Software Foundation; either version 2
+<i>12</i>&nbsp;* of the License, or (at your option) any later version.
+<i>13</i>&nbsp;*
+<i>14</i>&nbsp;*  BEAST is distributed in the hope that it will be useful,
+<i>15</i>&nbsp;*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>16</i>&nbsp;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>17</i>&nbsp;*  GNU Lesser General Public License for more details.
+<i>18</i>&nbsp;*
+<i>19</i>&nbsp;* You should have received a copy of the GNU Lesser General Public
+<i>20</i>&nbsp;* License along with BEAST; if not, write to the
+<i>21</i>&nbsp;* Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>22</i>&nbsp;* Boston, MA  02110-1301  USA
+<i>23</i>&nbsp;*/
+<i>24</i>&nbsp;package beast.core;
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;import java.util.HashMap;
+<i>28</i>&nbsp;import java.util.HashSet;
+<i>29</i>&nbsp;import java.util.Map;
+<i>30</i>&nbsp;import java.util.Set;
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;@Description(
+<i>33</i>&nbsp;        value = &quot;Base class for all BEAST objects, which is pretty much every class &quot; +
+<i>34</i>&nbsp;                &quot;you want to incorporate in a model.&quot;,
+<i>35</i>&nbsp;        isInheritable = false
+<i>36</i>&nbsp;)
+<b class="fc"><i>37</i>&nbsp;abstract public class BEASTObject implements BEASTInterface{</b>
+<i>38</i>&nbsp;    /**
+<i>39</i>&nbsp;     * set of Objects that have this Object in one of its Inputs *
+<i>40</i>&nbsp;     * @deprecate use getOuputs() or BEASTObject.getOuputs(object) instead
+<i>41</i>&nbsp;     */
+<b class="fc"><i>42</i>&nbsp;	@Deprecated</b>
+<i>43</i>&nbsp;    public Set&lt;BEASTInterface&gt; outputs = new HashSet&lt;&gt;();
+<i>44</i>&nbsp;	
+<i>45</i>&nbsp;	/** 
+<i>46</i>&nbsp;	 * cache collecting all Inputs and InputForAnnotatedConstrutors 
+<i>47</i>&nbsp;	 * indexed through input name
+<i>48</i>&nbsp;	 */
+<i>49</i>&nbsp;    private Map&lt;String,Input&lt;?&gt;&gt; inputcache;
+<i>50</i>&nbsp;	
+<i>51</i>&nbsp;    /**
+<i>52</i>&nbsp;     * @return set of Objects that have this Object in one of its Inputs
+<i>53</i>&nbsp;     */
+<i>54</i>&nbsp;	@Override
+<i>55</i>&nbsp;	public Set&lt;BEASTInterface&gt; getOutputs() {
+<b class="fc"><i>56</i>&nbsp;		return outputs;</b>
+<i>57</i>&nbsp;	};
+<i>58</i>&nbsp;
+<i>59</i>&nbsp;	@Override
+<i>60</i>&nbsp;	public Map&lt;String, Input&lt;?&gt;&gt; getInputs() {
+<b class="fc"><i>61</i>&nbsp;		if (inputcache == null) {</b>
+<b class="fc"><i>62</i>&nbsp;			inputcache = new HashMap&lt;&gt;();</b>
+<i>63</i>&nbsp;			try {
+<b class="fc"><i>64</i>&nbsp;				for (Input&lt;?&gt; input : listInputs()) {</b>
+<b class="fc"><i>65</i>&nbsp;					inputcache.put(input.getName(), input);</b>
+<b class="fc"><i>66</i>&nbsp;				}</b>
+<b class="nc"><i>67</i>&nbsp;			} catch (IllegalArgumentException e) {</b>
+<b class="nc"><i>68</i>&nbsp;				e.printStackTrace();</b>
+<b class="nc"><i>69</i>&nbsp;				throw new RuntimeException(&quot;Problem getting inputs &quot; + e.getClass().getName() + e.getMessage());</b>
+<b class="fc"><i>70</i>&nbsp;			}</b>
+<i>71</i>&nbsp;		}
+<b class="fc"><i>72</i>&nbsp;		return inputcache;</b>
+<i>73</i>&nbsp;	};
+<i>74</i>&nbsp;
+<i>75</i>&nbsp;	// identifiable
+<i>76</i>&nbsp;    protected String ID;
+<i>77</i>&nbsp;
+<i>78</i>&nbsp;	@Override
+<i>79</i>&nbsp;    public String getID() {
+<b class="fc"><i>80</i>&nbsp;        return ID;</b>
+<i>81</i>&nbsp;    }
+<i>82</i>&nbsp;
+<i>83</i>&nbsp;	@Override
+<i>84</i>&nbsp;    public void setID(final String ID) {
+<b class="fc"><i>85</i>&nbsp;        this.ID = ID;</b>
+<b class="fc"><i>86</i>&nbsp;    }</b>
+<i>87</i>&nbsp;
+<i>88</i>&nbsp;    // A default method in BEASTInterface cannot override
+<i>89</i>&nbsp;    // a method in Object, so it needs to be in BEASTObject
+<i>90</i>&nbsp;	@Override
+<i>91</i>&nbsp;    public String toString() {
+<b class="nc"><i>92</i>&nbsp;		if (getID() != null) {</b>
+<b class="nc"><i>93</i>&nbsp;			return getID();</b>
+<i>94</i>&nbsp;		}
+<b class="nc"><i>95</i>&nbsp;        return this.getClass().getSimpleName().toLowerCase();</b>
+<i>96</i>&nbsp;    }
+<i>97</i>&nbsp;    
+<i>98</i>&nbsp;    
+<i>99</i>&nbsp;    
+<i>100</i>&nbsp;} // class BEASTObject
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

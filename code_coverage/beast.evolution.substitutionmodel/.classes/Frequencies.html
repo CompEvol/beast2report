@@ -1,0 +1,344 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Frequencies</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.substitutionmodel</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Frequencies (beast.evolution.substitutionmodel)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Frequencies</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    77.8%
+  </span>
+  <span class="absValue">
+    (7/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    86.2%
+  </span>
+  <span class="absValue">
+    (75/ 87)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;* File Frequencies.java
+<i>3</i>&nbsp;*
+<i>4</i>&nbsp;* Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>5</i>&nbsp;*
+<i>6</i>&nbsp;* This file is part of BEAST2.
+<i>7</i>&nbsp;* See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp;* information regarding copyright ownership and licensing.
+<i>9</i>&nbsp;*
+<i>10</i>&nbsp;* BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp;* it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp;* published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp;* of the License, or (at your option) any later version.
+<i>14</i>&nbsp;*
+<i>15</i>&nbsp;*  BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp;*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp;*  GNU Lesser General Public License for more details.
+<i>19</i>&nbsp;*
+<i>20</i>&nbsp;* You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp;* License along with BEAST; if not, write to the
+<i>22</i>&nbsp;* Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp;* Boston, MA  02110-1301  USA
+<i>24</i>&nbsp;*/
+<i>25</i>&nbsp;package beast.evolution.substitutionmodel;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;import java.util.Arrays;
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;import beast.core.CalculationNode;
+<i>30</i>&nbsp;import beast.core.Description;
+<i>31</i>&nbsp;import beast.core.Input;
+<i>32</i>&nbsp;import beast.core.Input.Validate;
+<i>33</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>34</i>&nbsp;import beast.core.util.Log;
+<i>35</i>&nbsp;import beast.evolution.alignment.Alignment;
+<i>36</i>&nbsp;import beast.evolution.datatype.DataType;
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;// RRB: TODO: make this an interface?
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;@Description(&quot;Represents character frequencies typically used as distribution of the root of the tree. &quot; +
+<i>43</i>&nbsp;        &quot;Calculates empirical frequencies of characters in sequence data, or simply assumes a uniform &quot; +
+<i>44</i>&nbsp;        &quot;distribution if the estimate flag is set to false.&quot;)
+<b class="fc"><i>45</i>&nbsp;public class Frequencies extends CalculationNode {</b>
+<b class="fc"><i>46</i>&nbsp;    final public Input&lt;Alignment&gt; dataInput = new Input&lt;&gt;(&quot;data&quot;, &quot;Sequence data for which frequencies are calculated&quot;);</b>
+<b class="fc"><i>47</i>&nbsp;    final public Input&lt;Boolean&gt; estimateInput = new Input&lt;&gt;(&quot;estimate&quot;, &quot;Whether to estimate the frequencies from data (true=default) or assume a uniform distribution over characters (false)&quot;, true);</b>
+<b class="fc"><i>48</i>&nbsp;    final public Input&lt;RealParameter&gt; frequenciesInput = new Input&lt;&gt;(&quot;frequencies&quot;, &quot;A set of frequencies specified as space separated values summing to 1&quot;, Validate.XOR, dataInput);</b>
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;    /**
+<i>51</i>&nbsp;     * contains frequency distribution *
+<i>52</i>&nbsp;     */
+<i>53</i>&nbsp;    protected double[] freqs;
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;    /**
+<i>56</i>&nbsp;     * flag to indicate m_fFreqs is up to date *
+<i>57</i>&nbsp;     */
+<i>58</i>&nbsp;    boolean needsUpdate;
+<i>59</i>&nbsp;
+<i>60</i>&nbsp;
+<i>61</i>&nbsp;    @Override
+<i>62</i>&nbsp;    public void initAndValidate() {
+<b class="fc"><i>63</i>&nbsp;        update();</b>
+<b class="fc"><i>64</i>&nbsp;        double sum = getSumOfFrequencies(getFreqs());</b>
+<i>65</i>&nbsp;        // sanity check
+<b class="fc"><i>66</i>&nbsp;        if (Math.abs(sum - 1.0) &gt; 1e-6) {</b>
+<b class="nc"><i>67</i>&nbsp;            throw new IllegalArgumentException(&quot;Frequencies do not add up to 1&quot;);</b>
+<i>68</i>&nbsp;        }
+<i>69</i>&nbsp;
+<b class="fc"><i>70</i>&nbsp;    }</b>
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;    /**
+<i>73</i>&nbsp;     * return up to date frequencies *
+<i>74</i>&nbsp;     */
+<i>75</i>&nbsp;    public double[] getFreqs() {
+<b class="fc"><i>76</i>&nbsp;    	synchronized (this) {</b>
+<b class="fc"><i>77</i>&nbsp;            if (needsUpdate) {</b>
+<b class="nc"><i>78</i>&nbsp;                update();</b>
+<i>79</i>&nbsp;            }			
+<b class="fc"><i>80</i>&nbsp;		}</b>
+<i>81</i>&nbsp;
+<b class="fc"><i>82</i>&nbsp;        return freqs.clone();</b>
+<i>83</i>&nbsp;    }
+<i>84</i>&nbsp;
+<i>85</i>&nbsp;    /**
+<i>86</i>&nbsp;     * recalculate frequencies, unless it is fixed *
+<i>87</i>&nbsp;     */
+<i>88</i>&nbsp;    void update() {
+<b class="fc"><i>89</i>&nbsp;        if (frequenciesInput.get() != null) {</b>
+<i>90</i>&nbsp;
+<i>91</i>&nbsp;            // if user specified, parse frequencies from space delimited string
+<b class="fc"><i>92</i>&nbsp;            freqs = new double[frequenciesInput.get().getDimension()];</b>
+<i>93</i>&nbsp;
+<b class="fc"><i>94</i>&nbsp;            for (int i = 0; i &lt; freqs.length; i++) {</b>
+<b class="fc"><i>95</i>&nbsp;                freqs[i] = frequenciesInput.get().getValue(i);</b>
+<i>96</i>&nbsp;            }
+<i>97</i>&nbsp;
+<i>98</i>&nbsp;
+<b class="fc"><i>99</i>&nbsp;        } else if (estimateInput.get()) { // if not user specified, either estimate from data or set as fixed</b>
+<i>100</i>&nbsp;            // estimate
+<b class="fc"><i>101</i>&nbsp;            estimateFrequencies();</b>
+<b class="fc"><i>102</i>&nbsp;            checkFrequencies();</b>
+<i>103</i>&nbsp;        } else {
+<i>104</i>&nbsp;            // uniformly distributed
+<b class="fc"><i>105</i>&nbsp;            int states = dataInput.get().getMaxStateCount();</b>
+<b class="fc"><i>106</i>&nbsp;            freqs = new double[states];</b>
+<b class="fc"><i>107</i>&nbsp;            for (int i = 0; i &lt; states; i++) {</b>
+<b class="fc"><i>108</i>&nbsp;                freqs[i] = 1.0 / states;</b>
+<i>109</i>&nbsp;            }
+<i>110</i>&nbsp;        }
+<b class="fc"><i>111</i>&nbsp;        needsUpdate = false;</b>
+<b class="fc"><i>112</i>&nbsp;    } // update</b>
+<i>113</i>&nbsp;
+<i>114</i>&nbsp;
+<i>115</i>&nbsp;    /**
+<i>116</i>&nbsp;     * Estimate from sequence alignment.
+<i>117</i>&nbsp;     * This version matches the implementation in Beast 1 &amp; PAUP  *
+<i>118</i>&nbsp;     */
+<i>119</i>&nbsp;    void estimateFrequencies() {
+<b class="fc"><i>120</i>&nbsp;        Alignment alignment = dataInput.get();</b>
+<b class="fc"><i>121</i>&nbsp;        DataType dataType = alignment.getDataType();</b>
+<b class="fc"><i>122</i>&nbsp;        int stateCount = alignment.getMaxStateCount();</b>
+<i>123</i>&nbsp;
+<b class="fc"><i>124</i>&nbsp;        freqs = new double[stateCount];</b>
+<b class="fc"><i>125</i>&nbsp;        Arrays.fill(freqs, 1.0 / stateCount);</b>
+<i>126</i>&nbsp;
+<b class="fc"><i>127</i>&nbsp;        int attempts = 0;</b>
+<i>128</i>&nbsp;        double difference;
+<i>129</i>&nbsp;        do {
+<b class="fc"><i>130</i>&nbsp;            double[] tmpFreq = new double[stateCount];</b>
+<i>131</i>&nbsp;
+<b class="fc"><i>132</i>&nbsp;            double total = 0.0;</b>
+<b class="fc"><i>133</i>&nbsp;            for (int i = 0; i &lt; alignment.getPatternCount(); i++) {</b>
+<b class="fc"><i>134</i>&nbsp;                int[] pattern = alignment.getPattern(i);</b>
+<b class="fc"><i>135</i>&nbsp;                double weight = alignment.getPatternWeight(i);</b>
+<i>136</i>&nbsp;
+<b class="fc"><i>137</i>&nbsp;                for (int value : pattern) {</b>
+<b class="fc"><i>138</i>&nbsp;                    int[] codes = dataType.getStatesForCode(value);</b>
+<i>139</i>&nbsp;
+<b class="fc"><i>140</i>&nbsp;                    double sum = 0.0;</b>
+<b class="fc"><i>141</i>&nbsp;                    for (int codeIndex : codes) {</b>
+<b class="fc"><i>142</i>&nbsp;                        sum += freqs[codeIndex];</b>
+<i>143</i>&nbsp;                    }
+<i>144</i>&nbsp;
+<b class="fc"><i>145</i>&nbsp;                    for (int codeIndex : codes) {</b>
+<b class="fc"><i>146</i>&nbsp;                        double tmp = (freqs[codeIndex] * weight) / sum;</b>
+<b class="fc"><i>147</i>&nbsp;                        tmpFreq[codeIndex] += tmp;</b>
+<b class="fc"><i>148</i>&nbsp;                        total += tmp;</b>
+<i>149</i>&nbsp;                    }
+<i>150</i>&nbsp;                }
+<i>151</i>&nbsp;            }
+<i>152</i>&nbsp;
+<b class="fc"><i>153</i>&nbsp;            difference = 0.0;</b>
+<b class="fc"><i>154</i>&nbsp;            for (int i = 0; i &lt; stateCount; i++) {</b>
+<b class="fc"><i>155</i>&nbsp;                difference += Math.abs((tmpFreq[i] / total) - freqs[i]);</b>
+<b class="fc"><i>156</i>&nbsp;                freqs[i] = tmpFreq[i] / total;</b>
+<i>157</i>&nbsp;            }
+<b class="fc"><i>158</i>&nbsp;            attempts++;</b>
+<b class="fc"><i>159</i>&nbsp;        } while (difference &gt; 1E-8 &amp;&amp; attempts &lt; 1000);</b>
+<i>160</i>&nbsp;
+<i>161</i>&nbsp;//    	Alignment alignment = m_data.get();
+<i>162</i>&nbsp;//        m_fFreqs = new double[alignment.getMaxStateCount()];
+<i>163</i>&nbsp;//        for (int i = 0; i &lt; alignment.getPatternCount(); i++) {
+<i>164</i>&nbsp;//            int[] pattern = alignment.getPattern(i);
+<i>165</i>&nbsp;//            double weight = alignment.getPatternWeight(i);
+<i>166</i>&nbsp;//            DataType dataType = alignment.getDataType();
+<i>167</i>&nbsp;//            for (int value : pattern) {
+<i>168</i>&nbsp;//            	if (value &lt; 4) {
+<i>169</i>&nbsp;//            	int [] codes = dataType.getStatesForCode(value);
+<i>170</i>&nbsp;//            	for (int codeIndex : codes) {
+<i>171</i>&nbsp;//                    m_fFreqs[codeIndex] += weight / codes.length;
+<i>172</i>&nbsp;//            	}
+<i>173</i>&nbsp;//            	}
+<i>174</i>&nbsp;////                if (value &lt; m_fFreqs.length) { // ignore unknowns
+<i>175</i>&nbsp;////                    m_fFreqs[value] += weight;
+<i>176</i>&nbsp;////                }
+<i>177</i>&nbsp;//            }
+<i>178</i>&nbsp;//        }
+<i>179</i>&nbsp;//        // normalize
+<i>180</i>&nbsp;//        double sum = 0;
+<i>181</i>&nbsp;//        for (double f : m_fFreqs) {
+<i>182</i>&nbsp;//            sum += f;
+<i>183</i>&nbsp;//        }
+<i>184</i>&nbsp;//        for (int i = 0; i &lt; m_fFreqs.length; i++) {
+<i>185</i>&nbsp;//            m_fFreqs[i] /= sum;
+<i>186</i>&nbsp;//        }
+<b class="fc"><i>187</i>&nbsp;        Log.info.println(&quot;Starting frequencies: &quot; + Arrays.toString(freqs));</b>
+<b class="fc"><i>188</i>&nbsp;    } // calcFrequencies</b>
+<i>189</i>&nbsp;
+<i>190</i>&nbsp;    /**
+<i>191</i>&nbsp;     * Ensures that frequencies are not smaller than MINFREQ and
+<i>192</i>&nbsp;     * that two frequencies differ by at least 2*MINFDIFF.
+<i>193</i>&nbsp;     * This avoids potential problems later when eigenvalues
+<i>194</i>&nbsp;     * are computed.
+<i>195</i>&nbsp;     */
+<i>196</i>&nbsp;    private void checkFrequencies() {
+<i>197</i>&nbsp;        // required frequency difference
+<b class="fc"><i>198</i>&nbsp;        double MINFDIFF = 1.0E-10;</b>
+<i>199</i>&nbsp;
+<i>200</i>&nbsp;        // lower limit on frequency
+<b class="fc"><i>201</i>&nbsp;        double MINFREQ = 1.0E-10;</b>
+<i>202</i>&nbsp;
+<b class="fc"><i>203</i>&nbsp;        int maxi = 0;</b>
+<b class="fc"><i>204</i>&nbsp;        double sum = 0.0;</b>
+<b class="fc"><i>205</i>&nbsp;        double maxfreq = 0.0;</b>
+<b class="fc"><i>206</i>&nbsp;        for (int i = 0; i &lt; freqs.length; i++) {</b>
+<b class="fc"><i>207</i>&nbsp;            double freq = freqs[i];</b>
+<b class="fc"><i>208</i>&nbsp;            if (freq &lt; MINFREQ) freqs[i] = MINFREQ;</b>
+<b class="fc"><i>209</i>&nbsp;            if (freq &gt; maxfreq) {</b>
+<b class="fc"><i>210</i>&nbsp;                maxfreq = freq;</b>
+<b class="fc"><i>211</i>&nbsp;                maxi = i;</b>
+<i>212</i>&nbsp;            }
+<b class="fc"><i>213</i>&nbsp;            sum += freqs[i];</b>
+<i>214</i>&nbsp;        }
+<b class="fc"><i>215</i>&nbsp;        double diff = 1.0 - sum;</b>
+<b class="fc"><i>216</i>&nbsp;        freqs[maxi] += diff;</b>
+<i>217</i>&nbsp;
+<b class="fc"><i>218</i>&nbsp;        for (int i = 0; i &lt; freqs.length - 1; i++) {</b>
+<b class="fc"><i>219</i>&nbsp;            for (int j = i + 1; j &lt; freqs.length; j++) {</b>
+<b class="fc"><i>220</i>&nbsp;                if (freqs[i] == freqs[j]) {</b>
+<b class="nc"><i>221</i>&nbsp;                    freqs[i] += MINFDIFF;</b>
+<b class="nc"><i>222</i>&nbsp;                    freqs[j] -= MINFDIFF;</b>
+<i>223</i>&nbsp;                }
+<i>224</i>&nbsp;            }
+<i>225</i>&nbsp;        }
+<b class="fc"><i>226</i>&nbsp;    } // checkFrequencies</b>
+<i>227</i>&nbsp;
+<i>228</i>&nbsp;    /**
+<i>229</i>&nbsp;     * CalculationNode implementation *
+<i>230</i>&nbsp;     */
+<i>231</i>&nbsp;    @Override
+<i>232</i>&nbsp;    protected boolean requiresRecalculation() {
+<b class="nc"><i>233</i>&nbsp;        boolean recalculates = false;</b>
+<b class="nc"><i>234</i>&nbsp;        if (frequenciesInput.get().somethingIsDirty()) {</b>
+<i>235</i>&nbsp;
+<b class="nc"><i>236</i>&nbsp;            needsUpdate = true;</b>
+<b class="nc"><i>237</i>&nbsp;            recalculates = true;</b>
+<i>238</i>&nbsp;        }
+<i>239</i>&nbsp;
+<b class="nc"><i>240</i>&nbsp;        return recalculates;</b>
+<i>241</i>&nbsp;    }
+<i>242</i>&nbsp;
+<i>243</i>&nbsp;    /**
+<i>244</i>&nbsp;     * @param frequencies the frequencies
+<i>245</i>&nbsp;     * @return return the sum of frequencies
+<i>246</i>&nbsp;     */
+<i>247</i>&nbsp;    private double getSumOfFrequencies(double[] frequencies) {
+<b class="fc"><i>248</i>&nbsp;        double total = 0.0;</b>
+<b class="fc"><i>249</i>&nbsp;        for (double frequency : frequencies) {</b>
+<b class="fc"><i>250</i>&nbsp;            total += frequency;</b>
+<i>251</i>&nbsp;        }
+<b class="fc"><i>252</i>&nbsp;        return total;</b>
+<i>253</i>&nbsp;    }
+<i>254</i>&nbsp;
+<i>255</i>&nbsp;    @Override
+<i>256</i>&nbsp;	public void restore() {
+<b class="nc"><i>257</i>&nbsp;        needsUpdate = true;</b>
+<b class="nc"><i>258</i>&nbsp;        super.restore();</b>
+<b class="nc"><i>259</i>&nbsp;    }</b>
+<i>260</i>&nbsp;
+<i>261</i>&nbsp;} // class Frequencies
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

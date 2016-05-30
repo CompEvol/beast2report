@@ -1,0 +1,171 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: SampleOffValues</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.tree.coalescent</a> ]
+</div>
+
+<h1>Coverage Summary for Class: SampleOffValues (beast.evolution.tree.coalescent)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SampleOffValues</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 37)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.tree.coalescent;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import beast.core.Description;
+<i>4</i>&nbsp;import beast.core.Input;
+<i>5</i>&nbsp;import beast.core.Operator;
+<i>6</i>&nbsp;import beast.core.parameter.BooleanParameter;
+<i>7</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>8</i>&nbsp;import beast.math.distributions.ParametricDistribution;
+<i>9</i>&nbsp;import beast.util.Randomizer;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;/**
+<i>12</i>&nbsp; * @author Joseph Heled
+<i>13</i>&nbsp; *         Date: 2/03/2011
+<i>14</i>&nbsp; */
+<b class="nc"><i>15</i>&nbsp;@Description(&quot;Sample values from a distribution&quot;)</b>
+<b class="nc"><i>16</i>&nbsp;public class SampleOffValues extends Operator {</b>
+<b class="nc"><i>17</i>&nbsp;    final public Input&lt;RealParameter&gt; valuesInput = new Input&lt;&gt;(&quot;values&quot;, &quot;vector of target values&quot;, Input.Validate.REQUIRED);</b>
+<i>18</i>&nbsp;
+<b class="nc"><i>19</i>&nbsp;    final public Input&lt;BooleanParameter&gt; indicatorsInput = new Input&lt;&gt;(&quot;indicators&quot;, &quot;Sample only entries which are &#39;off&#39;&quot;);</b>
+<i>20</i>&nbsp;
+<b class="nc"><i>21</i>&nbsp;    final public Input&lt;ParametricDistribution&gt; distInput = new Input&lt;&gt;(&quot;dist&quot;,</b>
+<i>22</i>&nbsp;            &quot;distribution to sample from.&quot;, Input.Validate.REQUIRED);
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;    public final Input&lt;Boolean&gt; scaleAll =
+<b class="nc"><i>25</i>&nbsp;            new Input&lt;&gt;(&quot;all&quot;, &quot;if true, sample all off values in one go.&quot;, false);</b>
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;    @Override
+<i>28</i>&nbsp;	public void initAndValidate() {
+<i>29</i>&nbsp;    }
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;    @Override
+<i>32</i>&nbsp;    public double proposal() {
+<b class="nc"><i>33</i>&nbsp;        final BooleanParameter indicators = indicatorsInput.get(this);</b>
+<b class="nc"><i>34</i>&nbsp;        final RealParameter data = valuesInput.get(this);</b>
+<b class="nc"><i>35</i>&nbsp;        final ParametricDistribution distribution = distInput.get();</b>
+<i>36</i>&nbsp;
+<b class="nc"><i>37</i>&nbsp;        final int idim = indicators.getDimension();</b>
+<i>38</i>&nbsp;
+<b class="nc"><i>39</i>&nbsp;        final int offset = (data.getDimension() - 1) == idim ? 1 : 0;</b>
+<b class="nc"><i>40</i>&nbsp;        assert offset == 1 || data.getDimension() == idim : &quot;&quot; + idim + &quot; (?+1) != &quot; + data.getDimension();</b>
+<i>41</i>&nbsp;
+<b class="nc"><i>42</i>&nbsp;        double hr = Double.NEGATIVE_INFINITY;</b>
+<i>43</i>&nbsp;
+<b class="nc"><i>44</i>&nbsp;        if( scaleAll.get() ) {</b>
+<b class="nc"><i>45</i>&nbsp;            for (int i = offset; i &lt; idim; ++i) {</b>
+<b class="nc"><i>46</i>&nbsp;                if( !indicators.getValue(i-offset) ) {</b>
+<i>47</i>&nbsp;                    try {
+<b class="nc"><i>48</i>&nbsp;                        final double val = distribution.inverseCumulativeProbability(Randomizer.nextDouble());</b>
+<b class="nc"><i>49</i>&nbsp;                        hr += distribution.logDensity(data.getValue(i));</b>
+<b class="nc"><i>50</i>&nbsp;                        data.setValue(i, val);</b>
+<b class="nc"><i>51</i>&nbsp;                    } catch (Exception e) {</b>
+<i>52</i>&nbsp;                        // some distributions fail on extreme values - currently gamma
+<b class="nc"><i>53</i>&nbsp;                        return Double.NEGATIVE_INFINITY;</b>
+<b class="nc"><i>54</i>&nbsp;                    }</b>
+<i>55</i>&nbsp;                }
+<i>56</i>&nbsp;            }
+<i>57</i>&nbsp;        } else {
+<i>58</i>&nbsp;
+<i>59</i>&nbsp;            // available locations for direct sampling
+<b class="nc"><i>60</i>&nbsp;            int[] loc = new int[idim];</b>
+<b class="nc"><i>61</i>&nbsp;            int locIndex = 0;</b>
+<i>62</i>&nbsp;
+<b class="nc"><i>63</i>&nbsp;            for (int i = 0; i &lt; idim; ++i) {</b>
+<b class="nc"><i>64</i>&nbsp;                if( !indicators.getValue(i) ) {</b>
+<b class="nc"><i>65</i>&nbsp;                    loc[locIndex] = i + offset;</b>
+<b class="nc"><i>66</i>&nbsp;                    ++locIndex;</b>
+<i>67</i>&nbsp;                }
+<i>68</i>&nbsp;            }
+<i>69</i>&nbsp;
+<b class="nc"><i>70</i>&nbsp;            if( locIndex &gt; 0 ) {</b>
+<b class="nc"><i>71</i>&nbsp;                final int index = loc[Randomizer.nextInt(locIndex)];</b>
+<i>72</i>&nbsp;                try {
+<b class="nc"><i>73</i>&nbsp;                    final double val = distribution.inverseCumulativeProbability(Randomizer.nextDouble());</b>
+<b class="nc"><i>74</i>&nbsp;                    hr = distribution.logDensity(data.getValue(index));</b>
+<b class="nc"><i>75</i>&nbsp;                    data.setValue(index, val);</b>
+<b class="nc"><i>76</i>&nbsp;                } catch (Exception e) {</b>
+<i>77</i>&nbsp;                    // some distributions fail on extreme values - currently gamma
+<b class="nc"><i>78</i>&nbsp;                    return Double.NEGATIVE_INFINITY;</b>
+<i>79</i>&nbsp;                    //throw new OperatorFailedException(e.getMessage());
+<b class="nc"><i>80</i>&nbsp;                }</b>
+<i>81</i>&nbsp;            } else {
+<i>82</i>&nbsp;                // no non-active indicators
+<i>83</i>&nbsp;                //return Double.NEGATIVE_INFINITY;
+<i>84</i>&nbsp;            }
+<i>85</i>&nbsp;        }
+<b class="nc"><i>86</i>&nbsp;        return hr;</b>
+<i>87</i>&nbsp;    }
+<i>88</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

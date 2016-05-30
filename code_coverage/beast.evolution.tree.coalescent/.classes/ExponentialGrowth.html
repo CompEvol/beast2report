@@ -1,0 +1,300 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: ExponentialGrowth</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.tree.coalescent</a> ]
+</div>
+
+<h1>Coverage Summary for Class: ExponentialGrowth (beast.evolution.tree.coalescent)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExponentialGrowth</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 26)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.tree.coalescent;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import java.util.Collections;
+<i>5</i>&nbsp;import java.util.List;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import beast.core.Description;
+<i>8</i>&nbsp;import beast.core.Input;
+<i>9</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>10</i>&nbsp;/*
+<i>11</i>&nbsp; * ConstantPopulation.java
+<i>12</i>&nbsp; *
+<i>13</i>&nbsp; * Copyright (C) 2002-2006 Alexei Drummond and Andrew Rambaut
+<i>14</i>&nbsp; *
+<i>15</i>&nbsp; * This file is part of BEAST.
+<i>16</i>&nbsp; * See the NOTICE file distributed with this work for additional
+<i>17</i>&nbsp; * information regarding copyright ownership and licensing.
+<i>18</i>&nbsp; *
+<i>19</i>&nbsp; * BEAST is free software; you can redistribute it and/or modify
+<i>20</i>&nbsp; * it under the terms of the GNU Lesser General Public License as
+<i>21</i>&nbsp; * published by the Free Software Foundation; either version 2
+<i>22</i>&nbsp; * of the License, or (at your option) any later version.
+<i>23</i>&nbsp; *
+<i>24</i>&nbsp; *  BEAST is distributed in the hope that it will be useful,
+<i>25</i>&nbsp; *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>26</i>&nbsp; *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>27</i>&nbsp; *  GNU Lesser General Public License for more details.
+<i>28</i>&nbsp; *
+<i>29</i>&nbsp; * You should have received a copy of the GNU Lesser General Public
+<i>30</i>&nbsp; * License along with BEAST; if not, write to the
+<i>31</i>&nbsp; * Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>32</i>&nbsp; * Boston, MA  02110-1301  USA
+<i>33</i>&nbsp; */
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;/**
+<i>37</i>&nbsp; * @author Andrew Rambaut
+<i>38</i>&nbsp; * @author Alexei Drummond
+<i>39</i>&nbsp; * @version $Id: ConstantPopulation.java,v 1.9 2005/05/24 20:25:55 rambaut Exp $
+<i>40</i>&nbsp; */
+<i>41</i>&nbsp;@Description(&quot;Coalescent intervals for a exponentially growing population.&quot;)
+<b class="nc"><i>42</i>&nbsp;public class ExponentialGrowth extends PopulationFunction.Abstract {</b>
+<b class="nc"><i>43</i>&nbsp;    final public Input&lt;RealParameter&gt; popSizeParameterInput = new Input&lt;&gt;(&quot;popSize&quot;,</b>
+<i>44</i>&nbsp;            &quot;present-day population size (defaults to 1.0). &quot;);
+<b class="nc"><i>45</i>&nbsp;    final public Input&lt;RealParameter&gt; growthRateParameterInput = new Input&lt;&gt;(&quot;growthRate&quot;,</b>
+<i>46</i>&nbsp;            &quot;growth rate is the exponent of the exponential growth&quot;);
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;    //
+<i>49</i>&nbsp;    // Public stuff
+<i>50</i>&nbsp;    //
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;    @Override
+<i>53</i>&nbsp;	public void initAndValidate() {
+<b class="nc"><i>54</i>&nbsp;        if (popSizeParameterInput.get() != null) {</b>
+<b class="nc"><i>55</i>&nbsp;            popSizeParameterInput.get().setBounds(</b>
+<b class="nc"><i>56</i>&nbsp;            		Math.max(0.0, popSizeParameterInput.get().getLower()), </b>
+<b class="nc"><i>57</i>&nbsp;            		popSizeParameterInput.get().getUpper());</b>
+<i>58</i>&nbsp;        }
+<i>59</i>&nbsp;//        if (growthRateParameter.get() != null) {
+<i>60</i>&nbsp;//            growthRateParameter.get().setBounds(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+<i>61</i>&nbsp;//        }
+<i>62</i>&nbsp;    }
+<i>63</i>&nbsp;
+<i>64</i>&nbsp;    /**
+<i>65</i>&nbsp;     * @return initial population size.
+<i>66</i>&nbsp;     */
+<i>67</i>&nbsp;    public double getN0() {
+<b class="nc"><i>68</i>&nbsp;        return popSizeParameterInput.get().getValue();</b>
+<i>69</i>&nbsp;    }
+<i>70</i>&nbsp;
+<i>71</i>&nbsp;    /**
+<i>72</i>&nbsp;     * sets initial population size.
+<i>73</i>&nbsp;     *
+<i>74</i>&nbsp;     * @param N0 new size
+<i>75</i>&nbsp;     */
+<i>76</i>&nbsp;//    public void setN0(double N0) {
+<i>77</i>&nbsp;//        this.N0 = N0;
+<i>78</i>&nbsp;//    }
+<i>79</i>&nbsp;
+<i>80</i>&nbsp;    /**
+<i>81</i>&nbsp;     * @return growth rate.
+<i>82</i>&nbsp;     */
+<i>83</i>&nbsp;    public final double getGrowthRate() {
+<b class="nc"><i>84</i>&nbsp;        return growthRateParameterInput.get().getValue();</b>
+<i>85</i>&nbsp;    }
+<i>86</i>&nbsp;
+<i>87</i>&nbsp;    /**
+<i>88</i>&nbsp;     * sets growth rate to r.
+<i>89</i>&nbsp;     *
+<i>90</i>&nbsp;     * @param r
+<i>91</i>&nbsp;     */
+<i>92</i>&nbsp;//    public void setGrowthRate(double r) {
+<i>93</i>&nbsp;//        this.r = r;
+<i>94</i>&nbsp;//    }
+<i>95</i>&nbsp;
+<i>96</i>&nbsp;    /**
+<i>97</i>&nbsp;     * An alternative parameterization of this model. This
+<i>98</i>&nbsp;     * function sets growth rate for a given doubling time.
+<i>99</i>&nbsp;     *
+<i>100</i>&nbsp;     * @param doublingTime
+<i>101</i>&nbsp;     */
+<i>102</i>&nbsp;//    public void setDoublingTime(double doublingTime) {
+<i>103</i>&nbsp;//        setGrowthRate(Math.log(2) / doublingTime);
+<i>104</i>&nbsp;//    }
+<i>105</i>&nbsp;
+<i>106</i>&nbsp;    // Implementation of abstract methods
+<i>107</i>&nbsp;    @Override
+<i>108</i>&nbsp;	public double getPopSize(double t) {
+<i>109</i>&nbsp;
+<b class="nc"><i>110</i>&nbsp;        double r = getGrowthRate();</b>
+<b class="nc"><i>111</i>&nbsp;        if (r == 0) {</b>
+<b class="nc"><i>112</i>&nbsp;            return getN0();</b>
+<i>113</i>&nbsp;        } else {
+<b class="nc"><i>114</i>&nbsp;            return getN0() * Math.exp(-t * r);</b>
+<i>115</i>&nbsp;        }
+<i>116</i>&nbsp;    }
+<i>117</i>&nbsp;
+<i>118</i>&nbsp;    /**
+<i>119</i>&nbsp;     * Calculates the integral 1/N(x) dx between start and finish.
+<i>120</i>&nbsp;     */
+<i>121</i>&nbsp;    @Override
+<i>122</i>&nbsp;    public double getIntegral(double start, double finish) {
+<b class="nc"><i>123</i>&nbsp;        double r = getGrowthRate();</b>
+<b class="nc"><i>124</i>&nbsp;        if (r == 0.0) {</b>
+<b class="nc"><i>125</i>&nbsp;            return (finish - start) / getN0();</b>
+<i>126</i>&nbsp;        } else {
+<b class="nc"><i>127</i>&nbsp;            return (Math.exp(finish * r) - Math.exp(start * r)) / getN0() / r;</b>
+<i>128</i>&nbsp;        }
+<i>129</i>&nbsp;    }
+<i>130</i>&nbsp;
+<i>131</i>&nbsp;    @Override
+<i>132</i>&nbsp;	public double getIntensity(double t) {
+<b class="nc"><i>133</i>&nbsp;        double r = getGrowthRate();</b>
+<b class="nc"><i>134</i>&nbsp;        if (r == 0.0) {</b>
+<b class="nc"><i>135</i>&nbsp;            return t / getN0();</b>
+<i>136</i>&nbsp;        } else {
+<b class="nc"><i>137</i>&nbsp;            return (Math.exp(t * r) - 1.0) / getN0() / r;</b>
+<i>138</i>&nbsp;        }
+<i>139</i>&nbsp;    }
+<i>140</i>&nbsp;
+<i>141</i>&nbsp;    @Override
+<i>142</i>&nbsp;	public double getInverseIntensity(double x) {
+<i>143</i>&nbsp;
+<b class="nc"><i>144</i>&nbsp;        double r = getGrowthRate();</b>
+<b class="nc"><i>145</i>&nbsp;        if (r == 0.0) {</b>
+<b class="nc"><i>146</i>&nbsp;            return getN0() * x;</b>
+<i>147</i>&nbsp;        } else {
+<b class="nc"><i>148</i>&nbsp;            return Math.log(1.0 + getN0() * x * r) / r;</b>
+<i>149</i>&nbsp;        }
+<i>150</i>&nbsp;    }
+<i>151</i>&nbsp;
+<i>152</i>&nbsp;
+<i>153</i>&nbsp;    // Implementation of abstract methods
+<i>154</i>&nbsp;
+<i>155</i>&nbsp;    @Override
+<i>156</i>&nbsp;	public List&lt;String&gt; getParameterIds() {
+<b class="nc"><i>157</i>&nbsp;        return Collections.singletonList(popSizeParameterInput.get().getID());</b>
+<i>158</i>&nbsp;    }
+<i>159</i>&nbsp;
+<i>160</i>&nbsp;//    public int getNumArguments() {
+<i>161</i>&nbsp;//        return 2;
+<i>162</i>&nbsp;//    }
+<i>163</i>&nbsp;//
+<i>164</i>&nbsp;//    public String getArgumentName(int n) {
+<i>165</i>&nbsp;//        if (n == 0) return &quot;N0&quot;;
+<i>166</i>&nbsp;//        else return &quot;r&quot;;
+<i>167</i>&nbsp;//    }
+<i>168</i>&nbsp;//
+<i>169</i>&nbsp;//    public double getArgument(int n) {
+<i>170</i>&nbsp;//        if (n == 0) return getN0();
+<i>171</i>&nbsp;//        else return r;
+<i>172</i>&nbsp;//    }
+<i>173</i>&nbsp;//
+<i>174</i>&nbsp;//    public void setArgument(int n, double value) {
+<i>175</i>&nbsp;//        if (n == 0) setN0(value);
+<i>176</i>&nbsp;//        else r = value;
+<i>177</i>&nbsp;//    }
+<i>178</i>&nbsp;//
+<i>179</i>&nbsp;//    public double getLowerBound(int n) {
+<i>180</i>&nbsp;//        if (n == 0) return 0.0;
+<i>181</i>&nbsp;//        else return Double.NEGATIVE_INFINITY;
+<i>182</i>&nbsp;//    }
+<i>183</i>&nbsp;//
+<i>184</i>&nbsp;//    public double getUpperBound(int n) {
+<i>185</i>&nbsp;//        return Double.POSITIVE_INFINITY;
+<i>186</i>&nbsp;//    }
+<i>187</i>&nbsp;//
+<i>188</i>&nbsp;//    public PopulationFunction getCopy() {
+<i>189</i>&nbsp;//        ExponentialGrowth eg = new ExponentialGrowth();
+<i>190</i>&nbsp;//        eg.setN0(N0);
+<i>191</i>&nbsp;//        eg.r = r;
+<i>192</i>&nbsp;//        return eg;
+<i>193</i>&nbsp;//    }
+<i>194</i>&nbsp;
+<i>195</i>&nbsp;//    public void prepare(State state) {
+<i>196</i>&nbsp;//        if (popSizeParameter.get() != null) {
+<i>197</i>&nbsp;//            N0 = popSizeParameter.get().getValue();//state.getParameter(popSizeParameter).getValue();
+<i>198</i>&nbsp;//        }
+<i>199</i>&nbsp;//        if (growthRateParameter.get() != null) {
+<i>200</i>&nbsp;//            r = growthRateParameter.get().getValue();//state.getParameter(growthRateParameter).getValue();
+<i>201</i>&nbsp;//        }
+<i>202</i>&nbsp;//    }
+<i>203</i>&nbsp;
+<i>204</i>&nbsp;    //
+<i>205</i>&nbsp;    // private stuff
+<i>206</i>&nbsp;    //
+<i>207</i>&nbsp;
+<i>208</i>&nbsp;    /**
+<i>209</i>&nbsp;     * The current day population size
+<i>210</i>&nbsp;     */
+<i>211</i>&nbsp;    //private double N0 = 1.0;
+<i>212</i>&nbsp;
+<i>213</i>&nbsp;    /**
+<i>214</i>&nbsp;     * The exponential growth rate
+<i>215</i>&nbsp;     */
+<i>216</i>&nbsp;    //private double r = 0.01;
+<i>217</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

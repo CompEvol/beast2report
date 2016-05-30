@@ -1,0 +1,355 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: HKY</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.substitutionmodel</a> ]
+</div>
+
+<h1>Coverage Summary for Class: HKY (beast.evolution.substitutionmodel)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HKY</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    55.6%
+  </span>
+  <span class="absValue">
+    (5/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.5%
+  </span>
+  <span class="absValue">
+    (108/ 122)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;* File HKY.java
+<i>3</i>&nbsp;*
+<i>4</i>&nbsp;* Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>5</i>&nbsp;*
+<i>6</i>&nbsp;* This file is part of BEAST2.
+<i>7</i>&nbsp;* See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp;* information regarding copyright ownership and licensing.
+<i>9</i>&nbsp;*
+<i>10</i>&nbsp;* BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp;* it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp;* published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp;* of the License, or (at your option) any later version.
+<i>14</i>&nbsp;*
+<i>15</i>&nbsp;*  BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp;*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp;*  GNU Lesser General Public License for more details.
+<i>19</i>&nbsp;*
+<i>20</i>&nbsp;* You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp;* License along with BEAST; if not, write to the
+<i>22</i>&nbsp;* Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp;* Boston, MA  02110-1301  USA
+<i>24</i>&nbsp;*/
+<i>25</i>&nbsp;package beast.evolution.substitutionmodel;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;import beast.core.Citation;
+<i>28</i>&nbsp;import beast.core.Description;
+<i>29</i>&nbsp;import beast.core.Input;
+<i>30</i>&nbsp;import beast.core.Input.Validate;
+<i>31</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>32</i>&nbsp;import beast.evolution.datatype.DataType;
+<i>33</i>&nbsp;import beast.evolution.datatype.Nucleotide;
+<i>34</i>&nbsp;import beast.evolution.tree.Node;
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;@Description(&quot;HKY85 (Hasegawa, Kishino &amp; Yano, 1985) substitution model of nucleotide evolution.&quot;)
+<i>37</i>&nbsp;@Citation(value =
+<i>38</i>&nbsp;        &quot;Hasegawa M, Kishino H, Yano T (1985) Dating the human-ape splitting by a\n&quot;+
+<i>39</i>&nbsp;                &quot;  molecular clock of mitochondrial DNA. Journal of Molecular Evolution\n&quot; +
+<i>40</i>&nbsp;                &quot;  22:160-174.&quot;, DOI = &quot;10.1007/BF02101694&quot;, year = 1985, firstAuthorSurname = &quot;hasegawa&quot;)
+<b class="fc"><i>41</i>&nbsp;public class HKY extends SubstitutionModel.NucleotideBase {</b>
+<b class="fc"><i>42</i>&nbsp;    final public Input&lt;RealParameter&gt; kappaInput = new Input&lt;&gt;(&quot;kappa&quot;, &quot;kappa parameter in HKY model&quot;, Validate.REQUIRED);</b>
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;    /**
+<i>45</i>&nbsp;     * applies to nucleotides only *
+<i>46</i>&nbsp;     */
+<i>47</i>&nbsp;    public static final int STATE_COUNT = 4;
+<i>48</i>&nbsp;
+<i>49</i>&nbsp;    /**
+<i>50</i>&nbsp;     * Eigenvalue decomposition of rate matrix + its stored version *
+<i>51</i>&nbsp;     */
+<b class="fc"><i>52</i>&nbsp;    private EigenDecomposition eigenDecomposition = null;</b>
+<b class="fc"><i>53</i>&nbsp;    private EigenDecomposition storedEigenDecomposition = null;</b>
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;    /**
+<i>56</i>&nbsp;     * flag to indicate eigen decomposition is up to date *
+<i>57</i>&nbsp;     */
+<b class="fc"><i>58</i>&nbsp;    private boolean updateEigen = true;</b>
+<i>59</i>&nbsp;    /**
+<i>60</i>&nbsp;     * flag to indicate matrix is up to date *
+<i>61</i>&nbsp;     */
+<b class="fc"><i>62</i>&nbsp;    protected boolean updateMatrix = true;</b>
+<i>63</i>&nbsp;
+<i>64</i>&nbsp;    @Override
+<i>65</i>&nbsp;    public void initAndValidate() {
+<b class="fc"><i>66</i>&nbsp;        super.initAndValidate();</b>
+<b class="fc"><i>67</i>&nbsp;        kappaInput.get().setBounds(Math.max(0.0, kappaInput.get().getLower()), kappaInput.get().getUpper());</b>
+<i>68</i>&nbsp;
+<b class="fc"><i>69</i>&nbsp;        nrOfStates = STATE_COUNT;</b>
+<b class="fc"><i>70</i>&nbsp;    }</b>
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;    @Override
+<i>73</i>&nbsp;    public void getTransitionProbabilities(Node node, double startTime, double endTime, double rate, double[] matrix) {
+<b class="fc"><i>74</i>&nbsp;        double distance = (startTime - endTime) * rate;</b>
+<i>75</i>&nbsp;
+<b class="fc"><i>76</i>&nbsp;        synchronized(this) {</b>
+<b class="fc"><i>77</i>&nbsp;        	if (updateMatrix) {</b>
+<b class="fc"><i>78</i>&nbsp;        		setupMatrix();</b>
+<i>79</i>&nbsp;        	}
+<b class="fc"><i>80</i>&nbsp;        }</b>
+<i>81</i>&nbsp;
+<b class="fc"><i>82</i>&nbsp;        final double xx = beta * distance;</b>
+<b class="fc"><i>83</i>&nbsp;        final double bbR = Math.exp(xx * A_R);</b>
+<b class="fc"><i>84</i>&nbsp;        final double bbY = Math.exp(xx * A_Y);</b>
+<i>85</i>&nbsp;
+<b class="fc"><i>86</i>&nbsp;        final double aa = Math.exp(xx);</b>
+<b class="fc"><i>87</i>&nbsp;        final double oneminusa = 1 - aa;</b>
+<i>88</i>&nbsp;
+<b class="fc"><i>89</i>&nbsp;        final double t1Aaa = (tab1A * aa);</b>
+<b class="fc"><i>90</i>&nbsp;        matrix[0] = freqA + t1Aaa + (tab2A * bbR);</b>
+<i>91</i>&nbsp;
+<b class="fc"><i>92</i>&nbsp;        matrix[1] = freqC * oneminusa;</b>
+<b class="fc"><i>93</i>&nbsp;        final double t1Gaa = (tab1G * aa);</b>
+<b class="fc"><i>94</i>&nbsp;        matrix[2] = freqG + t1Gaa - (tab3G * bbR);</b>
+<b class="fc"><i>95</i>&nbsp;        matrix[3] = freqT * oneminusa;</b>
+<i>96</i>&nbsp;
+<b class="fc"><i>97</i>&nbsp;        matrix[4] = freqA * oneminusa;</b>
+<b class="fc"><i>98</i>&nbsp;        final double t1Caa = (tab1C * aa);</b>
+<b class="fc"><i>99</i>&nbsp;        matrix[5] = freqC + t1Caa + (tab2C * bbY);</b>
+<b class="fc"><i>100</i>&nbsp;        matrix[6] = freqG * oneminusa;</b>
+<b class="fc"><i>101</i>&nbsp;        final double t1Taa = (tab1T * aa);</b>
+<b class="fc"><i>102</i>&nbsp;        matrix[7] = freqT + t1Taa - (tab3T * bbY);</b>
+<i>103</i>&nbsp;
+<b class="fc"><i>104</i>&nbsp;        matrix[8] = freqA + t1Aaa - (tab3A * bbR);</b>
+<b class="fc"><i>105</i>&nbsp;        matrix[9] = matrix[1];</b>
+<b class="fc"><i>106</i>&nbsp;        matrix[10] = freqG + t1Gaa + (tab2G * bbR);</b>
+<b class="fc"><i>107</i>&nbsp;        matrix[11] = matrix[3];</b>
+<i>108</i>&nbsp;
+<b class="fc"><i>109</i>&nbsp;        matrix[12] = matrix[4];</b>
+<b class="fc"><i>110</i>&nbsp;        matrix[13] = freqC + t1Caa - (tab3C * bbY);</b>
+<b class="fc"><i>111</i>&nbsp;        matrix[14] = matrix[6];</b>
+<b class="fc"><i>112</i>&nbsp;        matrix[15] = freqT + t1Taa + (tab2T * bbY);</b>
+<b class="fc"><i>113</i>&nbsp;    }</b>
+<i>114</i>&nbsp;
+<i>115</i>&nbsp;    @Override
+<i>116</i>&nbsp;    public EigenDecomposition getEigenDecomposition(Node node) {
+<i>117</i>&nbsp;
+<b class="fc"><i>118</i>&nbsp;        if (eigenDecomposition == null) {</b>
+<b class="fc"><i>119</i>&nbsp;            double[] evec = new double[STATE_COUNT * STATE_COUNT];</b>
+<b class="fc"><i>120</i>&nbsp;            double[] ivec = new double[STATE_COUNT * STATE_COUNT];</b>
+<b class="fc"><i>121</i>&nbsp;            double[] eval = new double[STATE_COUNT];</b>
+<b class="fc"><i>122</i>&nbsp;            eigenDecomposition = new EigenDecomposition(evec, ivec, eval);</b>
+<i>123</i>&nbsp;
+<b class="fc"><i>124</i>&nbsp;            ivec[2 * STATE_COUNT + 1] = 1; // left eigenvectors 3 = (0,1,0,-1); 4 = (1,0,-1,0)</b>
+<b class="fc"><i>125</i>&nbsp;            ivec[2 * STATE_COUNT + 3] = -1;</b>
+<i>126</i>&nbsp;
+<b class="fc"><i>127</i>&nbsp;            ivec[3 * STATE_COUNT + 0] = 1;</b>
+<b class="fc"><i>128</i>&nbsp;            ivec[3 * STATE_COUNT + 2] = -1;</b>
+<i>129</i>&nbsp;
+<b class="fc"><i>130</i>&nbsp;            evec[0 * STATE_COUNT + 0] = 1; // right eigenvector 1 = (1,1,1,1)&#39;</b>
+<b class="fc"><i>131</i>&nbsp;            evec[1 * STATE_COUNT + 0] = 1;</b>
+<b class="fc"><i>132</i>&nbsp;            evec[2 * STATE_COUNT + 0] = 1;</b>
+<b class="fc"><i>133</i>&nbsp;            evec[3 * STATE_COUNT + 0] = 1;</b>
+<i>134</i>&nbsp;
+<b class="fc"><i>135</i>&nbsp;            updateEigen = true;</b>
+<i>136</i>&nbsp;        }
+<i>137</i>&nbsp;
+<b class="fc"><i>138</i>&nbsp;        if (updateEigen) {</b>
+<i>139</i>&nbsp;
+<b class="fc"><i>140</i>&nbsp;            double[] evec = eigenDecomposition.getEigenVectors();</b>
+<b class="fc"><i>141</i>&nbsp;            double[] ivec = eigenDecomposition.getInverseEigenVectors();</b>
+<b class="fc"><i>142</i>&nbsp;            double[] pi = frequencies.getFreqs();</b>
+<b class="fc"><i>143</i>&nbsp;            double piR = pi[0] + pi[2];</b>
+<b class="fc"><i>144</i>&nbsp;            double piY = pi[1] + pi[3];</b>
+<i>145</i>&nbsp;
+<i>146</i>&nbsp;            // left eigenvector #1
+<b class="fc"><i>147</i>&nbsp;            ivec[0 * STATE_COUNT + 0] = pi[0]; // or, evec[0] = pi;</b>
+<b class="fc"><i>148</i>&nbsp;            ivec[0 * STATE_COUNT + 1] = pi[1];</b>
+<b class="fc"><i>149</i>&nbsp;            ivec[0 * STATE_COUNT + 2] = pi[2];</b>
+<b class="fc"><i>150</i>&nbsp;            ivec[0 * STATE_COUNT + 3] = pi[3];</b>
+<i>151</i>&nbsp;
+<i>152</i>&nbsp;            // left eigenvector #2
+<b class="fc"><i>153</i>&nbsp;            ivec[1 * STATE_COUNT + 0] = pi[0] * piY;</b>
+<b class="fc"><i>154</i>&nbsp;            ivec[1 * STATE_COUNT + 1] = -pi[1] * piR;</b>
+<b class="fc"><i>155</i>&nbsp;            ivec[1 * STATE_COUNT + 2] = pi[2] * piY;</b>
+<b class="fc"><i>156</i>&nbsp;            ivec[1 * STATE_COUNT + 3] = -pi[3] * piR;</b>
+<i>157</i>&nbsp;
+<i>158</i>&nbsp;            // right eigenvector #2
+<b class="fc"><i>159</i>&nbsp;            evec[0 * STATE_COUNT + 1] = 1.0 / piR;</b>
+<b class="fc"><i>160</i>&nbsp;            evec[1 * STATE_COUNT + 1] = -1.0 / piY;</b>
+<b class="fc"><i>161</i>&nbsp;            evec[2 * STATE_COUNT + 1] = 1.0 / piR;</b>
+<b class="fc"><i>162</i>&nbsp;            evec[3 * STATE_COUNT + 1] = -1.0 / piY;</b>
+<i>163</i>&nbsp;
+<i>164</i>&nbsp;            // right eigenvector #3
+<b class="fc"><i>165</i>&nbsp;            evec[1 * STATE_COUNT + 2] = pi[3] / piY;</b>
+<b class="fc"><i>166</i>&nbsp;            evec[3 * STATE_COUNT + 2] = -pi[1] / piY;</b>
+<i>167</i>&nbsp;
+<i>168</i>&nbsp;            // right eigenvector #4
+<b class="fc"><i>169</i>&nbsp;            evec[0 * STATE_COUNT + 3] = pi[2] / piR;</b>
+<b class="fc"><i>170</i>&nbsp;            evec[2 * STATE_COUNT + 3] = -pi[0] / piR;</b>
+<i>171</i>&nbsp;
+<i>172</i>&nbsp;            // eigenvectors
+<b class="fc"><i>173</i>&nbsp;            double[] eval = eigenDecomposition.getEigenValues();</b>
+<b class="fc"><i>174</i>&nbsp;            final double k = kappaInput.get().getValue();</b>
+<i>175</i>&nbsp;
+<b class="fc"><i>176</i>&nbsp;            final double beta = -1.0 / (2.0 * (piR * piY + k * (pi[0] * pi[2] + pi[1] * pi[3])));</b>
+<b class="fc"><i>177</i>&nbsp;            final double A_R = 1.0 + piR * (k - 1);</b>
+<b class="fc"><i>178</i>&nbsp;            final double A_Y = 1.0 + piY * (k - 1);</b>
+<i>179</i>&nbsp;
+<b class="fc"><i>180</i>&nbsp;            eval[1] = beta;</b>
+<b class="fc"><i>181</i>&nbsp;            eval[2] = beta * A_Y;</b>
+<b class="fc"><i>182</i>&nbsp;            eval[3] = beta * A_R;</b>
+<i>183</i>&nbsp;
+<b class="fc"><i>184</i>&nbsp;            updateEigen = false;</b>
+<i>185</i>&nbsp;
+<i>186</i>&nbsp;        }
+<i>187</i>&nbsp;
+<b class="fc"><i>188</i>&nbsp;        return eigenDecomposition;</b>
+<i>189</i>&nbsp;    }
+<i>190</i>&nbsp;
+<i>191</i>&nbsp;    /**
+<i>192</i>&nbsp;     * Used for precalculations
+<i>193</i>&nbsp;     */
+<i>194</i>&nbsp;    protected double beta, A_R, A_Y;
+<i>195</i>&nbsp;    protected double tab1A, tab2A, tab3A;
+<i>196</i>&nbsp;    protected double tab1C, tab2C, tab3C;
+<i>197</i>&nbsp;    protected double tab1G, tab2G, tab3G;
+<i>198</i>&nbsp;    protected double tab1T, tab2T, tab3T;
+<i>199</i>&nbsp;
+<i>200</i>&nbsp;    protected void setupMatrix() {
+<i>201</i>&nbsp;
+<b class="fc"><i>202</i>&nbsp;        calculateFreqRY();</b>
+<i>203</i>&nbsp;
+<i>204</i>&nbsp;        // small speed up - reduce calculations. Comments show original code
+<i>205</i>&nbsp;
+<i>206</i>&nbsp;        // (C+T) / (A+G)
+<b class="fc"><i>207</i>&nbsp;        final double r1 = (1 / freqR) - 1;</b>
+<b class="fc"><i>208</i>&nbsp;        tab1A = freqA * r1;</b>
+<i>209</i>&nbsp;
+<b class="fc"><i>210</i>&nbsp;        tab3A = freqA / freqR;</b>
+<b class="fc"><i>211</i>&nbsp;        tab2A = 1 - tab3A;        // (freqR-freqA)/freqR;</b>
+<i>212</i>&nbsp;
+<b class="fc"><i>213</i>&nbsp;        final double r2 = 1 / r1; // ((1 / freqY) - 1);</b>
+<b class="fc"><i>214</i>&nbsp;        tab1C = freqC * r2;</b>
+<i>215</i>&nbsp;
+<b class="fc"><i>216</i>&nbsp;        tab3C = freqC / freqY;</b>
+<b class="fc"><i>217</i>&nbsp;        tab2C = 1 - tab3C;       // (freqY-freqC)/freqY; assert  tab2C + tab3C == 1.0;</b>
+<i>218</i>&nbsp;
+<b class="fc"><i>219</i>&nbsp;        tab1G = freqG * r1;</b>
+<b class="fc"><i>220</i>&nbsp;        tab3G = tab2A;            // 1 - tab3A; // freqG/freqR;</b>
+<b class="fc"><i>221</i>&nbsp;        tab2G = tab3A;            // 1 - tab3G; // (freqR-freqG)/freqR;</b>
+<i>222</i>&nbsp;
+<b class="fc"><i>223</i>&nbsp;        tab1T = freqT * r2;</b>
+<i>224</i>&nbsp;
+<b class="fc"><i>225</i>&nbsp;        tab3T = tab2C;            // 1 - tab3C;  // freqT/freqY;</b>
+<b class="fc"><i>226</i>&nbsp;        tab2T = tab3C;            // 1 - tab3T; // (freqY-freqT)/freqY; //assert tab2T + tab3T == 1.0 ;</b>
+<i>227</i>&nbsp;
+<b class="fc"><i>228</i>&nbsp;        final double k = kappaInput.get().getValue();</b>
+<b class="fc"><i>229</i>&nbsp;        beta = -1.0 / (2.0 * (freqR * freqY + k * (freqA * freqG + freqC * freqT)));</b>
+<i>230</i>&nbsp;
+<b class="fc"><i>231</i>&nbsp;        A_R = 1.0 + freqR * (k - 1);</b>
+<b class="fc"><i>232</i>&nbsp;        A_Y = 1.0 + freqY * (k - 1);</b>
+<i>233</i>&nbsp;
+<b class="fc"><i>234</i>&nbsp;        updateMatrix = false;</b>
+<b class="fc"><i>235</i>&nbsp;    }</b>
+<i>236</i>&nbsp;
+<i>237</i>&nbsp;
+<i>238</i>&nbsp;    /**
+<i>239</i>&nbsp;     * CalculationNode implementations *
+<i>240</i>&nbsp;     */
+<i>241</i>&nbsp;    @Override
+<i>242</i>&nbsp;    protected boolean requiresRecalculation() {
+<i>243</i>&nbsp;        // we only get here if something is dirty
+<b class="nc"><i>244</i>&nbsp;        updateMatrix = true;</b>
+<b class="nc"><i>245</i>&nbsp;        updateEigen = true;</b>
+<b class="nc"><i>246</i>&nbsp;        return true;</b>
+<i>247</i>&nbsp;    }
+<i>248</i>&nbsp;
+<i>249</i>&nbsp;    @Override
+<i>250</i>&nbsp;    protected void store() {
+<b class="nc"><i>251</i>&nbsp;        if (eigenDecomposition != null) {</b>
+<b class="nc"><i>252</i>&nbsp;            storedEigenDecomposition = eigenDecomposition.copy();</b>
+<i>253</i>&nbsp;        }
+<b class="nc"><i>254</i>&nbsp;        super.store();</b>
+<b class="nc"><i>255</i>&nbsp;    }</b>
+<i>256</i>&nbsp;
+<i>257</i>&nbsp;    @Override
+<i>258</i>&nbsp;    protected void restore() {
+<b class="nc"><i>259</i>&nbsp;        updateMatrix = true;</b>
+<b class="nc"><i>260</i>&nbsp;        updateEigen = true;</b>
+<b class="nc"><i>261</i>&nbsp;        if (storedEigenDecomposition != null) {</b>
+<b class="nc"><i>262</i>&nbsp;            eigenDecomposition = storedEigenDecomposition;</b>
+<i>263</i>&nbsp;        }
+<b class="nc"><i>264</i>&nbsp;        super.restore();</b>
+<b class="nc"><i>265</i>&nbsp;    }</b>
+<i>266</i>&nbsp;
+<i>267</i>&nbsp;    @Override
+<i>268</i>&nbsp;    public boolean canHandleDataType(DataType dataType) {
+<b class="nc"><i>269</i>&nbsp;        return dataType instanceof Nucleotide;</b>
+<i>270</i>&nbsp;    }
+<i>271</i>&nbsp;
+<i>272</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

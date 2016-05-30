@@ -1,0 +1,988 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: BeerLikelihoodCore</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.likelihood</a> ]
+</div>
+
+<h1>Coverage Summary for Class: BeerLikelihoodCore (beast.evolution.likelihood)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BeerLikelihoodCore</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    54.5%
+  </span>
+  <span class="absValue">
+    (18/ 33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    48.1%
+  </span>
+  <span class="absValue">
+    (143/ 297)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.likelihood;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;/**
+<i>5</i>&nbsp; * standard likelihood core, uses no caching *
+<i>6</i>&nbsp; */
+<i>7</i>&nbsp;public class BeerLikelihoodCore extends LikelihoodCore {
+<i>8</i>&nbsp;    protected int nrOfStates;
+<i>9</i>&nbsp;    protected int nrOfNodes;
+<i>10</i>&nbsp;    protected int nrOfPatterns;
+<i>11</i>&nbsp;    protected int partialsSize;
+<i>12</i>&nbsp;    protected int matrixSize;
+<i>13</i>&nbsp;    protected int nrOfMatrices;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;    protected boolean integrateCategories;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;    protected double[][][] partials;
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;    protected int[][] states;
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;    protected double[][][] matrices;
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;    protected int[] currentMatrixIndex;
+<i>24</i>&nbsp;    protected int[] storedMatrixIndex;
+<i>25</i>&nbsp;    protected int[] currentPartialsIndex;
+<i>26</i>&nbsp;    protected int[] storedPartialsIndex;
+<i>27</i>&nbsp;
+<b class="fc"><i>28</i>&nbsp;    protected boolean useScaling = false;</b>
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;    protected double[][][] scalingFactors;
+<i>31</i>&nbsp;
+<b class="fc"><i>32</i>&nbsp;    private double scalingThreshold = 1.0E-100;</b>
+<b class="fc"><i>33</i>&nbsp;    double SCALE = 2;</b>
+<i>34</i>&nbsp;
+<b class="fc"><i>35</i>&nbsp;    public BeerLikelihoodCore(int nrOfStates) {</b>
+<b class="fc"><i>36</i>&nbsp;        this.nrOfStates = nrOfStates;</b>
+<b class="fc"><i>37</i>&nbsp;    } // c&#39;tor</b>
+<i>38</i>&nbsp;
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;    /**
+<i>41</i>&nbsp;     * Calculates partial likelihoods at a node when both children have states.
+<i>42</i>&nbsp;     */
+<i>43</i>&nbsp;    protected void calculateStatesStatesPruning(int[] stateIndex1, double[] matrices1,
+<i>44</i>&nbsp;                                                int[] stateIndex2, double[] matrices2,
+<i>45</i>&nbsp;                                                double[] partials3) {
+<b class="fc"><i>46</i>&nbsp;        int v = 0;</b>
+<i>47</i>&nbsp;
+<b class="fc"><i>48</i>&nbsp;        for (int l = 0; l &lt; nrOfMatrices; l++) {</b>
+<i>49</i>&nbsp;
+<b class="fc"><i>50</i>&nbsp;            for (int k = 0; k &lt; nrOfPatterns; k++) {</b>
+<i>51</i>&nbsp;
+<b class="fc"><i>52</i>&nbsp;                int state1 = stateIndex1[k];</b>
+<b class="fc"><i>53</i>&nbsp;                int state2 = stateIndex2[k];</b>
+<i>54</i>&nbsp;
+<b class="fc"><i>55</i>&nbsp;                int w = l * matrixSize;</b>
+<i>56</i>&nbsp;
+<b class="fc"><i>57</i>&nbsp;                if (state1 &lt; nrOfStates &amp;&amp; state2 &lt; nrOfStates) {</b>
+<i>58</i>&nbsp;
+<b class="fc"><i>59</i>&nbsp;                    for (int i = 0; i &lt; nrOfStates; i++) {</b>
+<i>60</i>&nbsp;
+<b class="fc"><i>61</i>&nbsp;                        partials3[v] = matrices1[w + state1] * matrices2[w + state2];</b>
+<i>62</i>&nbsp;
+<b class="fc"><i>63</i>&nbsp;                        v++;</b>
+<b class="fc"><i>64</i>&nbsp;                        w += nrOfStates;</b>
+<i>65</i>&nbsp;                    }
+<i>66</i>&nbsp;
+<b class="nc"><i>67</i>&nbsp;                } else if (state1 &lt; nrOfStates) {</b>
+<i>68</i>&nbsp;                    // child 2 has a gap or unknown state so treat it as unknown
+<i>69</i>&nbsp;
+<b class="nc"><i>70</i>&nbsp;                    for (int i = 0; i &lt; nrOfStates; i++) {</b>
+<i>71</i>&nbsp;
+<b class="nc"><i>72</i>&nbsp;                        partials3[v] = matrices1[w + state1];</b>
+<i>73</i>&nbsp;
+<b class="nc"><i>74</i>&nbsp;                        v++;</b>
+<b class="nc"><i>75</i>&nbsp;                        w += nrOfStates;</b>
+<i>76</i>&nbsp;                    }
+<b class="nc"><i>77</i>&nbsp;                } else if (state2 &lt; nrOfStates) {</b>
+<i>78</i>&nbsp;                    // child 2 has a gap or unknown state so treat it as unknown
+<i>79</i>&nbsp;
+<b class="nc"><i>80</i>&nbsp;                    for (int i = 0; i &lt; nrOfStates; i++) {</b>
+<i>81</i>&nbsp;
+<b class="nc"><i>82</i>&nbsp;                        partials3[v] = matrices2[w + state2];</b>
+<i>83</i>&nbsp;
+<b class="nc"><i>84</i>&nbsp;                        v++;</b>
+<b class="nc"><i>85</i>&nbsp;                        w += nrOfStates;</b>
+<i>86</i>&nbsp;                    }
+<i>87</i>&nbsp;                } else {
+<i>88</i>&nbsp;                    // both children have a gap or unknown state so set partials to 1
+<i>89</i>&nbsp;
+<b class="nc"><i>90</i>&nbsp;                    for (int j = 0; j &lt; nrOfStates; j++) {</b>
+<b class="nc"><i>91</i>&nbsp;                        partials3[v] = 1.0;</b>
+<b class="nc"><i>92</i>&nbsp;                        v++;</b>
+<i>93</i>&nbsp;                    }
+<i>94</i>&nbsp;                }
+<i>95</i>&nbsp;            }
+<i>96</i>&nbsp;        }
+<b class="fc"><i>97</i>&nbsp;    }</b>
+<i>98</i>&nbsp;
+<i>99</i>&nbsp;    /**
+<i>100</i>&nbsp;     * Calculates partial likelihoods at a node when one child has states and one has partials.
+<i>101</i>&nbsp;     */
+<i>102</i>&nbsp;    protected void calculateStatesPartialsPruning(int[] stateIndex1, double[] matrices1,
+<i>103</i>&nbsp;                                                  double[] partials2, double[] matrices2,
+<i>104</i>&nbsp;                                                  double[] partials3) {
+<i>105</i>&nbsp;
+<i>106</i>&nbsp;        double sum, tmp;
+<i>107</i>&nbsp;
+<b class="fc"><i>108</i>&nbsp;        int u = 0;</b>
+<b class="fc"><i>109</i>&nbsp;        int v = 0;</b>
+<i>110</i>&nbsp;
+<b class="fc"><i>111</i>&nbsp;        for (int l = 0; l &lt; nrOfMatrices; l++) {</b>
+<b class="fc"><i>112</i>&nbsp;            for (int k = 0; k &lt; nrOfPatterns; k++) {</b>
+<i>113</i>&nbsp;
+<b class="fc"><i>114</i>&nbsp;                int state1 = stateIndex1[k];</b>
+<i>115</i>&nbsp;
+<b class="fc"><i>116</i>&nbsp;                int w = l * matrixSize;</b>
+<i>117</i>&nbsp;
+<b class="fc"><i>118</i>&nbsp;                if (state1 &lt; nrOfStates) {</b>
+<i>119</i>&nbsp;
+<i>120</i>&nbsp;
+<b class="fc"><i>121</i>&nbsp;                    for (int i = 0; i &lt; nrOfStates; i++) {</b>
+<i>122</i>&nbsp;
+<b class="fc"><i>123</i>&nbsp;                        tmp = matrices1[w + state1];</b>
+<i>124</i>&nbsp;
+<b class="fc"><i>125</i>&nbsp;                        sum = 0.0;</b>
+<b class="fc"><i>126</i>&nbsp;                        for (int j = 0; j &lt; nrOfStates; j++) {</b>
+<b class="fc"><i>127</i>&nbsp;                            sum += matrices2[w] * partials2[v + j];</b>
+<b class="fc"><i>128</i>&nbsp;                            w++;</b>
+<i>129</i>&nbsp;                        }
+<i>130</i>&nbsp;
+<b class="fc"><i>131</i>&nbsp;                        partials3[u] = tmp * sum;</b>
+<b class="fc"><i>132</i>&nbsp;                        u++;</b>
+<i>133</i>&nbsp;                    }
+<i>134</i>&nbsp;
+<b class="fc"><i>135</i>&nbsp;                    v += nrOfStates;</b>
+<i>136</i>&nbsp;                } else {
+<i>137</i>&nbsp;                    // Child 1 has a gap or unknown state so don&#39;t use it
+<i>138</i>&nbsp;
+<b class="nc"><i>139</i>&nbsp;                    for (int i = 0; i &lt; nrOfStates; i++) {</b>
+<i>140</i>&nbsp;
+<b class="nc"><i>141</i>&nbsp;                        sum = 0.0;</b>
+<b class="nc"><i>142</i>&nbsp;                        for (int j = 0; j &lt; nrOfStates; j++) {</b>
+<b class="nc"><i>143</i>&nbsp;                            sum += matrices2[w] * partials2[v + j];</b>
+<b class="nc"><i>144</i>&nbsp;                            w++;</b>
+<i>145</i>&nbsp;                        }
+<i>146</i>&nbsp;
+<b class="nc"><i>147</i>&nbsp;                        partials3[u] = sum;</b>
+<b class="nc"><i>148</i>&nbsp;                        u++;</b>
+<i>149</i>&nbsp;                    }
+<i>150</i>&nbsp;
+<b class="nc"><i>151</i>&nbsp;                    v += nrOfStates;</b>
+<i>152</i>&nbsp;                }
+<i>153</i>&nbsp;            }
+<i>154</i>&nbsp;        }
+<b class="fc"><i>155</i>&nbsp;    }</b>
+<i>156</i>&nbsp;
+<i>157</i>&nbsp;    /**
+<i>158</i>&nbsp;     * Calculates partial likelihoods at a node when both children have partials.
+<i>159</i>&nbsp;     */
+<i>160</i>&nbsp;    protected void calculatePartialsPartialsPruning(double[] partials1, double[] matrices1,
+<i>161</i>&nbsp;                                                    double[] partials2, double[] matrices2,
+<i>162</i>&nbsp;                                                    double[] partials3) {
+<i>163</i>&nbsp;        double sum1, sum2;
+<i>164</i>&nbsp;
+<b class="fc"><i>165</i>&nbsp;        int u = 0;</b>
+<b class="fc"><i>166</i>&nbsp;        int v = 0;</b>
+<i>167</i>&nbsp;
+<b class="fc"><i>168</i>&nbsp;        for (int l = 0; l &lt; nrOfMatrices; l++) {</b>
+<i>169</i>&nbsp;
+<b class="fc"><i>170</i>&nbsp;            for (int k = 0; k &lt; nrOfPatterns; k++) {</b>
+<i>171</i>&nbsp;
+<b class="fc"><i>172</i>&nbsp;                int w = l * matrixSize;</b>
+<i>173</i>&nbsp;
+<b class="fc"><i>174</i>&nbsp;                for (int i = 0; i &lt; nrOfStates; i++) {</b>
+<i>175</i>&nbsp;
+<b class="fc"><i>176</i>&nbsp;                    sum1 = sum2 = 0.0;</b>
+<i>177</i>&nbsp;
+<b class="fc"><i>178</i>&nbsp;                    for (int j = 0; j &lt; nrOfStates; j++) {</b>
+<b class="fc"><i>179</i>&nbsp;                        sum1 += matrices1[w] * partials1[v + j];</b>
+<b class="fc"><i>180</i>&nbsp;                        sum2 += matrices2[w] * partials2[v + j];</b>
+<i>181</i>&nbsp;
+<b class="fc"><i>182</i>&nbsp;                        w++;</b>
+<i>183</i>&nbsp;                    }
+<i>184</i>&nbsp;
+<b class="fc"><i>185</i>&nbsp;                    partials3[u] = sum1 * sum2;</b>
+<b class="fc"><i>186</i>&nbsp;                    u++;</b>
+<i>187</i>&nbsp;                }
+<b class="fc"><i>188</i>&nbsp;                v += nrOfStates;</b>
+<i>189</i>&nbsp;            }
+<i>190</i>&nbsp;        }
+<b class="fc"><i>191</i>&nbsp;    }</b>
+<i>192</i>&nbsp;
+<i>193</i>&nbsp;    /**
+<i>194</i>&nbsp;     * Calculates partial likelihoods at a node when both children have states.
+<i>195</i>&nbsp;     */
+<i>196</i>&nbsp;    protected void calculateStatesStatesPruning(int[] stateIndex1, double[] matrices1,
+<i>197</i>&nbsp;                                                int[] stateIndex2, double[] matrices2,
+<i>198</i>&nbsp;                                                double[] partials3, int[] matrixMap) {
+<b class="nc"><i>199</i>&nbsp;        int v = 0;</b>
+<i>200</i>&nbsp;
+<b class="nc"><i>201</i>&nbsp;        for (int k = 0; k &lt; nrOfPatterns; k++) {</b>
+<i>202</i>&nbsp;
+<b class="nc"><i>203</i>&nbsp;            int state1 = stateIndex1[k];</b>
+<b class="nc"><i>204</i>&nbsp;            int state2 = stateIndex2[k];</b>
+<i>205</i>&nbsp;
+<b class="nc"><i>206</i>&nbsp;            int w = matrixMap[k] * matrixSize;</b>
+<i>207</i>&nbsp;
+<b class="nc"><i>208</i>&nbsp;            if (state1 &lt; nrOfStates &amp;&amp; state2 &lt; nrOfStates) {</b>
+<i>209</i>&nbsp;
+<b class="nc"><i>210</i>&nbsp;                for (int i = 0; i &lt; nrOfStates; i++) {</b>
+<i>211</i>&nbsp;
+<b class="nc"><i>212</i>&nbsp;                    partials3[v] = matrices1[w + state1] * matrices2[w + state2];</b>
+<i>213</i>&nbsp;
+<b class="nc"><i>214</i>&nbsp;                    v++;</b>
+<b class="nc"><i>215</i>&nbsp;                    w += nrOfStates;</b>
+<i>216</i>&nbsp;                }
+<i>217</i>&nbsp;
+<b class="nc"><i>218</i>&nbsp;            } else if (state1 &lt; nrOfStates) {</b>
+<i>219</i>&nbsp;                // child 2 has a gap or unknown state so treat it as unknown
+<i>220</i>&nbsp;
+<b class="nc"><i>221</i>&nbsp;                for (int i = 0; i &lt; nrOfStates; i++) {</b>
+<i>222</i>&nbsp;
+<b class="nc"><i>223</i>&nbsp;                    partials3[v] = matrices1[w + state1];</b>
+<i>224</i>&nbsp;
+<b class="nc"><i>225</i>&nbsp;                    v++;</b>
+<b class="nc"><i>226</i>&nbsp;                    w += nrOfStates;</b>
+<i>227</i>&nbsp;                }
+<b class="nc"><i>228</i>&nbsp;            } else if (state2 &lt; nrOfStates) {</b>
+<i>229</i>&nbsp;                // child 2 has a gap or unknown state so treat it as unknown
+<i>230</i>&nbsp;
+<b class="nc"><i>231</i>&nbsp;                for (int i = 0; i &lt; nrOfStates; i++) {</b>
+<i>232</i>&nbsp;
+<b class="nc"><i>233</i>&nbsp;                    partials3[v] = matrices2[w + state2];</b>
+<i>234</i>&nbsp;
+<b class="nc"><i>235</i>&nbsp;                    v++;</b>
+<b class="nc"><i>236</i>&nbsp;                    w += nrOfStates;</b>
+<i>237</i>&nbsp;                }
+<i>238</i>&nbsp;            } else {
+<i>239</i>&nbsp;                // both children have a gap or unknown state so set partials to 1
+<i>240</i>&nbsp;
+<b class="nc"><i>241</i>&nbsp;                for (int j = 0; j &lt; nrOfStates; j++) {</b>
+<b class="nc"><i>242</i>&nbsp;                    partials3[v] = 1.0;</b>
+<b class="nc"><i>243</i>&nbsp;                    v++;</b>
+<i>244</i>&nbsp;                }
+<i>245</i>&nbsp;            }
+<i>246</i>&nbsp;        }
+<b class="nc"><i>247</i>&nbsp;    }</b>
+<i>248</i>&nbsp;
+<i>249</i>&nbsp;    /**
+<i>250</i>&nbsp;     * Calculates partial likelihoods at a node when one child has states and one has partials.
+<i>251</i>&nbsp;     */
+<i>252</i>&nbsp;    protected void calculateStatesPartialsPruning(int[] stateIndex1, double[] matrices1,
+<i>253</i>&nbsp;                                                  double[] partials2, double[] matrices2,
+<i>254</i>&nbsp;                                                  double[] partials3, int[] matrixMap) {
+<i>255</i>&nbsp;
+<i>256</i>&nbsp;        double sum, tmp;
+<i>257</i>&nbsp;
+<b class="nc"><i>258</i>&nbsp;        int u = 0;</b>
+<b class="nc"><i>259</i>&nbsp;        int v = 0;</b>
+<i>260</i>&nbsp;
+<b class="nc"><i>261</i>&nbsp;        for (int k = 0; k &lt; nrOfPatterns; k++) {</b>
+<i>262</i>&nbsp;
+<b class="nc"><i>263</i>&nbsp;            int state1 = stateIndex1[k];</b>
+<i>264</i>&nbsp;
+<b class="nc"><i>265</i>&nbsp;            int w = matrixMap[k] * matrixSize;</b>
+<i>266</i>&nbsp;
+<b class="nc"><i>267</i>&nbsp;            if (state1 &lt; nrOfStates) {</b>
+<i>268</i>&nbsp;
+<b class="nc"><i>269</i>&nbsp;                for (int i = 0; i &lt; nrOfStates; i++) {</b>
+<i>270</i>&nbsp;
+<b class="nc"><i>271</i>&nbsp;                    tmp = matrices1[w + state1];</b>
+<i>272</i>&nbsp;
+<b class="nc"><i>273</i>&nbsp;                    sum = 0.0;</b>
+<b class="nc"><i>274</i>&nbsp;                    for (int j = 0; j &lt; nrOfStates; j++) {</b>
+<b class="nc"><i>275</i>&nbsp;                        sum += matrices2[w] * partials2[v + j];</b>
+<b class="nc"><i>276</i>&nbsp;                        w++;</b>
+<i>277</i>&nbsp;                    }
+<i>278</i>&nbsp;
+<b class="nc"><i>279</i>&nbsp;                    partials3[u] = tmp * sum;</b>
+<b class="nc"><i>280</i>&nbsp;                    u++;</b>
+<i>281</i>&nbsp;                }
+<i>282</i>&nbsp;
+<b class="nc"><i>283</i>&nbsp;                v += nrOfStates;</b>
+<i>284</i>&nbsp;            } else {
+<i>285</i>&nbsp;                // Child 1 has a gap or unknown state so don&#39;t use it
+<i>286</i>&nbsp;
+<b class="nc"><i>287</i>&nbsp;                for (int i = 0; i &lt; nrOfStates; i++) {</b>
+<i>288</i>&nbsp;
+<b class="nc"><i>289</i>&nbsp;                    sum = 0.0;</b>
+<b class="nc"><i>290</i>&nbsp;                    for (int j = 0; j &lt; nrOfStates; j++) {</b>
+<b class="nc"><i>291</i>&nbsp;                        sum += matrices2[w] * partials2[v + j];</b>
+<b class="nc"><i>292</i>&nbsp;                        w++;</b>
+<i>293</i>&nbsp;                    }
+<i>294</i>&nbsp;
+<b class="nc"><i>295</i>&nbsp;                    partials3[u] = sum;</b>
+<b class="nc"><i>296</i>&nbsp;                    u++;</b>
+<i>297</i>&nbsp;                }
+<i>298</i>&nbsp;
+<b class="nc"><i>299</i>&nbsp;                v += nrOfStates;</b>
+<i>300</i>&nbsp;            }
+<i>301</i>&nbsp;        }
+<b class="nc"><i>302</i>&nbsp;    }</b>
+<i>303</i>&nbsp;
+<i>304</i>&nbsp;    /**
+<i>305</i>&nbsp;     * Calculates partial likelihoods at a node when both children have partials.
+<i>306</i>&nbsp;     */
+<i>307</i>&nbsp;    protected void calculatePartialsPartialsPruning(double[] partials1, double[] matrices1,
+<i>308</i>&nbsp;                                                    double[] partials2, double[] matrices2,
+<i>309</i>&nbsp;                                                    double[] partials3, int[] matrixMap) {
+<i>310</i>&nbsp;        double sum1, sum2;
+<i>311</i>&nbsp;
+<b class="nc"><i>312</i>&nbsp;        int u = 0;</b>
+<b class="nc"><i>313</i>&nbsp;        int v = 0;</b>
+<i>314</i>&nbsp;
+<b class="nc"><i>315</i>&nbsp;        for (int k = 0; k &lt; nrOfPatterns; k++) {</b>
+<i>316</i>&nbsp;
+<b class="nc"><i>317</i>&nbsp;            int w = matrixMap[k] * matrixSize;</b>
+<i>318</i>&nbsp;
+<b class="nc"><i>319</i>&nbsp;            for (int i = 0; i &lt; nrOfStates; i++) {</b>
+<i>320</i>&nbsp;
+<b class="nc"><i>321</i>&nbsp;                sum1 = sum2 = 0.0;</b>
+<i>322</i>&nbsp;
+<b class="nc"><i>323</i>&nbsp;                for (int j = 0; j &lt; nrOfStates; j++) {</b>
+<b class="nc"><i>324</i>&nbsp;                    sum1 += matrices1[w] * partials1[v + j];</b>
+<b class="nc"><i>325</i>&nbsp;                    sum2 += matrices2[w] * partials2[v + j];</b>
+<i>326</i>&nbsp;
+<b class="nc"><i>327</i>&nbsp;                    w++;</b>
+<i>328</i>&nbsp;                }
+<i>329</i>&nbsp;
+<b class="nc"><i>330</i>&nbsp;                partials3[u] = sum1 * sum2;</b>
+<b class="nc"><i>331</i>&nbsp;                u++;</b>
+<i>332</i>&nbsp;            }
+<b class="nc"><i>333</i>&nbsp;            v += nrOfStates;</b>
+<i>334</i>&nbsp;        }
+<b class="nc"><i>335</i>&nbsp;    }</b>
+<i>336</i>&nbsp;
+<i>337</i>&nbsp;    /**
+<i>338</i>&nbsp;     * Integrates partials across categories.
+<i>339</i>&nbsp;     *
+<i>340</i>&nbsp;     * @param inPartials  the array of partials to be integrated
+<i>341</i>&nbsp;     * @param proportions the proportions of sites in each category
+<i>342</i>&nbsp;     * @param outPartials an array into which the partials will go
+<i>343</i>&nbsp;     */
+<i>344</i>&nbsp;    @Override
+<i>345</i>&nbsp;	protected void calculateIntegratePartials(double[] inPartials, double[] proportions, double[] outPartials) {
+<i>346</i>&nbsp;
+<b class="fc"><i>347</i>&nbsp;        int u = 0;</b>
+<b class="fc"><i>348</i>&nbsp;        int v = 0;</b>
+<b class="fc"><i>349</i>&nbsp;        for (int k = 0; k &lt; nrOfPatterns; k++) {</b>
+<i>350</i>&nbsp;
+<b class="fc"><i>351</i>&nbsp;            for (int i = 0; i &lt; nrOfStates; i++) {</b>
+<i>352</i>&nbsp;
+<b class="fc"><i>353</i>&nbsp;                outPartials[u] = inPartials[v] * proportions[0];</b>
+<b class="fc"><i>354</i>&nbsp;                u++;</b>
+<b class="fc"><i>355</i>&nbsp;                v++;</b>
+<i>356</i>&nbsp;            }
+<i>357</i>&nbsp;        }
+<i>358</i>&nbsp;
+<i>359</i>&nbsp;
+<b class="fc"><i>360</i>&nbsp;        for (int l = 1; l &lt; nrOfMatrices; l++) {</b>
+<b class="fc"><i>361</i>&nbsp;            u = 0;</b>
+<i>362</i>&nbsp;
+<b class="fc"><i>363</i>&nbsp;            for (int k = 0; k &lt; nrOfPatterns; k++) {</b>
+<i>364</i>&nbsp;
+<b class="fc"><i>365</i>&nbsp;                for (int i = 0; i &lt; nrOfStates; i++) {</b>
+<i>366</i>&nbsp;
+<b class="fc"><i>367</i>&nbsp;                    outPartials[u] += inPartials[v] * proportions[l];</b>
+<b class="fc"><i>368</i>&nbsp;                    u++;</b>
+<b class="fc"><i>369</i>&nbsp;                    v++;</b>
+<i>370</i>&nbsp;                }
+<i>371</i>&nbsp;            }
+<i>372</i>&nbsp;        }
+<b class="fc"><i>373</i>&nbsp;    }</b>
+<i>374</i>&nbsp;
+<i>375</i>&nbsp;    /**
+<i>376</i>&nbsp;     * Calculates pattern log likelihoods at a node.
+<i>377</i>&nbsp;     *
+<i>378</i>&nbsp;     * @param partials          the partials used to calculate the likelihoods
+<i>379</i>&nbsp;     * @param frequencies       an array of state frequencies
+<i>380</i>&nbsp;     * @param outLogLikelihoods an array into which the likelihoods will go
+<i>381</i>&nbsp;     */
+<i>382</i>&nbsp;    @Override
+<i>383</i>&nbsp;	public void calculateLogLikelihoods(double[] partials, double[] frequencies, double[] outLogLikelihoods) {
+<b class="fc"><i>384</i>&nbsp;        int v = 0;</b>
+<b class="fc"><i>385</i>&nbsp;        for (int k = 0; k &lt; nrOfPatterns; k++) {</b>
+<i>386</i>&nbsp;
+<b class="fc"><i>387</i>&nbsp;            double sum = 0.0;</b>
+<b class="fc"><i>388</i>&nbsp;            for (int i = 0; i &lt; nrOfStates; i++) {</b>
+<i>389</i>&nbsp;
+<b class="fc"><i>390</i>&nbsp;                sum += frequencies[i] * partials[v];</b>
+<b class="fc"><i>391</i>&nbsp;                v++;</b>
+<i>392</i>&nbsp;            }
+<b class="fc"><i>393</i>&nbsp;            outLogLikelihoods[k] = Math.log(sum) + getLogScalingFactor(k);</b>
+<i>394</i>&nbsp;        }
+<b class="fc"><i>395</i>&nbsp;    }</b>
+<i>396</i>&nbsp;
+<i>397</i>&nbsp;
+<i>398</i>&nbsp;    /**
+<i>399</i>&nbsp;     * initializes partial likelihood arrays.
+<i>400</i>&nbsp;     *
+<i>401</i>&nbsp;     * @param nodeCount           the number of nodes in the tree
+<i>402</i>&nbsp;     * @param patternCount        the number of patterns
+<i>403</i>&nbsp;     * @param matrixCount         the number of matrices (i.e., number of categories)
+<i>404</i>&nbsp;     * @param integrateCategories whether sites are being integrated over all matrices
+<i>405</i>&nbsp;     */
+<i>406</i>&nbsp;    @Override
+<i>407</i>&nbsp;	public void initialize(int nodeCount, int patternCount, int matrixCount, boolean integrateCategories, boolean useAmbiguities) {
+<i>408</i>&nbsp;
+<b class="fc"><i>409</i>&nbsp;        this.nrOfNodes = nodeCount;</b>
+<b class="fc"><i>410</i>&nbsp;        this.nrOfPatterns = patternCount;</b>
+<b class="fc"><i>411</i>&nbsp;        this.nrOfMatrices = matrixCount;</b>
+<i>412</i>&nbsp;
+<b class="fc"><i>413</i>&nbsp;        this.integrateCategories = integrateCategories;</b>
+<i>414</i>&nbsp;
+<b class="fc"><i>415</i>&nbsp;        if (integrateCategories) {</b>
+<b class="fc"><i>416</i>&nbsp;            partialsSize = patternCount * nrOfStates * matrixCount;</b>
+<i>417</i>&nbsp;        } else {
+<b class="nc"><i>418</i>&nbsp;            partialsSize = patternCount * nrOfStates;</b>
+<i>419</i>&nbsp;        }
+<i>420</i>&nbsp;
+<b class="fc"><i>421</i>&nbsp;        partials = new double[2][nodeCount][];</b>
+<i>422</i>&nbsp;
+<b class="fc"><i>423</i>&nbsp;        currentMatrixIndex = new int[nodeCount];</b>
+<b class="fc"><i>424</i>&nbsp;        storedMatrixIndex = new int[nodeCount];</b>
+<i>425</i>&nbsp;
+<b class="fc"><i>426</i>&nbsp;        currentPartialsIndex = new int[nodeCount];</b>
+<b class="fc"><i>427</i>&nbsp;        storedPartialsIndex = new int[nodeCount];</b>
+<i>428</i>&nbsp;
+<b class="fc"><i>429</i>&nbsp;        states = new int[nodeCount][];</b>
+<i>430</i>&nbsp;
+<b class="fc"><i>431</i>&nbsp;        for (int i = 0; i &lt; nodeCount; i++) {</b>
+<b class="fc"><i>432</i>&nbsp;            partials[0][i] = null;</b>
+<b class="fc"><i>433</i>&nbsp;            partials[1][i] = null;</b>
+<i>434</i>&nbsp;
+<b class="fc"><i>435</i>&nbsp;            states[i] = null;</b>
+<i>436</i>&nbsp;        }
+<i>437</i>&nbsp;
+<b class="fc"><i>438</i>&nbsp;        matrixSize = nrOfStates * nrOfStates;</b>
+<i>439</i>&nbsp;
+<b class="fc"><i>440</i>&nbsp;        matrices = new double[2][nodeCount][matrixCount * matrixSize];</b>
+<b class="fc"><i>441</i>&nbsp;    }</b>
+<i>442</i>&nbsp;
+<i>443</i>&nbsp;    /**
+<i>444</i>&nbsp;     * cleans up and deallocates arrays.
+<i>445</i>&nbsp;     */
+<i>446</i>&nbsp;    @Override
+<i>447</i>&nbsp;	public void finalize() throws java.lang.Throwable {
+<b class="fc"><i>448</i>&nbsp;        nrOfNodes = 0;</b>
+<b class="fc"><i>449</i>&nbsp;        nrOfPatterns = 0;</b>
+<b class="fc"><i>450</i>&nbsp;        nrOfMatrices = 0;</b>
+<i>451</i>&nbsp;
+<b class="fc"><i>452</i>&nbsp;        partials = null;</b>
+<b class="fc"><i>453</i>&nbsp;        currentPartialsIndex = null;</b>
+<b class="fc"><i>454</i>&nbsp;        storedPartialsIndex = null;</b>
+<b class="fc"><i>455</i>&nbsp;        states = null;</b>
+<b class="fc"><i>456</i>&nbsp;        matrices = null;</b>
+<b class="fc"><i>457</i>&nbsp;        currentMatrixIndex = null;</b>
+<b class="fc"><i>458</i>&nbsp;        storedMatrixIndex = null;</b>
+<i>459</i>&nbsp;
+<b class="fc"><i>460</i>&nbsp;        scalingFactors = null;</b>
+<b class="fc"><i>461</i>&nbsp;    }</b>
+<i>462</i>&nbsp;
+<i>463</i>&nbsp;    @Override
+<i>464</i>&nbsp;    public void setUseScaling(double scale) {
+<b class="nc"><i>465</i>&nbsp;        useScaling = (scale != 1.0);</b>
+<i>466</i>&nbsp;
+<b class="nc"><i>467</i>&nbsp;        if (useScaling) {</b>
+<b class="nc"><i>468</i>&nbsp;            scalingFactors = new double[2][nrOfNodes][nrOfPatterns];</b>
+<i>469</i>&nbsp;        }
+<b class="nc"><i>470</i>&nbsp;    }</b>
+<i>471</i>&nbsp;
+<i>472</i>&nbsp;    /**
+<i>473</i>&nbsp;     * Allocates partials for a node
+<i>474</i>&nbsp;     */
+<i>475</i>&nbsp;    @Override
+<i>476</i>&nbsp;	public void createNodePartials(int nodeIndex) {
+<i>477</i>&nbsp;
+<b class="fc"><i>478</i>&nbsp;        this.partials[0][nodeIndex] = new double[partialsSize];</b>
+<b class="fc"><i>479</i>&nbsp;        this.partials[1][nodeIndex] = new double[partialsSize];</b>
+<b class="fc"><i>480</i>&nbsp;    }</b>
+<i>481</i>&nbsp;
+<i>482</i>&nbsp;    /**
+<i>483</i>&nbsp;     * Sets partials for a node
+<i>484</i>&nbsp;     */
+<i>485</i>&nbsp;    @Override
+<i>486</i>&nbsp;	public void setNodePartials(int nodeIndex, double[] partials) {
+<i>487</i>&nbsp;
+<b class="fc"><i>488</i>&nbsp;        if (this.partials[0][nodeIndex] == null) {</b>
+<b class="fc"><i>489</i>&nbsp;            createNodePartials(nodeIndex);</b>
+<i>490</i>&nbsp;        }
+<b class="fc"><i>491</i>&nbsp;        if (partials.length &lt; partialsSize) {</b>
+<b class="fc"><i>492</i>&nbsp;            int k = 0;</b>
+<b class="fc"><i>493</i>&nbsp;            for (int i = 0; i &lt; nrOfMatrices; i++) {</b>
+<b class="fc"><i>494</i>&nbsp;                System.arraycopy(partials, 0, this.partials[0][nodeIndex], k, partials.length);</b>
+<b class="fc"><i>495</i>&nbsp;                k += partials.length;</b>
+<i>496</i>&nbsp;            }
+<b class="fc"><i>497</i>&nbsp;        } else {</b>
+<b class="fc"><i>498</i>&nbsp;            System.arraycopy(partials, 0, this.partials[0][nodeIndex], 0, partials.length);</b>
+<i>499</i>&nbsp;        }
+<b class="fc"><i>500</i>&nbsp;    }</b>
+<i>501</i>&nbsp;
+<i>502</i>&nbsp;    @Override
+<i>503</i>&nbsp;    public void getNodePartials(int nodeIndex, double[] partialsOut) {
+<b class="nc"><i>504</i>&nbsp;        System.arraycopy(partials[currentPartialsIndex[nodeIndex]][nodeIndex], 0, partialsOut, 0, partialsOut.length);</b>
+<b class="nc"><i>505</i>&nbsp;    }</b>
+<i>506</i>&nbsp;
+<i>507</i>&nbsp;    /**
+<i>508</i>&nbsp;     * Allocates states for a node
+<i>509</i>&nbsp;     */
+<i>510</i>&nbsp;    public void createNodeStates(int nodeIndex) {
+<i>511</i>&nbsp;
+<b class="fc"><i>512</i>&nbsp;        this.states[nodeIndex] = new int[nrOfPatterns];</b>
+<b class="fc"><i>513</i>&nbsp;    }</b>
+<i>514</i>&nbsp;
+<i>515</i>&nbsp;    /**
+<i>516</i>&nbsp;     * Sets states for a node
+<i>517</i>&nbsp;     */
+<i>518</i>&nbsp;    @Override
+<i>519</i>&nbsp;	public void setNodeStates(int nodeIndex, int[] states) {
+<i>520</i>&nbsp;
+<b class="fc"><i>521</i>&nbsp;        if (this.states[nodeIndex] == null) {</b>
+<b class="fc"><i>522</i>&nbsp;            createNodeStates(nodeIndex);</b>
+<i>523</i>&nbsp;        }
+<b class="fc"><i>524</i>&nbsp;        System.arraycopy(states, 0, this.states[nodeIndex], 0, nrOfPatterns);</b>
+<b class="fc"><i>525</i>&nbsp;    }</b>
+<i>526</i>&nbsp;
+<i>527</i>&nbsp;    /**
+<i>528</i>&nbsp;     * Gets states for a node
+<i>529</i>&nbsp;     */
+<i>530</i>&nbsp;    @Override
+<i>531</i>&nbsp;	public void getNodeStates(int nodeIndex, int[] states) {
+<b class="nc"><i>532</i>&nbsp;        System.arraycopy(this.states[nodeIndex], 0, states, 0, nrOfPatterns);</b>
+<b class="nc"><i>533</i>&nbsp;    }</b>
+<i>534</i>&nbsp;
+<i>535</i>&nbsp;    @Override
+<i>536</i>&nbsp;    public void setNodeMatrixForUpdate(int nodeIndex) {
+<b class="fc"><i>537</i>&nbsp;        currentMatrixIndex[nodeIndex] = 1 - currentMatrixIndex[nodeIndex];</b>
+<i>538</i>&nbsp;
+<b class="fc"><i>539</i>&nbsp;    }</b>
+<i>540</i>&nbsp;
+<i>541</i>&nbsp;
+<i>542</i>&nbsp;    /**
+<i>543</i>&nbsp;     * Sets probability matrix for a node
+<i>544</i>&nbsp;     */
+<i>545</i>&nbsp;    @Override
+<i>546</i>&nbsp;	public void setNodeMatrix(int nodeIndex, int matrixIndex, double[] matrix) {
+<b class="fc"><i>547</i>&nbsp;        System.arraycopy(matrix, 0, matrices[currentMatrixIndex[nodeIndex]][nodeIndex],</b>
+<i>548</i>&nbsp;                matrixIndex * matrixSize, matrixSize);
+<b class="fc"><i>549</i>&nbsp;    }</b>
+<i>550</i>&nbsp;
+<i>551</i>&nbsp;    public void setPaddedNodeMatrices(int nodeIndex, double[] matrix) {
+<b class="nc"><i>552</i>&nbsp;        System.arraycopy(matrix, 0, matrices[currentMatrixIndex[nodeIndex]][nodeIndex],</b>
+<i>553</i>&nbsp;                0, nrOfMatrices * matrixSize);
+<b class="nc"><i>554</i>&nbsp;    }</b>
+<i>555</i>&nbsp;
+<i>556</i>&nbsp;
+<i>557</i>&nbsp;    /**
+<i>558</i>&nbsp;     * Gets probability matrix for a node
+<i>559</i>&nbsp;     */
+<i>560</i>&nbsp;    @Override
+<i>561</i>&nbsp;	public void getNodeMatrix(int nodeIndex, int matrixIndex, double[] matrix) {
+<b class="nc"><i>562</i>&nbsp;        System.arraycopy(matrices[currentMatrixIndex[nodeIndex]][nodeIndex],</b>
+<i>563</i>&nbsp;                matrixIndex * matrixSize, matrix, 0, matrixSize);
+<b class="nc"><i>564</i>&nbsp;    }</b>
+<i>565</i>&nbsp;
+<i>566</i>&nbsp;    @Override
+<i>567</i>&nbsp;    public void setNodePartialsForUpdate(int nodeIndex) {
+<b class="fc"><i>568</i>&nbsp;        currentPartialsIndex[nodeIndex] = 1 - currentPartialsIndex[nodeIndex];</b>
+<b class="fc"><i>569</i>&nbsp;    }</b>
+<i>570</i>&nbsp;
+<i>571</i>&nbsp;    /**
+<i>572</i>&nbsp;     * Sets the currently updating node partials for node nodeIndex. This may
+<i>573</i>&nbsp;     * need to repeatedly copy the partials for the different category partitions
+<i>574</i>&nbsp;     */
+<i>575</i>&nbsp;    public void setCurrentNodePartials(int nodeIndex, double[] partials) {
+<b class="nc"><i>576</i>&nbsp;        if (partials.length &lt; partialsSize) {</b>
+<b class="nc"><i>577</i>&nbsp;            int k = 0;</b>
+<b class="nc"><i>578</i>&nbsp;            for (int i = 0; i &lt; nrOfMatrices; i++) {</b>
+<b class="nc"><i>579</i>&nbsp;                System.arraycopy(partials, 0, this.partials[currentPartialsIndex[nodeIndex]][nodeIndex], k, partials.length);</b>
+<b class="nc"><i>580</i>&nbsp;                k += partials.length;</b>
+<i>581</i>&nbsp;            }
+<b class="nc"><i>582</i>&nbsp;        } else {</b>
+<b class="nc"><i>583</i>&nbsp;            System.arraycopy(partials, 0, this.partials[currentPartialsIndex[nodeIndex]][nodeIndex], 0, partials.length);</b>
+<i>584</i>&nbsp;        }
+<b class="nc"><i>585</i>&nbsp;    }</b>
+<i>586</i>&nbsp;
+<i>587</i>&nbsp;    /**
+<i>588</i>&nbsp;     * Calculates partial likelihoods at a node.
+<i>589</i>&nbsp;     *
+<i>590</i>&nbsp;     * @param nodeIndex1 the &#39;child 1&#39; node
+<i>591</i>&nbsp;     * @param nodeIndex2 the &#39;child 2&#39; node
+<i>592</i>&nbsp;     * @param nodeIndex3 the &#39;parent&#39; node
+<i>593</i>&nbsp;     */
+<i>594</i>&nbsp;    @Override
+<i>595</i>&nbsp;	public void calculatePartials(int nodeIndex1, int nodeIndex2, int nodeIndex3) {
+<b class="fc"><i>596</i>&nbsp;        if (states[nodeIndex1] != null) {</b>
+<b class="fc"><i>597</i>&nbsp;            if (states[nodeIndex2] != null) {</b>
+<b class="fc"><i>598</i>&nbsp;                calculateStatesStatesPruning(</b>
+<i>599</i>&nbsp;                        states[nodeIndex1], matrices[currentMatrixIndex[nodeIndex1]][nodeIndex1],
+<i>600</i>&nbsp;                        states[nodeIndex2], matrices[currentMatrixIndex[nodeIndex2]][nodeIndex2],
+<i>601</i>&nbsp;                        partials[currentPartialsIndex[nodeIndex3]][nodeIndex3]);
+<i>602</i>&nbsp;            } else {
+<b class="fc"><i>603</i>&nbsp;                calculateStatesPartialsPruning(states[nodeIndex1], matrices[currentMatrixIndex[nodeIndex1]][nodeIndex1],</b>
+<i>604</i>&nbsp;                        partials[currentPartialsIndex[nodeIndex2]][nodeIndex2], matrices[currentMatrixIndex[nodeIndex2]][nodeIndex2],
+<i>605</i>&nbsp;                        partials[currentPartialsIndex[nodeIndex3]][nodeIndex3]);
+<i>606</i>&nbsp;            }
+<i>607</i>&nbsp;        } else {
+<b class="fc"><i>608</i>&nbsp;            if (states[nodeIndex2] != null) {</b>
+<b class="fc"><i>609</i>&nbsp;                calculateStatesPartialsPruning(states[nodeIndex2], matrices[currentMatrixIndex[nodeIndex2]][nodeIndex2],</b>
+<i>610</i>&nbsp;                        partials[currentPartialsIndex[nodeIndex1]][nodeIndex1], matrices[currentMatrixIndex[nodeIndex1]][nodeIndex1],
+<i>611</i>&nbsp;                        partials[currentPartialsIndex[nodeIndex3]][nodeIndex3]);
+<i>612</i>&nbsp;            } else {
+<b class="fc"><i>613</i>&nbsp;                calculatePartialsPartialsPruning(partials[currentPartialsIndex[nodeIndex1]][nodeIndex1], matrices[currentMatrixIndex[nodeIndex1]][nodeIndex1],</b>
+<i>614</i>&nbsp;                        partials[currentPartialsIndex[nodeIndex2]][nodeIndex2], matrices[currentMatrixIndex[nodeIndex2]][nodeIndex2],
+<i>615</i>&nbsp;                        partials[currentPartialsIndex[nodeIndex3]][nodeIndex3]);
+<i>616</i>&nbsp;            }
+<i>617</i>&nbsp;        }
+<i>618</i>&nbsp;
+<b class="fc"><i>619</i>&nbsp;        if (useScaling) {</b>
+<b class="nc"><i>620</i>&nbsp;            scalePartials(nodeIndex3);</b>
+<i>621</i>&nbsp;        }
+<i>622</i>&nbsp;
+<i>623</i>&nbsp;//
+<i>624</i>&nbsp;//        int k =0;
+<i>625</i>&nbsp;//        for (int i = 0; i &lt; patternCount; i++) {
+<i>626</i>&nbsp;//            double f = 0.0;
+<i>627</i>&nbsp;//
+<i>628</i>&nbsp;//            for (int j = 0; j &lt; stateCount; j++) {
+<i>629</i>&nbsp;//                f += partials[currentPartialsIndices[nodeIndex3]][nodeIndex3][k];
+<i>630</i>&nbsp;//                k++;
+<i>631</i>&nbsp;//            }
+<i>632</i>&nbsp;//            if (f == 0.0) {
+<i>633</i>&nbsp;//                Logger.getLogger(&quot;error&quot;).severe(&quot;A partial likelihood (node index = &quot; + nodeIndex3 + &quot;, pattern = &quot;+ i +&quot;) is zero for all states.&quot;);
+<i>634</i>&nbsp;//            }
+<i>635</i>&nbsp;//        }
+<b class="fc"><i>636</i>&nbsp;    }</b>
+<i>637</i>&nbsp;
+<i>638</i>&nbsp;    /**
+<i>639</i>&nbsp;     * Calculates partial likelihoods at a node.
+<i>640</i>&nbsp;     *
+<i>641</i>&nbsp;     * @param nodeIndex1 the &#39;child 1&#39; node
+<i>642</i>&nbsp;     * @param nodeIndex2 the &#39;child 2&#39; node
+<i>643</i>&nbsp;     * @param nodeIndex3 the &#39;parent&#39; node
+<i>644</i>&nbsp;     * @param matrixMap  a map of which matrix to use for each pattern (can be null if integrating over categories)
+<i>645</i>&nbsp;     */
+<i>646</i>&nbsp;    public void calculatePartials(int nodeIndex1, int nodeIndex2, int nodeIndex3, int[] matrixMap) {
+<b class="nc"><i>647</i>&nbsp;        if (states[nodeIndex1] != null) {</b>
+<b class="nc"><i>648</i>&nbsp;            if (states[nodeIndex2] != null) {</b>
+<b class="nc"><i>649</i>&nbsp;                calculateStatesStatesPruning(</b>
+<i>650</i>&nbsp;                        states[nodeIndex1], matrices[currentMatrixIndex[nodeIndex1]][nodeIndex1],
+<i>651</i>&nbsp;                        states[nodeIndex2], matrices[currentMatrixIndex[nodeIndex2]][nodeIndex2],
+<i>652</i>&nbsp;                        partials[currentPartialsIndex[nodeIndex3]][nodeIndex3], matrixMap);
+<i>653</i>&nbsp;            } else {
+<b class="nc"><i>654</i>&nbsp;                calculateStatesPartialsPruning(</b>
+<i>655</i>&nbsp;                        states[nodeIndex1], matrices[currentMatrixIndex[nodeIndex1]][nodeIndex1],
+<i>656</i>&nbsp;                        partials[currentPartialsIndex[nodeIndex2]][nodeIndex2], matrices[currentMatrixIndex[nodeIndex2]][nodeIndex2],
+<i>657</i>&nbsp;                        partials[currentPartialsIndex[nodeIndex3]][nodeIndex3], matrixMap);
+<i>658</i>&nbsp;            }
+<i>659</i>&nbsp;        } else {
+<b class="nc"><i>660</i>&nbsp;            if (states[nodeIndex2] != null) {</b>
+<b class="nc"><i>661</i>&nbsp;                calculateStatesPartialsPruning(</b>
+<i>662</i>&nbsp;                        states[nodeIndex2], matrices[currentMatrixIndex[nodeIndex2]][nodeIndex2],
+<i>663</i>&nbsp;                        partials[currentPartialsIndex[nodeIndex1]][nodeIndex1], matrices[currentMatrixIndex[nodeIndex1]][nodeIndex1],
+<i>664</i>&nbsp;                        partials[currentPartialsIndex[nodeIndex3]][nodeIndex3], matrixMap);
+<i>665</i>&nbsp;            } else {
+<b class="nc"><i>666</i>&nbsp;                calculatePartialsPartialsPruning(</b>
+<i>667</i>&nbsp;                        partials[currentPartialsIndex[nodeIndex1]][nodeIndex1], matrices[currentMatrixIndex[nodeIndex1]][nodeIndex1],
+<i>668</i>&nbsp;                        partials[currentPartialsIndex[nodeIndex2]][nodeIndex2], matrices[currentMatrixIndex[nodeIndex2]][nodeIndex2],
+<i>669</i>&nbsp;                        partials[currentPartialsIndex[nodeIndex3]][nodeIndex3], matrixMap);
+<i>670</i>&nbsp;            }
+<i>671</i>&nbsp;        }
+<i>672</i>&nbsp;
+<b class="nc"><i>673</i>&nbsp;        if (useScaling) {</b>
+<b class="nc"><i>674</i>&nbsp;            scalePartials(nodeIndex3);</b>
+<i>675</i>&nbsp;        }
+<b class="nc"><i>676</i>&nbsp;    }</b>
+<i>677</i>&nbsp;
+<i>678</i>&nbsp;
+<i>679</i>&nbsp;    @Override
+<i>680</i>&nbsp;	public void integratePartials(int nodeIndex, double[] proportions, double[] outPartials) {
+<b class="fc"><i>681</i>&nbsp;        calculateIntegratePartials(partials[currentPartialsIndex[nodeIndex]][nodeIndex], proportions, outPartials);</b>
+<b class="fc"><i>682</i>&nbsp;    }</b>
+<i>683</i>&nbsp;
+<i>684</i>&nbsp;
+<i>685</i>&nbsp;    /**
+<i>686</i>&nbsp;     * Scale the partials at a given node. This uses a scaling suggested by Ziheng Yang in
+<i>687</i>&nbsp;     * Yang (2000) J. Mol. Evol. 51: 423-432
+<i>688</i>&nbsp;     * &lt;p/&gt;
+<i>689</i>&nbsp;     * This function looks over the partial likelihoods for each state at each pattern
+<i>690</i>&nbsp;     * and finds the largest. If this is less than the scalingThreshold (currently set
+<i>691</i>&nbsp;     * to 1E-40) then it rescales the partials for that pattern by dividing by this number
+<i>692</i>&nbsp;     * (i.e., normalizing to between 0, 1). It then stores the log of this scaling.
+<i>693</i>&nbsp;     * This is called for every internal node after the partials are calculated so provides
+<i>694</i>&nbsp;     * most of the performance hit. Ziheng suggests only doing this on a proportion of nodes
+<i>695</i>&nbsp;     * but this sounded like a headache to organize (and he doesn&#39;t use the threshold idea
+<i>696</i>&nbsp;     * which improves the performance quite a bit).
+<i>697</i>&nbsp;     *
+<i>698</i>&nbsp;     * @param nodeIndex
+<i>699</i>&nbsp;     */
+<i>700</i>&nbsp;    protected void scalePartials(int nodeIndex) {
+<i>701</i>&nbsp;//        int v = 0;
+<i>702</i>&nbsp;//    	double [] partials = m_fPartials[m_iCurrentPartialsIndices[nodeIndex]][nodeIndex];
+<i>703</i>&nbsp;//        for (int i = 0; i &lt; m_nPatternCount; i++) {
+<i>704</i>&nbsp;//            for (int k = 0; k &lt; m_nMatrixCount; k++) {
+<i>705</i>&nbsp;//                for (int j = 0; j &lt; m_nStateCount; j++) {
+<i>706</i>&nbsp;//                	partials[v] *= SCALE;
+<i>707</i>&nbsp;//                	v++;
+<i>708</i>&nbsp;//                }
+<i>709</i>&nbsp;//            }
+<i>710</i>&nbsp;//        }
+<b class="nc"><i>711</i>&nbsp;        int u = 0;</b>
+<i>712</i>&nbsp;
+<b class="nc"><i>713</i>&nbsp;        for (int i = 0; i &lt; nrOfPatterns; i++) {</b>
+<i>714</i>&nbsp;
+<b class="nc"><i>715</i>&nbsp;            double scaleFactor = 0.0;</b>
+<b class="nc"><i>716</i>&nbsp;            int v = u;</b>
+<b class="nc"><i>717</i>&nbsp;            for (int k = 0; k &lt; nrOfMatrices; k++) {</b>
+<b class="nc"><i>718</i>&nbsp;                for (int j = 0; j &lt; nrOfStates; j++) {</b>
+<b class="nc"><i>719</i>&nbsp;                    if (partials[currentPartialsIndex[nodeIndex]][nodeIndex][v] &gt; scaleFactor) {</b>
+<b class="nc"><i>720</i>&nbsp;                        scaleFactor = partials[currentPartialsIndex[nodeIndex]][nodeIndex][v];</b>
+<i>721</i>&nbsp;                    }
+<b class="nc"><i>722</i>&nbsp;                    v++;</b>
+<i>723</i>&nbsp;                }
+<b class="nc"><i>724</i>&nbsp;                v += (nrOfPatterns - 1) * nrOfStates;</b>
+<i>725</i>&nbsp;            }
+<i>726</i>&nbsp;
+<b class="nc"><i>727</i>&nbsp;            if (scaleFactor &lt; scalingThreshold) {</b>
+<i>728</i>&nbsp;
+<b class="nc"><i>729</i>&nbsp;                v = u;</b>
+<b class="nc"><i>730</i>&nbsp;                for (int k = 0; k &lt; nrOfMatrices; k++) {</b>
+<b class="nc"><i>731</i>&nbsp;                    for (int j = 0; j &lt; nrOfStates; j++) {</b>
+<b class="nc"><i>732</i>&nbsp;                        partials[currentPartialsIndex[nodeIndex]][nodeIndex][v] /= scaleFactor;</b>
+<b class="nc"><i>733</i>&nbsp;                        v++;</b>
+<i>734</i>&nbsp;                    }
+<b class="nc"><i>735</i>&nbsp;                    v += (nrOfPatterns - 1) * nrOfStates;</b>
+<i>736</i>&nbsp;                }
+<b class="nc"><i>737</i>&nbsp;                scalingFactors[currentPartialsIndex[nodeIndex]][nodeIndex][i] = Math.log(scaleFactor);</b>
+<i>738</i>&nbsp;
+<i>739</i>&nbsp;            } else {
+<b class="nc"><i>740</i>&nbsp;                scalingFactors[currentPartialsIndex[nodeIndex]][nodeIndex][i] = 0.0;</b>
+<i>741</i>&nbsp;            }
+<b class="nc"><i>742</i>&nbsp;            u += nrOfStates;</b>
+<i>743</i>&nbsp;
+<i>744</i>&nbsp;
+<i>745</i>&nbsp;        }
+<b class="nc"><i>746</i>&nbsp;    }</b>
+<i>747</i>&nbsp;
+<i>748</i>&nbsp;    /**
+<i>749</i>&nbsp;     * This function returns the scaling factor for that pattern by summing over
+<i>750</i>&nbsp;     * the log scalings used at each node. If scaling is off then this just returns
+<i>751</i>&nbsp;     * a 0.
+<i>752</i>&nbsp;     *
+<i>753</i>&nbsp;     * @return the log scaling factor
+<i>754</i>&nbsp;     */
+<i>755</i>&nbsp;    @Override
+<i>756</i>&nbsp;	public double getLogScalingFactor(int patternIndex_) {
+<i>757</i>&nbsp;//    	if (m_bUseScaling) {
+<i>758</i>&nbsp;//    		return -(m_nNodeCount/2) * Math.log(SCALE);
+<i>759</i>&nbsp;//    	} else {
+<i>760</i>&nbsp;//    		return 0;
+<i>761</i>&nbsp;//    	}        
+<b class="fc"><i>762</i>&nbsp;        double logScalingFactor = 0.0;</b>
+<b class="fc"><i>763</i>&nbsp;        if (useScaling) {</b>
+<b class="nc"><i>764</i>&nbsp;            for (int i = 0; i &lt; nrOfNodes; i++) {</b>
+<b class="nc"><i>765</i>&nbsp;                logScalingFactor += scalingFactors[currentPartialsIndex[i]][i][patternIndex_];</b>
+<i>766</i>&nbsp;            }
+<i>767</i>&nbsp;        }
+<b class="fc"><i>768</i>&nbsp;        return logScalingFactor;</b>
+<i>769</i>&nbsp;    }
+<i>770</i>&nbsp;
+<i>771</i>&nbsp;    /**
+<i>772</i>&nbsp;     * Gets the partials for a particular node.
+<i>773</i>&nbsp;     *
+<i>774</i>&nbsp;     * @param nodeIndex   the node
+<i>775</i>&nbsp;     * @param outPartials an array into which the partials will go
+<i>776</i>&nbsp;     */
+<i>777</i>&nbsp;    public void getPartials(int nodeIndex, double[] outPartials) {
+<b class="nc"><i>778</i>&nbsp;        double[] partials1 = partials[currentPartialsIndex[nodeIndex]][nodeIndex];</b>
+<i>779</i>&nbsp;
+<b class="nc"><i>780</i>&nbsp;        System.arraycopy(partials1, 0, outPartials, 0, partialsSize);</b>
+<b class="nc"><i>781</i>&nbsp;    }</b>
+<i>782</i>&nbsp;
+<i>783</i>&nbsp;    /**
+<i>784</i>&nbsp;     * Store current state
+<i>785</i>&nbsp;     */
+<i>786</i>&nbsp;    @Override
+<i>787</i>&nbsp;    public void restore() {
+<i>788</i>&nbsp;        // Rather than copying the stored stuff back, just swap the pointers...
+<b class="nc"><i>789</i>&nbsp;        int[] tmp1 = currentMatrixIndex;</b>
+<b class="nc"><i>790</i>&nbsp;        currentMatrixIndex = storedMatrixIndex;</b>
+<b class="nc"><i>791</i>&nbsp;        storedMatrixIndex = tmp1;</b>
+<i>792</i>&nbsp;
+<b class="nc"><i>793</i>&nbsp;        int[] tmp2 = currentPartialsIndex;</b>
+<b class="nc"><i>794</i>&nbsp;        currentPartialsIndex = storedPartialsIndex;</b>
+<b class="nc"><i>795</i>&nbsp;        storedPartialsIndex = tmp2;</b>
+<b class="nc"><i>796</i>&nbsp;    }</b>
+<i>797</i>&nbsp;
+<i>798</i>&nbsp;    @Override
+<i>799</i>&nbsp;	public void unstore() {
+<b class="nc"><i>800</i>&nbsp;        System.arraycopy(storedMatrixIndex, 0, currentMatrixIndex, 0, nrOfNodes);</b>
+<b class="nc"><i>801</i>&nbsp;        System.arraycopy(storedPartialsIndex, 0, currentPartialsIndex, 0, nrOfNodes);</b>
+<b class="nc"><i>802</i>&nbsp;    }</b>
+<i>803</i>&nbsp;
+<i>804</i>&nbsp;    /**
+<i>805</i>&nbsp;     * Restore the stored state
+<i>806</i>&nbsp;     */
+<i>807</i>&nbsp;    @Override
+<i>808</i>&nbsp;    public void store() {
+<b class="nc"><i>809</i>&nbsp;        System.arraycopy(currentMatrixIndex, 0, storedMatrixIndex, 0, nrOfNodes);</b>
+<b class="nc"><i>810</i>&nbsp;        System.arraycopy(currentPartialsIndex, 0, storedPartialsIndex, 0, nrOfNodes);</b>
+<b class="nc"><i>811</i>&nbsp;    }</b>
+<i>812</i>&nbsp;
+<i>813</i>&nbsp;
+<i>814</i>&nbsp;//	@Override
+<i>815</i>&nbsp;//    public void calcRootPsuedoRootPartials(double[] frequencies, int nodeIndex, double [] pseudoPartials) {
+<i>816</i>&nbsp;//		int u = 0;
+<i>817</i>&nbsp;//		double [] inPartials = m_fPartials[m_iCurrentPartials[nodeIndex]][nodeIndex];
+<i>818</i>&nbsp;//		for (int k = 0; k &lt; m_nPatterns; k++) {
+<i>819</i>&nbsp;//			for (int l = 0; l &lt; m_nMatrices; l++) {
+<i>820</i>&nbsp;//				for (int i = 0; i &lt; m_nStates; i++) {
+<i>821</i>&nbsp;//					pseudoPartials[u] = inPartials[u] * frequencies[i];
+<i>822</i>&nbsp;//					u++;
+<i>823</i>&nbsp;//				}
+<i>824</i>&nbsp;//			}
+<i>825</i>&nbsp;//		}
+<i>826</i>&nbsp;//    }
+<i>827</i>&nbsp;//	@Override
+<i>828</i>&nbsp;//    public void calcNodePsuedoRootPartials(double[] inPseudoPartials, int nodeIndex, double [] outPseudoPartials) {
+<i>829</i>&nbsp;//		double [] partials = m_fPartials[m_iCurrentPartials[nodeIndex]][nodeIndex];
+<i>830</i>&nbsp;//		double [] oldPartials = m_fPartials[m_iStoredPartials[nodeIndex]][nodeIndex];
+<i>831</i>&nbsp;//		int maxK = m_nPatterns * m_nMatrices * m_nStates; 
+<i>832</i>&nbsp;//		for (int k = 0; k &lt; maxK; k++) {
+<i>833</i>&nbsp;//			outPseudoPartials[k] = inPseudoPartials[k] * partials[k] / oldPartials[k];
+<i>834</i>&nbsp;//		}
+<i>835</i>&nbsp;//	}
+<i>836</i>&nbsp;//    
+<i>837</i>&nbsp;//	@Override
+<i>838</i>&nbsp;//    public void calcPsuedoRootPartials(double [] parentPseudoPartials, int nodeIndex, double [] pseudoPartials) {
+<i>839</i>&nbsp;//		int v = 0;
+<i>840</i>&nbsp;//		int u = 0;
+<i>841</i>&nbsp;//		double [] matrices = m_fMatrices[m_iCurrentMatrices[nodeIndex]][nodeIndex];
+<i>842</i>&nbsp;//		for (int k = 0; k &lt; m_nPatterns; k++) {
+<i>843</i>&nbsp;//			for (int l = 0; l &lt; m_nMatrices; l++) {
+<i>844</i>&nbsp;//				for (int i = 0; i &lt; m_nStates; i++) {
+<i>845</i>&nbsp;//					int w = 0;
+<i>846</i>&nbsp;//					double sum = 0;
+<i>847</i>&nbsp;//					for (int j = 0; j &lt; m_nStates; j++) {
+<i>848</i>&nbsp;//					      sum += parentPseudoPartials[u+j] * matrices[w + i];
+<i>849</i>&nbsp;//					      w+=m_nStates;
+<i>850</i>&nbsp;//					}
+<i>851</i>&nbsp;//					pseudoPartials[v] = sum;
+<i>852</i>&nbsp;//					v++;
+<i>853</i>&nbsp;////					int w = l * m_nMatrixSize;
+<i>854</i>&nbsp;////					double sum = 0;
+<i>855</i>&nbsp;////					for (int j = 0; j &lt; m_nStates; j++) {
+<i>856</i>&nbsp;////					      sum += parentPseudoPartials[u+j] * matrices[w+j];
+<i>857</i>&nbsp;////					}
+<i>858</i>&nbsp;////					pseudoPartials[v] = sum;
+<i>859</i>&nbsp;////					v++;
+<i>860</i>&nbsp;//				}
+<i>861</i>&nbsp;//				u += m_nStates;
+<i>862</i>&nbsp;//			}
+<i>863</i>&nbsp;//		}
+<i>864</i>&nbsp;//    }
+<i>865</i>&nbsp;//
+<i>866</i>&nbsp;//
+<i>867</i>&nbsp;//    @Override
+<i>868</i>&nbsp;//    void integratePartialsP(double [] inPartials, double [] proportions, double [] m_fRootPartials) {
+<i>869</i>&nbsp;//		int maxK = m_nPatterns * m_nStates;
+<i>870</i>&nbsp;//		for (int k = 0; k &lt; maxK; k++) {
+<i>871</i>&nbsp;//			m_fRootPartials[k] = inPartials[k] * proportions[0];
+<i>872</i>&nbsp;//		}
+<i>873</i>&nbsp;//
+<i>874</i>&nbsp;//		for (int l = 1; l &lt; m_nMatrices; l++) {
+<i>875</i>&nbsp;//			int n = maxK * l;
+<i>876</i>&nbsp;//			for (int k = 0; k &lt; maxK; k++) {
+<i>877</i>&nbsp;//				m_fRootPartials[k] += inPartials[n+k] * proportions[l];
+<i>878</i>&nbsp;//			}
+<i>879</i>&nbsp;//		}
+<i>880</i>&nbsp;//    } // integratePartials
+<i>881</i>&nbsp;//
+<i>882</i>&nbsp;//	/**
+<i>883</i>&nbsp;//	 * Calculates pattern log likelihoods at a node.
+<i>884</i>&nbsp;//	 * @param partials the partials used to calculate the likelihoods
+<i>885</i>&nbsp;//	 * @param frequencies an array of state frequencies
+<i>886</i>&nbsp;//	 * @param outLogLikelihoods an array into which the likelihoods will go
+<i>887</i>&nbsp;//	 */
+<i>888</i>&nbsp;//    @Override
+<i>889</i>&nbsp;//	public void calculateLogLikelihoodsP(double[] partials,double[] outLogLikelihoods)
+<i>890</i>&nbsp;//	{
+<i>891</i>&nbsp;//        int v = 0;
+<i>892</i>&nbsp;//		for (int k = 0; k &lt; m_nPatterns; k++) {
+<i>893</i>&nbsp;//            double sum = 0.0;
+<i>894</i>&nbsp;//			for (int i = 0; i &lt; m_nStates; i++) {
+<i>895</i>&nbsp;//				sum += partials[v];
+<i>896</i>&nbsp;//				v++;
+<i>897</i>&nbsp;//			}
+<i>898</i>&nbsp;//            outLogLikelihoods[k] = Math.log(sum) + getLogScalingFactor(k);
+<i>899</i>&nbsp;//		}
+<i>900</i>&nbsp;//	}
+<i>901</i>&nbsp;//	
+<i>902</i>&nbsp;//	
+<i>903</i>&nbsp;//	//    @Override
+<i>904</i>&nbsp;////    LikelihoodCore feelsGood() {return null;}
+<i>905</i>&nbsp;} // class BeerLikelihoodCore
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

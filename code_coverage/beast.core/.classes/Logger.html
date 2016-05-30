@@ -1,0 +1,794 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Logger</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.core</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Logger (beast.core)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Logger</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 293)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Logger$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Logger$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Logger$LogFileMode</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Logger$LOGMODE</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Logger$SORTMODE</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 303)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;* File Logger.java
+<i>3</i>&nbsp;*
+<i>4</i>&nbsp;* Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>5</i>&nbsp;*
+<i>6</i>&nbsp;* This file is part of BEAST2.
+<i>7</i>&nbsp;* See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp;* information regarding copyright ownership and licensing.
+<i>9</i>&nbsp;*
+<i>10</i>&nbsp;* BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp;* it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp;* published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp;* of the License, or (at your option) any later version.
+<i>14</i>&nbsp;*
+<i>15</i>&nbsp;*  BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp;*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp;*  GNU Lesser General Public License for more details.
+<i>19</i>&nbsp;*
+<i>20</i>&nbsp;* You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp;* License along with BEAST; if not, write to the
+<i>22</i>&nbsp;* Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp;* Boston, MA  02110-1301  USA
+<i>24</i>&nbsp;*/
+<i>25</i>&nbsp;package beast.core;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;import java.io.BufferedReader;
+<i>30</i>&nbsp;import java.io.ByteArrayOutputStream;
+<i>31</i>&nbsp;import java.io.File;
+<i>32</i>&nbsp;import java.io.FileOutputStream;
+<i>33</i>&nbsp;import java.io.FileReader;
+<i>34</i>&nbsp;import java.io.IOException;
+<i>35</i>&nbsp;import java.io.InputStreamReader;
+<i>36</i>&nbsp;import java.io.PrintStream;
+<i>37</i>&nbsp;import java.io.UnsupportedEncodingException;
+<i>38</i>&nbsp;import java.nio.file.Files;
+<i>39</i>&nbsp;import java.nio.file.StandardCopyOption;
+<i>40</i>&nbsp;import java.util.ArrayList;
+<i>41</i>&nbsp;import java.util.Arrays;
+<i>42</i>&nbsp;import java.util.Collections;
+<i>43</i>&nbsp;import java.util.List;
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;import beast.core.Input.Validate;
+<i>46</i>&nbsp;import beast.core.util.Log;
+<i>47</i>&nbsp;import beast.evolution.tree.Tree;
+<i>48</i>&nbsp;import beast.util.XMLProducer;
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;
+<b class="nc"><i>51</i>&nbsp;@Description(&quot;Logs results of a calculation processes on regular intervals.&quot;)</b>
+<b class="nc"><i>52</i>&nbsp;public class Logger extends BEASTObject {</b>
+<i>53</i>&nbsp;    /**
+<i>54</i>&nbsp;     * currently supported modes *
+<i>55</i>&nbsp;     */
+<b class="nc"><i>56</i>&nbsp;    public enum LOGMODE {</b>
+<b class="nc"><i>57</i>&nbsp;        autodetect, compound, tree</b>
+<i>58</i>&nbsp;    }
+<i>59</i>&nbsp;
+<b class="nc"><i>60</i>&nbsp;    public enum SORTMODE {</b>
+<b class="nc"><i>61</i>&nbsp;        none, alphabetic, smart</b>
+<i>62</i>&nbsp;    }
+<i>63</i>&nbsp;
+<b class="nc"><i>64</i>&nbsp;    final public Input&lt;String&gt; fileNameInput = new Input&lt;&gt;(&quot;fileName&quot;, &quot;Name of the file, or stdout if left blank&quot;);</b>
+<i>65</i>&nbsp;
+<b class="nc"><i>66</i>&nbsp;    final public Input&lt;Integer&gt; everyInput = new Input&lt;&gt;(&quot;logEvery&quot;, &quot;Number of the samples logged&quot;, 1);</b>
+<b class="nc"><i>67</i>&nbsp;    final public Input&lt;BEASTObject&gt; modelInput = new Input&lt;&gt;(&quot;model&quot;, &quot;Model to log at the top of the log. &quot; +</b>
+<i>68</i>&nbsp;            &quot;If specified, XML will be produced for the model, commented out by # at the start of a line. &quot; +
+<i>69</i>&nbsp;            &quot;Alignments are suppressed. This way, the log file documents itself. &quot;);
+<b class="nc"><i>70</i>&nbsp;    final public Input&lt;LOGMODE&gt; modeInput = new Input&lt;&gt;(&quot;mode&quot;, &quot;logging mode, one of &quot; + Arrays.toString(LOGMODE.values()), LOGMODE.autodetect, LOGMODE.values());</b>
+<b class="nc"><i>71</i>&nbsp;    final public Input&lt;SORTMODE&gt; sortModeInput = new Input&lt;&gt;(&quot;sort&quot;, &quot;sort items to be logged, one of &quot; + Arrays.toString(SORTMODE.values()), SORTMODE.none, SORTMODE.values());</b>
+<b class="nc"><i>72</i>&nbsp;    final public Input&lt;Boolean&gt; sanitiseHeadersInput = new Input&lt;&gt;(&quot;sanitiseHeaders&quot;, &quot;whether to remove any clutter introduced by Beauti&quot; , false);</b>
+<i>73</i>&nbsp;
+<b class="nc"><i>74</i>&nbsp;    final public Input&lt;List&lt;BEASTObject&gt;&gt; loggersInput = new Input&lt;&gt;(&quot;log&quot;,</b>
+<i>75</i>&nbsp;            &quot;Element in a log. This can be any plug in that is Loggable.&quot;,
+<i>76</i>&nbsp;            new ArrayList&lt;&gt;(), Validate.REQUIRED, Loggable.class);
+<i>77</i>&nbsp;
+<i>78</i>&nbsp;    // the file name to log to, or null, or &quot;&quot; if logging to stdout
+<i>79</i>&nbsp;    private String fileName;
+<i>80</i>&nbsp;
+<i>81</i>&nbsp;    /**
+<i>82</i>&nbsp;     * list of loggers, if any
+<i>83</i>&nbsp;     */
+<i>84</i>&nbsp;    List&lt;Loggable&gt; loggerList;
+<b class="nc"><i>85</i>&nbsp;    public enum LogFileMode {</b>
+<b class="nc"><i>86</i>&nbsp;    	only_new, overwrite, resume, only_new_or_exit</b>
+<i>87</i>&nbsp;    }
+<b class="nc"><i>88</i>&nbsp;    public static LogFileMode FILE_MODE = LogFileMode.only_new;</b>
+<i>89</i>&nbsp;    
+<i>90</i>&nbsp;    /**
+<i>91</i>&nbsp;     * Compound loggers get a sample number printed at the beginning of the line,
+<i>92</i>&nbsp;     * while tree loggers don&#39;t.
+<i>93</i>&nbsp;     */
+<b class="nc"><i>94</i>&nbsp;    public LOGMODE mode = LOGMODE.compound;</b>
+<i>95</i>&nbsp;    
+<i>96</i>&nbsp;    /**
+<i>97</i>&nbsp;     * offset for the sample number, which is non-zero when a chain is resumed *
+<i>98</i>&nbsp;     */
+<b class="nc"><i>99</i>&nbsp;    static int sampleOffset = -1;</b>
+<i>100</i>&nbsp;
+<i>101</i>&nbsp;    /**
+<i>102</i>&nbsp;     * number of samples between logs *
+<i>103</i>&nbsp;     */
+<b class="nc"><i>104</i>&nbsp;    int every = 1;</b>
+<i>105</i>&nbsp;
+<i>106</i>&nbsp;    /**
+<i>107</i>&nbsp;     * stream to log to
+<i>108</i>&nbsp;     */
+<i>109</i>&nbsp;    PrintStream m_out;
+<i>110</i>&nbsp;
+<i>111</i>&nbsp;    /**
+<i>112</i>&nbsp;     * keep track of time taken between logs to estimate speed *
+<i>113</i>&nbsp;     */
+<b class="nc"><i>114</i>&nbsp;    long startLogTime = -5;</b>
+<i>115</i>&nbsp;    int startSample;
+<i>116</i>&nbsp;
+<i>117</i>&nbsp;    @Override
+<i>118</i>&nbsp;    public void initAndValidate() {
+<i>119</i>&nbsp;
+<b class="nc"><i>120</i>&nbsp;        fileName = fileNameInput.get();</b>
+<i>121</i>&nbsp;
+<b class="nc"><i>122</i>&nbsp;        final List&lt;BEASTObject&gt; loggers = loggersInput.get();</b>
+<b class="nc"><i>123</i>&nbsp;        final int loggerCount = loggers.size();</b>
+<b class="nc"><i>124</i>&nbsp;        if (loggerCount == 0) {</b>
+<b class="nc"><i>125</i>&nbsp;            throw new RuntimeException(&quot;Logger with nothing to log specified&quot;);</b>
+<i>126</i>&nbsp;        }
+<i>127</i>&nbsp;
+<b class="nc"><i>128</i>&nbsp;        loggerList = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>129</i>&nbsp;        for (final BEASTObject logger : loggers) {</b>
+<b class="nc"><i>130</i>&nbsp;            loggerList.add((Loggable) logger);</b>
+<b class="nc"><i>131</i>&nbsp;        }</b>
+<i>132</i>&nbsp;
+<i>133</i>&nbsp;        // determine logging mode
+<b class="nc"><i>134</i>&nbsp;        final LOGMODE mode = modeInput.get();</b>
+<b class="nc"><i>135</i>&nbsp;        if (mode.equals(LOGMODE.autodetect)) {</b>
+<b class="nc"><i>136</i>&nbsp;            this.mode = LOGMODE.compound;</b>
+<b class="nc"><i>137</i>&nbsp;            if (loggerCount == 1 &amp;&amp; loggerList.get(0) instanceof Tree) {</b>
+<b class="nc"><i>138</i>&nbsp;            	this.mode = LOGMODE.tree;</b>
+<i>139</i>&nbsp;            }
+<b class="nc"><i>140</i>&nbsp;        } else if (mode.equals(LOGMODE.tree)) {</b>
+<b class="nc"><i>141</i>&nbsp;        	this.mode = LOGMODE.tree;</b>
+<b class="nc"><i>142</i>&nbsp;        } else if (mode.equals(LOGMODE.compound)) {</b>
+<b class="nc"><i>143</i>&nbsp;        	this.mode = LOGMODE.compound;</b>
+<i>144</i>&nbsp;        } else {
+<b class="nc"><i>145</i>&nbsp;            throw new IllegalArgumentException(&quot;Mode &#39;&quot; + mode + &quot;&#39; is not supported. Choose one of &quot; + Arrays.toString(LOGMODE.values()));</b>
+<i>146</i>&nbsp;        }
+<i>147</i>&nbsp;
+<b class="nc"><i>148</i>&nbsp;        if (everyInput.get() != null) {</b>
+<b class="nc"><i>149</i>&nbsp;            every = everyInput.get();</b>
+<i>150</i>&nbsp;        }
+<i>151</i>&nbsp;        
+<b class="nc"><i>152</i>&nbsp;        if (this.mode == LOGMODE.compound) {</b>
+<b class="nc"><i>153</i>&nbsp;        	switch (sortModeInput.get()) {</b>
+<i>154</i>&nbsp;        	case none:
+<i>155</i>&nbsp;        		// nothing to do
+<b class="nc"><i>156</i>&nbsp;       			break;</b>
+<i>157</i>&nbsp;        	case alphabetic:
+<i>158</i>&nbsp;        		// sort loggers by id
+<b class="nc"><i>159</i>&nbsp;        		Collections.sort(loggerList, (Loggable o1, Loggable o2) -&gt; {</b>
+<b class="nc"><i>160</i>&nbsp;						final String id1 = ((BEASTObject)o1).getID();</b>
+<b class="nc"><i>161</i>&nbsp;						final String id2 = ((BEASTObject)o2).getID();  //was o1, probably a bug, found by intelliJ</b>
+<b class="nc"><i>162</i>&nbsp;						if (id1 == null || id2 == null) {return 0;}</b>
+<b class="nc"><i>163</i>&nbsp;						return id1.compareTo(id2);</b>
+<i>164</i>&nbsp;					}
+<i>165</i>&nbsp;				);
+<b class="nc"><i>166</i>&nbsp;    			break;</b>
+<i>167</i>&nbsp;        	case smart:
+<i>168</i>&nbsp;        		// Group loggers with same id-prefix, where the prefix of an id is
+<i>169</i>&nbsp;        		// defined as the part of an id before the first full stop.
+<i>170</i>&nbsp;        		// This way, multi-partition analysis generated by BEAUti get all  
+<i>171</i>&nbsp;        		// related log items together in Tracer
+<b class="nc"><i>172</i>&nbsp;        		final List&lt;String&gt; ids = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>173</i>&nbsp;                for (final Loggable aLoggerList : loggerList) {</b>
+<b class="nc"><i>174</i>&nbsp;                    String id = ((BEASTObject) aLoggerList).getID();</b>
+<b class="nc"><i>175</i>&nbsp;                    if (id == null) {</b>
+<b class="nc"><i>176</i>&nbsp;                        id = &quot;&quot;;</b>
+<i>177</i>&nbsp;                    }
+<b class="nc"><i>178</i>&nbsp;                    if (id.indexOf(&#39;.&#39;) &gt; 0) {</b>
+<b class="nc"><i>179</i>&nbsp;                        id = id.substring(0, id.indexOf(&#39;.&#39;));</b>
+<i>180</i>&nbsp;                    }
+<b class="nc"><i>181</i>&nbsp;                    ids.add(id);</b>
+<b class="nc"><i>182</i>&nbsp;                }</b>
+<b class="nc"><i>183</i>&nbsp;        		for (int i = 0; i &lt; loggerList.size(); i++) {</b>
+<b class="nc"><i>184</i>&nbsp;        			int k = 1;</b>
+<b class="nc"><i>185</i>&nbsp;        			final String id = ids.get(i);</b>
+<b class="nc"><i>186</i>&nbsp;        			for (int j = i + 1; j &lt; loggerList.size(); j++) {</b>
+<b class="nc"><i>187</i>&nbsp;        				if (ids.get(j).equals(id)) {</b>
+<b class="nc"><i>188</i>&nbsp;        					ids.remove(j);</b>
+<b class="nc"><i>189</i>&nbsp;        					ids.add(i + k, id);</b>
+<b class="nc"><i>190</i>&nbsp;        					final Loggable l = loggerList.remove(j);</b>
+<b class="nc"><i>191</i>&nbsp;        					loggerList.add(i + k, l);</b>
+<b class="nc"><i>192</i>&nbsp;        					k++;</b>
+<i>193</i>&nbsp;        				}
+<i>194</i>&nbsp;        			}
+<i>195</i>&nbsp;        		}
+<i>196</i>&nbsp;    			break;
+<i>197</i>&nbsp;        	}
+<i>198</i>&nbsp;        }
+<i>199</i>&nbsp;    } // initAndValidate
+<i>200</i>&nbsp;
+<i>201</i>&nbsp;    /**
+<i>202</i>&nbsp;     * @return true if this logger is logging to stdout.
+<i>203</i>&nbsp;     */
+<i>204</i>&nbsp;    public boolean isLoggingToStdout() {
+<b class="nc"><i>205</i>&nbsp;        return (fileName == null || fileName.length() == 0);</b>
+<i>206</i>&nbsp;    }
+<i>207</i>&nbsp;
+<i>208</i>&nbsp;    /**
+<i>209</i>&nbsp;     * initialise log, open file (if necessary) and produce header of log
+<i>210</i>&nbsp;     */
+<i>211</i>&nbsp;    public void init() throws IOException {
+<b class="nc"><i>212</i>&nbsp;        final boolean needsHeader = openLogFile();</b>
+<b class="nc"><i>213</i>&nbsp;        if (needsHeader) {</b>
+<b class="nc"><i>214</i>&nbsp;            if (modelInput.get() != null) {</b>
+<i>215</i>&nbsp;                // print model at top of log
+<b class="nc"><i>216</i>&nbsp;                String xml = new XMLProducer().modelToXML(modelInput.get());</b>
+<b class="nc"><i>217</i>&nbsp;                xml = &quot;#&quot; + xml.replaceAll(&quot;\\n&quot;, &quot;\n#&quot;);</b>
+<b class="nc"><i>218</i>&nbsp;                m_out.println(&quot;#\n#model:\n#&quot;);</b>
+<b class="nc"><i>219</i>&nbsp;                m_out.println(xml);</b>
+<b class="nc"><i>220</i>&nbsp;                m_out.println(&quot;#&quot;);</b>
+<i>221</i>&nbsp;            }
+<b class="nc"><i>222</i>&nbsp;            ByteArrayOutputStream baos = null;</b>
+<b class="nc"><i>223</i>&nbsp;            PrintStream tmp = null;</b>
+<b class="nc"><i>224</i>&nbsp;            if (m_out == System.out) {</b>
+<b class="nc"><i>225</i>&nbsp;                tmp = m_out;</b>
+<b class="nc"><i>226</i>&nbsp;                baos = new ByteArrayOutputStream();</b>
+<b class="nc"><i>227</i>&nbsp;                m_out = new PrintStream(baos);</b>
+<i>228</i>&nbsp;            }
+<b class="nc"><i>229</i>&nbsp;            final ByteArrayOutputStream rawbaos = new ByteArrayOutputStream();</b>
+<b class="nc"><i>230</i>&nbsp;            final PrintStream out = new PrintStream(rawbaos);</b>
+<b class="nc"><i>231</i>&nbsp;            if (mode == LOGMODE.compound) {</b>
+<b class="nc"><i>232</i>&nbsp;                out.print(&quot;Sample\t&quot;);</b>
+<i>233</i>&nbsp;            }
+<b class="nc"><i>234</i>&nbsp;            for (final Loggable m_logger : loggerList) {</b>
+<b class="nc"><i>235</i>&nbsp;                m_logger.init(out);</b>
+<b class="nc"><i>236</i>&nbsp;            }</b>
+<i>237</i>&nbsp;
+<i>238</i>&nbsp;            // Remove trailing tab from header
+<b class="nc"><i>239</i>&nbsp;            String header = rawbaos.toString().trim();</b>
+<i>240</i>&nbsp;
+<b class="nc"><i>241</i>&nbsp;            if (sanitiseHeadersInput.get()) {</b>
+<b class="nc"><i>242</i>&nbsp;            	m_out.print(sanitiseHeader(header));</b>
+<i>243</i>&nbsp;            } else {
+<b class="nc"><i>244</i>&nbsp;            	m_out.print(header);</b>
+<i>245</i>&nbsp;            }
+<i>246</i>&nbsp;            
+<b class="nc"><i>247</i>&nbsp;            if ( baos != null ) {</b>
+<b class="nc"><i>248</i>&nbsp;                assert tmp == System.out;</b>
+<b class="nc"><i>249</i>&nbsp;                m_out = tmp;</b>
+<i>250</i>&nbsp;                try {
+<b class="nc"><i>251</i>&nbsp;                    String logContent = baos.toString(&quot;ASCII&quot;);</b>
+<b class="nc"><i>252</i>&nbsp;                    logContent = prettifyLogLine(logContent);</b>
+<b class="nc"><i>253</i>&nbsp;                    m_out.print(logContent);</b>
+<b class="nc"><i>254</i>&nbsp;                } catch (UnsupportedEncodingException e) {</b>
+<b class="nc"><i>255</i>&nbsp;                    e.printStackTrace();</b>
+<b class="nc"><i>256</i>&nbsp;                }</b>
+<i>257</i>&nbsp;            }
+<b class="nc"><i>258</i>&nbsp;            m_out.println();</b>
+<i>259</i>&nbsp;        }
+<i>260</i>&nbsp;    } // init
+<i>261</i>&nbsp;
+<i>262</i>&nbsp;    /** remove indicators of partition context from header of a log file **/
+<i>263</i>&nbsp;    private String sanitiseHeader(String header) {
+<i>264</i>&nbsp;    	// collect partitions
+<b class="nc"><i>265</i>&nbsp;    	String partitionPrefix = null, clockPrefix = null, sitePrefix = null, treePrefix = null;</b>
+<b class="nc"><i>266</i>&nbsp;    	for (int i = 0; i &lt; header.length(); i++) {</b>
+<b class="nc"><i>267</i>&nbsp;    		char c = header.charAt(i);</b>
+<b class="nc"><i>268</i>&nbsp;    		if (c == &#39;.&#39;) {</b>
+<b class="nc"><i>269</i>&nbsp;    			if (header.charAt(i+2) == &#39;:&#39;) {</b>
+<b class="nc"><i>270</i>&nbsp;    				final char c2 = header.charAt(++i);</b>
+<b class="nc"><i>271</i>&nbsp;    				i++;</b>
+<b class="nc"><i>272</i>&nbsp;    				String prefix = &quot;&quot;;</b>
+<b class="nc"><i>273</i>&nbsp;    				while (i &lt; header.length() - 1 &amp;&amp; c != &#39;\t&#39;) {</b>
+<b class="nc"><i>274</i>&nbsp;        				c = header.charAt(++i);</b>
+<b class="nc"><i>275</i>&nbsp;        				if (c != &#39;\t&#39;) {</b>
+<b class="nc"><i>276</i>&nbsp;        					prefix += c;</b>
+<i>277</i>&nbsp;        				}
+<i>278</i>&nbsp;    				}
+<b class="nc"><i>279</i>&nbsp;    				switch (c2) {</b>
+<i>280</i>&nbsp;    				case &#39;c&#39;:
+<b class="nc"><i>281</i>&nbsp;    					clockPrefix = getprefix(clockPrefix, prefix);</b>
+<b class="nc"><i>282</i>&nbsp;    					break;</b>
+<i>283</i>&nbsp;    				case &#39;s&#39;:
+<b class="nc"><i>284</i>&nbsp;    					sitePrefix = getprefix(sitePrefix, prefix);</b>
+<b class="nc"><i>285</i>&nbsp;    					break;</b>
+<i>286</i>&nbsp;    				case &#39;t&#39;:
+<b class="nc"><i>287</i>&nbsp;    					treePrefix = getprefix(treePrefix, prefix);</b>
+<i>288</i>&nbsp;    					break;
+<i>289</i>&nbsp;    				}
+<b class="nc"><i>290</i>&nbsp;    			} else {</b>
+<b class="nc"><i>291</i>&nbsp;    				String prefix = &quot;&quot;;</b>
+<b class="nc"><i>292</i>&nbsp;    				while (i &lt; header.length() - 1 &amp;&amp; c != &#39;\t&#39;) {</b>
+<b class="nc"><i>293</i>&nbsp;        				c = header.charAt(++i);</b>
+<b class="nc"><i>294</i>&nbsp;        				if (c != &#39;\t&#39;) {</b>
+<b class="nc"><i>295</i>&nbsp;        					prefix += c;</b>
+<i>296</i>&nbsp;        				}
+<i>297</i>&nbsp;    				}
+<b class="nc"><i>298</i>&nbsp;					partitionPrefix = getprefix(partitionPrefix, prefix);</b>
+<i>299</i>&nbsp;					// get rid of braces
+<b class="nc"><i>300</i>&nbsp;					partitionPrefix = partitionPrefix.replaceAll(&quot;[\\(\\)]&quot;,&quot;&quot;);</b>
+<i>301</i>&nbsp;    			}
+<i>302</i>&nbsp;    		}
+<i>303</i>&nbsp;    	}
+<i>304</i>&nbsp;
+<i>305</i>&nbsp;    	// remove clock/site/tree info
+<b class="nc"><i>306</i>&nbsp;    	header = header.replaceAll(&quot;\\.&quot; + partitionPrefix, &quot;.&quot;);</b>
+<b class="nc"><i>307</i>&nbsp;    	header = header.replaceAll(&quot;\\.c:&quot; + clockPrefix, &quot;.&quot;);</b>
+<b class="nc"><i>308</i>&nbsp;    	header = header.replaceAll(&quot;\\.t:&quot; + treePrefix, &quot;.&quot;);</b>
+<b class="nc"><i>309</i>&nbsp;    	header = header.replaceAll(&quot;\\.s:&quot; + sitePrefix, &quot;.&quot;);</b>
+<i>310</i>&nbsp;    	// remove trailing dots on labels
+<b class="nc"><i>311</i>&nbsp;    	header = header.replaceAll(&quot;\\.\\.&quot;, &quot;.&quot;);</b>
+<b class="nc"><i>312</i>&nbsp;    	header = header.replaceAll(&quot;\\.\t&quot;, &quot;\t&quot;);</b>
+<b class="nc"><i>313</i>&nbsp;		return header;</b>
+<i>314</i>&nbsp;	}
+<i>315</i>&nbsp;
+<i>316</i>&nbsp;    /** return longest common prefix of two strings, except when the first
+<i>317</i>&nbsp;     * on is null, then it returns the second string.
+<i>318</i>&nbsp;     */
+<i>319</i>&nbsp;	private String getprefix(final String str1, final String str2) {
+<b class="nc"><i>320</i>&nbsp;		if (str1 == null) {</b>
+<b class="nc"><i>321</i>&nbsp;			return str2;</b>
+<i>322</i>&nbsp;		} else {
+<b class="nc"><i>323</i>&nbsp;			String prefix = &quot;&quot;;</b>
+<b class="nc"><i>324</i>&nbsp;			int i = 0;</b>
+<b class="nc"><i>325</i>&nbsp;			while (i &lt; str1.length() &amp;&amp; i &lt; str2.length() &amp;&amp; </b>
+<b class="nc"><i>326</i>&nbsp;					str1.charAt(i) == str2.charAt(i)) {</b>
+<b class="nc"><i>327</i>&nbsp;				prefix += str1.charAt(i++);</b>
+<i>328</i>&nbsp;			}
+<b class="nc"><i>329</i>&nbsp;			return prefix;</b>
+<i>330</i>&nbsp;		}
+<i>331</i>&nbsp;	}
+<i>332</i>&nbsp;
+<i>333</i>&nbsp;
+<i>334</i>&nbsp;	boolean openLogFile() throws IOException {
+<b class="nc"><i>335</i>&nbsp;        if (isLoggingToStdout()) {</b>
+<b class="nc"><i>336</i>&nbsp;            m_out = System.out;</b>
+<b class="nc"><i>337</i>&nbsp;            return true;</b>
+<i>338</i>&nbsp;        } else {
+<b class="nc"><i>339</i>&nbsp;            if (fileName.contains(&quot;$(tree)&quot;)) {</b>
+<b class="nc"><i>340</i>&nbsp;            	String treeName = &quot;tree&quot;;</b>
+<b class="nc"><i>341</i>&nbsp;            	for (final Loggable logger : loggerList) {</b>
+<b class="nc"><i>342</i>&nbsp;            		if (logger instanceof BEASTObject) {</b>
+<b class="nc"><i>343</i>&nbsp;            			final String id = ((BEASTObject) logger).getID();</b>
+<b class="nc"><i>344</i>&nbsp;            			if (id.indexOf(&quot;.t:&quot;) &gt; 0) {</b>
+<b class="nc"><i>345</i>&nbsp;            				treeName = id.substring(id.indexOf(&quot;.t:&quot;) + 3); </b>
+<i>346</i>&nbsp;            			}
+<i>347</i>&nbsp;            		}
+<b class="nc"><i>348</i>&nbsp;            	}</b>
+<b class="nc"><i>349</i>&nbsp;                fileName = fileName.replace(&quot;$(tree)&quot;, treeName);</b>
+<b class="nc"><i>350</i>&nbsp;                fileNameInput.setValue(fileName, this);</b>
+<i>351</i>&nbsp;            }
+<b class="nc"><i>352</i>&nbsp;            if (System.getProperty(&quot;file.name.prefix&quot;) != null) {</b>
+<b class="nc"><i>353</i>&nbsp;                fileName = System.getProperty(&quot;file.name.prefix&quot;) + &quot;/&quot; + fileName;</b>
+<i>354</i>&nbsp;            }
+<b class="nc"><i>355</i>&nbsp;            switch (FILE_MODE) {</b>
+<i>356</i>&nbsp;                case only_new:// only open file if the file does not already exists
+<i>357</i>&nbsp;                case only_new_or_exit: {
+<b class="nc"><i>358</i>&nbsp;                    final File file = new File(fileName);</b>
+<b class="nc"><i>359</i>&nbsp;                    if (file.exists()) {</b>
+<b class="nc"><i>360</i>&nbsp;                        if (FILE_MODE == LogFileMode.only_new_or_exit) {</b>
+<b class="nc"><i>361</i>&nbsp;                            Log.err.println(&quot;Trying to write file &quot; + fileName + &quot; but the file already exists. Exiting now.&quot;);</b>
+<b class="nc"><i>362</i>&nbsp;                            throw new RuntimeException(&quot;Use overwrite or resume option, or remove the file&quot;);</b>
+<i>363</i>&nbsp;                            //System.exit(0);
+<i>364</i>&nbsp;                        }
+<i>365</i>&nbsp;                        // Check with user what to do next
+<b class="nc"><i>366</i>&nbsp;                        Log.info.println(&quot;Trying to write file &quot; + fileName + &quot; but the file already exists (perhaps use the -overwrite flag?).&quot;);</b>
+<b class="nc"><i>367</i>&nbsp;                        Log.info.println(&quot;Overwrite (Y/N)?:&quot;);</b>
+<b class="nc"><i>368</i>&nbsp;                        Log.info.flush();</b>
+<b class="nc"><i>369</i>&nbsp;                        final BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));</b>
+<b class="nc"><i>370</i>&nbsp;                        final String msg = stdin.readLine();</b>
+<b class="nc"><i>371</i>&nbsp;                        if (!msg.toLowerCase().equals(&quot;y&quot;)) {</b>
+<b class="nc"><i>372</i>&nbsp;                        	Log.info.println(&quot;Exiting now.&quot;);</b>
+<b class="nc"><i>373</i>&nbsp;                            System.exit(0);</b>
+<i>374</i>&nbsp;                        }
+<i>375</i>&nbsp;                    }
+<b class="nc"><i>376</i>&nbsp;                    m_out = new PrintStream(fileName);</b>
+<b class="nc"><i>377</i>&nbsp;                    Log.info.println(&quot;Writing file &quot; + fileName);</b>
+<b class="nc"><i>378</i>&nbsp;                    return true;</b>
+<i>379</i>&nbsp;                }
+<i>380</i>&nbsp;                case overwrite:// (over)write log file
+<i>381</i>&nbsp;                {
+<b class="nc"><i>382</i>&nbsp;                    String msg = &quot;Writing&quot;;</b>
+<b class="nc"><i>383</i>&nbsp;                    if (new File(fileName).exists()) {</b>
+<b class="nc"><i>384</i>&nbsp;                        msg = &quot;Warning: Overwriting&quot;;</b>
+<i>385</i>&nbsp;                    }
+<b class="nc"><i>386</i>&nbsp;                    m_out = new PrintStream(fileName);</b>
+<b class="nc"><i>387</i>&nbsp;                    Log.warning.println(msg + &quot; file &quot; + fileName);</b>
+<b class="nc"><i>388</i>&nbsp;                    return true;</b>
+<i>389</i>&nbsp;                }
+<i>390</i>&nbsp;                case resume:// append log file, pick up SampleOffset by reading existing log
+<i>391</i>&nbsp;                {
+<b class="nc"><i>392</i>&nbsp;                    final File file = new File(fileName);</b>
+<b class="nc"><i>393</i>&nbsp;                    if (file.exists()) {</b>
+<b class="nc"><i>394</i>&nbsp;                        if (mode == LOGMODE.compound) {</b>
+<i>395</i>&nbsp;                            // first find the sample nr offset
+<b class="nc"><i>396</i>&nbsp;                            final BufferedReader fin = new BufferedReader(new FileReader(fileName));</b>
+<b class="nc"><i>397</i>&nbsp;                            String str = null;</b>
+<b class="nc"><i>398</i>&nbsp;                            while (fin.ready()) {</b>
+<b class="nc"><i>399</i>&nbsp;                                str = fin.readLine();</b>
+<i>400</i>&nbsp;                            }
+<b class="nc"><i>401</i>&nbsp;                            fin.close();</b>
+<b class="nc"><i>402</i>&nbsp;                            assert str != null;</b>
+<b class="nc"><i>403</i>&nbsp;                            final int sampleOffset = Integer.parseInt(str.split(&quot;\\s&quot;)[0]);</b>
+<b class="nc"><i>404</i>&nbsp;                            if (Logger.sampleOffset &gt; 0 &amp;&amp; sampleOffset != Logger.sampleOffset) {</b>
+<b class="nc"><i>405</i>&nbsp;                                throw new RuntimeException(&quot;Error 400: Cannot resume: log files do not end in same sample number&quot;);</b>
+<i>406</i>&nbsp;                            }
+<b class="nc"><i>407</i>&nbsp;                            Logger.sampleOffset = sampleOffset;</b>
+<i>408</i>&nbsp;                            // open the file for appending
+<b class="nc"><i>409</i>&nbsp;                            final FileOutputStream out2 = new FileOutputStream(fileName, true);</b>
+<b class="nc"><i>410</i>&nbsp;                            m_out = new PrintStream(out2);</b>
+<b class="nc"><i>411</i>&nbsp;                        } else {</b>
+<i>412</i>&nbsp;                            // it is a tree logger, we may need to get rid of the last line!
+<i>413</i>&nbsp;
+<i>414</i>&nbsp;                            // back up file in case something goes wrong (e.g. an out of memory error occurs)
+<b class="nc"><i>415</i>&nbsp;                            final File treeFileBackup = new File(fileName);</b>
+<i>416</i>&nbsp;                            
+<i>417</i>&nbsp;                            //final boolean ok = treeFileBackup.renameTo(new File(fileName + &quot;.bu&quot;));    assert ok;
+<b class="nc"><i>418</i>&nbsp;                            Files.move(treeFileBackup.toPath(), new File(fileName+&quot;.bu&quot;).toPath(), StandardCopyOption.ATOMIC_MOVE);</b>
+<i>419</i>&nbsp;                            // open the file and write back all but the last line
+<b class="nc"><i>420</i>&nbsp;                            final BufferedReader fin = new BufferedReader(new FileReader(fileName+&quot;.bu&quot;));</b>
+<i>421</i>&nbsp;
+<b class="nc"><i>422</i>&nbsp;                            final FileOutputStream out2 = new FileOutputStream(fileName);</b>
+<b class="nc"><i>423</i>&nbsp;                            m_out = new PrintStream(out2);</b>
+<i>424</i>&nbsp;
+<i>425</i>&nbsp;                            //final StringBuilder buf = new StringBuilder();
+<b class="nc"><i>426</i>&nbsp;                            String strLast = null;</b>
+<i>427</i>&nbsp;                            //String str = fin.readLine();
+<b class="nc"><i>428</i>&nbsp;                            boolean endSeen = false;</b>
+<b class="nc"><i>429</i>&nbsp;                            while (fin.ready()) {</b>
+<b class="nc"><i>430</i>&nbsp;                                if( endSeen ) {</b>
+<b class="nc"><i>431</i>&nbsp;                                    m_out.println(&quot;End;&quot;);</b>
+<b class="nc"><i>432</i>&nbsp;                                    endSeen = false;</b>
+<i>433</i>&nbsp;                                }
+<b class="nc"><i>434</i>&nbsp;                                final String str = fin.readLine();</b>
+<b class="nc"><i>435</i>&nbsp;                                if (!str.equals(&quot;End;&quot;)) {</b>
+<b class="nc"><i>436</i>&nbsp;                                	m_out.println(str);</b>
+<b class="nc"><i>437</i>&nbsp;                                    strLast = str;</b>
+<i>438</i>&nbsp;                                } else {
+<b class="nc"><i>439</i>&nbsp;                                    endSeen = true;</b>
+<i>440</i>&nbsp;                                }
+<b class="nc"><i>441</i>&nbsp;                            }</b>
+<b class="nc"><i>442</i>&nbsp;                            fin.close();</b>
+<i>443</i>&nbsp;
+<i>444</i>&nbsp;                            // determine number of the last sample
+<b class="nc"><i>445</i>&nbsp;                            if( strLast == null ) {</b>
+<i>446</i>&nbsp;                                // empty log file?
+<b class="nc"><i>447</i>&nbsp;                                 throw new RuntimeException(&quot;Error 402: empty tree log file &quot; + fileName + &quot;? (check if there is a back up file &quot; + fileName + &quot;.bu)&quot;);</b>
+<i>448</i>&nbsp;                            }
+<b class="nc"><i>449</i>&nbsp;                            final String str = strLast.split(&quot;\\s+&quot;)[1];</b>
+<b class="nc"><i>450</i>&nbsp;                            final int sampleOffset = Integer.parseInt(str.substring(6));</b>
+<b class="nc"><i>451</i>&nbsp;                            if (Logger.sampleOffset &gt; 0 &amp;&amp; sampleOffset != Logger.sampleOffset) {</b>
+<i>452</i>&nbsp;                                //final boolean ok1 = treeFileBackup.renameTo(new File(fileName));        assert ok1;
+<b class="nc"><i>453</i>&nbsp;                                Files.move(treeFileBackup.toPath(), new File(fileName).toPath(), StandardCopyOption.ATOMIC_MOVE);</b>
+<b class="nc"><i>454</i>&nbsp;                                throw new RuntimeException(&quot;Error 401: Cannot resume: log files do not end in same sample number&quot;);</b>
+<i>455</i>&nbsp;                            }
+<b class="nc"><i>456</i>&nbsp;                            Logger.sampleOffset = sampleOffset;</b>
+<i>457</i>&nbsp;                            // it is safe to remove the backup file now
+<b class="nc"><i>458</i>&nbsp;                            new File(fileName + &quot;.bu&quot;).delete();</b>
+<i>459</i>&nbsp;                        }
+<b class="nc"><i>460</i>&nbsp;                        Log.info.println(&quot;Appending file &quot; + fileName);</b>
+<b class="nc"><i>461</i>&nbsp;                        return false;</b>
+<i>462</i>&nbsp;                    } else {
+<b class="nc"><i>463</i>&nbsp;                        m_out = new PrintStream(fileName);</b>
+<b class="nc"><i>464</i>&nbsp;                        Log.warning.println(&quot;WARNING: Resuming, but file &quot; + fileName + &quot; does not exist yet (perhaps the seed number is not the same as before?).&quot;);</b>
+<b class="nc"><i>465</i>&nbsp;                        Log.info.println(&quot;Writing new file &quot; + fileName);</b>
+<b class="nc"><i>466</i>&nbsp;                        return true;</b>
+<i>467</i>&nbsp;                    }
+<i>468</i>&nbsp;                }
+<i>469</i>&nbsp;                default:
+<b class="nc"><i>470</i>&nbsp;                    throw new RuntimeException(&quot;DEVELOPER ERROR: unknown file mode for logger &quot; + FILE_MODE);</b>
+<i>471</i>&nbsp;            }
+<i>472</i>&nbsp;        }
+<i>473</i>&nbsp;    } // openLogFile
+<i>474</i>&nbsp;
+<i>475</i>&nbsp;    /**
+<i>476</i>&nbsp;     * log the state for given sample nr
+<i>477</i>&nbsp;     * *
+<i>478</i>&nbsp;     * * @param sample
+<i>479</i>&nbsp;     */
+<i>480</i>&nbsp;    public void log(int sampleNr) {
+<b class="nc"><i>481</i>&nbsp;        if ((sampleNr &lt; 0) || (sampleNr % every &gt; 0)) {</b>
+<i>482</i>&nbsp;            return;
+<i>483</i>&nbsp;        }
+<b class="nc"><i>484</i>&nbsp;        if (sampleOffset &gt;= 0) {</b>
+<b class="nc"><i>485</i>&nbsp;            if (sampleNr == 0) {</b>
+<i>486</i>&nbsp;                // don&#39;t need to duplicate the last line in the log
+<i>487</i>&nbsp;                return;
+<i>488</i>&nbsp;            }
+<b class="nc"><i>489</i>&nbsp;            sampleNr += sampleOffset;</b>
+<i>490</i>&nbsp;        }
+<i>491</i>&nbsp;
+<b class="nc"><i>492</i>&nbsp;        ByteArrayOutputStream baos = new ByteArrayOutputStream();</b>
+<b class="nc"><i>493</i>&nbsp;        PrintStream out = new PrintStream(baos);</b>
+<i>494</i>&nbsp;
+<b class="nc"><i>495</i>&nbsp;        if (mode == LOGMODE.compound) {</b>
+<b class="nc"><i>496</i>&nbsp;            out.print((sampleNr) + &quot;\t&quot;);</b>
+<i>497</i>&nbsp;        }
+<i>498</i>&nbsp;
+<b class="nc"><i>499</i>&nbsp;        for (final Loggable m_logger : loggerList) {</b>
+<b class="nc"><i>500</i>&nbsp;            m_logger.log(sampleNr, out);</b>
+<b class="nc"><i>501</i>&nbsp;        }</b>
+<i>502</i>&nbsp;
+<i>503</i>&nbsp;        // Aquire log string and trim excess tab
+<i>504</i>&nbsp;        String logContent;
+<i>505</i>&nbsp;        try {
+<b class="nc"><i>506</i>&nbsp;            logContent = baos.toString(&quot;ASCII&quot;).trim();</b>
+<b class="nc"><i>507</i>&nbsp;        } catch (UnsupportedEncodingException e) {</b>
+<b class="nc"><i>508</i>&nbsp;            throw new RuntimeException(&quot;ASCII string encoding not supported: required for logging!&quot;);</b>
+<b class="nc"><i>509</i>&nbsp;        }</b>
+<i>510</i>&nbsp;
+<i>511</i>&nbsp;        // Include calculation speed estimate if this log is going to the terminal
+<b class="nc"><i>512</i>&nbsp;        if ( m_out == System.out ) {</b>
+<b class="nc"><i>513</i>&nbsp;            logContent = prettifyLogLine(logContent);</b>
+<b class="nc"><i>514</i>&nbsp;            m_out.print(logContent);</b>
+<i>515</i>&nbsp;
+<b class="nc"><i>516</i>&nbsp;            if (startLogTime &lt; 0) {</b>
+<b class="nc"><i>517</i>&nbsp;                if (sampleNr - sampleOffset &gt; 6000) {</b>
+<b class="nc"><i>518</i>&nbsp;                    startLogTime++;</b>
+<b class="nc"><i>519</i>&nbsp;                    if (startLogTime == 0) {</b>
+<b class="nc"><i>520</i>&nbsp;                        startLogTime = System.currentTimeMillis();</b>
+<b class="nc"><i>521</i>&nbsp;                        startSample = sampleNr;</b>
+<i>522</i>&nbsp;                    }
+<i>523</i>&nbsp;                }
+<b class="nc"><i>524</i>&nbsp;                m_out.print(&quot; --&quot;);</b>
+<i>525</i>&nbsp;            } else {
+<i>526</i>&nbsp;
+<b class="nc"><i>527</i>&nbsp;                final long logTime = System.currentTimeMillis();</b>
+<b class="nc"><i>528</i>&nbsp;                final int secondsPerMSamples = (int) ((logTime - startLogTime) * 1000.0 / (sampleNr - startSample + 1.0));</b>
+<b class="nc"><i>529</i>&nbsp;                final String timePerMSamples =</b>
+<i>530</i>&nbsp;                        (secondsPerMSamples &gt;= 3600 ? secondsPerMSamples / 3600 + &quot;h&quot; : &quot;&quot;) +
+<i>531</i>&nbsp;                                (secondsPerMSamples &gt;= 60 ? (secondsPerMSamples % 3600) / 60 + &quot;m&quot; : &quot;&quot;) +
+<i>532</i>&nbsp;                                (secondsPerMSamples % 60 + &quot;s&quot;);
+<b class="nc"><i>533</i>&nbsp;                m_out.print(&quot; &quot; + timePerMSamples + &quot;/Msamples&quot;);</b>
+<i>534</i>&nbsp;            }
+<b class="nc"><i>535</i>&nbsp;            m_out.println();</b>
+<i>536</i>&nbsp;
+<i>537</i>&nbsp;        } else {
+<b class="nc"><i>538</i>&nbsp;            m_out.println(logContent);</b>
+<i>539</i>&nbsp;        }
+<i>540</i>&nbsp;    } // log
+<i>541</i>&nbsp;
+<i>542</i>&nbsp;
+<i>543</i>&nbsp;    private String prettifyLogLine(String logContent) {
+<b class="nc"><i>544</i>&nbsp;        final String[] strs = logContent.split(&quot;\t&quot;);</b>
+<b class="nc"><i>545</i>&nbsp;        logContent = &quot;&quot;;</b>
+<b class="nc"><i>546</i>&nbsp;        for (final String str : strs) {</b>
+<b class="nc"><i>547</i>&nbsp;            logContent += prettifyLogEntry(str);</b>
+<i>548</i>&nbsp;        }
+<b class="nc"><i>549</i>&nbsp;        return logContent;</b>
+<i>550</i>&nbsp;    }
+<i>551</i>&nbsp;
+<i>552</i>&nbsp;    private String prettifyLogEntry(String str) {
+<i>553</i>&nbsp;        // TODO Q2R intelliJ says \\ can&#39;t be used in a range ...
+<b class="nc"><i>554</i>&nbsp;        if (str.matches(&quot;[\\d-E]+\\.[\\d-E]+&quot;)) {</b>
+<i>555</i>&nbsp;            // format as double
+<b class="nc"><i>556</i>&nbsp;            if (str.contains(&quot;E&quot;)) {</b>
+<b class="nc"><i>557</i>&nbsp;                if (str.length() &gt; 15) {</b>
+<b class="nc"><i>558</i>&nbsp;                    final String[] strs = str.split(&quot;E&quot;);</b>
+<b class="nc"><i>559</i>&nbsp;                    return &quot; &quot; + strs[0].substring(0, 15 - strs[1].length() - 2) + &quot;E&quot; + strs[1];</b>
+<i>560</i>&nbsp;                } else {
+<b class="nc"><i>561</i>&nbsp;                    return &quot;               &quot;.substring(str.length()) + str;</b>
+<i>562</i>&nbsp;                }
+<i>563</i>&nbsp;            }
+<b class="nc"><i>564</i>&nbsp;            final String s1 = str.substring(0, str.indexOf(&quot;.&quot;));</b>
+<b class="nc"><i>565</i>&nbsp;            String s2 = str.substring(str.indexOf(&quot;.&quot;) + 1);</b>
+<b class="nc"><i>566</i>&nbsp;            while (s2.length() &lt; 4) {</b>
+<b class="nc"><i>567</i>&nbsp;                s2 = s2 + &quot; &quot;;</b>
+<i>568</i>&nbsp;            }
+<b class="nc"><i>569</i>&nbsp;            s2 = s2.substring(0, 4);</b>
+<b class="nc"><i>570</i>&nbsp;            str = s1 + &quot;.&quot; + s2;</b>
+<b class="nc"><i>571</i>&nbsp;            str = &quot;               &quot;.substring(str.length()) + str;</b>
+<b class="nc"><i>572</i>&nbsp;        } else if (str.length() &lt; 15) {</b>
+<i>573</i>&nbsp;            // format integer, boolean
+<b class="nc"><i>574</i>&nbsp;            str = &quot;               &quot;.substring(str.length()) + str;</b>
+<i>575</i>&nbsp;        } else {
+<b class="nc"><i>576</i>&nbsp;            str = &quot; &quot; + str;</b>
+<i>577</i>&nbsp;        }
+<b class="nc"><i>578</i>&nbsp;        int overShoot = str.length() - 15;</b>
+<b class="nc"><i>579</i>&nbsp;        while (overShoot &gt; 0 &amp;&amp; str.length() &gt; 2 &amp;&amp; str.charAt(1) == &#39; &#39;) {</b>
+<b class="nc"><i>580</i>&nbsp;            str = str.substring(1);</b>
+<b class="nc"><i>581</i>&nbsp;            overShoot--;</b>
+<i>582</i>&nbsp;        }
+<b class="nc"><i>583</i>&nbsp;        if (overShoot &gt; 0) {</b>
+<b class="nc"><i>584</i>&nbsp;            str = str.substring(0, 8) + &quot;_&quot; + str.substring(str.length() - 6);</b>
+<i>585</i>&nbsp;        }
+<b class="nc"><i>586</i>&nbsp;        return str;</b>
+<i>587</i>&nbsp;    }
+<i>588</i>&nbsp;
+<i>589</i>&nbsp;
+<i>590</i>&nbsp;    /**
+<i>591</i>&nbsp;     * stop logging, produce end of log message and close file (if necessary) *
+<i>592</i>&nbsp;     */
+<i>593</i>&nbsp;    public void close() {
+<b class="nc"><i>594</i>&nbsp;        for (final Loggable m_logger : loggerList) {</b>
+<b class="nc"><i>595</i>&nbsp;            m_logger.close(m_out);</b>
+<b class="nc"><i>596</i>&nbsp;        }</b>
+<i>597</i>&nbsp;
+<b class="nc"><i>598</i>&nbsp;        if (m_out != System.out) {</b>
+<i>599</i>&nbsp;            // close all file, except stdout
+<b class="nc"><i>600</i>&nbsp;            m_out.close();</b>
+<i>601</i>&nbsp;        }
+<i>602</i>&nbsp;    } // close
+<i>603</i>&nbsp;
+<i>604</i>&nbsp;
+<i>605</i>&nbsp;    public static int getSampleOffset() {
+<b class="nc"><i>606</i>&nbsp;        return sampleOffset &lt; 0 ? 0 : sampleOffset;</b>
+<i>607</i>&nbsp;    }
+<i>608</i>&nbsp;
+<i>609</i>&nbsp;} // class Logger
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

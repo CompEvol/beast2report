@@ -1,0 +1,109 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Posterior</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.core</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Posterior (beast.core)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Posterior</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 10)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.core;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.util.List;
+<i>4</i>&nbsp;import java.util.Random;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;import beast.core.Input.Validate;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;@Description(&quot;Posterior, consisting of a prior and a likehood&quot;)
+<b class="nc"><i>9</i>&nbsp;public class Posterior extends Distribution {</b>
+<b class="nc"><i>10</i>&nbsp;	public Input&lt;Prior&gt; m_prior = new Input&lt;Prior&gt;(&quot;prior&quot;, &quot;prior distribution over the state&quot;, Validate.REQUIRED);</b>
+<b class="nc"><i>11</i>&nbsp;	public Input&lt;Likelihood&gt; m_likelihood = new Input&lt;Likelihood&gt;(&quot;likelihood&quot;, &quot;Likelihood distribution over the data&quot;, Validate.REQUIRED);</b>
+<i>12</i>&nbsp;	
+<i>13</i>&nbsp;	@Override 
+<i>14</i>&nbsp;    public double calculateLogP() {
+<b class="nc"><i>15</i>&nbsp;        logP = m_prior.get().calculateLogP();</b>
+<b class="nc"><i>16</i>&nbsp;        if (Double.isInfinite(logP)) {</b>
+<b class="nc"><i>17</i>&nbsp;        	return logP;</b>
+<i>18</i>&nbsp;        }
+<b class="nc"><i>19</i>&nbsp;        logP += m_likelihood.get().calculateLogP(); </b>
+<b class="nc"><i>20</i>&nbsp;        return logP;</b>
+<i>21</i>&nbsp;    }
+<i>22</i>&nbsp;	
+<b class="nc"><i>23</i>&nbsp;	@Override public List&lt;String&gt; getArguments() {return null;}</b>
+<b class="nc"><i>24</i>&nbsp;	@Override public List&lt;String&gt; getConditions() {return null;}</b>
+<i>25</i>&nbsp;	@Override public void sample(State state, Random random) {}
+<i>26</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

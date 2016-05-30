@@ -1,0 +1,204 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TreeReport</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.tree</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TreeReport (beast.evolution.tree)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TreeReport</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp; * Copyright (C) 2012 Tim Vaughan
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; * This program is free software: you can redistribute it and/or modify
+<i>5</i>&nbsp; * it under the terms of the GNU General Public License as published by
+<i>6</i>&nbsp; * the Free Software Foundation, either version 3 of the License, or
+<i>7</i>&nbsp; * (at your option) any later version.
+<i>8</i>&nbsp; *
+<i>9</i>&nbsp; * This program is distributed in the hope that it will be useful,
+<i>10</i>&nbsp; * but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>11</i>&nbsp; * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>12</i>&nbsp; * GNU General Public License for more details.
+<i>13</i>&nbsp; *
+<i>14</i>&nbsp; * You should have received a copy of the GNU General Public License
+<i>15</i>&nbsp; * along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+<i>16</i>&nbsp; */
+<i>17</i>&nbsp;package beast.evolution.tree;
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;import beast.core.BEASTObject;
+<i>20</i>&nbsp;import beast.core.Description;
+<i>21</i>&nbsp;import beast.core.Input;
+<i>22</i>&nbsp;import beast.core.Logger;
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;import java.util.ArrayList;
+<i>25</i>&nbsp;import java.util.List;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;/**
+<i>29</i>&nbsp; * Modified logger which analyses a sequence of tree states generated
+<i>30</i>&nbsp; * by an MCMC run.
+<i>31</i>&nbsp; *
+<i>32</i>&nbsp; * @author Tim Vaughan
+<i>33</i>&nbsp; */
+<i>34</i>&nbsp;@Description(&quot;Modified logger which analyses a list of tree states generated&quot;
+<i>35</i>&nbsp;		+ &quot;by an MCMC run.&quot;)
+<b class="nc"><i>36</i>&nbsp;public class TreeReport extends Logger {</b>
+<i>37</i>&nbsp;
+<b class="nc"><i>38</i>&nbsp;	public Input&lt;Double&gt; burninPercentageInput = new Input&lt;Double&gt;(&quot;burninPercentage&quot;,</b>
+<i>39</i>&nbsp;			&quot;PERCENTAGE of samples to skip (burn in)&quot;);
+<i>40</i>&nbsp;
+<b class="nc"><i>41</i>&nbsp;	public Input&lt;Double&gt; credibleSetPercentageInput = new Input&lt;Double&gt;(</b>
+<i>42</i>&nbsp;			&quot;credibleSetPercentage&quot;,
+<i>43</i>&nbsp;			&quot;Probability cutoff defining credible set of tree topologies.&quot;,
+<b class="nc"><i>44</i>&nbsp;			95.0</b>
+<i>45</i>&nbsp;			);
+<i>46</i>&nbsp;
+<b class="nc"><i>47</i>&nbsp;	public Input&lt;Boolean&gt; silentInput = new Input&lt;Boolean&gt;(&quot;silent&quot;,</b>
+<b class="nc"><i>48</i>&nbsp;			&quot;Don&#39;t display final report.&quot;, false);</b>
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;	Tree treeToTrack;
+<i>51</i>&nbsp;	List&lt;Tree&gt; treeTrace;
+<i>52</i>&nbsp;
+<b class="nc"><i>53</i>&nbsp;	int m_nEvery = 1;</b>
+<b class="nc"><i>54</i>&nbsp;	double burninPercentage = 10.0;</b>
+<b class="nc"><i>55</i>&nbsp;	double credibleSetPercentage = 95.0;</b>
+<b class="nc"><i>56</i>&nbsp;	boolean silent = false;</b>
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;	TreeTraceAnalysis traceAnalysis;
+<i>59</i>&nbsp;
+<i>60</i>&nbsp;	@Override
+<i>61</i>&nbsp;	public void initAndValidate() {
+<i>62</i>&nbsp;
+<b class="nc"><i>63</i>&nbsp;		List&lt;BEASTObject&gt; loggers = loggersInput.get();</b>
+<b class="nc"><i>64</i>&nbsp;        final int nLoggers = loggers.size();</b>
+<b class="nc"><i>65</i>&nbsp;        if (nLoggers == 0) {</b>
+<b class="nc"><i>66</i>&nbsp;            throw new IllegalArgumentException(&quot;Logger with nothing to log specified&quot;);</b>
+<i>67</i>&nbsp;        }
+<i>68</i>&nbsp;
+<b class="nc"><i>69</i>&nbsp;		if (everyInput.get() != null)</b>
+<b class="nc"><i>70</i>&nbsp;			m_nEvery = everyInput.get();</b>
+<i>71</i>&nbsp;
+<b class="nc"><i>72</i>&nbsp;		if (burninPercentageInput.get() != null)</b>
+<b class="nc"><i>73</i>&nbsp;			burninPercentage = burninPercentageInput.get();</b>
+<i>74</i>&nbsp;
+<b class="nc"><i>75</i>&nbsp;		if (credibleSetPercentageInput.get() != null)</b>
+<b class="nc"><i>76</i>&nbsp;			credibleSetPercentage = credibleSetPercentageInput.get();</b>
+<i>77</i>&nbsp;
+<b class="nc"><i>78</i>&nbsp;		if (silentInput.get() != null)</b>
+<b class="nc"><i>79</i>&nbsp;			silent = silentInput.get();</b>
+<i>80</i>&nbsp;
+<b class="nc"><i>81</i>&nbsp;		treeToTrack = (Tree)loggers.get(0);</b>
+<b class="nc"><i>82</i>&nbsp;		treeTrace = new ArrayList&lt;Tree&gt;();</b>
+<i>83</i>&nbsp;
+<i>84</i>&nbsp;	}
+<i>85</i>&nbsp;
+<i>86</i>&nbsp;	@Override
+<i>87</i>&nbsp;	public void init() { }
+<i>88</i>&nbsp;
+<i>89</i>&nbsp;	@Override
+<i>90</i>&nbsp;	public void log(int nSample) {
+<i>91</i>&nbsp;
+<b class="nc"><i>92</i>&nbsp;		if ((nSample &lt; 0) || (nSample % m_nEvery &gt; 0))</b>
+<i>93</i>&nbsp;            return;
+<i>94</i>&nbsp;
+<b class="nc"><i>95</i>&nbsp;		treeTrace.add(treeToTrack.copy());</b>
+<i>96</i>&nbsp;	}
+<i>97</i>&nbsp;
+<i>98</i>&nbsp;	@Override
+<i>99</i>&nbsp;	public void close() {
+<i>100</i>&nbsp;
+<b class="nc"><i>101</i>&nbsp;		traceAnalysis = new TreeTraceAnalysis(treeTrace, burninPercentage/100);</b>
+<b class="nc"><i>102</i>&nbsp;        traceAnalysis.analyze(credibleSetPercentage);</b>
+<i>103</i>&nbsp;
+<b class="nc"><i>104</i>&nbsp;		if (!silent) {</b>
+<b class="nc"><i>105</i>&nbsp;			System.out.println(&quot;\n----- Tree trace analysis -----------------------&quot;);</b>
+<b class="nc"><i>106</i>&nbsp;			traceAnalysis.report(System.out);</b>
+<b class="nc"><i>107</i>&nbsp;			System.out.println(&quot;-------------------------------------------------&quot;);</b>
+<b class="nc"><i>108</i>&nbsp;			System.out.println();</b>
+<i>109</i>&nbsp;		}
+<i>110</i>&nbsp;	}
+<i>111</i>&nbsp;
+<i>112</i>&nbsp;	/**
+<i>113</i>&nbsp;	 * Obtain completed analysis.
+<i>114</i>&nbsp;	 * 
+<i>115</i>&nbsp;	 * @return tree trace analysis.
+<i>116</i>&nbsp;	 */
+<i>117</i>&nbsp;	public TreeTraceAnalysis getAnalysis() {
+<b class="nc"><i>118</i>&nbsp;		return traceAnalysis;</b>
+<i>119</i>&nbsp;	}
+<i>120</i>&nbsp;
+<i>121</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

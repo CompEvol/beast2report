@@ -1,0 +1,232 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: FilteredValuable</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.core</a> ]
+</div>
+
+<h1>Coverage Summary for Class: FilteredValuable (beast.core)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FilteredValuable</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 61)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.core;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.io.PrintStream;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import beast.core.CalculationNode;
+<i>6</i>&nbsp;import beast.core.Description;
+<i>7</i>&nbsp;import beast.core.Function;
+<i>8</i>&nbsp;import beast.core.Input;
+<i>9</i>&nbsp;import beast.core.Loggable;
+<i>10</i>&nbsp;import beast.core.Input.Validate;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;@Description(&quot;selects values from a parameter, for instance all even indexed entries&quot;)
+<b class="nc"><i>15</i>&nbsp;public class FilteredValuable extends CalculationNode implements Function, Loggable {</b>
+<i>16</i>&nbsp;
+<b class="nc"><i>17</i>&nbsp;	public Input&lt;Function&gt; parameterInput = new Input&lt;Function&gt;(&quot;parameter&quot;, &quot;the parameter to select values from&quot;,</b>
+<i>18</i>&nbsp;			Validate.REQUIRED, Function.class);
+<b class="nc"><i>19</i>&nbsp;	public Input&lt;String&gt; rangeInput = new Input&lt;String&gt;(&quot;range&quot;, &quot;specifies list of indices &quot; + &quot;First site is 1.&quot;</b>
+<i>20</i>&nbsp;			+ &quot;Filter specs are comma separated, either a range [from]-[to] or iteration [from]:[to]:[step]; &quot;
+<i>21</i>&nbsp;			+ &quot;1-100 defines a range, &quot; + &quot;1-100\3 or 1:100:3 defines every third in range 1-100, &quot;
+<i>22</i>&nbsp;			+ &quot;1::3,2::3 removes every third site. &quot;
+<i>23</i>&nbsp;			+ &quot;negative values count from the last: -1 indicate the last element, -2 the one but last. &quot;
+<i>24</i>&nbsp;			+ &quot;Default for range [1]-[last site], default for iterator [1]:[last site]:[1]&quot;, Validate.REQUIRED);
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;	Function parameter;
+<i>27</i>&nbsp;	int[] indices;
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;	@Override
+<i>30</i>&nbsp;	public void initAndValidate() {
+<b class="nc"><i>31</i>&nbsp;		parameter = parameterInput.get();</b>
+<b class="nc"><i>32</i>&nbsp;		parseFilterSpec();</b>
+<i>33</i>&nbsp;	}
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;	private void parseFilterSpec() {
+<i>36</i>&nbsp;		// parse filter specification
+<b class="nc"><i>37</i>&nbsp;		String range = rangeInput.get();</b>
+<b class="nc"><i>38</i>&nbsp;		String[] filters = range.split(&quot;,&quot;);</b>
+<b class="nc"><i>39</i>&nbsp;		int[] from = new int[filters.length];</b>
+<b class="nc"><i>40</i>&nbsp;		int[] to = new int[filters.length];</b>
+<b class="nc"><i>41</i>&nbsp;		int[] step = new int[filters.length];</b>
+<b class="nc"><i>42</i>&nbsp;		for (int i = 0; i &lt; filters.length; i++) {</b>
+<b class="nc"><i>43</i>&nbsp;			range = &quot; &quot; + filters[i] + &quot; &quot;;</b>
+<b class="nc"><i>44</i>&nbsp;			if (range.matches(&quot;.*:.*:.+&quot;)) {</b>
+<i>45</i>&nbsp;				// iterator, e.g. 1:100:3
+<b class="nc"><i>46</i>&nbsp;				String[] strs = range.split(&quot;:&quot;);</b>
+<b class="nc"><i>47</i>&nbsp;				from[i] = parseInt(strs[0], 1) - 1;</b>
+<b class="nc"><i>48</i>&nbsp;				to[i] = parseInt(strs[1], parameter.getDimension()) - 1;</b>
+<b class="nc"><i>49</i>&nbsp;				step[i] = parseInt(strs[2], 1);</b>
+<b class="nc"><i>50</i>&nbsp;			} else if (range.matches(&quot;.*-.*&quot;)) {</b>
+<i>51</i>&nbsp;				// range, e.g. 1-100/3
+<b class="nc"><i>52</i>&nbsp;				if (range.indexOf(&#39;\\&#39;) &gt;= 0) {</b>
+<b class="nc"><i>53</i>&nbsp;					String str2 = range.substring(range.indexOf(&#39;\\&#39;) + 1);</b>
+<b class="nc"><i>54</i>&nbsp;					step[i] = parseInt(str2, 1);</b>
+<b class="nc"><i>55</i>&nbsp;					range = range.substring(0, range.indexOf(&#39;\\&#39;));</b>
+<b class="nc"><i>56</i>&nbsp;				} else {</b>
+<b class="nc"><i>57</i>&nbsp;					step[i] = 1;</b>
+<i>58</i>&nbsp;				}
+<b class="nc"><i>59</i>&nbsp;				String[] strs = range.split(&quot;-&quot;);</b>
+<b class="nc"><i>60</i>&nbsp;				from[i] = parseInt(strs[0], 1) - 1;</b>
+<b class="nc"><i>61</i>&nbsp;				to[i] = parseInt(strs[1], parameter.getDimension()) - 1;</b>
+<b class="nc"><i>62</i>&nbsp;			} else if (range.trim().matches(&quot;[0-9]*&quot;)) {</b>
+<b class="nc"><i>63</i>&nbsp;				from[i] = parseInt(range.trim(), 1) - 1;</b>
+<b class="nc"><i>64</i>&nbsp;				to[i] = from[i];</b>
+<b class="nc"><i>65</i>&nbsp;				step[i] = 1;</b>
+<i>66</i>&nbsp;			} else {
+<b class="nc"><i>67</i>&nbsp;				throw new IllegalArgumentException(&quot;Don&#39;t know how to parse filter &quot; + range);</b>
+<i>68</i>&nbsp;			}
+<i>69</i>&nbsp;		}
+<i>70</i>&nbsp;
+<b class="nc"><i>71</i>&nbsp;		boolean[] used = new boolean[parameter.getDimension()];</b>
+<b class="nc"><i>72</i>&nbsp;		for (int i = 0; i &lt; to.length; i++) {</b>
+<b class="nc"><i>73</i>&nbsp;			for (int k = from[i]; k &lt;= to[i]; k += step[i]) {</b>
+<b class="nc"><i>74</i>&nbsp;				used[k] = true;</b>
+<i>75</i>&nbsp;			}
+<i>76</i>&nbsp;		}
+<i>77</i>&nbsp;		// count
+<b class="nc"><i>78</i>&nbsp;		int k = 0;</b>
+<b class="nc"><i>79</i>&nbsp;		for (int i = 0; i &lt; used.length; i++) {</b>
+<b class="nc"><i>80</i>&nbsp;			if (used[i]) {</b>
+<b class="nc"><i>81</i>&nbsp;				k++;</b>
+<i>82</i>&nbsp;			}
+<i>83</i>&nbsp;		}
+<i>84</i>&nbsp;		// set up index set
+<b class="nc"><i>85</i>&nbsp;		indices = new int[k];</b>
+<b class="nc"><i>86</i>&nbsp;		k = 0;</b>
+<b class="nc"><i>87</i>&nbsp;		for (int i = 0; i &lt; used.length; i++) {</b>
+<b class="nc"><i>88</i>&nbsp;			if (used[i]) {</b>
+<b class="nc"><i>89</i>&nbsp;				indices[k++] = i;</b>
+<i>90</i>&nbsp;			}
+<i>91</i>&nbsp;		}
+<i>92</i>&nbsp;	}
+<i>93</i>&nbsp;
+<i>94</i>&nbsp;	int parseInt(String str, int _default) {
+<b class="nc"><i>95</i>&nbsp;		str = str.replaceAll(&quot;\\s+&quot;, &quot;&quot;);</b>
+<i>96</i>&nbsp;		try {
+<b class="nc"><i>97</i>&nbsp;			int value = Integer.parseInt(str);</b>
+<b class="nc"><i>98</i>&nbsp;			if (value &lt; 0) {</b>
+<b class="nc"><i>99</i>&nbsp;				value = parameter.getDimension() + 1 + value;</b>
+<i>100</i>&nbsp;			}
+<b class="nc"><i>101</i>&nbsp;			return value;</b>
+<b class="nc"><i>102</i>&nbsp;		} catch (Exception e) {</b>
+<b class="nc"><i>103</i>&nbsp;			return _default;</b>
+<i>104</i>&nbsp;		}
+<i>105</i>&nbsp;	}
+<i>106</i>&nbsp;
+<i>107</i>&nbsp;	@Override
+<i>108</i>&nbsp;	public int getDimension() {
+<b class="nc"><i>109</i>&nbsp;		return indices.length;</b>
+<i>110</i>&nbsp;	}
+<i>111</i>&nbsp;
+<i>112</i>&nbsp;	@Override
+<i>113</i>&nbsp;	public double getArrayValue() {
+<b class="nc"><i>114</i>&nbsp;		return parameter.getArrayValue(indices[0]);</b>
+<i>115</i>&nbsp;	}
+<i>116</i>&nbsp;
+<i>117</i>&nbsp;	@Override
+<i>118</i>&nbsp;	public double getArrayValue(int iDim) {
+<b class="nc"><i>119</i>&nbsp;		return parameter.getArrayValue(indices[iDim]);</b>
+<i>120</i>&nbsp;	}
+<i>121</i>&nbsp;
+<i>122</i>&nbsp;    /**
+<i>123</i>&nbsp;     * Loggable interface implementation follows (partly, the actual
+<i>124</i>&nbsp;     * logging of values happens in derived classes) *
+<i>125</i>&nbsp;     */
+<i>126</i>&nbsp;    @Override
+<i>127</i>&nbsp;    public void init(final PrintStream out) {
+<b class="nc"><i>128</i>&nbsp;        if (getDimension() == 1) {</b>
+<b class="nc"><i>129</i>&nbsp;            out.print(getID() + &quot;\t&quot;);</b>
+<i>130</i>&nbsp;        } else {
+<b class="nc"><i>131</i>&nbsp;            for (int iValue = 0; iValue &lt; getDimension(); iValue++) {</b>
+<b class="nc"><i>132</i>&nbsp;                out.print(getID() + (iValue + 1) + &quot;\t&quot;);</b>
+<i>133</i>&nbsp;            }
+<i>134</i>&nbsp;        }
+<i>135</i>&nbsp;    }
+<i>136</i>&nbsp;
+<i>137</i>&nbsp;	@Override
+<i>138</i>&nbsp;	public void log(int nSample, PrintStream out) {
+<b class="nc"><i>139</i>&nbsp;        for (int iValue = 0; iValue &lt; getDimension(); iValue++) {</b>
+<b class="nc"><i>140</i>&nbsp;            out.print(getArrayValue(iValue) + &quot;\t&quot;);</b>
+<i>141</i>&nbsp;        }
+<i>142</i>&nbsp;	}
+<i>143</i>&nbsp;
+<i>144</i>&nbsp;    @Override
+<i>145</i>&nbsp;    public void close(final PrintStream out) {
+<i>146</i>&nbsp;        // nothing to do
+<i>147</i>&nbsp;    }
+<i>148</i>&nbsp;
+<i>149</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

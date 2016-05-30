@@ -1,0 +1,2055 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: SpreadSheet</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.draw</a> ]
+</div>
+
+<h1>Coverage Summary for Class: SpreadSheet (beast.app.draw)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+</tr>
+  <tr>
+    <td class="name">SpreadSheet$1</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$10</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$11</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$12</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$13</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$14</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$15</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$16</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$17</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$18</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$19</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$2</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$20</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$21</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$22</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$23</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$24</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$25</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$26</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$27</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$28</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$29</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$3</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$30</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$31</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$32</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$33</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$34</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$35</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$4</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$5</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$6</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$7</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$8</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$9</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$CellBorder</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$CellFormat</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$FormulaCell</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$MyTableCellRenderer</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$RowHeightListener</td>
+  </tr>
+  <tr>
+    <td class="name">SpreadSheet$UndoAction</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.draw;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import java.awt.BorderLayout;
+<i>5</i>&nbsp;import java.awt.Color;
+<i>6</i>&nbsp;import java.awt.Component;
+<i>7</i>&nbsp;import java.awt.Cursor;
+<i>8</i>&nbsp;import java.awt.Dimension;
+<i>9</i>&nbsp;import java.awt.Font;
+<i>10</i>&nbsp;import java.awt.Graphics;
+<i>11</i>&nbsp;import java.awt.Graphics2D;
+<i>12</i>&nbsp;import java.awt.GraphicsEnvironment;
+<i>13</i>&nbsp;import java.awt.Point;
+<i>14</i>&nbsp;import java.awt.Rectangle;
+<i>15</i>&nbsp;import java.awt.Toolkit;
+<i>16</i>&nbsp;import java.awt.datatransfer.Clipboard;
+<i>17</i>&nbsp;import java.awt.datatransfer.ClipboardOwner;
+<i>18</i>&nbsp;import java.awt.datatransfer.DataFlavor;
+<i>19</i>&nbsp;import java.awt.datatransfer.StringSelection;
+<i>20</i>&nbsp;import java.awt.datatransfer.Transferable;
+<i>21</i>&nbsp;import java.awt.datatransfer.UnsupportedFlavorException;
+<i>22</i>&nbsp;import java.awt.event.ActionEvent;
+<i>23</i>&nbsp;import java.awt.event.ActionListener;
+<i>24</i>&nbsp;import java.awt.event.KeyEvent;
+<i>25</i>&nbsp;import java.awt.event.MouseEvent;
+<i>26</i>&nbsp;import java.awt.event.MouseListener;
+<i>27</i>&nbsp;import java.awt.image.BufferedImage;
+<i>28</i>&nbsp;import java.io.BufferedReader;
+<i>29</i>&nbsp;import java.io.File;
+<i>30</i>&nbsp;import java.io.FileReader;
+<i>31</i>&nbsp;import java.io.IOException;
+<i>32</i>&nbsp;import java.io.PrintStream;
+<i>33</i>&nbsp;import java.util.ArrayList;
+<i>34</i>&nbsp;import java.util.EventObject;
+<i>35</i>&nbsp;import java.util.HashMap;
+<i>36</i>&nbsp;import java.util.List;
+<i>37</i>&nbsp;import java.util.Random;
+<i>38</i>&nbsp;import java.util.regex.Matcher;
+<i>39</i>&nbsp;import java.util.regex.Pattern;
+<i>40</i>&nbsp;
+<i>41</i>&nbsp;import javax.script.ScriptEngine;
+<i>42</i>&nbsp;import javax.script.ScriptEngineManager;
+<i>43</i>&nbsp;import javax.swing.Action;
+<i>44</i>&nbsp;import javax.swing.DefaultListCellRenderer;
+<i>45</i>&nbsp;import javax.swing.Icon;
+<i>46</i>&nbsp;import javax.swing.ImageIcon;
+<i>47</i>&nbsp;import javax.swing.JColorChooser;
+<i>48</i>&nbsp;import javax.swing.JComboBox;
+<i>49</i>&nbsp;import javax.swing.JComponent;
+<i>50</i>&nbsp;import javax.swing.JFileChooser;
+<i>51</i>&nbsp;import javax.swing.JFrame;
+<i>52</i>&nbsp;import javax.swing.JLabel;
+<i>53</i>&nbsp;import javax.swing.JList;
+<i>54</i>&nbsp;import javax.swing.JMenu;
+<i>55</i>&nbsp;import javax.swing.JMenuBar;
+<i>56</i>&nbsp;import javax.swing.JOptionPane;
+<i>57</i>&nbsp;import javax.swing.JPanel;
+<i>58</i>&nbsp;import javax.swing.JScrollPane;
+<i>59</i>&nbsp;import javax.swing.JTable;
+<i>60</i>&nbsp;import javax.swing.JTextField;
+<i>61</i>&nbsp;import javax.swing.JToolBar;
+<i>62</i>&nbsp;import javax.swing.ListSelectionModel;
+<i>63</i>&nbsp;import javax.swing.LookAndFeel;
+<i>64</i>&nbsp;import javax.swing.SwingConstants;
+<i>65</i>&nbsp;import javax.swing.border.AbstractBorder;
+<i>66</i>&nbsp;import javax.swing.border.Border;
+<i>67</i>&nbsp;import javax.swing.event.CellEditorListener;
+<i>68</i>&nbsp;import javax.swing.event.ChangeEvent;
+<i>69</i>&nbsp;import javax.swing.event.ListSelectionEvent;
+<i>70</i>&nbsp;import javax.swing.event.ListSelectionListener;
+<i>71</i>&nbsp;import javax.swing.event.MouseInputAdapter;
+<i>72</i>&nbsp;import javax.swing.event.TableColumnModelEvent;
+<i>73</i>&nbsp;import javax.swing.event.TableColumnModelListener;
+<i>74</i>&nbsp;import javax.swing.event.TableModelEvent;
+<i>75</i>&nbsp;import javax.swing.filechooser.FileFilter;
+<i>76</i>&nbsp;import javax.swing.table.DefaultTableCellRenderer;
+<i>77</i>&nbsp;import javax.swing.table.DefaultTableModel;
+<i>78</i>&nbsp;import javax.swing.table.TableCellEditor;
+<i>79</i>&nbsp;
+<i>80</i>&nbsp;import beast.app.draw.MyAction;
+<i>81</i>&nbsp;import beast.app.draw.BEASTObjectDialog;
+<i>82</i>&nbsp;import beast.core.BEASTInterface;
+<i>83</i>&nbsp;import beast.core.Distribution;
+<i>84</i>&nbsp;import beast.core.Input;
+<i>85</i>&nbsp;import beast.core.Logger;
+<i>86</i>&nbsp;import beast.core.Operator;
+<i>87</i>&nbsp;import beast.core.StateNode;
+<i>88</i>&nbsp;import beast.core.BEASTObject;
+<i>89</i>&nbsp;import beast.evolution.alignment.Alignment;
+<i>90</i>&nbsp;import beast.evolution.alignment.Sequence;
+<i>91</i>&nbsp;import beast.util.AddOnManager;
+<i>92</i>&nbsp;import beast.util.XMLParser;
+<i>93</i>&nbsp;import beast.util.XMLProducer;
+<i>94</i>&nbsp;
+<i>95</i>&nbsp;
+<i>96</i>&nbsp;
+<i>97</i>&nbsp;
+<i>98</i>&nbsp;// Wishlist:
+<i>99</i>&nbsp;// TODO update all cells when a cell is changed
+<i>100</i>&nbsp;// TODO allow plugin text to be edited, dlg as backup
+<i>101</i>&nbsp;// TODO save/saveAs
+<i>102</i>&nbsp;// TODO cut/copy/paste/delete
+<i>103</i>&nbsp;// TODO undo/redo
+<i>104</i>&nbsp;
+<i>105</i>&nbsp;/** panel that shows a beast model as a spreadsheet **/
+<i>106</i>&nbsp;@SuppressWarnings(&quot;serial&quot;)
+<i>107</i>&nbsp;public class SpreadSheet extends JPanel implements ClipboardOwner {
+<i>108</i>&nbsp;	int DEFAULT_COLUMN_WIDTH = 75;
+<i>109</i>&nbsp;
+<i>110</i>&nbsp;	/** list of available Plugin objects **/
+<i>111</i>&nbsp;	List&lt;BEASTInterface&gt; m_plugins;
+<i>112</i>&nbsp;	List&lt;FormulaCell&gt; m_formulas;
+<i>113</i>&nbsp;	/** maps plugins to locations on the spreadsheet. Locations are encoded as (x + MAX_ROW * y) **/
+<i>114</i>&nbsp;	static HashMap&lt;BEASTInterface, Integer&gt; m_pluginLocation;
+<i>115</i>&nbsp;	static HashMap&lt;FormulaCell, Integer&gt; m_formulaLocation;
+<i>116</i>&nbsp;	/** objects associated with the spread sheet cells **/
+<i>117</i>&nbsp;	Object[][] m_objects;
+<i>118</i>&nbsp;	/** rendering style for cell **/
+<i>119</i>&nbsp;	CellFormat [][] m_cellFormat;
+<i>120</i>&nbsp;
+<i>121</i>&nbsp;	/** link to toolbar, for toggeling visibility **/
+<i>122</i>&nbsp;	JToolBar m_toolBar;
+<i>123</i>&nbsp;	/** main table of spreadsheet **/
+<i>124</i>&nbsp;	JTable m_table;
+<i>125</i>&nbsp;	/** row labels on the left of the spreadsheet **/
+<i>126</i>&nbsp;	JTable m_rowHeaderTable;
+<i>127</i>&nbsp;	String[] headers;
+<i>128</i>&nbsp;
+<i>129</i>&nbsp;	/** current directory for opening files **/
+<i>130</i>&nbsp;	String m_sDir = System.getProperty(&quot;user.dir&quot;);
+<i>131</i>&nbsp;	/** name of the current spreadsheet file **/
+<i>132</i>&nbsp;	String m_sSpreadsheetFileName = null;
+<i>133</i>&nbsp;	/** list of borders to choose from **/
+<i>134</i>&nbsp;	Border [] m_borders;
+<i>135</i>&nbsp;	Icon [] m_borderIcons;
+<i>136</i>&nbsp;
+<i>137</i>&nbsp;    /** nr of rows and columns in the spreadsheet **/
+<i>138</i>&nbsp;	static int MAX_ROW = 255;
+<i>139</i>&nbsp;	int MAX_COL = 32;
+<i>140</i>&nbsp;	String [] m_sPlugInNames;
+<i>141</i>&nbsp;
+<i>142</i>&nbsp;	/** undo stack **/
+<i>143</i>&nbsp;	List&lt;UndoAction&gt; m_actions;
+<i>144</i>&nbsp;	int m_iTopUndoAction;
+<i>145</i>&nbsp;	/** string for recording edit actions **/
+<i>146</i>&nbsp;	String m_sCellSpecs;
+<i>147</i>&nbsp;	/** for recording row, column and type of action, while edit action is in progress **/
+<i>148</i>&nbsp;	ArrayList&lt;Integer&gt; m_iEditRows;
+<i>149</i>&nbsp;	ArrayList&lt;Integer&gt; m_iEditCols;
+<i>150</i>&nbsp;	/** encodes type of edit action &#39;o&#39; for object, &#39;f&#39; for cell format, &#39;h&#39; for row height, &#39;w&#39; for column width **/
+<i>151</i>&nbsp;	ArrayList&lt;String&gt; m_iEditActions;
+<i>152</i>&nbsp;
+<i>153</i>&nbsp;	/** constructor **/
+<i>154</i>&nbsp;	SpreadSheet() {
+<i>155</i>&nbsp;        List&lt;String&gt; sPlugInNames = AddOnManager.find(beast.core.BEASTObject.class, AddOnManager.IMPLEMENTATION_DIR);
+<i>156</i>&nbsp;        m_sPlugInNames = sPlugInNames.toArray(new String[0]);
+<i>157</i>&nbsp;        headers = new String[MAX_COL];
+<i>158</i>&nbsp;		m_objects = new Object[MAX_ROW][MAX_COL];
+<i>159</i>&nbsp;		m_cellFormat = new CellFormat[MAX_ROW][MAX_COL];
+<i>160</i>&nbsp;		String abc = &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;;
+<i>161</i>&nbsp;		for (int i = 0; i &lt; MAX_COL; i++) {
+<i>162</i>&nbsp;			headers[i] = (i &gt;= 26 ? abc.charAt(i / 26 - 1) : &#39; &#39;) + &quot;&quot; + abc.charAt(i % 26) + &quot;&quot;;
+<i>163</i>&nbsp;		}
+<i>164</i>&nbsp;		m_table = new JTable(m_objects, headers) {
+<i>165</i>&nbsp;			@Override
+<i>166</i>&nbsp;			public void tableChanged(TableModelEvent e) {
+<i>167</i>&nbsp;				System.err.println(&quot;tableChanged&quot;);
+<i>168</i>&nbsp;				super.tableChanged(e);
+<i>169</i>&nbsp;				int iRow = getSelectedRow();
+<i>170</i>&nbsp;				int iCol = getSelectedColumn();
+<i>171</i>&nbsp;				if (iRow &lt; 0 || iCol &lt; 0) {
+<i>172</i>&nbsp;					return;
+<i>173</i>&nbsp;				}
+<i>174</i>&nbsp;				System.err.println(m_objects[iRow][iCol].getClass().getName());
+<i>175</i>&nbsp;				System.err.println(m_objects[iRow][iCol].toString());
+<i>176</i>&nbsp;			}
+<i>177</i>&nbsp;			@Override
+<i>178</i>&nbsp;			public void editingCanceled(ChangeEvent e) {
+<i>179</i>&nbsp;				System.err.println(&quot;editingCanceled &quot; + e);
+<i>180</i>&nbsp;				int iRow = getSelectedRow();
+<i>181</i>&nbsp;				int iCol = getSelectedColumn();
+<i>182</i>&nbsp;				if (iRow &lt; 0 || iCol &lt; 0) {
+<i>183</i>&nbsp;					return;
+<i>184</i>&nbsp;				}
+<i>185</i>&nbsp;				repaint();
+<i>186</i>&nbsp;			}
+<i>187</i>&nbsp;			@Override
+<i>188</i>&nbsp;			public void editingStopped(ChangeEvent e) {
+<i>189</i>&nbsp;				System.err.println(&quot;editingStopped &quot; + e);
+<i>190</i>&nbsp;				super.editingStopped(e);
+<i>191</i>&nbsp;			}
+<i>192</i>&nbsp;			@Override
+<i>193</i>&nbsp;			public String getToolTipText(MouseEvent e) {
+<i>194</i>&nbsp;				Point p = e.getPoint();
+<i>195</i>&nbsp;				int iRow = rowAtPoint(p);
+<i>196</i>&nbsp;				int iCol = columnAtPoint(p);
+<i>197</i>&nbsp;				if (iRow &lt; 0 || iCol &lt; 0) {
+<i>198</i>&nbsp;					return null;
+<i>199</i>&nbsp;				}
+<i>200</i>&nbsp;				Object o = m_objects[iRow][iCol];
+<i>201</i>&nbsp;				if (o instanceof BEASTObject) {
+<i>202</i>&nbsp;					return ((BEASTObject)o).getDescription();
+<i>203</i>&nbsp;				} else if (o instanceof FormulaCell) {
+<i>204</i>&nbsp;					return ((FormulaCell)o).m_sMessage;
+<i>205</i>&nbsp;				} else {
+<i>206</i>&nbsp;					return null;
+<i>207</i>&nbsp;				}
+<i>208</i>&nbsp;			}
+<i>209</i>&nbsp;		};
+<i>210</i>&nbsp;
+<i>211</i>&nbsp;		m_table.addMouseListener(new MouseListener() {
+<i>212</i>&nbsp;			@Override
+<i>213</i>&nbsp;			public void mouseReleased(MouseEvent e) {
+<i>214</i>&nbsp;			}
+<i>215</i>&nbsp;			@Override
+<i>216</i>&nbsp;			public void mousePressed(MouseEvent e) {
+<i>217</i>&nbsp;			}
+<i>218</i>&nbsp;			@Override
+<i>219</i>&nbsp;			public void mouseExited(MouseEvent e) {
+<i>220</i>&nbsp;			}
+<i>221</i>&nbsp;			@Override
+<i>222</i>&nbsp;			public void mouseEntered(MouseEvent e) {
+<i>223</i>&nbsp;			}
+<i>224</i>&nbsp;			@Override
+<i>225</i>&nbsp;			public void mouseClicked(MouseEvent e) {
+<i>226</i>&nbsp;				if (e.getButton() == MouseEvent.BUTTON3) {
+<i>227</i>&nbsp;					int iRow = m_table.rowAtPoint(e.getPoint());
+<i>228</i>&nbsp;					int iCol = m_table.columnAtPoint(e.getPoint());
+<i>229</i>&nbsp;					if (iRow &lt; 0 || iCol &lt; 0) {
+<i>230</i>&nbsp;						return;
+<i>231</i>&nbsp;					}
+<i>232</i>&nbsp;					beginEditAction();
+<i>233</i>&nbsp;					editObject(iRow, iCol);
+<i>234</i>&nbsp;					selectCell(iRow, iCol);
+<i>235</i>&nbsp;                    String sClassName = (String) JOptionPane.showInputDialog(m_table.getParent(), &quot;Select a constant&quot;,
+<i>236</i>&nbsp;                            &quot;select&quot;, JOptionPane.PLAIN_MESSAGE,  null, m_sPlugInNames, null);
+<i>237</i>&nbsp;                    if (sClassName != null) {
+<i>238</i>&nbsp;                    	try {
+<i>239</i>&nbsp;                    		BEASTObject plugin = (beast.core.BEASTObject) Class.forName(sClassName).newInstance();
+<i>240</i>&nbsp;                    		m_objects[iRow][iCol] = plugin;
+<i>241</i>&nbsp;                			m_pluginLocation.put(plugin, iRow + iCol * MAX_ROW);
+<i>242</i>&nbsp;                			m_plugins.add(plugin);
+<i>243</i>&nbsp;                    		endEditAction();
+<i>244</i>&nbsp;                    	} catch (Exception ex) {
+<i>245</i>&nbsp;							ex.printStackTrace();
+<i>246</i>&nbsp;						}
+<i>247</i>&nbsp;                    	m_table.editCellAt(iRow, iCol);
+<i>248</i>&nbsp;                    }
+<i>249</i>&nbsp;				}
+<i>250</i>&nbsp;			}
+<i>251</i>&nbsp;		});
+<i>252</i>&nbsp;
+<i>253</i>&nbsp;//		m_table.addKeyListener(new KeyListener() {
+<i>254</i>&nbsp;//			@Override
+<i>255</i>&nbsp;//			public void keyTyped(KeyEvent e) {
+<i>256</i>&nbsp;//			}
+<i>257</i>&nbsp;//
+<i>258</i>&nbsp;//			@Override
+<i>259</i>&nbsp;//			public void keyReleased(KeyEvent e) {
+<i>260</i>&nbsp;//			}
+<i>261</i>&nbsp;//
+<i>262</i>&nbsp;//			@Override
+<i>263</i>&nbsp;//			public void keyPressed(KeyEvent e) {
+<i>264</i>&nbsp;//				if (e.getModifiers() == KeyEvent.VK_CONTROL) {//e.getKeyCode() == 113) {
+<i>265</i>&nbsp;//					System.err.println(e.getKeyCode());
+<i>266</i>&nbsp;//				}
+<i>267</i>&nbsp;//			}
+<i>268</i>&nbsp;//		});
+<i>269</i>&nbsp;
+<i>270</i>&nbsp;		m_table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+<i>271</i>&nbsp;		m_table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+<i>272</i>&nbsp;		m_table.setCellSelectionEnabled(true);
+<i>273</i>&nbsp;		m_table.setDefaultRenderer(Object.class, new MyTableCellRenderer());
+<i>274</i>&nbsp;		m_table.setDefaultEditor(Object.class, new TableCellEditor() {
+<i>275</i>&nbsp;			JComponent component = new JTextField();
+<i>276</i>&nbsp;			int m_iRow, m_iCol;
+<i>277</i>&nbsp;			@Override
+<i>278</i>&nbsp;			public boolean stopCellEditing() {
+<i>279</i>&nbsp;				Object o = m_objects[m_iRow][m_iCol];
+<i>280</i>&nbsp;				System.err.println(&quot;stopCellEditing &quot;+ (o==null? &quot;null&quot;:o.getClass().getName() + &quot; &quot; + o) + &quot;  =&gt; &quot; + ((JTextField)component).getText());
+<i>281</i>&nbsp;				String sText = ((JTextField)component).getText();
+<i>282</i>&nbsp;				if (m_objects[m_iRow][m_iCol] instanceof FormulaCell) {
+<i>283</i>&nbsp;					m_formulas.remove(m_objects[m_iRow][m_iCol]);
+<i>284</i>&nbsp;					m_formulaLocation.remove(m_objects[m_iRow][m_iCol]);
+<i>285</i>&nbsp;				}
+<i>286</i>&nbsp;				if (m_objects[m_iRow][m_iCol] == null || !(m_objects[m_iRow][m_iCol] instanceof BEASTObject)) {
+<i>287</i>&nbsp;					if (sText.startsWith(&quot;=&quot;)) {
+<i>288</i>&nbsp;						FormulaCell formula = new FormulaCell(sText);
+<i>289</i>&nbsp;						m_objects[m_iRow][m_iCol] = formula;
+<i>290</i>&nbsp;						m_formulas.add(formula);
+<i>291</i>&nbsp;						m_formulaLocation.put(formula, m_iRow + m_iCol * MAX_ROW);
+<i>292</i>&nbsp;					} else {
+<i>293</i>&nbsp;						m_objects[m_iRow][m_iCol] = sText;
+<i>294</i>&nbsp;					}
+<i>295</i>&nbsp;				} else {
+<i>296</i>&nbsp;					// it is a Plugin
+<i>297</i>&nbsp;				}
+<i>298</i>&nbsp;				m_table.removeEditor();
+<i>299</i>&nbsp;				endEditAction();
+<i>300</i>&nbsp;				return true;
+<i>301</i>&nbsp;			}
+<i>302</i>&nbsp;
+<i>303</i>&nbsp;			@Override
+<i>304</i>&nbsp;			public boolean shouldSelectCell(EventObject anEvent) {
+<i>305</i>&nbsp;				System.err.println(&quot;shouldSelectCell&quot;);
+<i>306</i>&nbsp;				return true;
+<i>307</i>&nbsp;			}
+<i>308</i>&nbsp;
+<i>309</i>&nbsp;			@Override
+<i>310</i>&nbsp;			public void removeCellEditorListener(CellEditorListener l) {
+<i>311</i>&nbsp;				System.err.println(&quot;removeCellEditorListener&quot;);
+<i>312</i>&nbsp;			}
+<i>313</i>&nbsp;
+<i>314</i>&nbsp;			@Override
+<i>315</i>&nbsp;			public boolean isCellEditable(EventObject anEvent) {
+<i>316</i>&nbsp;				System.err.println(&quot;isCellEditable&quot;);
+<i>317</i>&nbsp;				return true;
+<i>318</i>&nbsp;			}
+<i>319</i>&nbsp;
+<i>320</i>&nbsp;			@Override
+<i>321</i>&nbsp;			public Object getCellEditorValue() {
+<i>322</i>&nbsp;				System.err.println(&quot;getCellEditorValue&quot;);
+<i>323</i>&nbsp;				return null;
+<i>324</i>&nbsp;			}
+<i>325</i>&nbsp;
+<i>326</i>&nbsp;			@Override
+<i>327</i>&nbsp;			public void cancelCellEditing() {
+<i>328</i>&nbsp;				System.err.println(&quot;cancelCellEditing&quot;);
+<i>329</i>&nbsp;			}
+<i>330</i>&nbsp;
+<i>331</i>&nbsp;			@Override
+<i>332</i>&nbsp;			public void addCellEditorListener(CellEditorListener l) {
+<i>333</i>&nbsp;				System.err.println(&quot;addCellEditorListener&quot;);
+<i>334</i>&nbsp;			}
+<i>335</i>&nbsp;
+<i>336</i>&nbsp;			@Override
+<i>337</i>&nbsp;			public Component getTableCellEditorComponent(JTable table, Object value,
+<i>338</i>&nbsp;					boolean isSelected, int row, int column) {
+<i>339</i>&nbsp;				if (!isSelected) {
+<i>340</i>&nbsp;					return null;
+<i>341</i>&nbsp;				}
+<i>342</i>&nbsp;				m_iRow = row;
+<i>343</i>&nbsp;				m_iCol = column;
+<i>344</i>&nbsp;				beginEditAction();
+<i>345</i>&nbsp;				editObject(m_iRow, m_iCol);
+<i>346</i>&nbsp;				selectCell(m_iRow, m_iCol);
+<i>347</i>&nbsp;				if (value == null) {
+<i>348</i>&nbsp;					((JTextField)component).setText(&quot;&quot;);
+<i>349</i>&nbsp;				} else if (value instanceof BEASTObject) {
+<i>350</i>&nbsp;					BEASTObject plugin = (BEASTObject) value;
+<i>351</i>&nbsp;					BEASTObjectDialog dlg = new BEASTObjectDialog(plugin, plugin.getClass(), null);
+<i>352</i>&nbsp;                    if (dlg.showDialog()) {
+<i>353</i>&nbsp;						dlg.accept(plugin, null);
+<i>354</i>&nbsp;						//plugin = dlg.m_panel.m_plugin;
+<i>355</i>&nbsp;						m_objects[m_iRow][m_iCol] = plugin;
+<i>356</i>&nbsp;						m_table.repaint();
+<i>357</i>&nbsp;					}
+<i>358</i>&nbsp;					return null;
+<i>359</i>&nbsp;
+<i>360</i>&nbsp;
+<i>361</i>&nbsp;				} else if (value instanceof FormulaCell) {
+<i>362</i>&nbsp;					((JTextField)component).setText(&quot;=&quot; + ((FormulaCell)value).m_sFormula);
+<i>363</i>&nbsp;				} else if (value instanceof String) {
+<i>364</i>&nbsp;					((JTextField)component).setText((String)value);
+<i>365</i>&nbsp;				}
+<i>366</i>&nbsp;				return component;
+<i>367</i>&nbsp;			}
+<i>368</i>&nbsp;		});
+<i>369</i>&nbsp;		JScrollPane scrollPane = new JScrollPane(m_table);
+<i>370</i>&nbsp;
+<i>371</i>&nbsp;		// set up row labels
+<i>372</i>&nbsp;		DefaultTableModel headerData = new DefaultTableModel(0, 1);
+<i>373</i>&nbsp;		for (int i = 0; i &lt; MAX_ROW; i++) {
+<i>374</i>&nbsp;			headerData.addRow(new Object[] { (i + 1) + &quot;&quot; });
+<i>375</i>&nbsp;		}
+<i>376</i>&nbsp;		m_rowHeaderTable = new JTable(headerData);
+<i>377</i>&nbsp;		LookAndFeel.installColorsAndFont(m_rowHeaderTable, &quot;TableHeader.background&quot;, &quot;TableHeader.foreground&quot;,
+<i>378</i>&nbsp;				&quot;TableHeader.font&quot;);
+<i>379</i>&nbsp;		m_rowHeaderTable.setIntercellSpacing(new Dimension(0, 0));
+<i>380</i>&nbsp;		Dimension d = m_rowHeaderTable.getPreferredScrollableViewportSize();
+<i>381</i>&nbsp;		d.width = m_rowHeaderTable.getPreferredSize().width;
+<i>382</i>&nbsp;		m_rowHeaderTable.setPreferredScrollableViewportSize(d);
+<i>383</i>&nbsp;		m_rowHeaderTable.setRowHeight(m_table.getRowHeight());
+<i>384</i>&nbsp;		scrollPane.setRowHeaderView(m_rowHeaderTable);
+<i>385</i>&nbsp;
+<i>386</i>&nbsp;		// height listener handles resizing of row heights
+<i>387</i>&nbsp;		RowHeightListener heightLtr = new RowHeightListener();
+<i>388</i>&nbsp;		m_rowHeaderTable.addMouseListener(heightLtr);
+<i>389</i>&nbsp;		m_rowHeaderTable.addMouseMotionListener(heightLtr);
+<i>390</i>&nbsp;
+<i>391</i>&nbsp;		// set up list of possible border configurations to choose from
+<i>392</i>&nbsp;		m_borders = new Border[30];
+<i>393</i>&nbsp;		int k = 0;
+<i>394</i>&nbsp;		m_borders[k++] = new CellBorder(0, 0, 0, 0);
+<i>395</i>&nbsp;		m_borders[k++] = new CellBorder(1, 1, 1, 1);
+<i>396</i>&nbsp;		m_borders[k++] = new CellBorder(1, 1, 1, 0);
+<i>397</i>&nbsp;		m_borders[k++] = new CellBorder(1, 1, 0, 1);
+<i>398</i>&nbsp;		m_borders[k++] = new CellBorder(1, 0, 1, 1);
+<i>399</i>&nbsp;		m_borders[k++] = new CellBorder(0, 1, 1, 1);
+<i>400</i>&nbsp;		m_borders[k++] = new CellBorder(1, 0, 1, 0);
+<i>401</i>&nbsp;		m_borders[k++] = new CellBorder(0, 1, 0, 1);
+<i>402</i>&nbsp;		m_borders[k++] = new CellBorder(1, 1, 0, 0);
+<i>403</i>&nbsp;		m_borders[k++] = new CellBorder(1, 0, 0, 1);
+<i>404</i>&nbsp;		m_borders[k++] = new CellBorder(0, 0, 1, 1);
+<i>405</i>&nbsp;		m_borders[k++] = new CellBorder(0, 1, 1, 0);
+<i>406</i>&nbsp;		m_borders[k++] = new CellBorder(1, 0, 0, 0);
+<i>407</i>&nbsp;		m_borders[k++] = new CellBorder(0, 1, 0, 0);
+<i>408</i>&nbsp;		m_borders[k++] = new CellBorder(0, 0, 1, 0);
+<i>409</i>&nbsp;		m_borders[k++] = new CellBorder(0, 0, 0, 1);
+<i>410</i>&nbsp;		m_borders[k++] = new CellBorder(2, 2, 2, 2);
+<i>411</i>&nbsp;		m_borders[k++] = new CellBorder(2, 2, 2, 0);
+<i>412</i>&nbsp;		m_borders[k++] = new CellBorder(2, 2, 0, 2);
+<i>413</i>&nbsp;		m_borders[k++] = new CellBorder(2, 0, 2, 2);
+<i>414</i>&nbsp;		m_borders[k++] = new CellBorder(0, 2, 2, 2);
+<i>415</i>&nbsp;		m_borders[k++] = new CellBorder(0, 2, 0, 2);
+<i>416</i>&nbsp;		m_borders[k++] = new CellBorder(2, 2, 0, 0);
+<i>417</i>&nbsp;		m_borders[k++] = new CellBorder(2, 0, 0, 2);
+<i>418</i>&nbsp;		m_borders[k++] = new CellBorder(0, 0, 2, 2);
+<i>419</i>&nbsp;		m_borders[k++] = new CellBorder(0, 2, 2, 0);
+<i>420</i>&nbsp;		m_borders[k++] = new CellBorder(2, 0, 0, 0);
+<i>421</i>&nbsp;		m_borders[k++] = new CellBorder(0, 2, 0, 0);
+<i>422</i>&nbsp;		m_borders[k++] = new CellBorder(0, 0, 2, 0);
+<i>423</i>&nbsp;		m_borders[k++] = new CellBorder(0, 0, 0, 2);
+<i>424</i>&nbsp;		m_borderIcons = new Icon[m_borders.length];
+<i>425</i>&nbsp;		for (int i = 0; i &lt; m_borders.length; i++) {
+<i>426</i>&nbsp;			BufferedImage image = new BufferedImage(20, 20, BufferedImage.TYPE_INT_RGB);
+<i>427</i>&nbsp;			Graphics2D g = image.createGraphics();
+<i>428</i>&nbsp;			g.clearRect(0, 0, 20, 20);
+<i>429</i>&nbsp;			g.setColor(Color.white);
+<i>430</i>&nbsp;			g.fillRect(0, 0, 20, 20);
+<i>431</i>&nbsp;			m_borders[i].paintBorder(null, g, 1, 1, 18, 18);
+<i>432</i>&nbsp;			m_borderIcons[i] = new ImageIcon(image);
+<i>433</i>&nbsp;		}
+<i>434</i>&nbsp;
+<i>435</i>&nbsp;		this.setLayout(new BorderLayout());
+<i>436</i>&nbsp;		this.add(scrollPane, BorderLayout.CENTER);
+<i>437</i>&nbsp;		m_toolBar = createToolBar();
+<i>438</i>&nbsp;		this.add(m_toolBar, BorderLayout.NORTH);
+<i>439</i>&nbsp;
+<i>440</i>&nbsp;		// handle change of selection
+<i>441</i>&nbsp;		m_table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+<i>442</i>&nbsp;			@Override
+<i>443</i>&nbsp;			public void valueChanged(ListSelectionEvent e) {
+<i>444</i>&nbsp;				updateActions();
+<i>445</i>&nbsp;			}
+<i>446</i>&nbsp;		});
+<i>447</i>&nbsp;		m_table.getColumnModel().addColumnModelListener(new TableColumnModelListener() {
+<i>448</i>&nbsp;			@Override
+<i>449</i>&nbsp;			public void columnSelectionChanged(ListSelectionEvent e) {
+<i>450</i>&nbsp;				updateActions();
+<i>451</i>&nbsp;			}
+<i>452</i>&nbsp;			@Override
+<i>453</i>&nbsp;			public void columnRemoved(TableColumnModelEvent e) {}
+<i>454</i>&nbsp;			@Override
+<i>455</i>&nbsp;			public void columnMoved(TableColumnModelEvent e) {}
+<i>456</i>&nbsp;			@Override
+<i>457</i>&nbsp;			public void columnMarginChanged(ChangeEvent e) {}
+<i>458</i>&nbsp;			@Override
+<i>459</i>&nbsp;			public void columnAdded(TableColumnModelEvent e) {}
+<i>460</i>&nbsp;		});
+<i>461</i>&nbsp;
+<i>462</i>&nbsp;		// override m_table actions
+<i>463</i>&nbsp;		m_table.getActionMap().put(&quot;copy&quot;,a_copy);
+<i>464</i>&nbsp;		m_table.getActionMap().put(&quot;paste&quot;,a_paste);
+<i>465</i>&nbsp;		m_table.getActionMap().put(&quot;cut&quot;,a_cut);
+<i>466</i>&nbsp;		m_table.getActionMap().put(&quot;delete&quot;,a_del);
+<i>467</i>&nbsp;		m_table.getActionMap().put(&quot;undo&quot;,a_undo);
+<i>468</i>&nbsp;		m_table.getActionMap().put(&quot;redo&quot;,a_redo);
+<i>469</i>&nbsp;		DEFAULT_COLUMN_WIDTH = m_table.getColumn(headers[0]).getWidth();
+<i>470</i>&nbsp;		newSpreadsheet();
+<i>471</i>&nbsp;	} // c&#39;tor
+<i>472</i>&nbsp;
+<i>473</i>&nbsp;	/**************************************************************************************/
+<i>474</i>&nbsp;	/** recalculation of cell contents when spreadsheet changes **/
+<i>475</i>&nbsp;	void recalculate() {
+<i>476</i>&nbsp;		System.err.println(&quot;recalculate&quot;);
+<i>477</i>&nbsp;		// first, collect all cells that need calculating
+<i>478</i>&nbsp;		boolean [] bDone = new boolean[m_formulas.size()];
+<i>479</i>&nbsp;		int nDone = 0;
+<i>480</i>&nbsp;		while (nDone &lt; bDone.length) {
+<i>481</i>&nbsp;			boolean bProgress = false;
+<i>482</i>&nbsp;			for (int iFormula = 0; iFormula &lt; m_formulas.size(); iFormula++) {
+<i>483</i>&nbsp;				if (!bDone[iFormula]) {
+<i>484</i>&nbsp;					// check if we can calculate iFormula yet
+<i>485</i>&nbsp;					FormulaCell formula = m_formulas.get(iFormula);
+<i>486</i>&nbsp;					boolean bCanCalculate = true;
+<i>487</i>&nbsp;					for (int iCell : formula.m_nTokens) {
+<i>488</i>&nbsp;						if (iCell &gt;= 0) {
+<i>489</i>&nbsp;							Object o = m_objects[iCell%MAX_ROW][iCell/MAX_ROW];
+<i>490</i>&nbsp;							if (o instanceof FormulaCell) {
+<i>491</i>&nbsp;								int iFormula2 = m_formulas.indexOf(o);
+<i>492</i>&nbsp;								if (!bDone[iFormula2]) {
+<i>493</i>&nbsp;									bCanCalculate = false;
+<i>494</i>&nbsp;									break;
+<i>495</i>&nbsp;								}
+<i>496</i>&nbsp;							}
+<i>497</i>&nbsp;						}
+<i>498</i>&nbsp;					}
+<i>499</i>&nbsp;					if (bCanCalculate) {
+<i>500</i>&nbsp;						formula.value();
+<i>501</i>&nbsp;						bDone[iFormula] = true;
+<i>502</i>&nbsp;						bProgress = true;
+<i>503</i>&nbsp;						nDone++;
+<i>504</i>&nbsp;					}
+<i>505</i>&nbsp;				}
+<i>506</i>&nbsp;			}
+<i>507</i>&nbsp;
+<i>508</i>&nbsp;			if (!bProgress) {
+<i>509</i>&nbsp;				System.err.println(&quot;Cycle in cell references. Cannot recalculate!&quot;);
+<i>510</i>&nbsp;				m_table.repaint();
+<i>511</i>&nbsp;			}
+<i>512</i>&nbsp;		}
+<i>513</i>&nbsp;		m_table.repaint();
+<i>514</i>&nbsp;	} // recalculate
+<i>515</i>&nbsp;
+<i>516</i>&nbsp;	/**************************************************************************************/
+<i>517</i>&nbsp;	/** undo/redo stuff **/
+<i>518</i>&nbsp;	class UndoAction {
+<i>519</i>&nbsp;		UndoAction(String sOldCellSpecs, String sNewCellSpecs) {
+<i>520</i>&nbsp;			m_sOldCellSpecs = sOldCellSpecs;
+<i>521</i>&nbsp;			m_sNewCellSpecs = sNewCellSpecs;
+<i>522</i>&nbsp;		}
+<i>523</i>&nbsp;		String m_sOldCellSpecs;
+<i>524</i>&nbsp;		String m_sNewCellSpecs;
+<i>525</i>&nbsp;	} // class UndoAction
+<i>526</i>&nbsp;
+<i>527</i>&nbsp;	/** start recording edit actions **/
+<i>528</i>&nbsp;	void beginEditAction() {
+<i>529</i>&nbsp;		m_sCellSpecs = &quot;&quot;;
+<i>530</i>&nbsp;		m_iEditRows = new ArrayList&lt;Integer&gt;();
+<i>531</i>&nbsp;		m_iEditCols = new ArrayList&lt;Integer&gt;();
+<i>532</i>&nbsp;		m_iEditActions = new ArrayList&lt;String&gt;();
+<i>533</i>&nbsp;	}
+<i>534</i>&nbsp;
+<i>535</i>&nbsp;	void editObject(int iRow, int iCol) {
+<i>536</i>&nbsp;		m_sCellSpecs += getCellAsText(iRow, iCol);
+<i>537</i>&nbsp;		if (m_iEditActions != null) {
+<i>538</i>&nbsp;			m_iEditActions.add(&quot;o&quot;);
+<i>539</i>&nbsp;			m_iEditRows.add(iRow);
+<i>540</i>&nbsp;			m_iEditCols.add(iCol);
+<i>541</i>&nbsp;		}
+<i>542</i>&nbsp;	}
+<i>543</i>&nbsp;
+<i>544</i>&nbsp;	void editFormat(int iRow, int iCol) {
+<i>545</i>&nbsp;		m_sCellSpecs += iRow + &quot; &quot; + iCol + &quot; {} y:&quot;;
+<i>546</i>&nbsp;		if (m_cellFormat[iRow][iCol] == null) {
+<i>547</i>&nbsp;			m_sCellSpecs += &quot;null\n&quot;;
+<i>548</i>&nbsp;		} else {
+<i>549</i>&nbsp;			m_sCellSpecs += m_cellFormat[iRow][iCol].toString() + &quot;\n&quot;;
+<i>550</i>&nbsp;		}
+<i>551</i>&nbsp;		if (m_iEditActions != null) {
+<i>552</i>&nbsp;			m_iEditActions.add(&quot;f&quot;);
+<i>553</i>&nbsp;			m_iEditRows.add(iRow);
+<i>554</i>&nbsp;			m_iEditCols.add(iCol);
+<i>555</i>&nbsp;		}
+<i>556</i>&nbsp;	}
+<i>557</i>&nbsp;
+<i>558</i>&nbsp;	void editWidth(int iCol) {
+<i>559</i>&nbsp;		int nWidth = m_table.getColumn(headers[iCol]).getWidth();
+<i>560</i>&nbsp;		m_sCellSpecs += nWidth + &quot; &quot; + iCol + &quot; {} w:\n&quot;;
+<i>561</i>&nbsp;		if (m_iEditActions != null) {
+<i>562</i>&nbsp;			m_iEditActions.add(&quot;w&quot;);
+<i>563</i>&nbsp;			m_iEditRows.add(-1);
+<i>564</i>&nbsp;			m_iEditCols.add(iCol);
+<i>565</i>&nbsp;		}
+<i>566</i>&nbsp;	}
+<i>567</i>&nbsp;
+<i>568</i>&nbsp;	void editHeight(int iRow) {
+<i>569</i>&nbsp;		int nHeight = m_rowHeaderTable.getRowHeight(iRow);
+<i>570</i>&nbsp;		m_sCellSpecs += iRow + &quot; &quot; + nHeight + &quot; {} h:\n&quot;;
+<i>571</i>&nbsp;		if (m_iEditActions != null) {
+<i>572</i>&nbsp;			m_iEditActions.add(&quot;h&quot;);
+<i>573</i>&nbsp;			m_iEditRows.add(iRow);
+<i>574</i>&nbsp;			m_iEditCols.add(-1);
+<i>575</i>&nbsp;		}
+<i>576</i>&nbsp;	}
+<i>577</i>&nbsp;
+<i>578</i>&nbsp;	/** end recording edit actions, and create new action on undo stack **/
+<i>579</i>&nbsp;	void endEditAction() {
+<i>580</i>&nbsp;		while (m_iTopUndoAction &gt; m_actions.size()) {
+<i>581</i>&nbsp;			m_actions.remove(m_iTopUndoAction);
+<i>582</i>&nbsp;		}
+<i>583</i>&nbsp;		String sOldSpecs = m_sCellSpecs;
+<i>584</i>&nbsp;		m_sCellSpecs = &quot;&quot;;
+<i>585</i>&nbsp;		ArrayList&lt;Integer&gt; iEditRows = m_iEditRows;
+<i>586</i>&nbsp;		m_iEditRows = null;
+<i>587</i>&nbsp;		ArrayList&lt;Integer&gt; iEditCols = m_iEditCols;
+<i>588</i>&nbsp;		m_iEditCols = null;
+<i>589</i>&nbsp;		ArrayList&lt;String&gt; iEditActions = m_iEditActions;
+<i>590</i>&nbsp;		m_iEditActions = null;
+<i>591</i>&nbsp;		for (int i = 0; i &lt; iEditRows.size(); i++) {
+<i>592</i>&nbsp;			switch (iEditActions.get(i).charAt(0)) {
+<i>593</i>&nbsp;			case &#39;f&#39;:
+<i>594</i>&nbsp;				editFormat(iEditRows.get(i), iEditCols.get(i));
+<i>595</i>&nbsp;				break;
+<i>596</i>&nbsp;			case &#39;o&#39;:
+<i>597</i>&nbsp;				editObject(iEditRows.get(i), iEditCols.get(i));
+<i>598</i>&nbsp;				break;
+<i>599</i>&nbsp;			case &#39;w&#39;:
+<i>600</i>&nbsp;				editWidth(iEditCols.get(i));
+<i>601</i>&nbsp;				break;
+<i>602</i>&nbsp;			case &#39;h&#39;:
+<i>603</i>&nbsp;				editHeight(iEditRows.get(i));
+<i>604</i>&nbsp;				break;
+<i>605</i>&nbsp;			}
+<i>606</i>&nbsp;		}
+<i>607</i>&nbsp;		String sNewSpecs = m_sCellSpecs;
+<i>608</i>&nbsp;		if (!sOldSpecs.equals(sNewSpecs)) {
+<i>609</i>&nbsp;			m_actions.add(new UndoAction(sOldSpecs, sNewSpecs));
+<i>610</i>&nbsp;			m_iTopUndoAction++;
+<i>611</i>&nbsp;		}
+<i>612</i>&nbsp;		updateActions();
+<i>613</i>&nbsp;		recalculate();
+<i>614</i>&nbsp;	} // endEditAction
+<i>615</i>&nbsp;
+<i>616</i>&nbsp;	void undo() {
+<i>617</i>&nbsp;		if (m_iTopUndoAction == 0) {
+<i>618</i>&nbsp;			return;
+<i>619</i>&nbsp;		}
+<i>620</i>&nbsp;		m_iTopUndoAction--;
+<i>621</i>&nbsp;		String sOldSpecs = m_actions.get(m_iTopUndoAction).m_sOldCellSpecs;
+<i>622</i>&nbsp;		processSpreadSheetAsText(sOldSpecs, 0, 0);
+<i>623</i>&nbsp;		updateActions();
+<i>624</i>&nbsp;	} // undo
+<i>625</i>&nbsp;
+<i>626</i>&nbsp;	void redo() {
+<i>627</i>&nbsp;		if (m_iTopUndoAction &gt;= m_actions.size()) {
+<i>628</i>&nbsp;			return;
+<i>629</i>&nbsp;		}
+<i>630</i>&nbsp;		String sNewSpecs = m_actions.get(m_iTopUndoAction).m_sNewCellSpecs;
+<i>631</i>&nbsp;		processSpreadSheetAsText(sNewSpecs, 0, 0);
+<i>632</i>&nbsp;		m_iTopUndoAction++;
+<i>633</i>&nbsp;		updateActions();
+<i>634</i>&nbsp;	} // redo
+<i>635</i>&nbsp;
+<i>636</i>&nbsp;	public class CellFormat {
+<i>637</i>&nbsp;		Color m_bgColor;
+<i>638</i>&nbsp;		Color m_fgColor;
+<i>639</i>&nbsp;		Font m_font;
+<i>640</i>&nbsp;		Border m_border;
+<i>641</i>&nbsp;		int m_alignment = SwingConstants.LEFT;
+<i>642</i>&nbsp;		public CellFormat() {}
+<i>643</i>&nbsp;
+<i>644</i>&nbsp;		public String toString() {
+<i>645</i>&nbsp;			String sStr = &quot;&quot;;
+<i>646</i>&nbsp;			if (m_bgColor != null) {
+<i>647</i>&nbsp;				sStr += &quot;bg:&quot; + m_bgColor.getRGB() + &quot; &quot;;
+<i>648</i>&nbsp;			}
+<i>649</i>&nbsp;			if (m_fgColor != null) {
+<i>650</i>&nbsp;				sStr += &quot;fg:&quot; + m_fgColor.getRGB() + &quot; &quot;;
+<i>651</i>&nbsp;			}
+<i>652</i>&nbsp;			if (m_font != null) {
+<i>653</i>&nbsp;				sStr += &quot;font:&quot; + m_font.getFontName() + &quot;,&quot; + m_font.getStyle() + &quot;,&quot; + m_font.getSize() + &quot; &quot;;
+<i>654</i>&nbsp;			}
+<i>655</i>&nbsp;			if (m_border != null) {
+<i>656</i>&nbsp;				CellBorder border = (CellBorder) m_border;
+<i>657</i>&nbsp;				sStr += &quot;border:&quot; + border.m_nNorthThickness +&quot;,&quot; + border.m_nEastThickness+&quot;,&quot;+border.m_nSouthThickness+&quot;,&quot;+border.m_nWestThickness+
+<i>658</i>&nbsp;					&quot;,&quot;+border.m_color.getRGB() +&quot; &quot;;
+<i>659</i>&nbsp;			}
+<i>660</i>&nbsp;			sStr += &quot;align:&quot; + m_alignment;
+<i>661</i>&nbsp;			return sStr;
+<i>662</i>&nbsp;		}
+<i>663</i>&nbsp;	} // class CellFormat
+<i>664</i>&nbsp;
+<i>665</i>&nbsp;	/** reconstruct a CellFormat from a string that a CellFormat.toString() produces **/
+<i>666</i>&nbsp;	void parseCellFormat(String sStr, int iRow, int iCol) {
+<i>667</i>&nbsp;		if (sStr.equals(&quot;null&quot;)) {
+<i>668</i>&nbsp;			m_cellFormat[iRow][iCol] = null;
+<i>669</i>&nbsp;			return;
+<i>670</i>&nbsp;		}
+<i>671</i>&nbsp;		CellFormat format = (m_cellFormat[iRow][iCol] != null ? m_cellFormat[iRow][iCol] : new CellFormat());
+<i>672</i>&nbsp;		m_cellFormat[iRow][iCol] = format;
+<i>673</i>&nbsp;		String [] sStrs = sStr.split(&quot; &quot;);
+<i>674</i>&nbsp;		for (String sStr2 : sStrs) {
+<i>675</i>&nbsp;			String [] sStrs2 = sStr2.split(&quot;:&quot;);
+<i>676</i>&nbsp;			if (sStrs2[0].equals(&quot;bg&quot;)) {
+<i>677</i>&nbsp;				format.m_bgColor = new Color(Integer.parseInt(sStrs2[1]));
+<i>678</i>&nbsp;			} else if (sStrs2[0].equals(&quot;fg&quot;)) {
+<i>679</i>&nbsp;				format.m_fgColor = new Color(Integer.parseInt(sStrs2[1]));
+<i>680</i>&nbsp;			} else if (sStrs2[0].equals(&quot;font&quot;)) {
+<i>681</i>&nbsp;				String [] sStrs3 = sStrs2[1].split(&quot;,&quot;);
+<i>682</i>&nbsp;				format.m_font = new Font(sStrs3[0], Integer.parseInt(sStrs3[1]), Integer.parseInt(sStrs3[2]));
+<i>683</i>&nbsp;			} else if (sStrs2[0].equals(&quot;border&quot;)) {
+<i>684</i>&nbsp;				String [] sStrs3 = sStrs2[1].split(&quot;,&quot;);
+<i>685</i>&nbsp;				format.m_border = new CellBorder(Integer.parseInt(sStrs3[0]), Integer.parseInt(sStrs3[1]), Integer.parseInt(sStrs3[2]), Integer.parseInt(sStrs3[3]));
+<i>686</i>&nbsp;				((CellBorder)format.m_border).m_color = new Color(Integer.parseInt(sStrs3[4]));
+<i>687</i>&nbsp;			} else if (sStrs2[0].equals(&quot;align&quot;)) {
+<i>688</i>&nbsp;				format.m_alignment = Integer.parseInt(sStrs2[1]);
+<i>689</i>&nbsp;			}
+<i>690</i>&nbsp;		}
+<i>691</i>&nbsp;	} // parseCellFormat
+<i>692</i>&nbsp;
+<i>693</i>&nbsp;	/** reconstruct a Plugin from a string that toString(Plugin) produces **/
+<i>694</i>&nbsp;	void parsePlugin(String sStr, int iRow, int iCol) {
+<i>695</i>&nbsp;		try {
+<i>696</i>&nbsp;			String sClass = sStr.substring(0, sStr.indexOf(&#39;(&#39;));
+<i>697</i>&nbsp;			for (String sClass2 : m_sPlugInNames) {
+<i>698</i>&nbsp;				if (sClass2.endsWith(sClass)) {
+<i>699</i>&nbsp;					sClass = sClass2;
+<i>700</i>&nbsp;				}
+<i>701</i>&nbsp;			}
+<i>702</i>&nbsp;			BEASTObject plugin = null;
+<i>703</i>&nbsp;			if (m_objects[iRow][iCol]==null || !m_objects[iRow][iCol].getClass().getName().equals(sClass)) {
+<i>704</i>&nbsp;				plugin = (BEASTObject) Class.forName(sClass).newInstance();
+<i>705</i>&nbsp;			} else {
+<i>706</i>&nbsp;				plugin = (BEASTObject) m_objects[iRow][iCol];
+<i>707</i>&nbsp;			}
+<i>708</i>&nbsp;			String sArgs = sStr.substring(sStr.indexOf(&#39;(&#39;) + 1, sStr.lastIndexOf(&#39;)&#39;));
+<i>709</i>&nbsp;			List&lt;Object&gt; objects = new ArrayList&lt;Object&gt;();
+<i>710</i>&nbsp;			int i = 0;
+<i>711</i>&nbsp;			while (i &lt; sArgs.length()) {
+<i>712</i>&nbsp;				if (sArgs.charAt(i) == &#39;[&#39;) {
+<i>713</i>&nbsp;					String sArrayStr = sArgs.substring(i+1, sArgs.indexOf(&#39;]&#39;, i));
+<i>714</i>&nbsp;					String [] sStrs = sArrayStr.split(&quot;,&quot;);
+<i>715</i>&nbsp;					List&lt;Object&gt; objects2 = new ArrayList&lt;Object&gt;();
+<i>716</i>&nbsp;					for (String sStr2 : sStrs) {
+<i>717</i>&nbsp;						objects2.add(parseObject(sStr2));
+<i>718</i>&nbsp;					}
+<i>719</i>&nbsp;					objects.add(objects2);
+<i>720</i>&nbsp;					i = sArgs.indexOf(&#39;]&#39;, i) + 2; // +1 for &#39;]&#39; +1 for &#39;,&#39;
+<i>721</i>&nbsp;				} else {
+<i>722</i>&nbsp;					int iComma = sArgs.indexOf(&#39;,&#39;, i);
+<i>723</i>&nbsp;					int iEnd = (iComma &gt;= 0 ? iComma : sArgs.length());
+<i>724</i>&nbsp;					String sInputStr = sArgs.substring(i, iEnd);
+<i>725</i>&nbsp;					objects.add(parseObject(sInputStr));
+<i>726</i>&nbsp;					i = iEnd + 1;
+<i>727</i>&nbsp;				}
+<i>728</i>&nbsp;			}
+<i>729</i>&nbsp;			plugin.init(objects.toArray());
+<i>730</i>&nbsp;			m_pluginLocation.put(plugin, iRow + iCol * MAX_ROW);
+<i>731</i>&nbsp;			m_plugins.add(plugin);
+<i>732</i>&nbsp;			m_objects[iRow][iCol] = plugin;
+<i>733</i>&nbsp;		} catch (Exception e) {
+<i>734</i>&nbsp;			e.printStackTrace();
+<i>735</i>&nbsp;		}
+<i>736</i>&nbsp;	} // parsePlugin
+<i>737</i>&nbsp;
+<i>738</i>&nbsp;	Object parseObject(String sStr) {
+<i>739</i>&nbsp;		if (sStr.equals(&quot;null&quot;)) {
+<i>740</i>&nbsp;			return null;
+<i>741</i>&nbsp;		}
+<i>742</i>&nbsp;		if (sStr.startsWith(&quot;$&quot;)) {
+<i>743</i>&nbsp;	    	Pattern cellPattern = Pattern.compile(&quot;([a-zA-Z]+)([0-9]+)&quot;);
+<i>744</i>&nbsp;			Matcher cellMatcher = cellPattern.matcher(sStr.substring(1));
+<i>745</i>&nbsp;			if (cellMatcher.matches()) {
+<i>746</i>&nbsp;				String sCol = cellMatcher.group(1).toUpperCase();
+<i>747</i>&nbsp;				String sRow = cellMatcher.group(2);
+<i>748</i>&nbsp;				int iCol = sCol.charAt(0) - &#39;A&#39;;
+<i>749</i>&nbsp;				for (int i = 1;i &lt; sCol.length(); i++) {
+<i>750</i>&nbsp;					iCol = (iCol+1) * 26 + sCol.charAt(i) - &#39;A&#39;;
+<i>751</i>&nbsp;				}
+<i>752</i>&nbsp;				int iRow = Integer.parseInt(sRow) - 1;
+<i>753</i>&nbsp;				return m_objects[iRow][iCol];
+<i>754</i>&nbsp;			}
+<i>755</i>&nbsp;		}
+<i>756</i>&nbsp;		return sStr;
+<i>757</i>&nbsp;	} // parseObject
+<i>758</i>&nbsp;
+<i>759</i>&nbsp;
+<i>760</i>&nbsp;
+<i>761</i>&nbsp;	/** file menu actions **/
+<i>762</i>&nbsp;	Action a_new = new MyAction(&quot;New&quot;, &quot;New spreadsheet file&quot;, &quot;new&quot;, KeyEvent.VK_N) {
+<i>763</i>&nbsp;		public void actionPerformed(ActionEvent ae) {
+<i>764</i>&nbsp;			newSpreadsheet();
+<i>765</i>&nbsp;		}
+<i>766</i>&nbsp;	};
+<i>767</i>&nbsp;	Action a_open = new MyAction(&quot;Open&quot;, &quot;Open spreadsheet file or Import beast xml specification&quot;, &quot;open&quot;, KeyEvent.VK_O) {
+<i>768</i>&nbsp;		public void actionPerformed(ActionEvent ae) {
+<i>769</i>&nbsp;			openSpreadsheet();
+<i>770</i>&nbsp;		}
+<i>771</i>&nbsp;	};
+<i>772</i>&nbsp;	Action a_save = new MyAction(&quot;Save&quot;, &quot;Save spreadsheet file&quot;, &quot;save&quot;, KeyEvent.VK_S) {
+<i>773</i>&nbsp;		public void actionPerformed(ActionEvent ae) {
+<i>774</i>&nbsp;			saveSpreadsheet();
+<i>775</i>&nbsp;		}
+<i>776</i>&nbsp;	};
+<i>777</i>&nbsp;	Action a_saveas = new MyAction(&quot;Save As&quot;, &quot;Save spreadsheet file under new name&quot;, &quot;saveas&quot;, -1) {
+<i>778</i>&nbsp;		public void actionPerformed(ActionEvent ae) {
+<i>779</i>&nbsp;			saveSpreadsheetAs();
+<i>780</i>&nbsp;		}
+<i>781</i>&nbsp;	};
+<i>782</i>&nbsp;	Action a_export = new MyAction(&quot;Export&quot;, &quot;Export beast xml specification&quot;, &quot;export&quot;, -1) {
+<i>783</i>&nbsp;		public void actionPerformed(ActionEvent ae) {
+<i>784</i>&nbsp;			exportBeast();
+<i>785</i>&nbsp;		}
+<i>786</i>&nbsp;	};
+<i>787</i>&nbsp;	Action a_exit = new MyAction(&quot;Exit&quot;, &quot;Exit program&quot;, &quot;exit&quot;, KeyEvent.VK_Q) {
+<i>788</i>&nbsp;		public void actionPerformed(ActionEvent ae) {
+<i>789</i>&nbsp;			System.exit(0);
+<i>790</i>&nbsp;		}
+<i>791</i>&nbsp;	};
+<i>792</i>&nbsp;
+<i>793</i>&nbsp;	/** edit menu actions **/
+<i>794</i>&nbsp;	Action a_cut = new MyAction(&quot;Cut&quot;, &quot;Cut&quot;, &quot;cut&quot;, KeyEvent.VK_X) {
+<i>795</i>&nbsp;		public void actionPerformed(ActionEvent ae) {
+<i>796</i>&nbsp;			copy();
+<i>797</i>&nbsp;			delete();
+<i>798</i>&nbsp;		}
+<i>799</i>&nbsp;	};
+<i>800</i>&nbsp;	Action a_copy = new MyAction(&quot;Copy&quot;, &quot;Copy&quot;, &quot;copy&quot;, KeyEvent.VK_C) {
+<i>801</i>&nbsp;		public void actionPerformed(ActionEvent ae) {
+<i>802</i>&nbsp;			copy();
+<i>803</i>&nbsp;		}
+<i>804</i>&nbsp;	};
+<i>805</i>&nbsp;	Action a_del = new MyAction(&quot;Delete&quot;, &quot;Delete&quot;, &quot;del&quot;, KeyEvent.VK_DELETE) {
+<i>806</i>&nbsp;		public void actionPerformed(ActionEvent ae) {
+<i>807</i>&nbsp;			delete();
+<i>808</i>&nbsp;		}
+<i>809</i>&nbsp;	};
+<i>810</i>&nbsp;	Action a_paste = new MyAction(&quot;Paste&quot;, &quot;Paste&quot;, &quot;paste&quot;, KeyEvent.VK_V) {
+<i>811</i>&nbsp;		public void actionPerformed(ActionEvent ae) {
+<i>812</i>&nbsp;			paste();
+<i>813</i>&nbsp;		}
+<i>814</i>&nbsp;	};
+<i>815</i>&nbsp;	Action a_undo = new MyAction(&quot;Undo&quot;, &quot;Undo&quot;, &quot;undo&quot;, KeyEvent.VK_Z) {
+<i>816</i>&nbsp;		public void actionPerformed(ActionEvent ae) {
+<i>817</i>&nbsp;			undo();
+<i>818</i>&nbsp;		}
+<i>819</i>&nbsp;	};
+<i>820</i>&nbsp;	Action a_redo = new MyAction(&quot;Redo&quot;, &quot;Redo&quot;, &quot;redo&quot;, KeyEvent.VK_Y) {
+<i>821</i>&nbsp;		public void actionPerformed(ActionEvent ae) {
+<i>822</i>&nbsp;			redo();
+<i>823</i>&nbsp;		}
+<i>824</i>&nbsp;	};
+<i>825</i>&nbsp;	/** window actions **/
+<i>826</i>&nbsp;    Action a_viewtoolbar = new MyAction(&quot;View toolbar&quot;, &quot;View toolbar&quot;, &quot;toolbar&quot;, -1) {
+<i>827</i>&nbsp;        public void actionPerformed(ActionEvent ae) {
+<i>828</i>&nbsp;        	m_toolBar.setVisible(!m_toolBar.isVisible());
+<i>829</i>&nbsp;        }
+<i>830</i>&nbsp;    };
+<i>831</i>&nbsp;	/** help actions **/
+<i>832</i>&nbsp;    Action a_about = new MyAction(&quot;About&quot;, &quot;Help about&quot;, &quot;about&quot;, -1) {
+<i>833</i>&nbsp;        public void actionPerformed(ActionEvent ae) {
+<i>834</i>&nbsp;            JOptionPane.showMessageDialog(null, &quot;Beast II Spreadsheet\nRemco Bouckaert\nrrb@xm.co.nz\n2010\nGPL licence&quot;, &quot;About Message&quot;, JOptionPane.PLAIN_MESSAGE);
+<i>835</i>&nbsp;        }
+<i>836</i>&nbsp;    };
+<i>837</i>&nbsp;
+<i>838</i>&nbsp;
+<i>839</i>&nbsp;
+<i>840</i>&nbsp;	/** file action implementations **/
+<i>841</i>&nbsp;	void newSpreadsheet() {
+<i>842</i>&nbsp;		m_plugins = new ArrayList&lt;BEASTInterface&gt;();
+<i>843</i>&nbsp;		m_formulas = new ArrayList&lt;FormulaCell&gt;();
+<i>844</i>&nbsp;		m_pluginLocation = new HashMap&lt;BEASTInterface, Integer&gt;();
+<i>845</i>&nbsp;		m_formulaLocation = new HashMap&lt;FormulaCell, Integer&gt;();
+<i>846</i>&nbsp;		m_actions = new ArrayList&lt;SpreadSheet.UndoAction&gt;();
+<i>847</i>&nbsp;		m_iTopUndoAction = 0;
+<i>848</i>&nbsp;
+<i>849</i>&nbsp;		for (int i = 0; i &lt; MAX_ROW; i++) {
+<i>850</i>&nbsp;    		for (int j = 0; j &lt; MAX_COL; j++) {
+<i>851</i>&nbsp;    			m_objects[i][j] = null;
+<i>852</i>&nbsp;    			m_cellFormat[i][j] = null;
+<i>853</i>&nbsp;    		}
+<i>854</i>&nbsp;		}
+<i>855</i>&nbsp;		m_table.repaint();
+<i>856</i>&nbsp;	}
+<i>857</i>&nbsp;
+<i>858</i>&nbsp;	void openSpreadsheet() {
+<i>859</i>&nbsp;        JFileChooser fc = new JFileChooser(m_sDir);
+<i>860</i>&nbsp;		fc.addChoosableFileFilter(new FileFilter() {
+<i>861</i>&nbsp;			public boolean accept(File f) {
+<i>862</i>&nbsp;				return f.isDirectory() || f.getName().toLowerCase().endsWith(getExtention());
+<i>863</i>&nbsp;			}
+<i>864</i>&nbsp;			public String getExtention(){return &quot;.bsp&quot;;}
+<i>865</i>&nbsp;			public String getDescription() {return &quot;Beast Spreadsheet files&quot;;}
+<i>866</i>&nbsp;		});
+<i>867</i>&nbsp;		fc.addChoosableFileFilter(new FileFilter() {
+<i>868</i>&nbsp;			public boolean accept(File f) {
+<i>869</i>&nbsp;				return f.isDirectory() || f.getName().toLowerCase().endsWith(getExtention());
+<i>870</i>&nbsp;			}
+<i>871</i>&nbsp;			public String getExtention(){return &quot;.xml&quot;;}
+<i>872</i>&nbsp;			public String getDescription() {return &quot;Beast II xml files&quot;;}
+<i>873</i>&nbsp;		});
+<i>874</i>&nbsp;		fc.setDialogTitle(&quot;Load Beast Spreadheet file&quot;);
+<i>875</i>&nbsp;		int rval = fc.showOpenDialog(null);
+<i>876</i>&nbsp;		if (rval == JFileChooser.APPROVE_OPTION) {
+<i>877</i>&nbsp;			m_sSpreadsheetFileName = fc.getSelectedFile().toString();
+<i>878</i>&nbsp;			if (m_sSpreadsheetFileName.lastIndexOf(&#39;/&#39;) &gt; 0) {
+<i>879</i>&nbsp;				m_sDir = m_sSpreadsheetFileName.substring(0, m_sSpreadsheetFileName.lastIndexOf(&#39;/&#39;));
+<i>880</i>&nbsp;			}
+<i>881</i>&nbsp;			newSpreadsheet();
+<i>882</i>&nbsp;			if (m_sSpreadsheetFileName.toLowerCase().endsWith(&quot;.xml&quot;)) {
+<i>883</i>&nbsp;				try {
+<i>884</i>&nbsp;					readXML(m_sSpreadsheetFileName);
+<i>885</i>&nbsp;				} catch (Exception e) {
+<i>886</i>&nbsp;					e.printStackTrace();
+<i>887</i>&nbsp;				}
+<i>888</i>&nbsp;				m_sSpreadsheetFileName = m_sSpreadsheetFileName.substring(0, m_sSpreadsheetFileName.length()-4) + &quot;.bsp&quot;;
+<i>889</i>&nbsp;			} else {
+<i>890</i>&nbsp;				try {
+<i>891</i>&nbsp;					BufferedReader fin = new BufferedReader(new FileReader(m_sSpreadsheetFileName));
+<i>892</i>&nbsp;					String sText = &quot;&quot;;
+<i>893</i>&nbsp;					while (fin.ready()) {
+<i>894</i>&nbsp;						sText += fin.readLine();
+<i>895</i>&nbsp;					}
+<i>896</i>&nbsp;					fin.close();
+<i>897</i>&nbsp;					processSpreadSheetAsText(sText, 0, 0);
+<i>898</i>&nbsp;				} catch (Exception e) {
+<i>899</i>&nbsp;					e.printStackTrace();
+<i>900</i>&nbsp;				}
+<i>901</i>&nbsp;			}
+<i>902</i>&nbsp;		}
+<i>903</i>&nbsp;	}
+<i>904</i>&nbsp;
+<i>905</i>&nbsp;	void saveSpreadsheet() {
+<i>906</i>&nbsp;		if (m_sSpreadsheetFileName == null) {
+<i>907</i>&nbsp;			saveSpreadsheetAs();
+<i>908</i>&nbsp;		}
+<i>909</i>&nbsp;    	File file = new File(m_sSpreadsheetFileName);
+<i>910</i>&nbsp;    	if (file.exists()) {
+<i>911</i>&nbsp;    		System.err.println(&quot;Overwriting file &quot; + m_sSpreadsheetFileName + &quot;.&quot;);
+<i>912</i>&nbsp;    	}
+<i>913</i>&nbsp;    	try {
+<i>914</i>&nbsp;    		PrintStream out = new PrintStream(m_sSpreadsheetFileName);
+<i>915</i>&nbsp;    		m_table.selectAll();
+<i>916</i>&nbsp;    		// first the contents
+<i>917</i>&nbsp;    		out.print(getSpreadsheetAsText());
+<i>918</i>&nbsp;    		// then the cell widths &amp; heights if any
+<i>919</i>&nbsp;    		int iRowEnd = m_table.getSelectionModel().getMaxSelectionIndex();
+<i>920</i>&nbsp;    		for (int iRow = m_table.getSelectedRow(); iRow &lt; iRowEnd; iRow++) {
+<i>921</i>&nbsp;    			int nHeight = m_rowHeaderTable.getRowHeight(iRow);
+<i>922</i>&nbsp;    			if (nHeight != m_rowHeaderTable.getRowHeight()) {
+<i>923</i>&nbsp;    				out.print(iRow + &quot; &quot; + nHeight + &quot; {} h:\n&quot;);
+<i>924</i>&nbsp;    			}
+<i>925</i>&nbsp;    		}
+<i>926</i>&nbsp;    		int iColEnd = m_table.getColumnModel().getSelectionModel().getMaxSelectionIndex();
+<i>927</i>&nbsp;    		for (int iCol = m_table.getSelectedColumn(); iCol &lt; iColEnd; iCol++) {
+<i>928</i>&nbsp;    			int nWidth = m_table.getColumn(headers[iCol]).getWidth();
+<i>929</i>&nbsp;    			if (nWidth != DEFAULT_COLUMN_WIDTH) {
+<i>930</i>&nbsp;    				out.print(nWidth + &quot; &quot; + iCol + &quot; {} w:\n&quot;);
+<i>931</i>&nbsp;    			}
+<i>932</i>&nbsp;    		}
+<i>933</i>&nbsp;    		out.close();
+<i>934</i>&nbsp;    	} catch (Exception e) {
+<i>935</i>&nbsp;			e.printStackTrace();
+<i>936</i>&nbsp;		}
+<i>937</i>&nbsp;	}
+<i>938</i>&nbsp;
+<i>939</i>&nbsp;	void saveSpreadsheetAs() {
+<i>940</i>&nbsp;        JFileChooser fc = new JFileChooser(m_sDir);
+<i>941</i>&nbsp;		fc.addChoosableFileFilter(new FileFilter() {
+<i>942</i>&nbsp;			public boolean accept(File f) {
+<i>943</i>&nbsp;				return f.isDirectory() || f.getName().toLowerCase().endsWith(getExtention());
+<i>944</i>&nbsp;			}
+<i>945</i>&nbsp;			public String getExtention(){return &quot;.bsp&quot;;}
+<i>946</i>&nbsp;			public String getDescription() {return &quot;Beast Spreadsheet files&quot;;}
+<i>947</i>&nbsp;		});
+<i>948</i>&nbsp;		fc.setDialogTitle(&quot;Save Beast Spreadheet file&quot;);
+<i>949</i>&nbsp;		int rval = fc.showSaveDialog(null);
+<i>950</i>&nbsp;		if (rval == JFileChooser.APPROVE_OPTION) {
+<i>951</i>&nbsp;			m_sSpreadsheetFileName = fc.getSelectedFile().toString();
+<i>952</i>&nbsp;			if (m_sSpreadsheetFileName.lastIndexOf(&#39;/&#39;) &gt; 0) {
+<i>953</i>&nbsp;				m_sDir = m_sSpreadsheetFileName.substring(0, m_sSpreadsheetFileName.lastIndexOf(&#39;/&#39;));
+<i>954</i>&nbsp;			}
+<i>955</i>&nbsp;			try {
+<i>956</i>&nbsp;				saveSpreadsheet();
+<i>957</i>&nbsp;			} catch (Exception e) {
+<i>958</i>&nbsp;				e.printStackTrace();
+<i>959</i>&nbsp;			}
+<i>960</i>&nbsp;		}
+<i>961</i>&nbsp;	}
+<i>962</i>&nbsp;
+<i>963</i>&nbsp;	void exportBeast() {
+<i>964</i>&nbsp;		int iRow = m_table.getSelectedRow();
+<i>965</i>&nbsp;		int iCol = m_table.getSelectedColumn();
+<i>966</i>&nbsp;		if (iRow &lt; 0 || iCol &lt; 0 || m_objects[iRow][iCol] == null || !(m_objects[iRow][iCol] instanceof beast.core.Runnable)) {
+<i>967</i>&nbsp;			JOptionPane.showMessageDialog(this, &quot;Select a runnable plugin to export as Beast II xml file&quot;);
+<i>968</i>&nbsp;			return;
+<i>969</i>&nbsp;		}
+<i>970</i>&nbsp;        JFileChooser fc = new JFileChooser(m_sDir);
+<i>971</i>&nbsp;		fc.addChoosableFileFilter(new FileFilter() {
+<i>972</i>&nbsp;			public boolean accept(File f) {
+<i>973</i>&nbsp;				return f.isDirectory() || f.getName().toLowerCase().endsWith(getExtention());
+<i>974</i>&nbsp;			}
+<i>975</i>&nbsp;			public String getExtention(){return &quot;.xml&quot;;}
+<i>976</i>&nbsp;			public String getDescription() {return &quot;Beast II xml files&quot;;}
+<i>977</i>&nbsp;		});
+<i>978</i>&nbsp;		fc.setDialogTitle(&quot;Save Beast II xml file&quot;);
+<i>979</i>&nbsp;		if (m_sSpreadsheetFileName != null &amp;&amp; m_sSpreadsheetFileName.endsWith(&quot;.bsp&quot;)) {
+<i>980</i>&nbsp;			fc.setSelectedFile(new File(m_sSpreadsheetFileName.substring(0, m_sSpreadsheetFileName.length()-4) + &quot;.xml&quot;));
+<i>981</i>&nbsp;		}
+<i>982</i>&nbsp;		int rval = fc.showSaveDialog(null);
+<i>983</i>&nbsp;		if (rval == JFileChooser.APPROVE_OPTION) {
+<i>984</i>&nbsp;			String sFileName = fc.getSelectedFile().toString();
+<i>985</i>&nbsp;			if (sFileName .lastIndexOf(&#39;/&#39;) &gt; 0) {
+<i>986</i>&nbsp;				m_sDir = sFileName .substring(0, sFileName .lastIndexOf(&#39;/&#39;));
+<i>987</i>&nbsp;			}
+<i>988</i>&nbsp;			try {
+<i>989</i>&nbsp;				BEASTObject plugin = (BEASTObject) m_objects[iRow][iCol];
+<i>990</i>&nbsp;				PrintStream out = new PrintStream(sFileName);
+<i>991</i>&nbsp;				out.print(new XMLProducer().toXML(plugin));
+<i>992</i>&nbsp;				out.close();
+<i>993</i>&nbsp;			} catch (Exception e) {
+<i>994</i>&nbsp;				e.printStackTrace();
+<i>995</i>&nbsp;			}
+<i>996</i>&nbsp;		}
+<i>997</i>&nbsp;
+<i>998</i>&nbsp;	}
+<i>999</i>&nbsp;
+<i>1000</i>&nbsp;
+<i>1001</i>&nbsp;	/** edit action implementations **/
+<i>1002</i>&nbsp;
+<i>1003</i>&nbsp;
+<i>1004</i>&nbsp;	void copy() {
+<i>1005</i>&nbsp;		// Get the min and max ranges of selected cells
+<i>1006</i>&nbsp;		String sClipboardText = getSpreadsheetAsText();
+<i>1007</i>&nbsp;	    StringSelection stringSelection = new StringSelection( sClipboardText );
+<i>1008</i>&nbsp;	    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+<i>1009</i>&nbsp;	    clipboard.setContents( stringSelection, this );
+<i>1010</i>&nbsp;		updateActions();
+<i>1011</i>&nbsp;	} // copy
+<i>1012</i>&nbsp;
+<i>1013</i>&nbsp;
+<i>1014</i>&nbsp;	void delete() {
+<i>1015</i>&nbsp;		beginEditAction();
+<i>1016</i>&nbsp;		// Get the min and max ranges of selected cells
+<i>1017</i>&nbsp;		int iRowStart = m_table.getSelectedRow();
+<i>1018</i>&nbsp;		int iRowEnd = m_table.getSelectionModel().getMaxSelectionIndex();
+<i>1019</i>&nbsp;		int iColStart = m_table.getSelectedColumn();
+<i>1020</i>&nbsp;		int iColEnd = m_table.getColumnModel().getSelectionModel().getMaxSelectionIndex();
+<i>1021</i>&nbsp;		// Check each cell in the range
+<i>1022</i>&nbsp;		for (int iRow = iRowStart; iRow &lt;= iRowEnd; iRow++) {
+<i>1023</i>&nbsp;			for (int iCol = iColStart; iCol &lt;= iColEnd; iCol++) {
+<i>1024</i>&nbsp;				if (m_table.isCellSelected(iRow, iCol)) {
+<i>1025</i>&nbsp;					editObject(iRow,iCol);
+<i>1026</i>&nbsp;					if (m_objects[iRow][iCol] instanceof BEASTObject) {
+<i>1027</i>&nbsp;						m_pluginLocation.remove(m_objects[iRow][iCol]);
+<i>1028</i>&nbsp;						m_plugins.remove(m_objects[iRow][iCol]);
+<i>1029</i>&nbsp;					} else if (m_objects[iRow][iCol] instanceof FormulaCell) {
+<i>1030</i>&nbsp;						m_formulaLocation.remove(m_objects[iRow][iCol]);
+<i>1031</i>&nbsp;						m_formulas.remove(m_objects[iRow][iCol]);
+<i>1032</i>&nbsp;					}
+<i>1033</i>&nbsp;					m_objects[iRow][iCol] = null;
+<i>1034</i>&nbsp;				}
+<i>1035</i>&nbsp;			}
+<i>1036</i>&nbsp;		}
+<i>1037</i>&nbsp;		m_table.repaint();
+<i>1038</i>&nbsp;		endEditAction();
+<i>1039</i>&nbsp;	} // delete
+<i>1040</i>&nbsp;
+<i>1041</i>&nbsp;	void paste() {
+<i>1042</i>&nbsp;		String sClipboard = &quot;&quot;;
+<i>1043</i>&nbsp;	    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+<i>1044</i>&nbsp;	    Transferable contents = clipboard.getContents(null);
+<i>1045</i>&nbsp;	    boolean hasTransferableText = (contents != null) &amp;&amp;  contents.isDataFlavorSupported(DataFlavor.stringFlavor);
+<i>1046</i>&nbsp;	    if ( hasTransferableText ) {
+<i>1047</i>&nbsp;	      try {
+<i>1048</i>&nbsp;	        sClipboard = (String)contents.getTransferData(DataFlavor.stringFlavor);
+<i>1049</i>&nbsp;	      }
+<i>1050</i>&nbsp;	      catch (UnsupportedFlavorException ex){
+<i>1051</i>&nbsp;	        //highly unlikely since we are using a standard DataFlavor
+<i>1052</i>&nbsp;	        ex.printStackTrace();
+<i>1053</i>&nbsp;	      }
+<i>1054</i>&nbsp;	      catch (IOException ex) {
+<i>1055</i>&nbsp;	        ex.printStackTrace();
+<i>1056</i>&nbsp;	      }
+<i>1057</i>&nbsp;	    }
+<i>1058</i>&nbsp;
+<i>1059</i>&nbsp;		int iRowStart = m_table.getSelectedRow();
+<i>1060</i>&nbsp;		int iColStart = m_table.getSelectedColumn();
+<i>1061</i>&nbsp;		if (iRowStart &lt; 0 || iColStart &lt; 0) {
+<i>1062</i>&nbsp;			return;
+<i>1063</i>&nbsp;		}
+<i>1064</i>&nbsp;		beginEditAction();
+<i>1065</i>&nbsp;		processSpreadSheetAsText(sClipboard, iRowStart, iColStart);
+<i>1066</i>&nbsp;		m_table.repaint();
+<i>1067</i>&nbsp;        endEditAction();
+<i>1068</i>&nbsp;	} // paste
+<i>1069</i>&nbsp;
+<i>1070</i>&nbsp;	String getSpreadsheetAsText() {
+<i>1071</i>&nbsp;		int iRowStart = m_table.getSelectedRow();
+<i>1072</i>&nbsp;		int iRowEnd = m_table.getSelectionModel().getMaxSelectionIndex();
+<i>1073</i>&nbsp;		int iColStart = m_table.getSelectedColumn();
+<i>1074</i>&nbsp;		int iColEnd = m_table.getColumnModel().getSelectionModel().getMaxSelectionIndex();
+<i>1075</i>&nbsp;		// Check each cell in the range
+<i>1076</i>&nbsp;		String sClipboardText = iRowStart +&quot; &quot; + iColStart +&quot; {} o:\n&quot;;
+<i>1077</i>&nbsp;		for (int iRow = iRowStart; iRow &lt;= iRowEnd; iRow++) {
+<i>1078</i>&nbsp;			for (int iCol = iColStart; iCol &lt;= iColEnd; iCol++) {
+<i>1079</i>&nbsp;				if (m_table.isCellSelected(iRow, iCol) &amp;&amp; m_objects[iRow][iCol] != null) {
+<i>1080</i>&nbsp;					sClipboardText += getCellAsText(iRow, iCol);
+<i>1081</i>&nbsp;				}
+<i>1082</i>&nbsp;			}
+<i>1083</i>&nbsp;		}
+<i>1084</i>&nbsp;		return sClipboardText;
+<i>1085</i>&nbsp;	}
+<i>1086</i>&nbsp;
+<i>1087</i>&nbsp;
+<i>1088</i>&nbsp;	String getCellAsText(int iRow, int iCol) {
+<i>1089</i>&nbsp;		Object o = m_objects[iRow][iCol];
+<i>1090</i>&nbsp;		String sText = iRow + &quot; &quot; + iCol + &quot; &quot;;
+<i>1091</i>&nbsp;		sText += &quot;{&quot; + (m_cellFormat[iRow][iCol]!=null ? m_cellFormat[iRow][iCol].toString() : &quot;&quot;)+&quot;}&quot;;
+<i>1092</i>&nbsp;		if (o == null) {
+<i>1093</i>&nbsp;			sText += &quot; n:&quot;;
+<i>1094</i>&nbsp;		} else if (o instanceof FormulaCell) {
+<i>1095</i>&nbsp;			sText += &quot; f:=&quot; + ((FormulaCell) o).m_sFormula;
+<i>1096</i>&nbsp;		} else if (o instanceof BEASTObject) {
+<i>1097</i>&nbsp;			sText += &quot; p:&quot; + toString((BEASTObject) o);
+<i>1098</i>&nbsp;		} else {
+<i>1099</i>&nbsp;			sText += &quot; s:&quot; + o.toString();
+<i>1100</i>&nbsp;		}
+<i>1101</i>&nbsp;		sText += &quot;\n&quot;;
+<i>1102</i>&nbsp;		return sText;
+<i>1103</i>&nbsp;	}
+<i>1104</i>&nbsp;
+<i>1105</i>&nbsp;	/** try to paste contents of sText into the spreadsheet
+<i>1106</i>&nbsp;	 * @param sText: string of cell-specs, line by line, as produced by getSpreadsheetAsText()
+<i>1107</i>&nbsp;	 * @param iRow0, iCol0: relative cell position
+<i>1108</i>&nbsp;	 */
+<i>1109</i>&nbsp;	void processSpreadSheetAsText(String sText, int iRow0, int iCol0) {
+<i>1110</i>&nbsp;		String [] sStrs = sText.split(&quot;\n&quot;);
+<i>1111</i>&nbsp;    	Pattern cellPattern = Pattern.compile(&quot;([0-9]+) ([0-9]+) \\{([^}]*)\\} ([a-z]):(.*)&quot;);
+<i>1112</i>&nbsp;    	for (int i = 0; i &lt; sStrs.length; i++) {
+<i>1113</i>&nbsp;    		String sStr = sStrs[i];
+<i>1114</i>&nbsp;    		Matcher cellMatcher = cellPattern.matcher(sStr);
+<i>1115</i>&nbsp;    		if (cellMatcher.matches()) {
+<i>1116</i>&nbsp;    			int iRow = Integer.parseInt(cellMatcher.group(1));
+<i>1117</i>&nbsp;    			int iCol = Integer.parseInt(cellMatcher.group(2));
+<i>1118</i>&nbsp;    			String sCellFormat = cellMatcher.group(3);
+<i>1119</i>&nbsp;    			char aType = cellMatcher.group(4).charAt(0);
+<i>1120</i>&nbsp;    			String sSpec = cellMatcher.group(5);
+<i>1121</i>&nbsp;    			if (sCellFormat.length() &gt; 0) {
+<i>1122</i>&nbsp;					editFormat(iRow + iRow0, iCol + iCol0);
+<i>1123</i>&nbsp;    				parseCellFormat(sCellFormat, iRow + iRow0, iCol + iCol0);
+<i>1124</i>&nbsp;    			}
+<i>1125</i>&nbsp;    			if (aType == &#39;o&#39;) {
+<i>1126</i>&nbsp;    				// offset, should be on first line of sStrs only
+<i>1127</i>&nbsp;    				iRow0 -= iRow;
+<i>1128</i>&nbsp;    				iCol0 -= iCol;
+<i>1129</i>&nbsp;    			} else if (aType == &#39;n&#39;) {
+<i>1130</i>&nbsp;    				// null object
+<i>1131</i>&nbsp;					editFormat(iRow + iRow0, iCol + iCol0);
+<i>1132</i>&nbsp;    				m_objects[iRow + iRow0][iCol + iCol0] = null;
+<i>1133</i>&nbsp;    			} else if (aType == &#39;y&#39;) {
+<i>1134</i>&nbsp;    				// cell format
+<i>1135</i>&nbsp;					editFormat(iRow + iRow0, iCol + iCol0);
+<i>1136</i>&nbsp;    				parseCellFormat(sSpec, iRow + iRow0, iCol + iCol0);
+<i>1137</i>&nbsp;    			} else if (aType == &#39;p&#39;) {
+<i>1138</i>&nbsp;    				// plugin
+<i>1139</i>&nbsp;					editObject(iRow + iRow0, iCol + iCol0);
+<i>1140</i>&nbsp;    				parsePlugin(sSpec, iRow + iRow0, iCol + iCol0);
+<i>1141</i>&nbsp;    			} else if (aType == &#39;f&#39;) {
+<i>1142</i>&nbsp;    				// cell formula
+<i>1143</i>&nbsp;					editObject(iRow + iRow0, iCol + iCol0);
+<i>1144</i>&nbsp;					FormulaCell formula = new FormulaCell(sSpec);
+<i>1145</i>&nbsp;    				m_objects[iRow + iRow0][iCol + iCol0] = formula;
+<i>1146</i>&nbsp;    				m_formulas.add(formula);
+<i>1147</i>&nbsp;    				m_formulaLocation.put(formula, iRow + iRow0 + (iCol + iCol0) * MAX_ROW);
+<i>1148</i>&nbsp;    			} else if (aType == &#39;w&#39;) {
+<i>1149</i>&nbsp;    				// cell width
+<i>1150</i>&nbsp;    				int nWidth = iRow;
+<i>1151</i>&nbsp;					editWidth(iCol);
+<i>1152</i>&nbsp;    				m_table.getColumnModel().getColumn(iCol).setPreferredWidth(nWidth);
+<i>1153</i>&nbsp;    			} else if (aType == &#39;h&#39;) {
+<i>1154</i>&nbsp;    				// cell height
+<i>1155</i>&nbsp;    				int nHeight = iCol;
+<i>1156</i>&nbsp;					editHeight(iCol);
+<i>1157</i>&nbsp;    				m_table.setRowHeight(iRow, nHeight);
+<i>1158</i>&nbsp;    				m_rowHeaderTable.setRowHeight(iRow, nHeight);
+<i>1159</i>&nbsp;    			} else {
+<i>1160</i>&nbsp;    				// assume it is a string
+<i>1161</i>&nbsp;					editObject(iRow + iRow0, iCol + iCol0);
+<i>1162</i>&nbsp;    				m_objects[iRow + iRow0][iCol + iCol0] = sSpec;
+<i>1163</i>&nbsp;    			}
+<i>1164</i>&nbsp;    		} else {
+<i>1165</i>&nbsp;    			// not a Beast spreadsheet paste, assume it is a string
+<i>1166</i>&nbsp;				editObject(iRow0, iCol0);
+<i>1167</i>&nbsp;    			m_objects[iRow0][iCol0] = sText;
+<i>1168</i>&nbsp;    			return;
+<i>1169</i>&nbsp;    		}
+<i>1170</i>&nbsp;    	}
+<i>1171</i>&nbsp;	} // processSpreadSheetAsText
+<i>1172</i>&nbsp;
+<i>1173</i>&nbsp;	/** enable/disable actions depending on the state of the system **/
+<i>1174</i>&nbsp;	void updateActions() {
+<i>1175</i>&nbsp;		int iRow = m_table.getSelectedRow();
+<i>1176</i>&nbsp;		int iCol = m_table.getSelectedColumn();
+<i>1177</i>&nbsp;		boolean bSelected = iRow &gt;= 0 &amp;&amp; iCol &gt;= 0 &amp;&amp; m_objects[iRow][iCol] != null;
+<i>1178</i>&nbsp;		a_copy.setEnabled(bSelected);
+<i>1179</i>&nbsp;		a_cut.setEnabled(bSelected);
+<i>1180</i>&nbsp;
+<i>1181</i>&nbsp;	    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+<i>1182</i>&nbsp;	    Transferable contents = clipboard.getContents(null);
+<i>1183</i>&nbsp;	    boolean hasTransferableText = (contents != null) &amp;&amp;  contents.isDataFlavorSupported(DataFlavor.stringFlavor);
+<i>1184</i>&nbsp;	    a_paste.setEnabled(hasTransferableText);
+<i>1185</i>&nbsp;
+<i>1186</i>&nbsp;	    a_undo.setEnabled(m_iTopUndoAction &gt; 0);
+<i>1187</i>&nbsp;	    a_redo.setEnabled(m_iTopUndoAction &lt; m_actions.size());
+<i>1188</i>&nbsp;	    m_table.repaint();
+<i>1189</i>&nbsp;	} // updateActions
+<i>1190</i>&nbsp;
+<i>1191</i>&nbsp;	JToolBar createToolBar() {
+<i>1192</i>&nbsp;		JToolBar toolBar = new JToolBar();
+<i>1193</i>&nbsp;		toolBar.add(a_new);
+<i>1194</i>&nbsp;		toolBar.add(a_open);
+<i>1195</i>&nbsp;		toolBar.add(a_save);
+<i>1196</i>&nbsp;		toolBar.addSeparator();
+<i>1197</i>&nbsp;		toolBar.add(a_cut);
+<i>1198</i>&nbsp;		toolBar.add(a_copy);
+<i>1199</i>&nbsp;		toolBar.add(a_del);
+<i>1200</i>&nbsp;		toolBar.add(a_paste);
+<i>1201</i>&nbsp;		toolBar.addSeparator();
+<i>1202</i>&nbsp;		toolBar.add(a_undo);
+<i>1203</i>&nbsp;		toolBar.add(a_redo);
+<i>1204</i>&nbsp;		toolBar.addSeparator();
+<i>1205</i>&nbsp;		toolBar.add(new MyAction(&quot;Background&quot;, &quot;Background color&quot;, &quot;color&quot;, -1) {
+<i>1206</i>&nbsp;			public void actionPerformed(ActionEvent ae) {
+<i>1207</i>&nbsp;				setColor(true);
+<i>1208</i>&nbsp;	        }
+<i>1209</i>&nbsp;		});
+<i>1210</i>&nbsp;		toolBar.add(new MyAction(&quot;Color&quot;, &quot;Text color&quot;, &quot;tcolor&quot;, -1) {
+<i>1211</i>&nbsp;
+<i>1212</i>&nbsp;
+<i>1213</i>&nbsp;			public void actionPerformed(ActionEvent ae) {
+<i>1214</i>&nbsp;				setColor(false);
+<i>1215</i>&nbsp;	        }
+<i>1216</i>&nbsp;		});
+<i>1217</i>&nbsp;		toolBar.addSeparator();
+<i>1218</i>&nbsp;		toolBar.add(new MyAction(&quot;Bold&quot;, &quot;Toggle boldness of text&quot;, &quot;bold&quot;, -1) {
+<i>1219</i>&nbsp;
+<i>1220</i>&nbsp;
+<i>1221</i>&nbsp;			public void actionPerformed(ActionEvent ae) {
+<i>1222</i>&nbsp;	        	toggleFontProperty(null,Font.BOLD,0);
+<i>1223</i>&nbsp;	        }
+<i>1224</i>&nbsp;		});
+<i>1225</i>&nbsp;		toolBar.add(new MyAction(&quot;Italic&quot;, &quot;Toggle italicness of text&quot;, &quot;italic&quot;, -1) {
+<i>1226</i>&nbsp;
+<i>1227</i>&nbsp;
+<i>1228</i>&nbsp;			public void actionPerformed(ActionEvent ae) {
+<i>1229</i>&nbsp;	        	toggleFontProperty(null,Font.ITALIC,0);
+<i>1230</i>&nbsp;	        }
+<i>1231</i>&nbsp;		});
+<i>1232</i>&nbsp;		toolBar.add(new MyAction(&quot;Bigger&quot;, &quot;Increase size of font&quot;, &quot;bigger&quot;, -1) {
+<i>1233</i>&nbsp;
+<i>1234</i>&nbsp;
+<i>1235</i>&nbsp;			public void actionPerformed(ActionEvent ae) {
+<i>1236</i>&nbsp;	        	toggleFontProperty(null, -1, 1);
+<i>1237</i>&nbsp;	        }
+<i>1238</i>&nbsp;		});
+<i>1239</i>&nbsp;		toolBar.add(new MyAction(&quot;Smaller&quot;, &quot;Decrease size of font&quot;, &quot;smaller&quot;, -1) {
+<i>1240</i>&nbsp;
+<i>1241</i>&nbsp;
+<i>1242</i>&nbsp;			public void actionPerformed(ActionEvent ae) {
+<i>1243</i>&nbsp;	        	toggleFontProperty(null, -1, 3);
+<i>1244</i>&nbsp;	        }
+<i>1245</i>&nbsp;		});
+<i>1246</i>&nbsp;
+<i>1247</i>&nbsp;		GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+<i>1248</i>&nbsp;		JComboBox combo = new JComboBox(env.getAvailableFontFamilyNames());
+<i>1249</i>&nbsp;	    combo.addActionListener(new ActionListener() {
+<i>1250</i>&nbsp;	           public void actionPerformed(ActionEvent e) {
+<i>1251</i>&nbsp;	        	   toggleFontProperty((String)((JComboBox)e.getSource(  )).getSelectedItem(), -1, -1);
+<i>1252</i>&nbsp;	           }
+<i>1253</i>&nbsp;	    });
+<i>1254</i>&nbsp;	    toolBar.add(combo);
+<i>1255</i>&nbsp;		combo.setMaximumSize(new Dimension(350, 20));
+<i>1256</i>&nbsp;
+<i>1257</i>&nbsp;		toolBar.addSeparator();
+<i>1258</i>&nbsp;		toolBar.add(new MyAction(&quot;Left&quot;, &quot;Align left&quot;, &quot;left&quot;, -1) {
+<i>1259</i>&nbsp;
+<i>1260</i>&nbsp;
+<i>1261</i>&nbsp;			public void actionPerformed(ActionEvent ae) {
+<i>1262</i>&nbsp;	        	setAlignemnt(SwingConstants.LEFT);
+<i>1263</i>&nbsp;	        }
+<i>1264</i>&nbsp;		});
+<i>1265</i>&nbsp;		toolBar.add(new MyAction(&quot;Right&quot;, &quot;Align right&quot;, &quot;right&quot;, -1) {
+<i>1266</i>&nbsp;
+<i>1267</i>&nbsp;
+<i>1268</i>&nbsp;			public void actionPerformed(ActionEvent ae) {
+<i>1269</i>&nbsp;	        	setAlignemnt(SwingConstants.RIGHT);
+<i>1270</i>&nbsp;	        }
+<i>1271</i>&nbsp;		});
+<i>1272</i>&nbsp;		toolBar.add(new MyAction(&quot;Center&quot;, &quot;Align center&quot;, &quot;center&quot;, -1) {
+<i>1273</i>&nbsp;
+<i>1274</i>&nbsp;
+<i>1275</i>&nbsp;			public void actionPerformed(ActionEvent ae) {
+<i>1276</i>&nbsp;	        	setAlignemnt(SwingConstants.CENTER);
+<i>1277</i>&nbsp;	        }
+<i>1278</i>&nbsp;		});
+<i>1279</i>&nbsp;		toolBar.addSeparator();
+<i>1280</i>&nbsp;
+<i>1281</i>&nbsp;
+<i>1282</i>&nbsp;
+<i>1283</i>&nbsp;		JComboBox combo2 = new JComboBox(m_borderIcons);
+<i>1284</i>&nbsp;		combo2.setRenderer(new DefaultListCellRenderer() {
+<i>1285</i>&nbsp;			@Override
+<i>1286</i>&nbsp;			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
+<i>1287</i>&nbsp;					boolean cellHasFocus) {
+<i>1288</i>&nbsp;				    JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+<i>1289</i>&nbsp;			        label.setIcon(m_borderIcons[Math.max(index, 0)]);
+<i>1290</i>&nbsp;			        return label;
+<i>1291</i>&nbsp;			}
+<i>1292</i>&nbsp;		});
+<i>1293</i>&nbsp;		combo2.setMaximumSize(new Dimension(40, 20));
+<i>1294</i>&nbsp;	    combo2.addActionListener(new ActionListener() {
+<i>1295</i>&nbsp;	           public void actionPerformed(ActionEvent e) {
+<i>1296</i>&nbsp;	        	   int i = ((JComboBox)e.getSource()).getSelectedIndex();
+<i>1297</i>&nbsp;	        	   System.err.println(&quot;Selected &quot; + i);
+<i>1298</i>&nbsp;	        	   setBorderProperty(i);
+<i>1299</i>&nbsp;	           }
+<i>1300</i>&nbsp;	    });
+<i>1301</i>&nbsp;	    toolBar.add(combo2);
+<i>1302</i>&nbsp;
+<i>1303</i>&nbsp;		return toolBar;
+<i>1304</i>&nbsp;	} // createToolBar
+<i>1305</i>&nbsp;
+<i>1306</i>&nbsp;	void setBorderProperty(int iBorder) {
+<i>1307</i>&nbsp;		beginEditAction();
+<i>1308</i>&nbsp;		// Get the min and max ranges of selected cells
+<i>1309</i>&nbsp;		int iRowStart = m_table.getSelectedRow();
+<i>1310</i>&nbsp;		int iRowEnd = m_table.getSelectionModel().getMaxSelectionIndex();
+<i>1311</i>&nbsp;		int iColStart = m_table.getSelectedColumn();
+<i>1312</i>&nbsp;		int iColEnd = m_table.getColumnModel().getSelectionModel().getMaxSelectionIndex();
+<i>1313</i>&nbsp;		// Check each cell in the range
+<i>1314</i>&nbsp;		for (int iRow = iRowStart; iRow &lt;= iRowEnd; iRow++) {
+<i>1315</i>&nbsp;			for (int iCol = iColStart; iCol &lt;= iColEnd; iCol++) {
+<i>1316</i>&nbsp;				if (m_table.isCellSelected(iRow, iCol)) {
+<i>1317</i>&nbsp;					if (m_cellFormat[iRow][iCol] == null) {
+<i>1318</i>&nbsp;						m_cellFormat[iRow][iCol] = new CellFormat();
+<i>1319</i>&nbsp;					}
+<i>1320</i>&nbsp;					editFormat(iRow, iCol);
+<i>1321</i>&nbsp;					m_cellFormat[iRow][iCol].m_border = m_borders[iBorder];
+<i>1322</i>&nbsp;				}
+<i>1323</i>&nbsp;			}
+<i>1324</i>&nbsp;		}
+<i>1325</i>&nbsp;		endEditAction();
+<i>1326</i>&nbsp;		m_table.repaint();
+<i>1327</i>&nbsp;	}
+<i>1328</i>&nbsp;	/** choose colour for foreground or background of selected cells **/
+<i>1329</i>&nbsp;	void setColor(boolean bForeground) {
+<i>1330</i>&nbsp;		beginEditAction();
+<i>1331</i>&nbsp;		// Get the min and max ranges of selected cells
+<i>1332</i>&nbsp;		int iRowStart = m_table.getSelectedRow();
+<i>1333</i>&nbsp;		int iColStart = m_table.getSelectedColumn();
+<i>1334</i>&nbsp;    	if (iRowStart &lt; 0 || iColStart &lt; 0) {
+<i>1335</i>&nbsp;    		return;
+<i>1336</i>&nbsp;    	}
+<i>1337</i>&nbsp;    	Color initialColor = Color.white;
+<i>1338</i>&nbsp;    	if (m_cellFormat[iRowStart][iColStart] != null) {
+<i>1339</i>&nbsp;    		initialColor = (bForeground?m_cellFormat[iRowStart][iColStart].m_fgColor : m_cellFormat[iRowStart][iColStart].m_bgColor);
+<i>1340</i>&nbsp;    	}
+<i>1341</i>&nbsp;        Color color = JColorChooser.showDialog(null, &quot;Select Text color&quot;, initialColor);
+<i>1342</i>&nbsp;        if (color != null) {
+<i>1343</i>&nbsp;
+<i>1344</i>&nbsp;	    	int iRowEnd = m_table.getSelectionModel().getMaxSelectionIndex();
+<i>1345</i>&nbsp;			int iColEnd = m_table.getColumnModel().getSelectionModel().getMaxSelectionIndex();
+<i>1346</i>&nbsp;			// Check each cell in the range
+<i>1347</i>&nbsp;			for (int iRow = iRowStart; iRow &lt;= iRowEnd; iRow++) {
+<i>1348</i>&nbsp;				for (int iCol = iColStart; iCol &lt;= iColEnd; iCol++) {
+<i>1349</i>&nbsp;					if (m_table.isCellSelected(iRow, iCol)) {
+<i>1350</i>&nbsp;						editFormat(iRow, iCol);
+<i>1351</i>&nbsp;						if (m_cellFormat[iRow][iCol] == null) {
+<i>1352</i>&nbsp;							m_cellFormat[iRow][iCol] = new CellFormat();
+<i>1353</i>&nbsp;						}
+<i>1354</i>&nbsp;						if (bForeground) {
+<i>1355</i>&nbsp;							m_cellFormat[iRow][iCol].m_bgColor = color;
+<i>1356</i>&nbsp;						} else {
+<i>1357</i>&nbsp;							m_cellFormat[iRow][iCol].m_fgColor = color;
+<i>1358</i>&nbsp;						}
+<i>1359</i>&nbsp;					}
+<i>1360</i>&nbsp;				}
+<i>1361</i>&nbsp;			}
+<i>1362</i>&nbsp;        }
+<i>1363</i>&nbsp;		m_table.repaint();
+<i>1364</i>&nbsp;		endEditAction();
+<i>1365</i>&nbsp;	}
+<i>1366</i>&nbsp;
+<i>1367</i>&nbsp;	/** set alignment of selected cells **/
+<i>1368</i>&nbsp;	void setAlignemnt(int nAlignment) {
+<i>1369</i>&nbsp;		beginEditAction();
+<i>1370</i>&nbsp;		// Get the min and max ranges of selected cells
+<i>1371</i>&nbsp;		int iRowStart = m_table.getSelectedRow();
+<i>1372</i>&nbsp;		int iRowEnd = m_table.getSelectionModel().getMaxSelectionIndex();
+<i>1373</i>&nbsp;		int iColStart = m_table.getSelectedColumn();
+<i>1374</i>&nbsp;		int iColEnd = m_table.getColumnModel().getSelectionModel().getMaxSelectionIndex();
+<i>1375</i>&nbsp;		// Check each cell in the range
+<i>1376</i>&nbsp;		for (int iRow = iRowStart; iRow &lt;= iRowEnd; iRow++) {
+<i>1377</i>&nbsp;			for (int iCol = iColStart; iCol &lt;= iColEnd; iCol++) {
+<i>1378</i>&nbsp;				if (m_table.isCellSelected(iRow, iCol)) {
+<i>1379</i>&nbsp;					editFormat(iRow, iCol);
+<i>1380</i>&nbsp;					if (m_cellFormat[iRow][iCol] == null) {
+<i>1381</i>&nbsp;						m_cellFormat[iRow][iCol] = new CellFormat();
+<i>1382</i>&nbsp;					}
+<i>1383</i>&nbsp;					m_cellFormat[iRow][iCol].m_alignment = nAlignment;
+<i>1384</i>&nbsp;				}
+<i>1385</i>&nbsp;			}
+<i>1386</i>&nbsp;		}
+<i>1387</i>&nbsp;		m_table.repaint();
+<i>1388</i>&nbsp;		endEditAction();
+<i>1389</i>&nbsp;	} // setAlignment
+<i>1390</i>&nbsp;
+<i>1391</i>&nbsp;	/** set font properties of selected cells **/
+<i>1392</i>&nbsp;	void toggleFontProperty(String sFontName, int nFontStyle, int nFontSize) {
+<i>1393</i>&nbsp;		beginEditAction();
+<i>1394</i>&nbsp;		// Get the min and max ranges of selected cells
+<i>1395</i>&nbsp;		int iRowStart = m_table.getSelectedRow();
+<i>1396</i>&nbsp;		int iRowEnd = m_table.getSelectionModel().getMaxSelectionIndex();
+<i>1397</i>&nbsp;		int iColStart = m_table.getSelectedColumn();
+<i>1398</i>&nbsp;		int iColEnd = m_table.getColumnModel().getSelectionModel().getMaxSelectionIndex();
+<i>1399</i>&nbsp;		// Check each cell in the range
+<i>1400</i>&nbsp;		for (int iRow = iRowStart; iRow &lt;= iRowEnd; iRow++) {
+<i>1401</i>&nbsp;			for (int iCol = iColStart; iCol &lt;= iColEnd; iCol++) {
+<i>1402</i>&nbsp;				if (m_table.isCellSelected(iRow, iCol)) {
+<i>1403</i>&nbsp;					editFormat(iRow, iCol);
+<i>1404</i>&nbsp;			       	if (m_cellFormat[iRow][iCol] == null) {
+<i>1405</i>&nbsp;			       		m_cellFormat[iRow][iCol] = new CellFormat();
+<i>1406</i>&nbsp;			       	}
+<i>1407</i>&nbsp;			   		if (m_cellFormat[iRow][iCol].m_font == null) {
+<i>1408</i>&nbsp;			   	       	Font font = m_table.getFont();
+<i>1409</i>&nbsp;			   			m_cellFormat[iRow][iCol].m_font = new Font(font.getName(), font.getStyle(), font.getSize());
+<i>1410</i>&nbsp;			   		}
+<i>1411</i>&nbsp;			       	Font font = m_cellFormat[iRow][iCol].m_font;
+<i>1412</i>&nbsp;			       	String sFont = (sFontName == null ? font.getFamily() : sFontName);
+<i>1413</i>&nbsp;			       	int nStyle = (nFontStyle &gt; 0 ? (font.getStyle() ^ nFontStyle) : font.getStyle());
+<i>1414</i>&nbsp;			       	int nSize = (nFontSize &gt; 0 ? Math.max(2, font.getSize() + 2 - nFontSize): font.getSize());
+<i>1415</i>&nbsp;			   		m_cellFormat[iRow][iCol].m_font = new Font(sFont, nStyle, nSize);
+<i>1416</i>&nbsp;				}
+<i>1417</i>&nbsp;			}
+<i>1418</i>&nbsp;		}
+<i>1419</i>&nbsp;		endEditAction();
+<i>1420</i>&nbsp;	    m_table.repaint();
+<i>1421</i>&nbsp;	} // toggleFontProperty
+<i>1422</i>&nbsp;
+<i>1423</i>&nbsp;	void readXML(String fileName) throws Exception {
+<i>1424</i>&nbsp;		XMLParser parser = new XMLParser();
+<i>1425</i>&nbsp;		Random rand = new Random(127);
+<i>1426</i>&nbsp;
+<i>1427</i>&nbsp;
+<i>1428</i>&nbsp;		BEASTObject plugin0 = null;
+<i>1429</i>&nbsp;		plugin0 = parser.parseFile(new File(fileName));
+<i>1430</i>&nbsp;		// collect all objects and store in m_plugins
+<i>1431</i>&nbsp;		m_plugins = new ArrayList&lt;BEASTInterface&gt;();
+<i>1432</i>&nbsp;		collectPlugins(plugin0);
+<i>1433</i>&nbsp;		m_plugins.add(plugin0);
+<i>1434</i>&nbsp;
+<i>1435</i>&nbsp;		Color color = new Color(rand.nextInt(256), 128+rand.nextInt(128), rand.nextInt(128));
+<i>1436</i>&nbsp;		int k = 0;
+<i>1437</i>&nbsp;		int i = 0;
+<i>1438</i>&nbsp;		while (k &lt; m_plugins.size()) {
+<i>1439</i>&nbsp;			BEASTInterface plugin = m_plugins.get(k++);
+<i>1440</i>&nbsp;			if (i &gt; 1) {
+<i>1441</i>&nbsp;				Object prev = m_objects[i-1][1];
+<i>1442</i>&nbsp;				if (prev instanceof Sequence &amp;&amp; !(plugin instanceof Sequence) ||
+<i>1443</i>&nbsp;				    !(prev instanceof Operator) &amp;&amp; plugin instanceof Operator ||
+<i>1444</i>&nbsp;					plugin instanceof Alignment ||
+<i>1445</i>&nbsp;					plugin instanceof Runnable ||
+<i>1446</i>&nbsp;					plugin instanceof Logger) {
+<i>1447</i>&nbsp;					color = new Color(128+rand.nextInt(128), 200+rand.nextInt(56), rand.nextInt(128));
+<i>1448</i>&nbsp;					i++;
+<i>1449</i>&nbsp;				}
+<i>1450</i>&nbsp;			}
+<i>1451</i>&nbsp;			String sID = plugin.getID();
+<i>1452</i>&nbsp;			if (sID == null || sID.equals(&quot;&quot;)) {
+<i>1453</i>&nbsp;				sID = plugin.getClass().getName().substring(plugin.getClass().getName().lastIndexOf(&#39;.&#39;) + 1);
+<i>1454</i>&nbsp;			}
+<i>1455</i>&nbsp;			m_objects[i][0] = sID;
+<i>1456</i>&nbsp;			m_objects[i][1] = plugin;
+<i>1457</i>&nbsp;			CellFormat format = new CellFormat();
+<i>1458</i>&nbsp;			format.m_bgColor = color;
+<i>1459</i>&nbsp;			m_cellFormat[i][1] = format;
+<i>1460</i>&nbsp;
+<i>1461</i>&nbsp;			plugin.setID(&quot;B&quot;+(i+1));
+<i>1462</i>&nbsp;			m_pluginLocation.put(plugin, i + MAX_ROW);
+<i>1463</i>&nbsp;			if (plugin instanceof StateNode || plugin instanceof Distribution) {
+<i>1464</i>&nbsp;				FormulaCell formula = new FormulaCell(&quot;=$B&quot;+(i+1));
+<i>1465</i>&nbsp;				m_objects[i][2] = formula;
+<i>1466</i>&nbsp;				m_formulas.add(formula);
+<i>1467</i>&nbsp;				m_formulaLocation.put(formula, i + MAX_ROW * 2);
+<i>1468</i>&nbsp;			}
+<i>1469</i>&nbsp;			i++;
+<i>1470</i>&nbsp;		}
+<i>1471</i>&nbsp;		m_table.getColumnModel().getColumn(0).setPreferredWidth(100);
+<i>1472</i>&nbsp;		m_table.getColumnModel().getColumn(1).setPreferredWidth(400);
+<i>1473</i>&nbsp;		updateActions();
+<i>1474</i>&nbsp;	} // readXML
+<i>1475</i>&nbsp;
+<i>1476</i>&nbsp;	void collectPlugins(BEASTInterface plugin) throws Exception {
+<i>1477</i>&nbsp;		for (BEASTInterface plugin2 : plugin.listActiveBEASTObjects()) {
+<i>1478</i>&nbsp;			if (!m_plugins.contains(plugin2)) {
+<i>1479</i>&nbsp;				m_plugins.add(plugin2);
+<i>1480</i>&nbsp;				collectPlugins(plugin2);
+<i>1481</i>&nbsp;			}
+<i>1482</i>&nbsp;		}
+<i>1483</i>&nbsp;	} // collectPlugins
+<i>1484</i>&nbsp;
+<i>1485</i>&nbsp;	static String toString(BEASTObject plugin) {
+<i>1486</i>&nbsp;		String sClass = plugin.getClass().getName();
+<i>1487</i>&nbsp;		String sStr = sClass.substring(sClass.lastIndexOf(&#39;.&#39;) + 1);
+<i>1488</i>&nbsp;		sStr += &quot;(&quot;;
+<i>1489</i>&nbsp;		try {
+<i>1490</i>&nbsp;			List&lt;Input&lt;?&gt;&gt; inputs = plugin.listInputs();
+<i>1491</i>&nbsp;			for (int i = 0; i &lt; inputs.size(); i++) {
+<i>1492</i>&nbsp;				@SuppressWarnings(&quot;rawtypes&quot;)
+<i>1493</i>&nbsp;				Input input = inputs.get(i);
+<i>1494</i>&nbsp;				if (input.get() == null) {
+<i>1495</i>&nbsp;					sStr += &quot;null&quot;;
+<i>1496</i>&nbsp;				} else if (input.get() instanceof BEASTObject) {
+<i>1497</i>&nbsp;					sStr += getLocation((BEASTObject) input.get());
+<i>1498</i>&nbsp;				} else if (input.get() instanceof List) {
+<i>1499</i>&nbsp;					sStr += &quot;[&quot;;
+<i>1500</i>&nbsp;					@SuppressWarnings(&quot;rawtypes&quot;)
+<i>1501</i>&nbsp;					List list = (List) input.get();
+<i>1502</i>&nbsp;					for (int j = 0; j &lt; list.size(); j++) {
+<i>1503</i>&nbsp;						Object o = list.get(j);
+<i>1504</i>&nbsp;						if (o instanceof BEASTObject) {
+<i>1505</i>&nbsp;							sStr += getLocation((BEASTObject) o);
+<i>1506</i>&nbsp;						} else {
+<i>1507</i>&nbsp;							sStr += o;
+<i>1508</i>&nbsp;						}
+<i>1509</i>&nbsp;						if (j &lt; list.size() - 1) {
+<i>1510</i>&nbsp;							sStr += &quot;,&quot;;
+<i>1511</i>&nbsp;						}
+<i>1512</i>&nbsp;					}
+<i>1513</i>&nbsp;					sStr += &quot;]&quot;;
+<i>1514</i>&nbsp;				} else {
+<i>1515</i>&nbsp;					sStr += input.get().toString();
+<i>1516</i>&nbsp;				}
+<i>1517</i>&nbsp;				if (i &lt; inputs.size() - 1) {
+<i>1518</i>&nbsp;					sStr += &quot;,&quot;;
+<i>1519</i>&nbsp;				}
+<i>1520</i>&nbsp;			}
+<i>1521</i>&nbsp;		} catch (Exception e) {
+<i>1522</i>&nbsp;			e.printStackTrace();
+<i>1523</i>&nbsp;		}
+<i>1524</i>&nbsp;		sStr += &quot;)&quot;;
+<i>1525</i>&nbsp;		return sStr;
+<i>1526</i>&nbsp;	} // toString
+<i>1527</i>&nbsp;
+<i>1528</i>&nbsp;	static String getLocation(BEASTObject plugin) {
+<i>1529</i>&nbsp;		int iLocation = m_pluginLocation.get(plugin);
+<i>1530</i>&nbsp;		char a = (char) (&#39;A&#39; + (iLocation / MAX_ROW));
+<i>1531</i>&nbsp;		return &quot;$&quot; + a + (1 + iLocation % MAX_ROW);
+<i>1532</i>&nbsp;	}
+<i>1533</i>&nbsp;
+<i>1534</i>&nbsp;	/** class for resizing row height by dragging the mouse over the row header **/
+<i>1535</i>&nbsp;	class RowHeightListener extends MouseInputAdapter {
+<i>1536</i>&nbsp;		Point first, last;
+<i>1537</i>&nbsp;
+<i>1538</i>&nbsp;		@Override
+<i>1539</i>&nbsp;		public void mouseMoved(MouseEvent e) {
+<i>1540</i>&nbsp;			Point point = e.getPoint();
+<i>1541</i>&nbsp;			int iRow = m_rowHeaderTable.rowAtPoint(point);
+<i>1542</i>&nbsp;			Rectangle rect = m_rowHeaderTable.getCellRect(iRow, 0, true);
+<i>1543</i>&nbsp;			if (rect.y + rect.height - point.y &lt; 5) {
+<i>1544</i>&nbsp;				m_rowHeaderTable.setCursor(Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR));
+<i>1545</i>&nbsp;			} else {
+<i>1546</i>&nbsp;				m_rowHeaderTable.setCursor(Cursor.getDefaultCursor());
+<i>1547</i>&nbsp;			}
+<i>1548</i>&nbsp;		}
+<i>1549</i>&nbsp;
+<i>1550</i>&nbsp;		@Override
+<i>1551</i>&nbsp;		public void mouseDragged(MouseEvent e) {
+<i>1552</i>&nbsp;			if (first == null) {
+<i>1553</i>&nbsp;				first = e.getPoint();
+<i>1554</i>&nbsp;				int iRow = m_rowHeaderTable.rowAtPoint(first);
+<i>1555</i>&nbsp;				Rectangle rect = m_rowHeaderTable.getCellRect(iRow, 0, true);
+<i>1556</i>&nbsp;				if (rect.y + rect.height - first.y &lt; 5) {
+<i>1557</i>&nbsp;				} else {
+<i>1558</i>&nbsp;					first = null;
+<i>1559</i>&nbsp;					return;
+<i>1560</i>&nbsp;				}
+<i>1561</i>&nbsp;			} else {
+<i>1562</i>&nbsp;				last = e.getPoint();
+<i>1563</i>&nbsp;				if (last == null) {
+<i>1564</i>&nbsp;					System.err.println(&quot;last = 0&quot;);
+<i>1565</i>&nbsp;					return;
+<i>1566</i>&nbsp;				}
+<i>1567</i>&nbsp;				int height = (int) (last.y - first.y);
+<i>1568</i>&nbsp;				if (height == 0) {
+<i>1569</i>&nbsp;					System.err.println(&quot;height = 0&quot;);
+<i>1570</i>&nbsp;					return;
+<i>1571</i>&nbsp;				}
+<i>1572</i>&nbsp;				int row = m_rowHeaderTable.rowAtPoint(first);
+<i>1573</i>&nbsp;				int rowHeight = m_rowHeaderTable.getRowHeight(row);
+<i>1574</i>&nbsp;				m_table.setRowHeight(row, Math.max(1, rowHeight + height));
+<i>1575</i>&nbsp;				m_rowHeaderTable.setRowHeight(row, Math.max(1, rowHeight + height));
+<i>1576</i>&nbsp;				first.y = last.y;
+<i>1577</i>&nbsp;				System.err.println(&quot;rowheight = &quot; + Math.max(1, rowHeight + height));
+<i>1578</i>&nbsp;			}
+<i>1579</i>&nbsp;			last = e.getPoint();
+<i>1580</i>&nbsp;		}
+<i>1581</i>&nbsp;
+<i>1582</i>&nbsp;		@Override
+<i>1583</i>&nbsp;		public void mouseReleased(MouseEvent e) {
+<i>1584</i>&nbsp;			endEditAction();
+<i>1585</i>&nbsp;		}
+<i>1586</i>&nbsp;
+<i>1587</i>&nbsp;		@Override
+<i>1588</i>&nbsp;		public void mouseClicked(MouseEvent e) {
+<i>1589</i>&nbsp;			beginEditAction();
+<i>1590</i>&nbsp;			int iRow = m_rowHeaderTable.rowAtPoint(e.getPoint());
+<i>1591</i>&nbsp;			editHeight(iRow);
+<i>1592</i>&nbsp;		}
+<i>1593</i>&nbsp;	} // class RowHeightListener
+<i>1594</i>&nbsp;
+<i>1595</i>&nbsp;    // a JavaScript engine
+<i>1596</i>&nbsp;    static ScriptEngine m_engine;
+<i>1597</i>&nbsp;    /** class representing a cell containing a formula, which is evaluated using the JavaScript engine **/
+<i>1598</i>&nbsp;	class FormulaCell {
+<i>1599</i>&nbsp;	    {
+<i>1600</i>&nbsp;			// create a script engine manager
+<i>1601</i>&nbsp;		    ScriptEngineManager factory = new ScriptEngineManager();
+<i>1602</i>&nbsp;		    // create a JavaScript engine
+<i>1603</i>&nbsp;		    m_engine = factory.getEngineByName(&quot;JavaScript&quot;);
+<i>1604</i>&nbsp;	    }
+<i>1605</i>&nbsp;		// formula string represented by this cell
+<i>1606</i>&nbsp;		String m_sFormula;
+<i>1607</i>&nbsp;		String m_sValue;
+<i>1608</i>&nbsp;		String m_sMessage;
+<i>1609</i>&nbsp;		// formula split up in tokens consisting of cell references and non-cell reference parts
+<i>1610</i>&nbsp;		List&lt;String&gt; m_sTokens;
+<i>1611</i>&nbsp;		List&lt;Integer&gt; m_nTokens;
+<i>1612</i>&nbsp;
+<i>1613</i>&nbsp;		FormulaCell(String sFormula) {
+<i>1614</i>&nbsp;			m_sFormula = sFormula.substring(1);
+<i>1615</i>&nbsp;			try {
+<i>1616</i>&nbsp;				parse(m_sFormula);
+<i>1617</i>&nbsp;				m_sValue = value().toString();
+<i>1618</i>&nbsp;			} catch (Exception e) {
+<i>1619</i>&nbsp;				m_sMessage = e.getMessage();
+<i>1620</i>&nbsp;				m_sValue = &quot;NaN&quot;;
+<i>1621</i>&nbsp;			}
+<i>1622</i>&nbsp;		}
+<i>1623</i>&nbsp;
+<i>1624</i>&nbsp;		Object getCellRef(int nCode) {
+<i>1625</i>&nbsp;			int iRow = nCode &amp; MAX_ROW;
+<i>1626</i>&nbsp;			int iCol = nCode / MAX_ROW;
+<i>1627</i>&nbsp;			Object o = m_objects[iRow][iCol];
+<i>1628</i>&nbsp;			if (o instanceof FormulaCell) {
+<i>1629</i>&nbsp;				return ((FormulaCell)o).value();
+<i>1630</i>&nbsp;			} else if (o instanceof StateNode) {
+<i>1631</i>&nbsp;				return ((StateNode)o).getArrayValue();
+<i>1632</i>&nbsp;			} else if (o instanceof Distribution) {
+<i>1633</i>&nbsp;				try {
+<i>1634</i>&nbsp;					return ((Distribution)o).calculateLogP();
+<i>1635</i>&nbsp;				} catch (Exception e) {
+<i>1636</i>&nbsp;					e.printStackTrace();
+<i>1637</i>&nbsp;				}
+<i>1638</i>&nbsp;			} else if (o instanceof String) {
+<i>1639</i>&nbsp;				return Double.parseDouble((String) o);
+<i>1640</i>&nbsp;			}
+<i>1641</i>&nbsp;			return Double.NaN;
+<i>1642</i>&nbsp;		}
+<i>1643</i>&nbsp;
+<i>1644</i>&nbsp;		Object value() {
+<i>1645</i>&nbsp;			String sFormula = &quot;with (Math) {&quot;;
+<i>1646</i>&nbsp;			for (int i = 0; i &lt; m_nTokens.size(); i++) {
+<i>1647</i>&nbsp;				if (m_nTokens.get(i) &gt;= 0) {
+<i>1648</i>&nbsp;					sFormula += &quot;(&quot; + getCellRef(m_nTokens.get(i)) + &quot;)&quot;;
+<i>1649</i>&nbsp;				} else {
+<i>1650</i>&nbsp;					sFormula += m_sTokens.get(i);
+<i>1651</i>&nbsp;				}
+<i>1652</i>&nbsp;			}
+<i>1653</i>&nbsp;			sFormula += &quot;}&quot;;
+<i>1654</i>&nbsp;			System.err.println(&quot;parsing &quot; + sFormula);
+<i>1655</i>&nbsp;			try {
+<i>1656</i>&nbsp;				Object o = m_engine.eval(sFormula);
+<i>1657</i>&nbsp;				m_sValue = o.toString();
+<i>1658</i>&nbsp;				return o;
+<i>1659</i>&nbsp;			} catch (javax.script.ScriptException es) {
+<i>1660</i>&nbsp;				return es.getMessage();
+<i>1661</i>&nbsp;			}
+<i>1662</i>&nbsp;		}
+<i>1663</i>&nbsp;
+<i>1664</i>&nbsp;		public String toString() {
+<i>1665</i>&nbsp;			return m_sValue;
+<i>1666</i>&nbsp;		}
+<i>1667</i>&nbsp;
+<i>1668</i>&nbsp;		/**splits the formula in tokens of cell-refs and non-cell refs **/
+<i>1669</i>&nbsp;		void parse(String sFormula) throws Exception {
+<i>1670</i>&nbsp;			m_sTokens = new ArrayList&lt;String&gt;();
+<i>1671</i>&nbsp;			m_nTokens = new ArrayList&lt;Integer&gt;();
+<i>1672</i>&nbsp;	    	Pattern pattern = Pattern.compile(&quot;([^\\$]*)\\$([a-zA-Z0-9]*)(.*)&quot;);
+<i>1673</i>&nbsp;	    	Pattern cellPattern = Pattern.compile(&quot;([a-zA-Z]+)([0-9]+)&quot;);
+<i>1674</i>&nbsp;			while (sFormula.length() &gt; 0) {
+<i>1675</i>&nbsp;				Matcher matcher = pattern.matcher(sFormula);
+<i>1676</i>&nbsp;				if (matcher.matches()) {
+<i>1677</i>&nbsp;					String sPre = matcher.group(1);
+<i>1678</i>&nbsp;					if (sPre.length() &gt; 0) {
+<i>1679</i>&nbsp;						m_sTokens.add(sPre);
+<i>1680</i>&nbsp;						m_nTokens.add(-1);
+<i>1681</i>&nbsp;					}
+<i>1682</i>&nbsp;					String sCellRef = matcher.group(2);
+<i>1683</i>&nbsp;					Matcher cellMatcher = cellPattern.matcher(sCellRef);
+<i>1684</i>&nbsp;					if (cellMatcher.matches()) {
+<i>1685</i>&nbsp;						String sCol = cellMatcher.group(1).toUpperCase();
+<i>1686</i>&nbsp;						String sRow = cellMatcher.group(2);
+<i>1687</i>&nbsp;						int nCellReff = sCol.charAt(0) - &#39;A&#39;;
+<i>1688</i>&nbsp;						for (int i = 1;i &lt; sCol.length(); i++) {
+<i>1689</i>&nbsp;							nCellReff = (nCellReff+1) * 26 + sCol.charAt(i) - &#39;A&#39;;
+<i>1690</i>&nbsp;						}
+<i>1691</i>&nbsp;						nCellReff = nCellReff * (MAX_ROW+1) + Integer.parseInt(sRow) - 1;
+<i>1692</i>&nbsp;						m_sTokens.add(sCellRef);
+<i>1693</i>&nbsp;						m_nTokens.add(nCellReff);
+<i>1694</i>&nbsp;					} else {
+<i>1695</i>&nbsp;						throw new Exception(&quot;Not a valid cell reference &#39;$&quot; + sCellRef + &quot;&#39;&quot;);
+<i>1696</i>&nbsp;					}
+<i>1697</i>&nbsp;					sFormula = matcher.group(3);
+<i>1698</i>&nbsp;				} else {
+<i>1699</i>&nbsp;					m_sTokens.add(sFormula);
+<i>1700</i>&nbsp;					m_nTokens.add(-1);
+<i>1701</i>&nbsp;					sFormula = &quot;&quot;;
+<i>1702</i>&nbsp;				}
+<i>1703</i>&nbsp;			}
+<i>1704</i>&nbsp;		} // parse
+<i>1705</i>&nbsp;	} // class FormulaCell
+<i>1706</i>&nbsp;
+<i>1707</i>&nbsp;	class MyTableCellRenderer extends DefaultTableCellRenderer {
+<i>1708</i>&nbsp;
+<i>1709</i>&nbsp;		public Component getTableCellRendererComponent (JTable table, Object value, boolean bSelected, boolean bFocused, int iRow, int iCol) {
+<i>1710</i>&nbsp;
+<i>1711</i>&nbsp;			setEnabled(table == null || table.isEnabled()); // see question above
+<i>1712</i>&nbsp;
+<i>1713</i>&nbsp;	        if (m_cellFormat[iRow][iCol] != null) {
+<i>1714</i>&nbsp;	            setForeground(m_cellFormat[iRow][iCol].m_fgColor);
+<i>1715</i>&nbsp;	            setHorizontalAlignment(m_cellFormat[iRow][iCol].m_alignment);
+<i>1716</i>&nbsp;			} else {
+<i>1717</i>&nbsp;	            setForeground(null);
+<i>1718</i>&nbsp;	            setHorizontalAlignment(SwingConstants.LEFT);
+<i>1719</i>&nbsp;			}
+<i>1720</i>&nbsp;
+<i>1721</i>&nbsp;	        if (value instanceof BEASTObject) {
+<i>1722</i>&nbsp;	        	setText(SpreadSheet.toString((BEASTObject) value));
+<i>1723</i>&nbsp;	        } else {
+<i>1724</i>&nbsp;	        	super.getTableCellRendererComponent(table, value, bSelected, bFocused, iRow, iCol);
+<i>1725</i>&nbsp;	        }
+<i>1726</i>&nbsp;
+<i>1727</i>&nbsp;	        if (m_cellFormat[iRow][iCol] != null) {
+<i>1728</i>&nbsp;	        	if (bSelected) {
+<i>1729</i>&nbsp;	        		if (m_cellFormat[iRow][iCol].m_bgColor != null) {
+<i>1730</i>&nbsp;	        		Color c1 = m_cellFormat[iRow][iCol].m_bgColor;
+<i>1731</i>&nbsp;	        		Color c2 = Color.LIGHT_GRAY;
+<i>1732</i>&nbsp;	        			setBackground(new Color((c1.getRed() + c2.getRed())/2, (c1.getGreen() + c2.getGreen())/2, (c1.getBlue() + c2.getBlue())/2));
+<i>1733</i>&nbsp;	        		} else {
+<i>1734</i>&nbsp;		        		setBackground(Color.LIGHT_GRAY);
+<i>1735</i>&nbsp;	        		}
+<i>1736</i>&nbsp;	        	} else {
+<i>1737</i>&nbsp;	        		setBackground(m_cellFormat[iRow][iCol].m_bgColor);
+<i>1738</i>&nbsp;	        	}
+<i>1739</i>&nbsp;	            setFont(m_cellFormat[iRow][iCol].m_font);
+<i>1740</i>&nbsp;	            setBorder(m_cellFormat[iRow][iCol].m_border);
+<i>1741</i>&nbsp;			} else {
+<i>1742</i>&nbsp;	        	if (bSelected) {
+<i>1743</i>&nbsp;	        		setBackground(Color.LIGHT_GRAY);
+<i>1744</i>&nbsp;	        	} else {
+<i>1745</i>&nbsp;	        		setBackground(null);
+<i>1746</i>&nbsp;	        	}
+<i>1747</i>&nbsp;	            setFont(null);
+<i>1748</i>&nbsp;	            setBorder(null);
+<i>1749</i>&nbsp;			}
+<i>1750</i>&nbsp;	        return this;
+<i>1751</i>&nbsp;	    }
+<i>1752</i>&nbsp;	} // class ColoredTableCellRenderer
+<i>1753</i>&nbsp;
+<i>1754</i>&nbsp;
+<i>1755</i>&nbsp;	public class CellBorder extends AbstractBorder implements SwingConstants {
+<i>1756</i>&nbsp;		protected int m_nNorthThickness;
+<i>1757</i>&nbsp;		protected int m_nSouthThickness;
+<i>1758</i>&nbsp;		protected int m_nEastThickness;
+<i>1759</i>&nbsp;		protected int m_nWestThickness;
+<i>1760</i>&nbsp;		protected Color m_color;
+<i>1761</i>&nbsp;
+<i>1762</i>&nbsp;	    public CellBorder(int nNorth, int nEast, int nSouth, int nWest) {
+<i>1763</i>&nbsp;		    m_nNorthThickness = nNorth;
+<i>1764</i>&nbsp;		    m_nEastThickness = nEast;
+<i>1765</i>&nbsp;		    m_nSouthThickness = nSouth;
+<i>1766</i>&nbsp;		    m_nWestThickness = nWest;
+<i>1767</i>&nbsp;		    m_color = Color.black;
+<i>1768</i>&nbsp;	    }
+<i>1769</i>&nbsp;
+<i>1770</i>&nbsp;	    public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+<i>1771</i>&nbsp;	    	Color oldColor = g.getColor();
+<i>1772</i>&nbsp;
+<i>1773</i>&nbsp;	    	g.setColor(m_color);
+<i>1774</i>&nbsp;	    	for (int i = 0; i &lt; m_nNorthThickness; i++)  {
+<i>1775</i>&nbsp;	    		g.drawLine(x, y+i, x+width-1, y+i);
+<i>1776</i>&nbsp;	    	}
+<i>1777</i>&nbsp;	    	for (int i = 0; i &lt; m_nSouthThickness; i++)  {
+<i>1778</i>&nbsp;	    		g.drawLine(x, y+height-i-1, x+width-1, y+height-i-1);
+<i>1779</i>&nbsp;	    	}
+<i>1780</i>&nbsp;	    	for (int i = 0; i &lt; m_nWestThickness; i++)  {
+<i>1781</i>&nbsp;	    		g.drawLine(x+i, y, x+i, y+height-1);
+<i>1782</i>&nbsp;	    	}
+<i>1783</i>&nbsp;	    	for (int i = 0; i &lt; m_nEastThickness; i++)  {
+<i>1784</i>&nbsp;	    		g.drawLine(x+width-i-1, y, x+width-i-1, y+height-1);
+<i>1785</i>&nbsp;	    	}
+<i>1786</i>&nbsp;
+<i>1787</i>&nbsp;	    	g.setColor(oldColor);
+<i>1788</i>&nbsp;	    }
+<i>1789</i>&nbsp;	} // class CellBorder
+<i>1790</i>&nbsp;
+<i>1791</i>&nbsp;	void selectCell(int iRow, int iCol) {
+<i>1792</i>&nbsp;		m_table.clearSelection();
+<i>1793</i>&nbsp;		m_table.addRowSelectionInterval(iRow, iRow);
+<i>1794</i>&nbsp;		m_table.addColumnSelectionInterval(iCol, iCol);
+<i>1795</i>&nbsp;	}
+<i>1796</i>&nbsp;
+<i>1797</i>&nbsp;
+<i>1798</i>&nbsp;
+<i>1799</i>&nbsp;	protected JMenuBar getMenuBar() {
+<i>1800</i>&nbsp;		JMenuBar m_menuBar = new JMenuBar();
+<i>1801</i>&nbsp;		JMenu fileMenu = new JMenu(&quot;File&quot;);
+<i>1802</i>&nbsp;		fileMenu.setMnemonic(&#39;F&#39;);
+<i>1803</i>&nbsp;		// ----------------------------------------------------------------------
+<i>1804</i>&nbsp;		// File menu */
+<i>1805</i>&nbsp;		m_menuBar.add(fileMenu);
+<i>1806</i>&nbsp;		fileMenu.add(a_open);
+<i>1807</i>&nbsp;		fileMenu.add(a_save);
+<i>1808</i>&nbsp;		fileMenu.add(a_saveas);
+<i>1809</i>&nbsp;//		fileMenu.add(a_loadimage);
+<i>1810</i>&nbsp;		fileMenu.addSeparator();
+<i>1811</i>&nbsp;//		fileMenu.add(a_import);
+<i>1812</i>&nbsp;		fileMenu.add(a_export);
+<i>1813</i>&nbsp;//		fileMenu.add(a_print);
+<i>1814</i>&nbsp;		fileMenu.addSeparator();
+<i>1815</i>&nbsp;		fileMenu.add(a_exit);
+<i>1816</i>&nbsp;
+<i>1817</i>&nbsp;		// ----------------------------------------------------------------------
+<i>1818</i>&nbsp;		// Edit menu */
+<i>1819</i>&nbsp;		JMenu editMenu = new JMenu(&quot;Edit&quot;);
+<i>1820</i>&nbsp;		editMenu.setMnemonic(&#39;E&#39;);
+<i>1821</i>&nbsp;		m_menuBar.add(editMenu);
+<i>1822</i>&nbsp;		editMenu.add(a_undo);
+<i>1823</i>&nbsp;		editMenu.add(a_redo);
+<i>1824</i>&nbsp;		fileMenu.addSeparator();
+<i>1825</i>&nbsp;//		editMenu.add(a_selectAll);
+<i>1826</i>&nbsp;//		editMenu.add(a_unselectAll);
+<i>1827</i>&nbsp;		editMenu.add(a_cut);
+<i>1828</i>&nbsp;		editMenu.add(a_copy);
+<i>1829</i>&nbsp;		editMenu.add(a_del);
+<i>1830</i>&nbsp;		editMenu.add(a_paste);
+<i>1831</i>&nbsp;
+<i>1832</i>&nbsp;
+<i>1833</i>&nbsp;		// ----------------------------------------------------------------------
+<i>1834</i>&nbsp;		// Window menu */
+<i>1835</i>&nbsp;		JMenu windowMenu = new JMenu(&quot;Window&quot;);
+<i>1836</i>&nbsp;		windowMenu.setMnemonic(&#39;W&#39;);
+<i>1837</i>&nbsp;		m_menuBar.add(windowMenu);
+<i>1838</i>&nbsp;		windowMenu.add(a_viewtoolbar);
+<i>1839</i>&nbsp;//		windowMenu.add(a_viewtoolbar);
+<i>1840</i>&nbsp;
+<i>1841</i>&nbsp;		// ----------------------------------------------------------------------
+<i>1842</i>&nbsp;		// Help menu */
+<i>1843</i>&nbsp;		JMenu helpMenu = new JMenu(&quot;Help&quot;);
+<i>1844</i>&nbsp;		helpMenu.setMnemonic(&#39;H&#39;);
+<i>1845</i>&nbsp;		m_menuBar.add(helpMenu);
+<i>1846</i>&nbsp;//		helpMenu.add(a_help);
+<i>1847</i>&nbsp;		helpMenu.add(a_about);
+<i>1848</i>&nbsp;		return m_menuBar;
+<i>1849</i>&nbsp;	} // makeMenuBar
+<i>1850</i>&nbsp;
+<i>1851</i>&nbsp;
+<i>1852</i>&nbsp;
+<i>1853</i>&nbsp;	/**
+<i>1854</i>&nbsp;	 * Rudimentary test of this panel, takes a Beast II xml file as argument and
+<i>1855</i>&nbsp;	 * opens it
+<i>1856</i>&nbsp;	 **/
+<i>1857</i>&nbsp;	public static void main(String args[]) {
+<i>1858</i>&nbsp;		try {
+<i>1859</i>&nbsp;			AddOnManager.loadExternalJars();
+<i>1860</i>&nbsp;
+<i>1861</i>&nbsp;			Logger.FILE_MODE = Logger.LogFileMode.overwrite;
+<i>1862</i>&nbsp;			SpreadSheet spreadSheet = new SpreadSheet();
+<i>1863</i>&nbsp;			spreadSheet.setSize(2048, 2048);
+<i>1864</i>&nbsp;			if (args.length &gt; 0) {
+<i>1865</i>&nbsp;				spreadSheet.readXML(args[0]);
+<i>1866</i>&nbsp;			}
+<i>1867</i>&nbsp;
+<i>1868</i>&nbsp;			JFrame frame = new JFrame(&quot;Beast II Calculator&quot;);
+<i>1869</i>&nbsp;			JMenuBar menuBar = spreadSheet.getMenuBar();
+<i>1870</i>&nbsp;			frame.setJMenuBar(menuBar);
+<i>1871</i>&nbsp;			frame.getContentPane().add(spreadSheet, BorderLayout.CENTER);
+<i>1872</i>&nbsp;			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+<i>1873</i>&nbsp;			frame.setSize(800, 600);
+<i>1874</i>&nbsp;			frame.setVisible(true);
+<i>1875</i>&nbsp;		} catch (Exception e) {
+<i>1876</i>&nbsp;			e.printStackTrace();
+<i>1877</i>&nbsp;		}
+<i>1878</i>&nbsp;	} // main
+<i>1879</i>&nbsp;
+<i>1880</i>&nbsp;	@Override
+<i>1881</i>&nbsp;	public void lostOwnership(Clipboard clipboard, Transferable contents) {
+<i>1882</i>&nbsp;		// do nothing
+<i>1883</i>&nbsp;	}
+<i>1884</i>&nbsp;
+<i>1885</i>&nbsp;} // class SpreadSheet
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

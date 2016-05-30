@@ -1,0 +1,1347 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: XMLParser</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.util</a> ]
+</div>
+
+<h1>Coverage Summary for Class: XMLParser (beast.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">XMLParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    63.6%
+  </span>
+  <span class="absValue">
+    (21/ 33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    48.6%
+  </span>
+  <span class="absValue">
+    (266/ 547)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">XMLParser$NameValuePair</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">XMLParser$RequiredInputProvider</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    64.7%
+  </span>
+  <span class="absValue">
+    (22/ 34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    49.1%
+  </span>
+  <span class="absValue">
+    (271/ 552)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;* File XMLParser.java
+<i>3</i>&nbsp;*
+<i>4</i>&nbsp;* Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>5</i>&nbsp;*
+<i>6</i>&nbsp;* This file is part of BEAST2.
+<i>7</i>&nbsp;* See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp;* information regarding copyright ownership and licensing.
+<i>9</i>&nbsp;*
+<i>10</i>&nbsp;* BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp;* it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp;* published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp;* of the License, or (at your option) any later version.
+<i>14</i>&nbsp;*
+<i>15</i>&nbsp;*  BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp;*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp;*  GNU Lesser General Public License for more details.
+<i>19</i>&nbsp;*
+<i>20</i>&nbsp;* You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp;* License along with BEAST; if not, write to the
+<i>22</i>&nbsp;* Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp;* Boston, MA  02110-1301  USA
+<i>24</i>&nbsp;*/
+<i>25</i>&nbsp;package beast.util;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;import static beast.util.XMLParserUtils.processPlates;
+<i>29</i>&nbsp;import static beast.util.XMLParserUtils.replaceVariable;
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;import java.io.File;
+<i>32</i>&nbsp;import java.io.IOException;
+<i>33</i>&nbsp;import java.io.PrintStream;
+<i>34</i>&nbsp;import java.io.StringReader;
+<i>35</i>&nbsp;import java.lang.annotation.Annotation;
+<i>36</i>&nbsp;import java.lang.reflect.Constructor;
+<i>37</i>&nbsp;import java.lang.reflect.InvocationTargetException;
+<i>38</i>&nbsp;import java.lang.reflect.Type;
+<i>39</i>&nbsp;import java.util.ArrayList;
+<i>40</i>&nbsp;import java.util.HashMap;
+<i>41</i>&nbsp;import java.util.HashSet;
+<i>42</i>&nbsp;import java.util.List;
+<i>43</i>&nbsp;import java.util.Set;
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;import javax.xml.parsers.DocumentBuilderFactory;
+<i>46</i>&nbsp;import javax.xml.parsers.ParserConfigurationException;
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;import org.w3c.dom.Document;
+<i>49</i>&nbsp;import org.w3c.dom.Element;
+<i>50</i>&nbsp;import org.w3c.dom.NamedNodeMap;
+<i>51</i>&nbsp;import org.w3c.dom.Node;
+<i>52</i>&nbsp;import org.w3c.dom.NodeList;
+<i>53</i>&nbsp;import org.xml.sax.InputSource;
+<i>54</i>&nbsp;import org.xml.sax.SAXException;
+<i>55</i>&nbsp;
+<i>56</i>&nbsp;import beast.app.beauti.PartitionContext;
+<i>57</i>&nbsp;import beast.core.BEASTInterface;
+<i>58</i>&nbsp;import beast.core.Distribution;
+<i>59</i>&nbsp;import beast.core.Input;
+<i>60</i>&nbsp;import beast.core.Input.Validate;
+<i>61</i>&nbsp;import beast.core.Logger;
+<i>62</i>&nbsp;import beast.core.Operator;
+<i>63</i>&nbsp;import beast.core.Param;
+<i>64</i>&nbsp;import beast.core.Runnable;
+<i>65</i>&nbsp;import beast.core.State;
+<i>66</i>&nbsp;import beast.core.parameter.Map;
+<i>67</i>&nbsp;import beast.core.parameter.Parameter;
+<i>68</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>69</i>&nbsp;import beast.core.util.Log;
+<i>70</i>&nbsp;import beast.evolution.alignment.Alignment;
+<i>71</i>&nbsp;import beast.evolution.alignment.Sequence;
+<i>72</i>&nbsp;import beast.evolution.tree.Tree;
+<i>73</i>&nbsp;
+<i>74</i>&nbsp;
+<i>75</i>&nbsp;/**
+<i>76</i>&nbsp; * XMLParser process Beast 2 XML and constructs an MCMC object
+<i>77</i>&nbsp; * &lt;p/&gt;
+<i>78</i>&nbsp; * &lt;p/&gt;
+<i>79</i>&nbsp; * Reserved elements (present in element2class map)
+<i>80</i>&nbsp; * &lt;distribution&gt;
+<i>81</i>&nbsp; * &lt;operator&gt;
+<i>82</i>&nbsp; * &lt;logger&gt;
+<i>83</i>&nbsp; * &lt;data&gt;
+<i>84</i>&nbsp; * &lt;sequence&gt;
+<i>85</i>&nbsp; * &lt;state&gt;
+<i>86</i>&nbsp; * &lt;parameter&gt;
+<i>87</i>&nbsp; * &lt;tree&gt;
+<i>88</i>&nbsp; * &lt;beast version=&#39;2.0&#39; namespace=&#39;x.y.z:&#39;&gt;
+<i>89</i>&nbsp; * &lt;map name=&#39;elementName&#39;&gt;x.y.z.Class&lt;/map&gt;
+<i>90</i>&nbsp; * &lt;run&gt;
+<i>91</i>&nbsp; * &lt;plate&gt;
+<i>92</i>&nbsp; * &lt;input&gt;
+<i>93</i>&nbsp; * &lt;p/&gt;
+<i>94</i>&nbsp; * Reserved attributes:
+<i>95</i>&nbsp; * &lt;input id=&#39;myId&#39; idRef=&#39;otherId&#39; name=&#39;inputName&#39; spec=&#39;x.y.z.MyClass&#39;/&gt;
+<i>96</i>&nbsp; * &lt;p/&gt;
+<i>97</i>&nbsp; * Reserved attribute formats:
+<i>98</i>&nbsp; * shortcut for idref inputs
+<i>99</i>&nbsp; * &lt;input xyz=&#39;@ref&#39;/&gt;
+<i>100</i>&nbsp; * ==
+<i>101</i>&nbsp; * &lt;input&gt;
+<i>102</i>&nbsp; * &lt;input name=&#39;xyz&#39; idref=&#39;ref&#39;/&gt;
+<i>103</i>&nbsp; * &lt;/input&gt;
+<i>104</i>&nbsp; * &lt;p/&gt;
+<i>105</i>&nbsp; * plate notations
+<i>106</i>&nbsp; * &lt;plate var=&#39;n&#39; range=&#39;1,2,3&#39;&gt;&lt;xyz id=&#39;id$(n)&#39;/&gt;&lt;/plate&gt;
+<i>107</i>&nbsp; * ==
+<i>108</i>&nbsp; * &lt;xyz id=&#39;id1&#39;/&gt;
+<i>109</i>&nbsp; * &lt;xyz id=&#39;id2&#39;/&gt;
+<i>110</i>&nbsp; * &lt;xyz id=&#39;id3&#39;/&gt;
+<i>111</i>&nbsp; * &lt;p/&gt;
+<i>112</i>&nbsp; * Resolving class:
+<i>113</i>&nbsp; * 1. specified in spec attribute
+<i>114</i>&nbsp; * 2. if not, get from element2class map
+<i>115</i>&nbsp; * 3. if not, use element name (and hope it shows up in the namespace somewhere).
+<i>116</i>&nbsp; * &lt;p/&gt;
+<i>117</i>&nbsp; * Resolving name:
+<i>118</i>&nbsp; * 1. specified in name attribute
+<i>119</i>&nbsp; * 2. if not, use (non-reserved) attribute name
+<i>120</i>&nbsp; * 3. if not, use element name
+<i>121</i>&nbsp; * 4. if input, use &#39;value&#39; when there is text content, but no element content
+<i>122</i>&nbsp; * &lt;p/&gt;
+<i>123</i>&nbsp; * Resolving value:
+<i>124</i>&nbsp; * 0. if idref is specified, use the referred object
+<i>125</i>&nbsp; * 1. specified in value attribute
+<i>126</i>&nbsp; * 2. if not, use value of (non-reserved) attribute
+<i>127</i>&nbsp; * 3. if not, use text content when there is text content, but no element content
+<i>128</i>&nbsp; * &lt;p/&gt;
+<i>129</i>&nbsp; * Parsing rules:
+<i>130</i>&nbsp; * &lt;p/&gt;
+<i>131</i>&nbsp; * Processing non reserved attributes
+<i>132</i>&nbsp; * &lt;input otherAttribute=&quot;xyz&quot;/&gt;
+<i>133</i>&nbsp; * equals
+<i>134</i>&nbsp; * &lt;input&gt;
+<i>135</i>&nbsp; * &lt;input name=&#39;otherAttribute&#39; value=&#39;xyz&#39;/&gt;
+<i>136</i>&nbsp; * &lt;/input&gt;
+<i>137</i>&nbsp; * &lt;p/&gt;
+<i>138</i>&nbsp; * Processing non reserved element names
+<i>139</i>&nbsp; * &lt;myElement/&gt;
+<i>140</i>&nbsp; * ==
+<i>141</i>&nbsp; * &lt;input spec=&#39;myElement&#39; name=&#39;myElement&#39;/&gt;
+<i>142</i>&nbsp; * unless &#39;spec&#39; is a specified attribute, then that overrides, likewise for &#39;name&#39;
+<i>143</i>&nbsp; * &lt;p/&gt;
+<i>144</i>&nbsp; * Processing of text content (only when there are no enclosing elements)
+<i>145</i>&nbsp; * &lt;input name=&#39;data&#39;&gt;xyz&lt;/input&gt;
+<i>146</i>&nbsp; * ==
+<i>147</i>&nbsp; * &lt;input name=&#39;data&#39; value=&#39;xyz/&gt;
+<i>148</i>&nbsp; *
+<i>149</i>&nbsp; * @author rrb
+<i>150</i>&nbsp; */
+<i>151</i>&nbsp;
+<i>152</i>&nbsp;
+<i>153</i>&nbsp;public class XMLParser {
+<b class="fc"><i>154</i>&nbsp;    final static String DATA_CLASS = Alignment.class.getName();</b>
+<b class="fc"><i>155</i>&nbsp;    final static String SEQUENCE_CLASS = Sequence.class.getName();</b>
+<b class="fc"><i>156</i>&nbsp;    final static String STATE_CLASS = State.class.getName();</b>
+<b class="fc"><i>157</i>&nbsp;    final static String LIKELIHOOD_CLASS = Distribution.class.getName();</b>
+<b class="fc"><i>158</i>&nbsp;    final static String LOG_CLASS = Logger.class.getName();</b>
+<b class="fc"><i>159</i>&nbsp;    final static String OPERATOR_CLASS = Operator.class.getName();</b>
+<b class="fc"><i>160</i>&nbsp;    final static String REAL_PARAMETER_CLASS = RealParameter.class.getName();</b>
+<b class="fc"><i>161</i>&nbsp;    final static String BEAST_INTERFACE_CLASS = BEASTInterface.class.getName();</b>
+<b class="fc"><i>162</i>&nbsp;    final static String INPUT_CLASS = Input.class.getName();</b>
+<b class="fc"><i>163</i>&nbsp;    final static String TREE_CLASS = Tree.class.getName();</b>
+<b class="fc"><i>164</i>&nbsp;    final static String RUNNABLE_CLASS = Runnable.class.getName();</b>
+<i>165</i>&nbsp;
+<i>166</i>&nbsp;
+<i>167</i>&nbsp;    /* This is the set of keywords in XML.
+<i>168</i>&nbsp;* This list should not be added to unless there
+<i>169</i>&nbsp;* is a very very good reason. */
+<i>170</i>&nbsp;    public final static String BEAST_ELEMENT = &quot;beast&quot;;
+<i>171</i>&nbsp;    public final static String MAP_ELEMENT = &quot;map&quot;;
+<i>172</i>&nbsp;    public final static String DISTRIBUTION_ELEMENT = &quot;distribution&quot;;
+<i>173</i>&nbsp;    public final static String OPERATOR_ELEMENT = &quot;operator&quot;;
+<i>174</i>&nbsp;    public final static String INPUT_ELEMENT = &quot;input&quot;;
+<i>175</i>&nbsp;    public final static String LOG_ELEMENT = &quot;logger&quot;;
+<i>176</i>&nbsp;    public final static String DATA_ELEMENT = &quot;data&quot;;
+<i>177</i>&nbsp;    public final static String SEQUENCE_ELEMENT = &quot;sequence&quot;;
+<i>178</i>&nbsp;    public final static String STATE_ELEMENT = &quot;state&quot;;
+<i>179</i>&nbsp;    public final static String TREE_ELEMENT = &quot;tree&quot;;
+<i>180</i>&nbsp;    public final static String REAL_PARAMETER_ELEMENT = &quot;parameter&quot;;
+<i>181</i>&nbsp;    public final static String RUN_ELEMENT = &quot;run&quot;;
+<i>182</i>&nbsp;    public final static String PLATE_ELEMENT = &quot;plate&quot;;
+<i>183</i>&nbsp;
+<i>184</i>&nbsp;    Runnable m_runnable;
+<i>185</i>&nbsp;    State m_state;
+<i>186</i>&nbsp;    /**
+<i>187</i>&nbsp;     * DOM document representation of XML file *
+<i>188</i>&nbsp;     */
+<i>189</i>&nbsp;    Document doc;
+<i>190</i>&nbsp;
+<i>191</i>&nbsp;    /**
+<i>192</i>&nbsp;     * maps sequence data onto integer value *
+<i>193</i>&nbsp;     */
+<i>194</i>&nbsp;    String m_sDataMap;
+<i>195</i>&nbsp;
+<i>196</i>&nbsp;    HashMap&lt;String, BEASTInterface&gt; IDMap;
+<i>197</i>&nbsp;    HashMap&lt;String, Integer[]&gt; likelihoodMap;
+<i>198</i>&nbsp;    HashMap&lt;String, Node&gt; IDNodeMap;
+<i>199</i>&nbsp;
+<i>200</i>&nbsp;
+<i>201</i>&nbsp;    static HashMap&lt;String, String&gt; element2ClassMap;
+<i>202</i>&nbsp;    static Set&lt;String&gt; reservedElements;
+<i>203</i>&nbsp;    static {
+<b class="fc"><i>204</i>&nbsp;        element2ClassMap = new HashMap&lt;&gt;();</b>
+<b class="fc"><i>205</i>&nbsp;        element2ClassMap.put(DISTRIBUTION_ELEMENT, LIKELIHOOD_CLASS);</b>
+<b class="fc"><i>206</i>&nbsp;        element2ClassMap.put(OPERATOR_ELEMENT, OPERATOR_CLASS);</b>
+<b class="fc"><i>207</i>&nbsp;        element2ClassMap.put(INPUT_ELEMENT, INPUT_CLASS);</b>
+<b class="fc"><i>208</i>&nbsp;        element2ClassMap.put(LOG_ELEMENT, LOG_CLASS);</b>
+<b class="fc"><i>209</i>&nbsp;        element2ClassMap.put(DATA_ELEMENT, DATA_CLASS);</b>
+<b class="fc"><i>210</i>&nbsp;        element2ClassMap.put(STATE_ELEMENT, STATE_CLASS);</b>
+<b class="fc"><i>211</i>&nbsp;        element2ClassMap.put(SEQUENCE_ELEMENT, SEQUENCE_CLASS);</b>
+<b class="fc"><i>212</i>&nbsp;        element2ClassMap.put(TREE_ELEMENT, TREE_CLASS);</b>
+<b class="fc"><i>213</i>&nbsp;        element2ClassMap.put(REAL_PARAMETER_ELEMENT, REAL_PARAMETER_CLASS);</b>
+<b class="fc"><i>214</i>&nbsp;        reservedElements = new HashSet&lt;&gt;();</b>
+<b class="fc"><i>215</i>&nbsp;        for (final String element : element2ClassMap.keySet()) {</b>
+<b class="fc"><i>216</i>&nbsp;        	reservedElements.add(element);</b>
+<b class="fc"><i>217</i>&nbsp;        }</b>
+<b class="fc"><i>218</i>&nbsp;    }</b>
+<i>219</i>&nbsp;
+<i>220</i>&nbsp;    public static class NameValuePair {
+<i>221</i>&nbsp;		String name;
+<i>222</i>&nbsp;		Object value;
+<i>223</i>&nbsp;		boolean processed;
+<b class="fc"><i>224</i>&nbsp;		public NameValuePair(String name, Object value) {</b>
+<b class="fc"><i>225</i>&nbsp;			this.name = name;</b>
+<b class="fc"><i>226</i>&nbsp;			this.value = value;</b>
+<b class="fc"><i>227</i>&nbsp;			processed = false;</b>
+<b class="fc"><i>228</i>&nbsp;		}</b>
+<i>229</i>&nbsp;	}
+<i>230</i>&nbsp;
+<i>231</i>&nbsp;    List&lt;BEASTInterface&gt; beastObjectsWaitingToInit;
+<i>232</i>&nbsp;    List&lt;Node&gt; nodesWaitingToInit;
+<i>233</i>&nbsp;
+<i>234</i>&nbsp;    public HashMap&lt;String, String&gt; getElement2ClassMap() {
+<b class="nc"><i>235</i>&nbsp;        return element2ClassMap;</b>
+<i>236</i>&nbsp;    }
+<i>237</i>&nbsp;
+<i>238</i>&nbsp;
+<i>239</i>&nbsp;    String[] nameSpaces;
+<i>240</i>&nbsp;
+<i>241</i>&nbsp;    /**
+<i>242</i>&nbsp;     * Flag to indicate initAndValidate should be called after
+<i>243</i>&nbsp;     * all inputs of a beast object have been parsed
+<i>244</i>&nbsp;     */
+<b class="fc"><i>245</i>&nbsp;    boolean needsInitialisation = true;</b>
+<i>246</i>&nbsp;
+<i>247</i>&nbsp;    /**
+<i>248</i>&nbsp;     * when parsing XML, missing inputs can be assigned default values through
+<i>249</i>&nbsp;     * a RequiredInputProvider
+<i>250</i>&nbsp;     */
+<b class="fc"><i>251</i>&nbsp;    RequiredInputProvider requiredInputProvider = null;</b>
+<b class="fc"><i>252</i>&nbsp;    PartitionContext partitionContext = null;</b>
+<i>253</i>&nbsp;
+<b class="fc"><i>254</i>&nbsp;    public XMLParser() {</b>
+<b class="fc"><i>255</i>&nbsp;        beastObjectsWaitingToInit = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>256</i>&nbsp;        nodesWaitingToInit = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>257</i>&nbsp;    }</b>
+<i>258</i>&nbsp;
+<i>259</i>&nbsp;    public Runnable parseFile(final File file) throws SAXException, IOException, ParserConfigurationException, XMLParserException {
+<i>260</i>&nbsp;        // parse the XML file into a DOM document
+<b class="fc"><i>261</i>&nbsp;        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();</b>
+<i>262</i>&nbsp;        //factory.setValidating(true);
+<b class="fc"><i>263</i>&nbsp;        doc = factory.newDocumentBuilder().parse(file);</b>
+<b class="fc"><i>264</i>&nbsp;        doc.normalize();</b>
+<b class="fc"><i>265</i>&nbsp;        processPlates(doc,PLATE_ELEMENT);</b>
+<i>266</i>&nbsp;
+<i>267</i>&nbsp;        // Substitute occurrences of &quot;$(filebase)&quot; with name of file 
+<b class="fc"><i>268</i>&nbsp;        int pointIdx = file.getName().lastIndexOf(&#39;.&#39;);</b>
+<b class="fc"><i>269</i>&nbsp;        String baseName = pointIdx&lt;0 ? file.getName() : file.getName().substring(0, pointIdx);</b>
+<b class="fc"><i>270</i>&nbsp;        if (doc.getElementsByTagName(BEAST_ELEMENT).item(0) == null) {</b>
+<b class="nc"><i>271</i>&nbsp;        	Log.err.println(&quot;Incorrect XML: Could not find &#39;beast&#39; element in file &quot; + file.getName());</b>
+<b class="nc"><i>272</i>&nbsp;        	throw new RuntimeException();</b>
+<i>273</i>&nbsp;        }
+<b class="fc"><i>274</i>&nbsp;        replaceVariable(doc.getElementsByTagName(BEAST_ELEMENT).item(0), &quot;filebase&quot;, baseName);</b>
+<i>275</i>&nbsp;
+<i>276</i>&nbsp;        // Substitute occurrences of &quot;$(seed)&quot; with RNG seed
+<b class="fc"><i>277</i>&nbsp;        replaceVariable(doc.getElementsByTagName(BEAST_ELEMENT).item(0), &quot;seed&quot;,</b>
+<b class="fc"><i>278</i>&nbsp;                String.valueOf(Randomizer.getSeed()));</b>
+<i>279</i>&nbsp;        
+<b class="fc"><i>280</i>&nbsp;        IDMap = new HashMap&lt;&gt;();</b>
+<b class="fc"><i>281</i>&nbsp;        likelihoodMap = new HashMap&lt;&gt;();</b>
+<b class="fc"><i>282</i>&nbsp;        IDNodeMap = new HashMap&lt;&gt;();</b>
+<i>283</i>&nbsp;
+<i>284</i>&nbsp;        
+<b class="fc"><i>285</i>&nbsp;        parse();</b>
+<i>286</i>&nbsp;        //assert m_runnable == null || m_runnable instanceof Runnable;
+<b class="fc"><i>287</i>&nbsp;        if (m_runnable != null)</b>
+<b class="fc"><i>288</i>&nbsp;            return m_runnable;</b>
+<i>289</i>&nbsp;        else {
+<b class="nc"><i>290</i>&nbsp;            throw new XMLParserException(&quot;Run element does not point to a runnable object.&quot;);</b>
+<i>291</i>&nbsp;        }
+<i>292</i>&nbsp;    } // parseFile
+<i>293</i>&nbsp;
+<i>294</i>&nbsp;    /**
+<i>295</i>&nbsp;     * extract all elements (runnable or not) from an XML fragment.
+<i>296</i>&nbsp;     * Useful for retrieving all non-runnable elements when a template
+<i>297</i>&nbsp;     * is instantiated by Beauti 
+<i>298</i>&nbsp;     * @throws ParserConfigurationException 
+<i>299</i>&nbsp;     * @throws IOException 
+<i>300</i>&nbsp;     * @throws SAXException *
+<i>301</i>&nbsp;     */
+<i>302</i>&nbsp;    public List&lt;BEASTInterface&gt; parseTemplate(final String xml, final HashMap&lt;String, BEASTInterface&gt; idMap, final boolean initialise) throws XMLParserException, SAXException, IOException, ParserConfigurationException {
+<b class="nc"><i>303</i>&nbsp;        needsInitialisation = initialise;</b>
+<i>304</i>&nbsp;        // parse the XML file into a DOM document
+<b class="nc"><i>305</i>&nbsp;        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();</b>
+<i>306</i>&nbsp;        //factory.setValidating(true);
+<b class="nc"><i>307</i>&nbsp;        doc = factory.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));</b>
+<b class="nc"><i>308</i>&nbsp;        doc.normalize();</b>
+<b class="nc"><i>309</i>&nbsp;        processPlates(doc,PLATE_ELEMENT);</b>
+<i>310</i>&nbsp;        
+<i>311</i>&nbsp;        //XMLParserUtils.saveDocAsXML(doc, &quot;/tmp/beast2.xml&quot;);
+<i>312</i>&nbsp;
+<b class="nc"><i>313</i>&nbsp;        IDMap = idMap;//new HashMap&lt;&gt;();</b>
+<b class="nc"><i>314</i>&nbsp;        likelihoodMap = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>315</i>&nbsp;        IDNodeMap = new HashMap&lt;&gt;();</b>
+<i>316</i>&nbsp;
+<b class="nc"><i>317</i>&nbsp;        final List&lt;BEASTInterface&gt; beastObjects = new ArrayList&lt;&gt;();</b>
+<i>318</i>&nbsp;
+<i>319</i>&nbsp;        // find top level beast element
+<b class="nc"><i>320</i>&nbsp;        final NodeList nodes = doc.getElementsByTagName(&quot;*&quot;);</b>
+<b class="nc"><i>321</i>&nbsp;        if (nodes == null || nodes.getLength() == 0) {</b>
+<b class="nc"><i>322</i>&nbsp;            throw new XMLParserException(&quot;Expected top level beast element in XML&quot;);</b>
+<i>323</i>&nbsp;        }
+<b class="nc"><i>324</i>&nbsp;        final Node topNode = nodes.item(0);</b>
+<i>325</i>&nbsp;        // sanity check that we are reading a beast 2 file
+<b class="nc"><i>326</i>&nbsp;        final double version = getAttributeAsDouble(topNode, &quot;version&quot;);</b>
+<b class="nc"><i>327</i>&nbsp;        if (!topNode.getNodeName().equals(BEAST_ELEMENT) || version &lt; 2.0 || version == Double.MAX_VALUE) {</b>
+<b class="nc"><i>328</i>&nbsp;            return beastObjects;</b>
+<i>329</i>&nbsp;        }
+<i>330</i>&nbsp;        // only process templates
+<i>331</i>&nbsp;//        String typeName = getAttribute(topNode, &quot;type&quot;);
+<i>332</i>&nbsp;//        if (typeName == null || !typeName.equals(&quot;template&quot;)) {
+<i>333</i>&nbsp;//        	return beastObjects;
+<i>334</i>&nbsp;//        }
+<i>335</i>&nbsp;
+<i>336</i>&nbsp;
+<b class="nc"><i>337</i>&nbsp;        initIDNodeMap(topNode);</b>
+<b class="nc"><i>338</i>&nbsp;        parseNameSpaceAndMap(topNode);</b>
+<i>339</i>&nbsp;
+<b class="nc"><i>340</i>&nbsp;        final NodeList children = topNode.getChildNodes();</b>
+<b class="nc"><i>341</i>&nbsp;        for (int i = 0; i &lt; children.getLength(); i++) {</b>
+<b class="nc"><i>342</i>&nbsp;            if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {</b>
+<b class="nc"><i>343</i>&nbsp;                final Node child = children.item(i);</b>
+<b class="nc"><i>344</i>&nbsp;                Log.warning.println(child.getNodeName());</b>
+<b class="nc"><i>345</i>&nbsp;                if (!child.getNodeName().equals(MAP_ELEMENT)) {</b>
+<b class="nc"><i>346</i>&nbsp;                    beastObjects.add(createObject(child, BEAST_INTERFACE_CLASS));</b>
+<i>347</i>&nbsp;                }
+<i>348</i>&nbsp;            }
+<i>349</i>&nbsp;        }
+<b class="nc"><i>350</i>&nbsp;        initBEASTObjects();</b>
+<b class="nc"><i>351</i>&nbsp;        return beastObjects;</b>
+<i>352</i>&nbsp;    } // parseTemplate
+<i>353</i>&nbsp;
+<i>354</i>&nbsp;    private void initBEASTObjects() throws XMLParserException {
+<b class="fc"><i>355</i>&nbsp;    	Node node = null;</b>
+<i>356</i>&nbsp;        try {
+<b class="fc"><i>357</i>&nbsp;        	for (int i = 0; i &lt; beastObjectsWaitingToInit.size(); i++) {</b>
+<b class="fc"><i>358</i>&nbsp;        		final BEASTInterface beastObject = beastObjectsWaitingToInit.get(i);</b>
+<b class="fc"><i>359</i>&nbsp;        		node = nodesWaitingToInit.get(i);</b>
+<b class="fc"><i>360</i>&nbsp;        		beastObject.initAndValidate();</b>
+<i>361</i>&nbsp;        	}
+<b class="nc"><i>362</i>&nbsp;        } catch (Exception e) {</b>
+<i>363</i>&nbsp;            // next lines for debugging only
+<i>364</i>&nbsp;            //beastObject.validateInputs();
+<i>365</i>&nbsp;            //beastObject.initAndValidate();
+<b class="nc"><i>366</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>367</i>&nbsp;            throw new XMLParserException(node, &quot;validate and intialize error: &quot; + e.getMessage(), 110);</b>
+<b class="fc"><i>368</i>&nbsp;        }</b>
+<b class="fc"><i>369</i>&nbsp;	}</b>
+<i>370</i>&nbsp;
+<i>371</i>&nbsp;    /**
+<i>372</i>&nbsp;     * Parse an XML fragment representing a Plug-in
+<i>373</i>&nbsp;     * Only the run element or if that does not exist the last child element of
+<i>374</i>&nbsp;     * the top level &lt;beast&gt; element is considered.
+<i>375</i>&nbsp;     * @throws XMLParserException 
+<i>376</i>&nbsp;     */
+<i>377</i>&nbsp;    public BEASTInterface parseFragment(final String xml, final boolean initialise) throws XMLParserException  {
+<b class="nc"><i>378</i>&nbsp;        needsInitialisation = initialise;</b>
+<i>379</i>&nbsp;        // parse the XML fragment into a DOM document
+<b class="nc"><i>380</i>&nbsp;        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();</b>
+<i>381</i>&nbsp;        try {
+<b class="nc"><i>382</i>&nbsp;			doc = factory.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));</b>
+<b class="nc"><i>383</i>&nbsp;		} catch (SAXException | IOException | ParserConfigurationException e) {</b>
+<b class="nc"><i>384</i>&nbsp;			throw new RuntimeException(e);</b>
+<b class="nc"><i>385</i>&nbsp;		}</b>
+<b class="nc"><i>386</i>&nbsp;        doc.normalize();</b>
+<b class="nc"><i>387</i>&nbsp;        processPlates(doc,PLATE_ELEMENT);</b>
+<i>388</i>&nbsp;
+<b class="nc"><i>389</i>&nbsp;        IDMap = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>390</i>&nbsp;        likelihoodMap = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>391</i>&nbsp;        IDNodeMap = new HashMap&lt;&gt;();</b>
+<i>392</i>&nbsp;
+<i>393</i>&nbsp;        // find top level beast element
+<b class="nc"><i>394</i>&nbsp;        final NodeList nodes = doc.getElementsByTagName(&quot;*&quot;);</b>
+<b class="nc"><i>395</i>&nbsp;        if (nodes == null || nodes.getLength() == 0) {</b>
+<b class="nc"><i>396</i>&nbsp;            throw new XMLParserException(&quot;Expected top level beast element in XML&quot;);</b>
+<i>397</i>&nbsp;        }
+<b class="nc"><i>398</i>&nbsp;        final Node topNode = nodes.item(0);</b>
+<b class="nc"><i>399</i>&nbsp;        initIDNodeMap(topNode);</b>
+<b class="nc"><i>400</i>&nbsp;        parseNameSpaceAndMap(topNode);</b>
+<i>401</i>&nbsp;
+<b class="nc"><i>402</i>&nbsp;        final NodeList children = topNode.getChildNodes();</b>
+<b class="nc"><i>403</i>&nbsp;        if (children.getLength() == 0) {</b>
+<b class="nc"><i>404</i>&nbsp;            throw new XMLParserException(&quot;Need at least one child element&quot;);</b>
+<i>405</i>&nbsp;        }
+<b class="nc"><i>406</i>&nbsp;        int i = children.getLength() - 1;</b>
+<b class="nc"><i>407</i>&nbsp;        while (i &gt;= 0 &amp;&amp; (children.item(i).getNodeType() != Node.ELEMENT_NODE ||</b>
+<b class="nc"><i>408</i>&nbsp;                !children.item(i).getNodeName().equals(&quot;run&quot;))) {</b>
+<b class="nc"><i>409</i>&nbsp;            i--;</b>
+<i>410</i>&nbsp;        }
+<b class="nc"><i>411</i>&nbsp;        if (i &lt; 0) {</b>
+<b class="nc"><i>412</i>&nbsp;            i = children.getLength() - 1;</b>
+<b class="nc"><i>413</i>&nbsp;            while (i &gt;= 0 &amp;&amp; children.item(i).getNodeType() != Node.ELEMENT_NODE) {</b>
+<b class="nc"><i>414</i>&nbsp;                i--;</b>
+<i>415</i>&nbsp;            }
+<i>416</i>&nbsp;        }
+<b class="nc"><i>417</i>&nbsp;        if (i &lt; 0) {</b>
+<b class="nc"><i>418</i>&nbsp;            throw new XMLParserException(&quot;Need at least one child element&quot;);</b>
+<i>419</i>&nbsp;        }
+<i>420</i>&nbsp;
+<b class="nc"><i>421</i>&nbsp;        final BEASTInterface beastObject = createObject(children.item(i), BEAST_INTERFACE_CLASS);</b>
+<b class="nc"><i>422</i>&nbsp;        initBEASTObjects();</b>
+<b class="nc"><i>423</i>&nbsp;        return beastObject;</b>
+<i>424</i>&nbsp;    } // parseFragment
+<i>425</i>&nbsp;
+<i>426</i>&nbsp;    /**
+<i>427</i>&nbsp;     * Parse XML fragment that will be wrapped in a beast element
+<i>428</i>&nbsp;     * before parsing. This allows for ease of creating beast objects,
+<i>429</i>&nbsp;     * like this:
+<i>430</i>&nbsp;     * Tree tree = (Tree) new XMLParser().parseBareFragment(&quot;&lt;tree spec=&#39;beast.util.TreeParser&#39; newick=&#39;((1:1,3:1):1,2:2)&#39;/&gt;&quot;);
+<i>431</i>&nbsp;     * to create a simple tree.
+<i>432</i>&nbsp;     */
+<i>433</i>&nbsp;    public BEASTInterface parseBareFragment(String xml, final boolean initialise) throws XMLParserException {
+<i>434</i>&nbsp;        // get rid of XML processing instruction
+<b class="nc"><i>435</i>&nbsp;        xml = xml.replaceAll(&quot;&lt;\\?xml[^&gt;]*&gt;&quot;, &quot;&quot;);</b>
+<b class="nc"><i>436</i>&nbsp;        if (xml.contains(&quot;&lt;beast&quot;)) {</b>
+<b class="nc"><i>437</i>&nbsp;            return parseFragment(xml, initialise);</b>
+<i>438</i>&nbsp;        } else {
+<b class="nc"><i>439</i>&nbsp;            return parseFragment(&quot;&lt;beast&gt;&quot; + xml + &quot;&lt;/beast&gt;&quot;, initialise);</b>
+<i>440</i>&nbsp;        }
+<i>441</i>&nbsp;    }
+<i>442</i>&nbsp;
+<i>443</i>&nbsp;    public List&lt;BEASTInterface&gt; parseBareFragments(final String xml, final boolean initialise) throws XMLParserException, SAXException, IOException, ParserConfigurationException {
+<b class="nc"><i>444</i>&nbsp;        needsInitialisation = initialise;</b>
+<i>445</i>&nbsp;        // parse the XML fragment into a DOM document
+<b class="nc"><i>446</i>&nbsp;        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();</b>
+<b class="nc"><i>447</i>&nbsp;        doc = factory.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));</b>
+<b class="nc"><i>448</i>&nbsp;        doc.normalize();</b>
+<b class="nc"><i>449</i>&nbsp;        processPlates(doc,PLATE_ELEMENT);</b>
+<i>450</i>&nbsp;
+<i>451</i>&nbsp;        // find top level beast element
+<b class="nc"><i>452</i>&nbsp;        final NodeList nodes = doc.getElementsByTagName(&quot;*&quot;);</b>
+<b class="nc"><i>453</i>&nbsp;        if (nodes == null || nodes.getLength() == 0) {</b>
+<b class="nc"><i>454</i>&nbsp;            throw new XMLParserException(&quot;Expected top level beast element in XML&quot;);</b>
+<i>455</i>&nbsp;        }
+<b class="nc"><i>456</i>&nbsp;        final Node topNode = nodes.item(0);</b>
+<b class="nc"><i>457</i>&nbsp;        initIDNodeMap(topNode);</b>
+<b class="nc"><i>458</i>&nbsp;        parseNameSpaceAndMap(topNode);</b>
+<i>459</i>&nbsp;
+<b class="nc"><i>460</i>&nbsp;        final NodeList children = topNode.getChildNodes();</b>
+<b class="nc"><i>461</i>&nbsp;        final List&lt;BEASTInterface&gt; beastObjects = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>462</i>&nbsp;        for (int i = 0; i &lt; children.getLength(); i++) {</b>
+<b class="nc"><i>463</i>&nbsp;            if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {</b>
+<b class="nc"><i>464</i>&nbsp;                final BEASTInterface beastObject = createObject(children.item(i), BEAST_INTERFACE_CLASS);</b>
+<b class="nc"><i>465</i>&nbsp;                beastObjects.add(beastObject);</b>
+<i>466</i>&nbsp;            }
+<i>467</i>&nbsp;        }
+<b class="nc"><i>468</i>&nbsp;        initBEASTObjects();</b>
+<b class="nc"><i>469</i>&nbsp;        return beastObjects;</b>
+<i>470</i>&nbsp;    }
+<i>471</i>&nbsp;
+<i>472</i>&nbsp;    /**
+<i>473</i>&nbsp;     * parse BEAST file as DOM document
+<i>474</i>&nbsp;     * @throws XMLParserException 
+<i>475</i>&nbsp;     */
+<i>476</i>&nbsp;    public void parse() throws XMLParserException {
+<i>477</i>&nbsp;        // find top level beast element
+<b class="fc"><i>478</i>&nbsp;        final NodeList nodes = doc.getElementsByTagName(&quot;*&quot;);</b>
+<b class="fc"><i>479</i>&nbsp;        if (nodes == null || nodes.getLength() == 0) {</b>
+<b class="nc"><i>480</i>&nbsp;            throw new XMLParserException(&quot;Expected top level beast element in XML&quot;);</b>
+<i>481</i>&nbsp;        }
+<b class="fc"><i>482</i>&nbsp;        final Node topNode = nodes.item(0);</b>
+<b class="fc"><i>483</i>&nbsp;        final double version = getAttributeAsDouble(topNode, &quot;version&quot;);</b>
+<b class="fc"><i>484</i>&nbsp;        if (version &lt; 2.0 || version == Double.MAX_VALUE) {</b>
+<b class="nc"><i>485</i>&nbsp;            throw new XMLParserException(topNode, &quot;Wrong version: only versions &gt; 2.0 are supported&quot;, 101);</b>
+<i>486</i>&nbsp;        }
+<i>487</i>&nbsp;
+<b class="fc"><i>488</i>&nbsp;        initIDNodeMap(topNode);</b>
+<b class="fc"><i>489</i>&nbsp;        parseNameSpaceAndMap(topNode);</b>
+<i>490</i>&nbsp;
+<i>491</i>&nbsp;        //parseState();
+<b class="fc"><i>492</i>&nbsp;        parseRunElement(topNode);</b>
+<b class="fc"><i>493</i>&nbsp;        initBEASTObjects();</b>
+<b class="fc"><i>494</i>&nbsp;    } // parse</b>
+<i>495</i>&nbsp;
+<i>496</i>&nbsp;
+<i>497</i>&nbsp;    /**
+<i>498</i>&nbsp;     * Traverse DOM beast.tree and grab all nodes that have an &#39;id&#39; attribute
+<i>499</i>&nbsp;     * Throw exception when a duplicate id is encountered
+<i>500</i>&nbsp;     *
+<i>501</i>&nbsp;     * @param node
+<i>502</i>&nbsp;     * @throws XMLParserException
+<i>503</i>&nbsp;     */
+<i>504</i>&nbsp;    void initIDNodeMap(final Node node) throws XMLParserException {
+<b class="fc"><i>505</i>&nbsp;        final String id = getID(node);</b>
+<b class="fc"><i>506</i>&nbsp;        if (id != null) {</b>
+<b class="fc"><i>507</i>&nbsp;            if (IDNodeMap.containsKey(id)) {</b>
+<b class="nc"><i>508</i>&nbsp;                throw new XMLParserException(node, &quot;IDs should be unique. Duplicate id &#39;&quot; + id + &quot;&#39; found&quot;, 104);</b>
+<i>509</i>&nbsp;            }
+<b class="fc"><i>510</i>&nbsp;            IDNodeMap.put(id, node);</b>
+<i>511</i>&nbsp;        }
+<b class="fc"><i>512</i>&nbsp;        final NodeList children = node.getChildNodes();</b>
+<b class="fc"><i>513</i>&nbsp;        for (int i = 0; i &lt; children.getLength(); i++) {</b>
+<b class="fc"><i>514</i>&nbsp;            initIDNodeMap(children.item(i));</b>
+<i>515</i>&nbsp;        }
+<b class="fc"><i>516</i>&nbsp;    }</b>
+<i>517</i>&nbsp;
+<i>518</i>&nbsp;    /**
+<i>519</i>&nbsp;     * find out namespaces (beast/@namespace attribute)
+<i>520</i>&nbsp;     * and element to class maps, which reside in beast/map elements
+<i>521</i>&nbsp;     * &lt;beast version=&#39;2.0&#39; namespace=&#39;snap:beast.util&#39;&gt;
+<i>522</i>&nbsp;     * &lt;map name=&#39;snapprior&#39;&gt;snap.likelihood.SnAPPrior&lt;/map&gt;
+<i>523</i>&nbsp;     * &lt;map name=&#39;snaplikelihood&#39;&gt;snap.likelihood.SnAPTreeLikelihood&lt;/map&gt;
+<i>524</i>&nbsp;     *
+<i>525</i>&nbsp;     * @param topNode
+<i>526</i>&nbsp;     * @throws XMLParserException
+<i>527</i>&nbsp;     */
+<i>528</i>&nbsp;    void parseNameSpaceAndMap(final Node topNode) throws XMLParserException {
+<i>529</i>&nbsp;        // process namespaces
+<b class="fc"><i>530</i>&nbsp;        if (hasAtt(topNode, &quot;namespace&quot;)) {</b>
+<b class="fc"><i>531</i>&nbsp;            final String nameSpace = getAttribute(topNode, &quot;namespace&quot;);</b>
+<b class="fc"><i>532</i>&nbsp;            setNameSpace(nameSpace);</b>
+<b class="fc"><i>533</i>&nbsp;        } else {</b>
+<i>534</i>&nbsp;            // make sure that the default namespace is in there
+<b class="nc"><i>535</i>&nbsp;            if (this.nameSpaces == null) {</b>
+<b class="nc"><i>536</i>&nbsp;                this.nameSpaces = new String[1];</b>
+<b class="nc"><i>537</i>&nbsp;                this.nameSpaces[0] = &quot;&quot;;</b>
+<i>538</i>&nbsp;            }
+<i>539</i>&nbsp;        }
+<i>540</i>&nbsp;
+<i>541</i>&nbsp;        // process map elements
+<b class="fc"><i>542</i>&nbsp;        final NodeList nodes = doc.getElementsByTagName(MAP_ELEMENT);</b>
+<b class="fc"><i>543</i>&nbsp;        for (int i = 0; i &lt; nodes.getLength(); i++) {</b>
+<b class="nc"><i>544</i>&nbsp;            final Node child = nodes.item(i);</b>
+<b class="nc"><i>545</i>&nbsp;            final String name = getAttribute(child, &quot;name&quot;);</b>
+<b class="nc"><i>546</i>&nbsp;            if (name == null) {</b>
+<b class="nc"><i>547</i>&nbsp;                throw new XMLParserException(child, &quot;name attribute expected in map element&quot;, 300);</b>
+<i>548</i>&nbsp;            }
+<b class="nc"><i>549</i>&nbsp;            if (!element2ClassMap.containsKey(name)) {</b>
+<i>550</i>&nbsp;//                throw new XMLParserException(child, &quot;name &#39;&quot; + name + &quot;&#39; is already defined as &quot; + m_sElement2ClassMap.get(name), 301);
+<i>551</i>&nbsp;//            }
+<i>552</i>&nbsp;
+<i>553</i>&nbsp;	            // get class
+<b class="nc"><i>554</i>&nbsp;	            String clazz = child.getTextContent();</b>
+<i>555</i>&nbsp;	            // remove spaces
+<b class="nc"><i>556</i>&nbsp;	            clazz = clazz.replaceAll(&quot;\\s&quot;, &quot;&quot;);</b>
+<i>557</i>&nbsp;	            // go through namespaces in order they are declared to find the correct class
+<b class="nc"><i>558</i>&nbsp;	            boolean isDone = false;</b>
+<b class="nc"><i>559</i>&nbsp;	            for (final String nameSpace : this.nameSpaces) {</b>
+<i>560</i>&nbsp;	                try {
+<i>561</i>&nbsp;	                    // sanity check: class should exist
+<b class="nc"><i>562</i>&nbsp;	                    if (!isDone &amp;&amp; Class.forName(nameSpace + clazz) != null) {</b>
+<b class="nc"><i>563</i>&nbsp;	                        element2ClassMap.put(name, clazz);</b>
+<b class="nc"><i>564</i>&nbsp;	                        Log.debug.println(name + &quot; =&gt; &quot; + nameSpace + clazz);</b>
+<b class="nc"><i>565</i>&nbsp;	                        final String reserved = getAttribute(child, &quot;reserved&quot;);</b>
+<b class="nc"><i>566</i>&nbsp;	                        if (reserved != null &amp;&amp; reserved.toLowerCase().equals(&quot;true&quot;)) {</b>
+<b class="nc"><i>567</i>&nbsp;	                        	reservedElements.add(name);</b>
+<i>568</i>&nbsp;	                        }
+<i>569</i>&nbsp;	
+<b class="nc"><i>570</i>&nbsp;	                        isDone = true;</b>
+<i>571</i>&nbsp;	                    }
+<b class="nc"><i>572</i>&nbsp;	                } catch (ClassNotFoundException e) {</b>
+<i>573</i>&nbsp;	                    // Log.warning.println(&quot;Not found &quot; + e.getMessage());
+<i>574</i>&nbsp;	                    // TODO: handle exception
+<b class="nc"><i>575</i>&nbsp;	                }</b>
+<i>576</i>&nbsp;	            }
+<i>577</i>&nbsp;            }
+<i>578</i>&nbsp;        }
+<b class="fc"><i>579</i>&nbsp;    } // parseNameSpaceAndMap</b>
+<i>580</i>&nbsp;
+<i>581</i>&nbsp;    public void setNameSpace(final String nameSpaceStr) {
+<b class="fc"><i>582</i>&nbsp;        final String[] nameSpaces = nameSpaceStr.split(&quot;:&quot;);</b>
+<i>583</i>&nbsp;        // append dot after every non-zero namespace
+<b class="fc"><i>584</i>&nbsp;        this.nameSpaces = new String[nameSpaces.length + 1];</b>
+<b class="fc"><i>585</i>&nbsp;        int i = 0;</b>
+<b class="fc"><i>586</i>&nbsp;        for (String nameSpace : nameSpaces) {</b>
+<b class="fc"><i>587</i>&nbsp;            nameSpace = nameSpace.trim();</b>
+<b class="fc"><i>588</i>&nbsp;            if (nameSpace.length() &gt; 0) {</b>
+<b class="fc"><i>589</i>&nbsp;                if (nameSpace.charAt(nameSpace.length() - 1) != &#39;.&#39;) {</b>
+<b class="fc"><i>590</i>&nbsp;                    nameSpace += &#39;.&#39;;</b>
+<i>591</i>&nbsp;                }
+<i>592</i>&nbsp;            }
+<b class="fc"><i>593</i>&nbsp;            this.nameSpaces[i++] = nameSpace;</b>
+<i>594</i>&nbsp;        }
+<i>595</i>&nbsp;        // make sure that the default namespace is in there
+<b class="fc"><i>596</i>&nbsp;        this.nameSpaces[i] = &quot;&quot;;</b>
+<b class="fc"><i>597</i>&nbsp;    }</b>
+<i>598</i>&nbsp;
+<i>599</i>&nbsp;    void parseRunElement(final Node topNode) throws XMLParserException {
+<i>600</i>&nbsp;        // find mcmc element
+<b class="fc"><i>601</i>&nbsp;        final NodeList nodes = doc.getElementsByTagName(RUN_ELEMENT);</b>
+<b class="fc"><i>602</i>&nbsp;        if (nodes.getLength() == 0) {</b>
+<b class="nc"><i>603</i>&nbsp;            throw new XMLParserException(topNode, &quot;Expected run element in file&quot;, 102);</b>
+<i>604</i>&nbsp;        }
+<b class="fc"><i>605</i>&nbsp;        if (nodes.getLength() &gt; 1) {</b>
+<b class="nc"><i>606</i>&nbsp;            throw new XMLParserException(topNode, &quot;Expected only one mcmc element in file, not &quot; + nodes.getLength(), 103);</b>
+<i>607</i>&nbsp;        }
+<b class="fc"><i>608</i>&nbsp;        final Node mcmc = nodes.item(0);</b>
+<i>609</i>&nbsp;
+<b class="fc"><i>610</i>&nbsp;        m_runnable = (Runnable) createObject(mcmc, RUNNABLE_CLASS);</b>
+<b class="fc"><i>611</i>&nbsp;    } // parseMCMC</b>
+<i>612</i>&nbsp;
+<i>613</i>&nbsp;    /**
+<i>614</i>&nbsp;     * Check that beast object is a class that is assignable to class with name className.
+<i>615</i>&nbsp;     * This involves a parameter clutch to deal with non-real parameters.
+<i>616</i>&nbsp;     * This needs a bit of work, obviously...
+<i>617</i>&nbsp;     * @throws ClassNotFoundException 
+<i>618</i>&nbsp;     */
+<i>619</i>&nbsp;    boolean checkType(final String className, final BEASTInterface beastObject, Node node) throws XMLParserException  {
+<i>620</i>&nbsp;        try {
+<b class="nc"><i>621</i>&nbsp;			if (className.equals(INPUT_CLASS) || Class.forName(className).isInstance(beastObject)) {</b>
+<b class="nc"><i>622</i>&nbsp;			    return true;</b>
+<i>623</i>&nbsp;			}
+<b class="nc"><i>624</i>&nbsp;		} catch (ClassNotFoundException e) {</b>
+<b class="nc"><i>625</i>&nbsp;			throw new XMLParserException(node, &quot;Class not found:&quot; + e.getMessage(), 444);</b>
+<b class="nc"><i>626</i>&nbsp;		}</b>
+<i>627</i>&nbsp;        // parameter clutch
+<b class="nc"><i>628</i>&nbsp;        if (className.equals(RealParameter.class.getName()) &amp;&amp; beastObject instanceof Parameter&lt;?&gt;) {</b>
+<b class="nc"><i>629</i>&nbsp;            return true;</b>
+<i>630</i>&nbsp;        }
+<b class="nc"><i>631</i>&nbsp;        return false;</b>
+<i>632</i>&nbsp;    } // checkType
+<i>633</i>&nbsp;
+<i>634</i>&nbsp;    BEASTInterface createObject(final Node node, final String classname) throws XMLParserException {
+<i>635</i>&nbsp;        // try the IDMap first
+<b class="fc"><i>636</i>&nbsp;        final String id = getID(node);</b>
+<i>637</i>&nbsp;
+<b class="fc"><i>638</i>&nbsp;        if (id != null) {</b>
+<b class="fc"><i>639</i>&nbsp;            if (IDMap.containsKey(id)) {</b>
+<b class="nc"><i>640</i>&nbsp;                final BEASTInterface beastObject = IDMap.get(id);</b>
+<b class="nc"><i>641</i>&nbsp;                if (checkType(classname, beastObject, node)) {</b>
+<b class="nc"><i>642</i>&nbsp;                    return beastObject;</b>
+<i>643</i>&nbsp;                }
+<b class="nc"><i>644</i>&nbsp;                throw new XMLParserException(node, &quot;id=&quot; + id + &quot;. Expected object of type &quot; + classname + &quot; instead of &quot; + beastObject.getClass().getName(), 105);</b>
+<i>645</i>&nbsp;            }
+<i>646</i>&nbsp;        }
+<i>647</i>&nbsp;
+<b class="fc"><i>648</i>&nbsp;        final String dRef = getIDRef(node);</b>
+<b class="fc"><i>649</i>&nbsp;        if (dRef != null) {</b>
+<i>650</i>&nbsp;            // produce warning if there are other attributes than idref
+<b class="nc"><i>651</i>&nbsp;            if (node.getAttributes().getLength() &gt; 1) {</b>
+<i>652</i>&nbsp;                // check if there are just 2 attributes and other attribute is &#39;name&#39; and/or &#39;id&#39;
+<b class="nc"><i>653</i>&nbsp;            	final int offset = (getAttribute(node, &quot;id&quot;) == null? 0: 1) + (getAttribute(node, &quot;name&quot;) == null? 0: 1);</b>
+<b class="nc"><i>654</i>&nbsp;                if (node.getAttributes().getLength() &gt; 1 + offset) {</b>
+<b class="nc"><i>655</i>&nbsp;                    Log.warning.println(&quot;Element &quot; + node.getNodeName() + &quot; found with idref=&#39;&quot; + dRef + &quot;&#39;. All other attributes are ignored.\n&quot;);</b>
+<i>656</i>&nbsp;                }
+<i>657</i>&nbsp;            }
+<b class="nc"><i>658</i>&nbsp;            if (IDMap.containsKey(dRef)) {</b>
+<b class="nc"><i>659</i>&nbsp;                final BEASTInterface beastObject = IDMap.get(dRef);</b>
+<b class="nc"><i>660</i>&nbsp;                if (checkType(classname, beastObject, node)) {</b>
+<b class="nc"><i>661</i>&nbsp;                    return beastObject;</b>
+<i>662</i>&nbsp;                }
+<b class="nc"><i>663</i>&nbsp;                throw new XMLParserException(node, &quot;id=&quot; + dRef + &quot;. Expected object of type &quot; + classname + &quot; instead of &quot; + beastObject.getClass().getName(), 106);</b>
+<b class="nc"><i>664</i>&nbsp;            } else if (IDNodeMap.containsKey(dRef)) {</b>
+<b class="nc"><i>665</i>&nbsp;                final BEASTInterface beastObject = createObject(IDNodeMap.get(dRef), classname);</b>
+<b class="nc"><i>666</i>&nbsp;                if (checkType(classname, beastObject, node)) {</b>
+<b class="nc"><i>667</i>&nbsp;                    return beastObject;</b>
+<i>668</i>&nbsp;                }
+<b class="nc"><i>669</i>&nbsp;                throw new XMLParserException(node, &quot;id=&quot; + dRef + &quot;. Expected object of type &quot; + classname + &quot; instead of &quot; + beastObject.getClass().getName(), 107);</b>
+<i>670</i>&nbsp;            }
+<b class="nc"><i>671</i>&nbsp;            throw new XMLParserException(node, &quot;Could not find object associated with idref &quot; + dRef, 170);</b>
+<i>672</i>&nbsp;        }
+<i>673</i>&nbsp;        // it&#39;s not in the ID map yet, so we have to create a new object
+<b class="fc"><i>674</i>&nbsp;        String specClass = classname;</b>
+<b class="fc"><i>675</i>&nbsp;        final String elementName = node.getNodeName();</b>
+<i>676</i>&nbsp;
+<i>677</i>&nbsp;
+<b class="fc"><i>678</i>&nbsp;        if (element2ClassMap.containsKey(elementName)) {</b>
+<b class="nc"><i>679</i>&nbsp;            specClass = element2ClassMap.get(elementName);</b>
+<i>680</i>&nbsp;        }
+<b class="fc"><i>681</i>&nbsp;        final String spec = getAttribute(node, &quot;spec&quot;);</b>
+<b class="fc"><i>682</i>&nbsp;        if (spec != null) {</b>
+<b class="fc"><i>683</i>&nbsp;            specClass = spec;</b>
+<i>684</i>&nbsp;        }
+<i>685</i>&nbsp;    	
+<i>686</i>&nbsp;    	//if (specClass.indexOf(&quot;BEASTInterface&quot;) &gt; 0) {
+<i>687</i>&nbsp;    	//	Log.info.println(specClass);
+<i>688</i>&nbsp;    	//}
+<i>689</i>&nbsp;        
+<b class="fc"><i>690</i>&nbsp;		String clazzName = null;</b>
+<i>691</i>&nbsp;		// determine clazzName from specName, taking name spaces in account
+<b class="fc"><i>692</i>&nbsp;		for (String nameSpace : nameSpaces) {</b>
+<b class="fc"><i>693</i>&nbsp;			if (clazzName == null) {</b>
+<b class="fc"><i>694</i>&nbsp;				if (XMLParserUtils.beastObjectNames.contains(nameSpace + specClass)) {</b>
+<b class="fc"><i>695</i>&nbsp;					clazzName = nameSpace + specClass;</b>
+<b class="fc"><i>696</i>&nbsp;					break;</b>
+<i>697</i>&nbsp;				}
+<i>698</i>&nbsp;			}
+<i>699</i>&nbsp;		}
+<b class="fc"><i>700</i>&nbsp;		if (clazzName == null) {</b>
+<i>701</i>&nbsp;			// try to create the old-fashioned way by creating the class
+<b class="fc"><i>702</i>&nbsp;            boolean isDone = false;</b>
+<b class="fc"><i>703</i>&nbsp;            for (final String nameSpace : nameSpaces) {</b>
+<i>704</i>&nbsp;                try {
+<b class="fc"><i>705</i>&nbsp;                    if (!isDone) {</b>
+<b class="fc"><i>706</i>&nbsp;                        Class.forName(nameSpace + specClass);</b>
+<b class="fc"><i>707</i>&nbsp;                        clazzName = nameSpace + specClass;</b>
+<b class="fc"><i>708</i>&nbsp;                        isDone = true;</b>
+<i>709</i>&nbsp;                    }
+<b class="fc"><i>710</i>&nbsp;                } catch (ClassNotFoundException e) {</b>
+<i>711</i>&nbsp;                    // class does not exist -- try another namespace
+<b class="fc"><i>712</i>&nbsp;                }</b>
+<i>713</i>&nbsp;            }
+<i>714</i>&nbsp;		}
+<b class="fc"><i>715</i>&nbsp;		if (clazzName == null) {</b>
+<b class="nc"><i>716</i>&nbsp;			throw new XMLParserException(node, &quot;Class could not be found. Did you mean &quot; + XMLParserUtils.guessClass(specClass) + &quot;?&quot;, 1017);</b>
+<i>717</i>&nbsp;			// throw new ClassNotFoundException(specClass);
+<i>718</i>&nbsp;		}
+<i>719</i>&nbsp;				
+<i>720</i>&nbsp;		// sanity check		
+<i>721</i>&nbsp;		try {
+<b class="fc"><i>722</i>&nbsp;			Class&lt;?&gt; clazz = Class.forName(clazzName);</b>
+<b class="fc"><i>723</i>&nbsp;			if (!BEASTInterface.class.isAssignableFrom(clazz)) {</b>
+<b class="nc"><i>724</i>&nbsp;				throw new XMLParserException(node, &quot;Expected object to be instance of BEASTObject&quot;, 108);</b>
+<i>725</i>&nbsp;			}
+<b class="nc"><i>726</i>&nbsp;		} catch (ClassNotFoundException e1) {</b>
+<i>727</i>&nbsp;			// should never happen since clazzName is in the list of classes collected by the AddOnManager
+<b class="nc"><i>728</i>&nbsp;			e1.printStackTrace();</b>
+<b class="nc"><i>729</i>&nbsp;			throw new RuntimeException(e1);</b>
+<b class="fc"><i>730</i>&nbsp;		}</b>
+<i>731</i>&nbsp;		
+<i>732</i>&nbsp;		// process inputs
+<b class="fc"><i>733</i>&nbsp;		List&lt;NameValuePair&gt; inputInfo = parseInputs(node, clazzName);</b>
+<b class="fc"><i>734</i>&nbsp;		BEASTInterface beastObject = createBeastObject(node, id, clazzName, inputInfo);</b>
+<i>735</i>&nbsp;
+<i>736</i>&nbsp;        // initialise
+<b class="fc"><i>737</i>&nbsp;        if (needsInitialisation) {</b>
+<i>738</i>&nbsp;            try {
+<b class="fc"><i>739</i>&nbsp;                beastObject.validateInputs();</b>
+<b class="fc"><i>740</i>&nbsp;                beastObjectsWaitingToInit.add(beastObject);</b>
+<b class="fc"><i>741</i>&nbsp;                nodesWaitingToInit.add(node);</b>
+<b class="nc"><i>742</i>&nbsp;            } catch (IllegalArgumentException e) {</b>
+<i>743</i>&nbsp;                // next lines for debugging only
+<i>744</i>&nbsp;                //beastObject.validateInputs();
+<i>745</i>&nbsp;                //beastObject.initAndValidate();
+<b class="nc"><i>746</i>&nbsp;                e.printStackTrace();</b>
+<b class="nc"><i>747</i>&nbsp;                throw new XMLParserException(node, &quot;validate and intialize error: &quot; + e.getMessage(), 110);</b>
+<b class="fc"><i>748</i>&nbsp;            }</b>
+<i>749</i>&nbsp;        }
+<b class="fc"><i>750</i>&nbsp;        return beastObject;</b>
+<i>751</i>&nbsp;    } // createObject
+<i>752</i>&nbsp;
+<i>753</i>&nbsp;    
+<i>754</i>&nbsp;	/** create BEASTInterface either using Inputs, or using annotated constructor **/
+<i>755</i>&nbsp;	private BEASTInterface createBeastObject(Node node, String ID, String clazzName, List&lt;NameValuePair&gt; inputInfo) throws XMLParserException {
+<b class="fc"><i>756</i>&nbsp;		BEASTInterface beastObject = useAnnotatedConstructor(node, ID, clazzName, inputInfo);</b>
+<b class="fc"><i>757</i>&nbsp;		if (beastObject != null) {</b>
+<b class="fc"><i>758</i>&nbsp;			return beastObject;</b>
+<i>759</i>&nbsp;		}
+<i>760</i>&nbsp;		
+<i>761</i>&nbsp;		// create new instance using class name
+<b class="fc"><i>762</i>&nbsp;		Object o = null;</b>
+<i>763</i>&nbsp;		try {
+<b class="fc"><i>764</i>&nbsp;			Class&lt;?&gt; c = Class.forName(clazzName); </b>
+<b class="fc"><i>765</i>&nbsp;				o = c.newInstance();</b>
+<b class="nc"><i>766</i>&nbsp;		} catch (InstantiationException e) {</b>
+<i>767</i>&nbsp;			// we only get here when the class exists, but cannot be
+<i>768</i>&nbsp;			// created for instance because it is abstract
+<b class="nc"><i>769</i>&nbsp;			throw new XMLParserException(node, &quot;Cannot instantiate class. Please check the spec attribute.&quot;, 1006);</b>
+<b class="nc"><i>770</i>&nbsp;		} catch (ClassNotFoundException e) {</b>
+<i>771</i>&nbsp;			// ignore -- class was found in beastObjectNames before
+<b class="nc"><i>772</i>&nbsp;		} catch (IllegalAccessException e) {</b>
+<i>773</i>&nbsp;			// T O D O Auto-generated catch block
+<b class="nc"><i>774</i>&nbsp;			e.printStackTrace();</b>
+<b class="nc"><i>775</i>&nbsp;			throw new XMLParserException(node, &quot;Cannot access class. Please check the spec attribute.&quot;, 1011);</b>
+<b class="fc"><i>776</i>&nbsp;		}</b>
+<i>777</i>&nbsp;		
+<i>778</i>&nbsp;		// set id
+<b class="fc"><i>779</i>&nbsp;		beastObject = (BEASTInterface) o;</b>
+<b class="fc"><i>780</i>&nbsp;		beastObject.setID(ID);</b>
+<i>781</i>&nbsp;
+<i>782</i>&nbsp;		// hack required to make log-parsing easier
+<b class="fc"><i>783</i>&nbsp;		if (o instanceof State) {</b>
+<b class="nc"><i>784</i>&nbsp;			m_state = (State) o;</b>
+<i>785</i>&nbsp;		}
+<i>786</i>&nbsp;
+<i>787</i>&nbsp;		// process inputs for annotated constructors
+<b class="fc"><i>788</i>&nbsp;		for (NameValuePair pair : inputInfo) {</b>
+<b class="nc"><i>789</i>&nbsp;			if (pair.value instanceof BEASTInterface) {</b>
+<b class="nc"><i>790</i>&nbsp;				setInput(node, beastObject, pair.name, (BEASTInterface) pair.value);</b>
+<b class="nc"><i>791</i>&nbsp;			} else if (pair.value instanceof String) {</b>
+<b class="nc"><i>792</i>&nbsp;				setInput(node, beastObject, pair.name, (String) pair.value);</b>
+<i>793</i>&nbsp;			} else {
+<b class="nc"><i>794</i>&nbsp;				throw new RuntimeException(&quot;Programmer error: value should be String or BEASTInterface&quot;);</b>
+<i>795</i>&nbsp;			}
+<b class="nc"><i>796</i>&nbsp;		}</b>
+<i>797</i>&nbsp;		
+<i>798</i>&nbsp;		// fill in missing inputs, if an input provider is available
+<i>799</i>&nbsp;		try {
+<b class="fc"><i>800</i>&nbsp;			if (requiredInputProvider != null) {</b>
+<b class="nc"><i>801</i>&nbsp;				for (Input&lt;?&gt; input : beastObject.listInputs()) {</b>
+<b class="nc"><i>802</i>&nbsp;					if (input.get() == null &amp;&amp; input.getRule() == Validate.REQUIRED) {</b>
+<b class="nc"><i>803</i>&nbsp;						Object o2 = requiredInputProvider.createInput(beastObject, input, partitionContext);</b>
+<b class="nc"><i>804</i>&nbsp;						if (o2 != null) {</b>
+<b class="nc"><i>805</i>&nbsp;							input.setValue(o2, beastObject);</b>
+<i>806</i>&nbsp;						}
+<i>807</i>&nbsp;					}
+<b class="nc"><i>808</i>&nbsp;				}</b>
+<i>809</i>&nbsp;			}
+<b class="nc"><i>810</i>&nbsp;		} catch (Exception e) {</b>
+<b class="nc"><i>811</i>&nbsp;			throw new XMLParserException(node, e.getMessage(), 1008);			</b>
+<b class="fc"><i>812</i>&nbsp;		}</b>
+<i>813</i>&nbsp;		
+<i>814</i>&nbsp;		// sanity check: all attributes should be valid input names
+<b class="fc"><i>815</i>&nbsp;		if (!(beastObject instanceof Map)) {</b>
+<b class="fc"><i>816</i>&nbsp;			for (NameValuePair pair : inputInfo) {</b>
+<b class="nc"><i>817</i>&nbsp;				String name = pair.name;</b>
+<b class="nc"><i>818</i>&nbsp;				if (!(name.equals(&quot;id&quot;) || name.equals(&quot;idref&quot;) || name.equals(&quot;spec&quot;) || name.equals(&quot;name&quot;))) {</b>
+<i>819</i>&nbsp;					try {
+<b class="nc"><i>820</i>&nbsp;						beastObject.getInput(name);</b>
+<b class="nc"><i>821</i>&nbsp;					} catch (Exception e) {</b>
+<b class="nc"><i>822</i>&nbsp;						throw new XMLParserException(node, e.getMessage(), 1009);</b>
+<b class="nc"><i>823</i>&nbsp;					}</b>
+<i>824</i>&nbsp;				}
+<b class="nc"><i>825</i>&nbsp;			}</b>
+<i>826</i>&nbsp;		}
+<i>827</i>&nbsp;		
+<i>828</i>&nbsp;		// make sure object o is in outputs of inputs
+<b class="fc"><i>829</i>&nbsp;		for (NameValuePair pair : inputInfo) {</b>
+<b class="nc"><i>830</i>&nbsp;			if (pair.value instanceof BEASTInterface) {</b>
+<b class="nc"><i>831</i>&nbsp;				((BEASTInterface) pair.value).getOutputs().add((BEASTInterface) o);</b>
+<i>832</i>&nbsp;			}	
+<b class="nc"><i>833</i>&nbsp;		}</b>
+<i>834</i>&nbsp;		
+<i>835</i>&nbsp;
+<b class="fc"><i>836</i>&nbsp;		register(node, beastObject);</b>
+<b class="fc"><i>837</i>&nbsp;		return beastObject;</b>
+<i>838</i>&nbsp;	}
+<i>839</i>&nbsp;
+<i>840</i>&nbsp;    
+<i>841</i>&nbsp;	@SuppressWarnings({ &quot;rawtypes&quot;, &quot;unchecked&quot; })
+<i>842</i>&nbsp;	private BEASTInterface useAnnotatedConstructor(Node node, String _id, String clazzName, List&lt;NameValuePair&gt; inputInfo) throws XMLParserException {
+<b class="fc"><i>843</i>&nbsp;		Class&lt;?&gt; clazz = null;</b>
+<i>844</i>&nbsp;		try {
+<b class="fc"><i>845</i>&nbsp;			clazz = Class.forName(clazzName);</b>
+<b class="nc"><i>846</i>&nbsp;		} catch (ClassNotFoundException e) {</b>
+<i>847</i>&nbsp;			// cannot get here, since we checked the class existed before
+<b class="nc"><i>848</i>&nbsp;			e.printStackTrace();</b>
+<b class="fc"><i>849</i>&nbsp;		}</b>
+<b class="fc"><i>850</i>&nbsp;	    Constructor&lt;?&gt;[] allConstructors = clazz.getDeclaredConstructors();</b>
+<b class="fc"><i>851</i>&nbsp;	    for (Constructor&lt;?&gt; ctor : allConstructors) {</b>
+<b class="fc"><i>852</i>&nbsp;	    	Annotation[][] annotations = ctor.getParameterAnnotations();</b>
+<b class="fc"><i>853</i>&nbsp;	    	List&lt;Param&gt; paramAnnotations = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>854</i>&nbsp;	    	for (Annotation [] a0 : annotations) {</b>
+<b class="fc"><i>855</i>&nbsp;		    	for (Annotation a : a0) {</b>
+<b class="fc"><i>856</i>&nbsp;		    		if (a instanceof Param) {</b>
+<b class="fc"><i>857</i>&nbsp;		    			paramAnnotations.add((Param) a);</b>
+<i>858</i>&nbsp;		    		}
+<i>859</i>&nbsp;	    		}
+<i>860</i>&nbsp;	    	}
+<i>861</i>&nbsp;	    	
+<b class="fc"><i>862</i>&nbsp;	    	for (NameValuePair pair : inputInfo) {</b>
+<b class="fc"><i>863</i>&nbsp;	    		pair.processed = false;</b>
+<b class="fc"><i>864</i>&nbsp;	    	}</b>
+<i>865</i>&nbsp;
+<b class="fc"><i>866</i>&nbsp;	    	Class&lt;?&gt;[] types  = ctor.getParameterTypes();</b>
+<i>867</i>&nbsp;    		//Type[] gtypes = ctor.getGenericParameterTypes();
+<b class="fc"><i>868</i>&nbsp;	    	if (types.length &gt; 0 &amp;&amp; paramAnnotations.size() == types.length) {</b>
+<i>869</i>&nbsp;		    	try {
+<b class="fc"><i>870</i>&nbsp;		    		Object [] args = new Object[types.length];</b>
+<b class="fc"><i>871</i>&nbsp;		    		for (int i = 0; i &lt; types.length; i++) {</b>
+<b class="fc"><i>872</i>&nbsp;		    			Param param = paramAnnotations.get(i);</b>
+<b class="fc"><i>873</i>&nbsp;		    			Type type = types[i];</b>
+<b class="fc"><i>874</i>&nbsp;		    			if (type.getTypeName().equals(&quot;java.util.List&quot;)) {</b>
+<b class="fc"><i>875</i>&nbsp;		    				if (args[i] == null) {</b>
+<i>876</i>&nbsp;		    					// no need to parameterise list due to type erasure
+<b class="fc"><i>877</i>&nbsp;		    					args[i] = new ArrayList();</b>
+<i>878</i>&nbsp;		    				}
+<b class="fc"><i>879</i>&nbsp;		    				List&lt;Object&gt; values = getListOfValues(param, inputInfo);</b>
+<b class="fc"><i>880</i>&nbsp;		    				((List)args[i]).addAll(values);</b>
+<b class="fc"><i>881</i>&nbsp;		    			} else {</b>
+<b class="fc"><i>882</i>&nbsp;		    				args[i] = getValue(param, types[i], inputInfo);</b>
+<i>883</i>&nbsp;		    			}
+<i>884</i>&nbsp;		    		}
+<i>885</i>&nbsp;
+<i>886</i>&nbsp;		    		// ensure all inputs are used
+<b class="fc"><i>887</i>&nbsp;		    		boolean allUsed = true;</b>
+<b class="fc"><i>888</i>&nbsp;			    	for (NameValuePair pair : inputInfo) {</b>
+<b class="fc"><i>889</i>&nbsp;			    		if (!pair.processed) {</b>
+<b class="nc"><i>890</i>&nbsp;			    			allUsed= false;</b>
+<i>891</i>&nbsp;			    		}
+<b class="fc"><i>892</i>&nbsp;			    	}</b>
+<i>893</i>&nbsp;
+<b class="fc"><i>894</i>&nbsp;			    	if (allUsed) {</b>
+<i>895</i>&nbsp;				    	try {
+<b class="fc"><i>896</i>&nbsp;							Object o = ctor.newInstance(args);</b>
+<b class="fc"><i>897</i>&nbsp;							BEASTInterface beastObject = (BEASTInterface) o;</b>
+<b class="fc"><i>898</i>&nbsp;							register(node, beastObject);</b>
+<b class="fc"><i>899</i>&nbsp;							return beastObject;</b>
+<b class="nc"><i>900</i>&nbsp;						} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {</b>
+<b class="nc"><i>901</i>&nbsp;							throw new XMLParserException(node, &quot;Could not create object: &quot; + e.getMessage(), 1012);</b>
+<i>902</i>&nbsp;						}
+<i>903</i>&nbsp;			    	}
+<b class="nc"><i>904</i>&nbsp;				} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException</b>
+<i>905</i>&nbsp;						| InvocationTargetException e) {
+<i>906</i>&nbsp;					// we get here when a param value cannot be constructed from a default value
+<i>907</i>&nbsp;					// let&#39;s try the next constructor (if any)
+<b class="nc"><i>908</i>&nbsp;				}</b>
+<i>909</i>&nbsp;
+<i>910</i>&nbsp;	    	}
+<i>911</i>&nbsp;		}
+<b class="fc"><i>912</i>&nbsp;		return null;</b>
+<i>913</i>&nbsp;	}
+<i>914</i>&nbsp;
+<i>915</i>&nbsp;	private Object getValue(Param param, Class&lt;?&gt; type, List&lt;NameValuePair&gt; inputInfo) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+<b class="fc"><i>916</i>&nbsp;		for (NameValuePair pair : inputInfo) {</b>
+<b class="fc"><i>917</i>&nbsp;			if (pair.name.equals(param.name())) {</b>
+<b class="fc"><i>918</i>&nbsp;				pair.processed = true;</b>
+<b class="fc"><i>919</i>&nbsp;				if (type.isAssignableFrom(Integer.class)) {</b>
+<b class="fc"><i>920</i>&nbsp;					return Integer.parseInt((String) pair.value);</b>
+<i>921</i>&nbsp;				}
+<b class="nc"><i>922</i>&nbsp;				if (type.isAssignableFrom(Double.class)) {</b>
+<b class="nc"><i>923</i>&nbsp;					return Double.parseDouble((String) pair.value);</b>
+<i>924</i>&nbsp;				}
+<b class="nc"><i>925</i>&nbsp;				return pair.value;</b>
+<i>926</i>&nbsp;			}
+<b class="nc"><i>927</i>&nbsp;		}</b>
+<i>928</i>&nbsp;		
+<i>929</i>&nbsp;		// could not find Param entry in inputInfo
+<i>930</i>&nbsp;		
+<i>931</i>&nbsp;		// check if this parameter is required or optional
+<b class="nc"><i>932</i>&nbsp;		if (!param.optional()) {</b>
+<b class="nc"><i>933</i>&nbsp;			throw new IllegalArgumentException();</b>
+<i>934</i>&nbsp;		}
+<i>935</i>&nbsp;
+<i>936</i>&nbsp;		// try using a String constructor of the default value
+<i>937</i>&nbsp;        Constructor&lt;?&gt; ctor;
+<b class="nc"><i>938</i>&nbsp;        String value = param.defaultValue();</b>
+<b class="nc"><i>939</i>&nbsp;        Object v = value; </b>
+<i>940</i>&nbsp;        try {
+<b class="nc"><i>941</i>&nbsp;        	ctor = type.getDeclaredConstructor(String.class);</b>
+<b class="nc"><i>942</i>&nbsp;        } catch (NoSuchMethodException e) {</b>
+<i>943</i>&nbsp;        	// we get here if there is not String constructor
+<i>944</i>&nbsp;        	// try integer constructor instead
+<i>945</i>&nbsp;        	try {
+<b class="nc"><i>946</i>&nbsp;        		if (value.startsWith(&quot;0x&quot;)) {</b>
+<b class="nc"><i>947</i>&nbsp;        			v = Integer.parseInt(value.substring(2), 16);</b>
+<i>948</i>&nbsp;        		} else {
+<b class="nc"><i>949</i>&nbsp;        			v = Integer.parseInt(value);</b>
+<i>950</i>&nbsp;        		}
+<b class="nc"><i>951</i>&nbsp;            	ctor = type.getDeclaredConstructor(int.class);</b>
+<i>952</i>&nbsp;            	
+<b class="nc"><i>953</i>&nbsp;        	} catch (NumberFormatException e2) {</b>
+<i>954</i>&nbsp;            	// could not parse as integer, try double instead
+<b class="nc"><i>955</i>&nbsp;        		v = Double.parseDouble(value);</b>
+<b class="nc"><i>956</i>&nbsp;            	ctor = type.getDeclaredConstructor(double.class);</b>
+<b class="nc"><i>957</i>&nbsp;        	}</b>
+<b class="nc"><i>958</i>&nbsp;        }</b>
+<b class="nc"><i>959</i>&nbsp;        ctor.setAccessible(true);</b>
+<b class="nc"><i>960</i>&nbsp;        final Object o = ctor.newInstance(v);</b>
+<b class="nc"><i>961</i>&nbsp;        return o;</b>
+<i>962</i>&nbsp;	}
+<i>963</i>&nbsp;
+<i>964</i>&nbsp;	static List&lt;Object&gt; getListOfValues(Param param, List&lt;NameValuePair&gt; inputInfo) {
+<b class="fc"><i>965</i>&nbsp;		List&lt;Object&gt; values = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>966</i>&nbsp;		for (NameValuePair pair : inputInfo) {</b>
+<b class="fc"><i>967</i>&nbsp;			if (pair.name.equals(param.name())) {</b>
+<b class="fc"><i>968</i>&nbsp;				values.add(pair.value);</b>
+<b class="fc"><i>969</i>&nbsp;				pair.processed = true;</b>
+<i>970</i>&nbsp;			}
+<b class="fc"><i>971</i>&nbsp;		}</b>
+<b class="fc"><i>972</i>&nbsp;		return values;</b>
+<i>973</i>&nbsp;	}
+<i>974</i>&nbsp;
+<i>975</i>&nbsp;
+<i>976</i>&nbsp;	@Deprecated // use XMLParserUtils.getLevenshteinDistance instead
+<i>977</i>&nbsp;    public static int getLevenshteinDistance(final String s, final String t) {
+<b class="nc"><i>978</i>&nbsp;    	return XMLParserUtils.getLevenshteinDistance(s, t);</b>
+<i>979</i>&nbsp;    }
+<i>980</i>&nbsp;    
+<i>981</i>&nbsp;    private List&lt;NameValuePair&gt; parseInputs(Node node, String clazzName) throws XMLParserException {
+<b class="fc"><i>982</i>&nbsp;    	List&lt;NameValuePair&gt; inputInfo = new ArrayList&lt;&gt;();</b>
+<i>983</i>&nbsp;        // first, process attributes
+<b class="fc"><i>984</i>&nbsp;        NamedNodeMap atts = node.getAttributes();</b>
+<b class="fc"><i>985</i>&nbsp;        if (atts != null) {</b>
+<b class="fc"><i>986</i>&nbsp;            for (int i = 0; i &lt; atts.getLength(); i++) {</b>
+<b class="fc"><i>987</i>&nbsp;                final String name = atts.item(i).getNodeName();</b>
+<b class="fc"><i>988</i>&nbsp;                if (!(name.equals(&quot;id&quot;) ||</b>
+<b class="fc"><i>989</i>&nbsp;                        name.equals(&quot;idref&quot;) ||</b>
+<b class="fc"><i>990</i>&nbsp;                        name.equals(&quot;spec&quot;) ||</b>
+<b class="fc"><i>991</i>&nbsp;                        name.equals(&quot;name&quot;))) {</b>
+<b class="fc"><i>992</i>&nbsp;                    final String value = atts.item(i).getNodeValue();</b>
+<b class="fc"><i>993</i>&nbsp;                    if (value.startsWith(&quot;@&quot;)) {</b>
+<b class="nc"><i>994</i>&nbsp;                        final String idRef = value.substring(1);</b>
+<b class="nc"><i>995</i>&nbsp;                        final Element element = doc.createElement(&quot;input&quot;);</b>
+<b class="nc"><i>996</i>&nbsp;                        element.setAttribute(&quot;idref&quot;, idRef);</b>
+<i>997</i>&nbsp;                        // add child in case things go belly up, and an XMLParserException is thrown
+<b class="nc"><i>998</i>&nbsp;                        node.appendChild(element);</b>
+<b class="nc"><i>999</i>&nbsp;                        final BEASTInterface beastObject = createObject(element, BEAST_INTERFACE_CLASS);</b>
+<i>1000</i>&nbsp;                        // it is save to remove the element now
+<b class="nc"><i>1001</i>&nbsp;                        node.removeChild(element);</b>
+<b class="nc"><i>1002</i>&nbsp;                        inputInfo.add(new NameValuePair(name, beastObject));</b>
+<b class="nc"><i>1003</i>&nbsp;                    } else {</b>
+<b class="fc"><i>1004</i>&nbsp;                        inputInfo.add(new NameValuePair(name, value));</b>
+<i>1005</i>&nbsp;                    }
+<i>1006</i>&nbsp;                }
+<i>1007</i>&nbsp;            }
+<i>1008</i>&nbsp;        }
+<i>1009</i>&nbsp;        // process element nodes
+<b class="fc"><i>1010</i>&nbsp;        final NodeList children = node.getChildNodes();</b>
+<b class="fc"><i>1011</i>&nbsp;        int childElements = 0;</b>
+<b class="fc"><i>1012</i>&nbsp;        String text = &quot;&quot;;</b>
+<b class="fc"><i>1013</i>&nbsp;        for (int i = 0; i &lt; children.getLength(); i++) {</b>
+<b class="fc"><i>1014</i>&nbsp;            final Node child = children.item(i);</b>
+<b class="fc"><i>1015</i>&nbsp;            if (child.getNodeType() == Node.ELEMENT_NODE) {</b>
+<b class="fc"><i>1016</i>&nbsp;                final String element = child.getNodeName();</b>
+<i>1017</i>&nbsp;                // resolve name of the input
+<b class="fc"><i>1018</i>&nbsp;                String name = getAttribute(child, &quot;name&quot;);</b>
+<b class="fc"><i>1019</i>&nbsp;                if (name == null) {</b>
+<b class="fc"><i>1020</i>&nbsp;                    name = element;</b>
+<i>1021</i>&nbsp;                }
+<i>1022</i>&nbsp;                // resolve base class
+<b class="fc"><i>1023</i>&nbsp;                String classname = BEAST_INTERFACE_CLASS;</b>
+<b class="fc"><i>1024</i>&nbsp;                if (element2ClassMap.containsKey(element)) {</b>
+<b class="nc"><i>1025</i>&nbsp;                    classname = element2ClassMap.get(element);</b>
+<i>1026</i>&nbsp;                }
+<i>1027</i>&nbsp;                // test for special cases: &lt;xyz&gt;value&lt;/xyz&gt;  and &lt;input name=&quot;xyz&quot;&gt;value&lt;/input&gt;
+<i>1028</i>&nbsp;                // where value is a string
+<b class="fc"><i>1029</i>&nbsp;                boolean done = false;</b>
+<b class="fc"><i>1030</i>&nbsp;                atts = child.getAttributes();</b>
+<b class="fc"><i>1031</i>&nbsp;                if (atts.getLength() == 0 || (element.equals(&quot;input&quot;) &amp;&amp; atts.getLength() == 1 &amp;&amp; name != null)) {</b>
+<b class="nc"><i>1032</i>&nbsp;                	NodeList grantchildren = child.getChildNodes();</b>
+<b class="nc"><i>1033</i>&nbsp;                	boolean hasElements = false;</b>
+<b class="nc"><i>1034</i>&nbsp;                	for (int j = 0; j &lt; grantchildren.getLength(); j++) {</b>
+<b class="nc"><i>1035</i>&nbsp;                		if (grantchildren.item(j).getNodeType() == Node.ELEMENT_NODE) {</b>
+<b class="nc"><i>1036</i>&nbsp;                			hasElements = true;</b>
+<b class="nc"><i>1037</i>&nbsp;                			break;</b>
+<i>1038</i>&nbsp;                		}
+<i>1039</i>&nbsp;                	}
+<b class="nc"><i>1040</i>&nbsp;                	if (!hasElements) {</b>
+<b class="nc"><i>1041</i>&nbsp;                		String content = child.getTextContent();</b>
+<b class="nc"><i>1042</i>&nbsp;                		inputInfo.add(new NameValuePair(name, content));</b>
+<b class="nc"><i>1043</i>&nbsp;                		done = true;</b>
+<i>1044</i>&nbsp;                	}
+<i>1045</i>&nbsp;                }
+<i>1046</i>&nbsp;                
+<i>1047</i>&nbsp;                // create object from element, if not already done so
+<b class="fc"><i>1048</i>&nbsp;                if (!done) {</b>
+<b class="fc"><i>1049</i>&nbsp;                    final BEASTInterface childItem = createObject(child, classname);</b>
+<b class="fc"><i>1050</i>&nbsp;                    if (childItem != null) {</b>
+<b class="fc"><i>1051</i>&nbsp;                    	inputInfo.add(new NameValuePair(name, childItem));</b>
+<i>1052</i>&nbsp;                    }                		
+<i>1053</i>&nbsp;            	}
+<b class="fc"><i>1054</i>&nbsp;                childElements++;</b>
+<b class="fc"><i>1055</i>&nbsp;            } else if (child.getNodeType() == Node.CDATA_SECTION_NODE ||</b>
+<b class="fc"><i>1056</i>&nbsp;                    child.getNodeType() == Node.TEXT_NODE) {</b>
+<b class="fc"><i>1057</i>&nbsp;                text += child.getTextContent();</b>
+<i>1058</i>&nbsp;            }
+<i>1059</i>&nbsp;        }
+<b class="fc"><i>1060</i>&nbsp;        if (!text.matches(&quot;\\s*&quot;)) {</b>
+<b class="nc"><i>1061</i>&nbsp;        	inputInfo.add(new NameValuePair(&quot;value&quot;, text));</b>
+<i>1062</i>&nbsp;        }
+<i>1063</i>&nbsp;
+<b class="fc"><i>1064</i>&nbsp;        if (childElements == 0) {</b>
+<b class="fc"><i>1065</i>&nbsp;            final String content = node.getTextContent();</b>
+<b class="fc"><i>1066</i>&nbsp;            if (content != null &amp;&amp; content.length() &gt; 0 &amp;&amp; content.replaceAll(&quot;\\s&quot;, &quot;&quot;).length() &gt; 0) {</b>
+<i>1067</i>&nbsp;                try {
+<b class="nc"><i>1068</i>&nbsp;                	inputInfo.add(new NameValuePair(&quot;value&quot;, content));</b>
+<b class="nc"><i>1069</i>&nbsp;                } catch (Exception e) {</b>
+<i>1070</i>&nbsp;                    //
+<b class="nc"><i>1071</i>&nbsp;                }</b>
+<i>1072</i>&nbsp;            }
+<i>1073</i>&nbsp;        }
+<i>1074</i>&nbsp;
+<b class="fc"><i>1075</i>&nbsp;        return inputInfo;</b>
+<i>1076</i>&nbsp;    } // setInputs
+<i>1077</i>&nbsp;
+<i>1078</i>&nbsp;    void setInput(final Node node, final BEASTInterface beastObject, final String name, final BEASTInterface beastObject2) throws XMLParserException {
+<i>1079</i>&nbsp;        try {
+<b class="nc"><i>1080</i>&nbsp;            final Input&lt;?&gt; input = beastObject.getInput(name);</b>
+<i>1081</i>&nbsp;            // test whether input was not set before, this is done by testing whether input has default value.
+<i>1082</i>&nbsp;            // for non-list inputs, this should be true if the value was not already set before
+<i>1083</i>&nbsp;            // for list inputs this is always true.
+<b class="nc"><i>1084</i>&nbsp;            if (input.get() == input.defaultValue) {</b>
+<b class="nc"><i>1085</i>&nbsp;                beastObject.setInputValue(name, beastObject2);</b>
+<i>1086</i>&nbsp;            } else {
+<b class="nc"><i>1087</i>&nbsp;                throw new XMLParserException(&quot;Multiple entries for non-list input &quot; + input.getName());</b>
+<i>1088</i>&nbsp;            }
+<b class="nc"><i>1089</i>&nbsp;            return;</b>
+<b class="nc"><i>1090</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>1091</i>&nbsp;        	if (name.equals(&quot;xml:base&quot;)) {</b>
+<i>1092</i>&nbsp;        		// ignore xml:base attributes introduces by XML entities
+<b class="nc"><i>1093</i>&nbsp;        		return;</b>
+<i>1094</i>&nbsp;        	}
+<b class="nc"><i>1095</i>&nbsp;            if (e.getMessage().contains(&quot;101&quot;)) {</b>
+<b class="nc"><i>1096</i>&nbsp;                String type = &quot;?&quot;;</b>
+<i>1097</i>&nbsp;                try {
+<b class="nc"><i>1098</i>&nbsp;                    type = beastObject.getInput(name).getType().getName().replaceAll(&quot;.*\\.&quot;, &quot;&quot;);</b>
+<b class="nc"><i>1099</i>&nbsp;                } catch (Exception e2) {</b>
+<i>1100</i>&nbsp;                    // TODO: handle exception
+<b class="nc"><i>1101</i>&nbsp;                }</b>
+<b class="nc"><i>1102</i>&nbsp;                throw new XMLParserException(node, e.getMessage() +</b>
+<i>1103</i>&nbsp;                        &quot; expected &#39;&quot; + type +
+<b class="nc"><i>1104</i>&nbsp;                        &quot;&#39; but got &#39;&quot; + beastObject2.getClass().getName().replaceAll(&quot;.*\\.&quot;, &quot;&quot;) + &quot;&#39;&quot;</b>
+<i>1105</i>&nbsp;                        , 123);
+<i>1106</i>&nbsp;            } else {
+<b class="nc"><i>1107</i>&nbsp;                throw new XMLParserException(node, e.getMessage(), 130);</b>
+<i>1108</i>&nbsp;            }
+<i>1109</i>&nbsp;        }
+<i>1110</i>&nbsp;        //throw new XMLParserException(node, &quot;no such input &#39;&quot;+name+&quot;&#39; for element &lt;&quot; + node.getNodeName() + &quot;&gt;&quot;, 167);
+<i>1111</i>&nbsp;    }
+<i>1112</i>&nbsp;
+<i>1113</i>&nbsp;    void setInput(final Node node, final BEASTInterface beastObject, final String name, final String value) throws XMLParserException {
+<i>1114</i>&nbsp;        try {
+<b class="nc"><i>1115</i>&nbsp;			beastObject.setInputValue(name, value);</b>
+<b class="nc"><i>1116</i>&nbsp;            return;</b>
+<b class="nc"><i>1117</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>1118</i>&nbsp;        	if (name.equals(&quot;xml:base&quot;)) {</b>
+<i>1119</i>&nbsp;        		// ignore xml:base attributes introduces by XML entities
+<b class="nc"><i>1120</i>&nbsp;        		return;</b>
+<i>1121</i>&nbsp;        	}
+<i>1122</i>&nbsp;            try {
+<b class="nc"><i>1123</i>&nbsp;				beastObject.setInputValue(name, value);</b>
+<b class="nc"><i>1124</i>&nbsp;			} catch (Exception e1) {</b>
+<i>1125</i>&nbsp;				// TODO Auto-generated catch block
+<b class="nc"><i>1126</i>&nbsp;				e1.printStackTrace();</b>
+<b class="nc"><i>1127</i>&nbsp;			}</b>
+<b class="nc"><i>1128</i>&nbsp;            throw new XMLParserException(node, e.getMessage(), 124);</b>
+<i>1129</i>&nbsp;        }
+<i>1130</i>&nbsp;        //throw new XMLParserException(node, &quot;no such input &#39;&quot;+name+&quot;&#39; for element &lt;&quot; + node.getNodeName() + &quot;&gt;&quot;, 168);
+<i>1131</i>&nbsp;    }
+<i>1132</i>&nbsp;
+<i>1133</i>&nbsp;    /**
+<i>1134</i>&nbsp;     * records id in IDMap, for ease of retrieving beast objects associated with idrefs *
+<i>1135</i>&nbsp;     */
+<i>1136</i>&nbsp;    void register(final Node node, final BEASTInterface beastObject) {
+<b class="fc"><i>1137</i>&nbsp;        final String id = getID(node);</b>
+<b class="fc"><i>1138</i>&nbsp;        if (id != null) {</b>
+<b class="fc"><i>1139</i>&nbsp;            IDMap.put(id, beastObject);</b>
+<i>1140</i>&nbsp;        }
+<b class="fc"><i>1141</i>&nbsp;    }</b>
+<i>1142</i>&nbsp;
+<i>1143</i>&nbsp;    public static String getID(final Node node) { 
+<b class="fc"><i>1144</i>&nbsp;        return getAttribute(node, &quot;id&quot;);</b>
+<i>1145</i>&nbsp;    } // getID
+<i>1146</i>&nbsp;
+<i>1147</i>&nbsp;    public static String getIDRef(final Node node) {
+<b class="fc"><i>1148</i>&nbsp;        return getAttribute(node, &quot;idref&quot;);</b>
+<i>1149</i>&nbsp;    } // getIDRef
+<i>1150</i>&nbsp;
+<i>1151</i>&nbsp;    /**
+<i>1152</i>&nbsp;     * get string value of attribute with given name
+<i>1153</i>&nbsp;     * as opposed to double or integer value (see methods below) *
+<i>1154</i>&nbsp;     */
+<i>1155</i>&nbsp;    public static String getAttribute(final Node node, final String attName) { 
+<b class="fc"><i>1156</i>&nbsp;        final NamedNodeMap atts = node.getAttributes();</b>
+<b class="fc"><i>1157</i>&nbsp;        if (atts == null) {</b>
+<b class="fc"><i>1158</i>&nbsp;            return null;</b>
+<i>1159</i>&nbsp;        }
+<b class="fc"><i>1160</i>&nbsp;        for (int i = 0; i &lt; atts.getLength(); i++) {</b>
+<b class="fc"><i>1161</i>&nbsp;            final String name = atts.item(i).getNodeName();</b>
+<b class="fc"><i>1162</i>&nbsp;            if (name.equals(attName)) {</b>
+<b class="fc"><i>1163</i>&nbsp;                return atts.item(i).getNodeValue();</b>
+<i>1164</i>&nbsp;            }
+<i>1165</i>&nbsp;        }
+<b class="fc"><i>1166</i>&nbsp;        return null;</b>
+<i>1167</i>&nbsp;    } // getAttribute
+<i>1168</i>&nbsp;
+<i>1169</i>&nbsp;    /**
+<i>1170</i>&nbsp;     * get integer value of attribute with given name *
+<i>1171</i>&nbsp;     */
+<i>1172</i>&nbsp;    public static int getAttributeAsInt(final Node node, final String attName) { 
+<b class="nc"><i>1173</i>&nbsp;        final String att = getAttribute(node, attName);</b>
+<b class="nc"><i>1174</i>&nbsp;        if (att == null) {</b>
+<b class="nc"><i>1175</i>&nbsp;            return -1;</b>
+<i>1176</i>&nbsp;        }
+<b class="nc"><i>1177</i>&nbsp;        return Integer.parseInt(att);</b>
+<i>1178</i>&nbsp;    }
+<i>1179</i>&nbsp;
+<i>1180</i>&nbsp;    /**
+<i>1181</i>&nbsp;     * get double value of attribute with given name *
+<i>1182</i>&nbsp;     */
+<i>1183</i>&nbsp;    public static double getAttributeAsDouble(final Node node, final String attName) { 
+<b class="fc"><i>1184</i>&nbsp;        final String att = getAttribute(node, attName);</b>
+<b class="fc"><i>1185</i>&nbsp;        if (att == null) {</b>
+<b class="nc"><i>1186</i>&nbsp;            return Double.MAX_VALUE;</b>
+<i>1187</i>&nbsp;        }
+<b class="fc"><i>1188</i>&nbsp;        return Double.parseDouble(att);</b>
+<i>1189</i>&nbsp;    }
+<i>1190</i>&nbsp;
+<i>1191</i>&nbsp;    /**
+<i>1192</i>&nbsp;     * test whether a node contains a attribute with given name *
+<i>1193</i>&nbsp;     */
+<i>1194</i>&nbsp;    boolean hasAtt(final Node node, final String attributeName) {
+<b class="fc"><i>1195</i>&nbsp;        final NamedNodeMap atts = node.getAttributes();</b>
+<b class="fc"><i>1196</i>&nbsp;        if (atts != null) {</b>
+<b class="fc"><i>1197</i>&nbsp;            for (int i = 0; i &lt; atts.getLength(); i++) {</b>
+<b class="fc"><i>1198</i>&nbsp;                final String name = atts.item(i).getNodeName();</b>
+<b class="fc"><i>1199</i>&nbsp;                if (name.equals(attributeName)) {</b>
+<b class="fc"><i>1200</i>&nbsp;                    return true;</b>
+<i>1201</i>&nbsp;                }
+<i>1202</i>&nbsp;            }
+<i>1203</i>&nbsp;        }
+<b class="nc"><i>1204</i>&nbsp;        return false;</b>
+<i>1205</i>&nbsp;    }
+<i>1206</i>&nbsp;
+<i>1207</i>&nbsp;    public interface RequiredInputProvider {
+<i>1208</i>&nbsp;		Object createInput(BEASTInterface beastObject, Input&lt;?&gt; input, PartitionContext context);
+<i>1209</i>&nbsp;    }
+<i>1210</i>&nbsp;
+<i>1211</i>&nbsp;    public void setRequiredInputProvider(final RequiredInputProvider provider, final PartitionContext context) {
+<b class="nc"><i>1212</i>&nbsp;        requiredInputProvider = provider;</b>
+<b class="nc"><i>1213</i>&nbsp;        partitionContext = context;</b>
+<b class="nc"><i>1214</i>&nbsp;    }</b>
+<i>1215</i>&nbsp;
+<i>1216</i>&nbsp;    /**
+<i>1217</i>&nbsp;     * parses file and formats it using the XMLProducer *
+<i>1218</i>&nbsp;     */
+<i>1219</i>&nbsp;    public static void main(final String[] args) {
+<i>1220</i>&nbsp;        try {
+<i>1221</i>&nbsp;            // redirect stdout to stderr
+<b class="nc"><i>1222</i>&nbsp;            final PrintStream out = System.out;</b>
+<b class="nc"><i>1223</i>&nbsp;            System.setOut(System.err);</b>
+<i>1224</i>&nbsp;            // parse the file
+<b class="nc"><i>1225</i>&nbsp;            final XMLParser parser = new XMLParser();</b>
+<b class="nc"><i>1226</i>&nbsp;            final BEASTInterface beastObject = parser.parseFile(new File(args[0]));</b>
+<i>1227</i>&nbsp;            // restore stdout
+<b class="nc"><i>1228</i>&nbsp;            System.setOut(out);</b>
+<b class="nc"><i>1229</i>&nbsp;            System.out.println(new XMLProducer().toXML(beastObject));</b>
+<b class="nc"><i>1230</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>1231</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>1232</i>&nbsp;        }</b>
+<b class="nc"><i>1233</i>&nbsp;    }</b>
+<i>1234</i>&nbsp;    
+<i>1235</i>&nbsp;} // class XMLParser
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

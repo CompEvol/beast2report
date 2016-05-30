@@ -1,0 +1,101 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Fragment</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.beauti</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Fragment (beast.app.beauti)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Fragment</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/ 4)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.beauti;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.util.ArrayList;
+<i>4</i>&nbsp;import java.util.List;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;import beast.core.BEASTObject;
+<i>7</i>&nbsp;import beast.core.Description;
+<i>8</i>&nbsp;import beast.core.Input;
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;@Description(&quot;Dummy container for representing template fragment&quot;)
+<b class="fc"><i>11</i>&nbsp;public class Fragment extends BEASTObject {</b>
+<b class="fc"><i>12</i>&nbsp;	final public Input&lt;String&gt; valueInput = new Input&lt;&gt;(&quot;value&quot;,&quot;for representing CDATA section&quot;);</b>
+<b class="fc"><i>13</i>&nbsp;	final public Input&lt;List&lt;BeautiConnector&gt;&gt; connectorsInput = new Input&lt;&gt;(&quot;connect&quot;, &quot;for representing BEAUti connectors&quot;, new ArrayList&lt;&gt;());</b>
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;	@Override
+<i>16</i>&nbsp;	public void initAndValidate() {
+<b class="fc"><i>17</i>&nbsp;	}</b>
+<i>18</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

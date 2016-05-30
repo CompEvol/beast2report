@@ -1,0 +1,73 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: XMLFileInputEditor</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.beauti</a> ]
+</div>
+
+<h1>Coverage Summary for Class: XMLFileInputEditor (beast.app.beauti)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">XMLFileInputEditor</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.beauti;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import beast.app.util.XMLFile;
+<i>6</i>&nbsp;import beast.core.BEASTInterface;
+<i>7</i>&nbsp;import beast.core.Input;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;public class XMLFileInputEditor extends FileInputEditor {
+<i>10</i>&nbsp;	
+<i>11</i>&nbsp;	private static final long serialVersionUID = 1L;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;	@Override
+<i>14</i>&nbsp;	public Class&lt;?&gt; type() {
+<i>15</i>&nbsp;		return XMLFile.class;
+<i>16</i>&nbsp;	}
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;	public XMLFileInputEditor(BeautiDoc doc) {
+<i>19</i>&nbsp;		super(doc);
+<i>20</i>&nbsp;	}
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;	@Override
+<i>23</i>&nbsp;	public void init(Input&lt;?&gt; input, BEASTInterface plugin, int itemNr, ExpandOption bExpandOption, boolean bAddButtons) {
+<i>24</i>&nbsp;		init(input, plugin, itemNr, bExpandOption, bAddButtons, &quot;BEAST XML files&quot;, &quot;xml&quot;);
+<i>25</i>&nbsp;	}
+<i>26</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

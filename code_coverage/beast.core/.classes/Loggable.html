@@ -1,0 +1,85 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Loggable</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.core</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Loggable (beast.core)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">Loggable</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.core;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.io.PrintStream;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;/**
+<i>6</i>&nbsp; * @author Andrew Rambaut
+<i>7</i>&nbsp; * @version $Id$
+<i>8</i>&nbsp; */
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;/**
+<i>11</i>&nbsp; * interface for items that can be logged through a Logger *
+<i>12</i>&nbsp; */
+<i>13</i>&nbsp;public interface Loggable {
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;    /**
+<i>16</i>&nbsp;     * write header information, e.g. labels of a parameter,
+<i>17</i>&nbsp;     * or Nexus tree preamble
+<i>18</i>&nbsp;     *
+<i>19</i>&nbsp;     * @param out log stream
+<i>20</i>&nbsp;     */
+<i>21</i>&nbsp;    void init(PrintStream out);
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;    /**
+<i>24</i>&nbsp;     * log this sample for current state to PrintStream,
+<i>25</i>&nbsp;     * e.g. value of a parameter, list of parameters or Newick tree
+<i>26</i>&nbsp;     *
+<i>27</i>&nbsp;     * @param sample chain sample number
+<i>28</i>&nbsp;     * @param out     log stream
+<i>29</i>&nbsp;     */
+<i>30</i>&nbsp;    void log(int sample, PrintStream out);
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;    /**
+<i>33</i>&nbsp;     * close log. An end of log message can be left (as in End; for Nexus trees)
+<i>34</i>&nbsp;     *
+<i>35</i>&nbsp;     * @param out log stream
+<i>36</i>&nbsp;     */
+<i>37</i>&nbsp;    void close(PrintStream out);
+<i>38</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,214 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: FrequenciesInputEditor</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.beauti</a> ]
+</div>
+
+<h1>Coverage Summary for Class: FrequenciesInputEditor (beast.app.beauti)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FrequenciesInputEditor</td>
+<td class="coverageStat">
+  <span class="percent">
+    28.6%
+  </span>
+  <span class="absValue">
+    (2/ 7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    7.5%
+  </span>
+  <span class="absValue">
+    (3/ 40)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">FrequenciesInputEditor$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 19)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    22.2%
+  </span>
+  <span class="absValue">
+    (2/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    5.1%
+  </span>
+  <span class="absValue">
+    (3/ 59)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.beauti;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import java.awt.event.ActionEvent;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;import javax.swing.JComboBox;
+<i>7</i>&nbsp;import javax.swing.JComponent;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;import beast.app.draw.BEASTObjectInputEditor;
+<i>10</i>&nbsp;import beast.core.BEASTInterface;
+<i>11</i>&nbsp;import beast.core.Input;
+<i>12</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>13</i>&nbsp;import beast.evolution.alignment.Alignment;
+<i>14</i>&nbsp;import beast.evolution.substitutionmodel.Frequencies;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;public class FrequenciesInputEditor extends BEASTObjectInputEditor {
+<i>19</i>&nbsp;    RealParameter freqsParameter;
+<i>20</i>&nbsp;    Alignment alignment;
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;    private static final long serialVersionUID = 1L;
+<i>23</i>&nbsp;    boolean useDefaultBehavior;
+<i>24</i>&nbsp;
+<i>25</i>&nbsp;	public FrequenciesInputEditor(BeautiDoc doc) {
+<b class="fc"><i>26</i>&nbsp;		super(doc);</b>
+<b class="fc"><i>27</i>&nbsp;	}</b>
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;    @Override
+<i>30</i>&nbsp;    public Class&lt;?&gt; type() {
+<b class="fc"><i>31</i>&nbsp;        return ActionEvent.class;</b>
+<i>32</i>&nbsp;        //return Frequencies.class;
+<i>33</i>&nbsp;    }
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;    @Override
+<i>36</i>&nbsp;    public void init(Input&lt;?&gt; input, BEASTInterface beastObject, int itemNr, ExpandOption isExpandOption, boolean addButtons) {
+<b class="nc"><i>37</i>&nbsp;        super.init(input, beastObject, itemNr, isExpandOption, addButtons);</b>
+<b class="nc"><i>38</i>&nbsp;    } // init</b>
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;
+<i>41</i>&nbsp;    @Override
+<i>42</i>&nbsp;    /** suppress combobox **/
+<i>43</i>&nbsp;    protected void addComboBox(JComponent box, Input&lt;?&gt; input, BEASTInterface beastObject) {
+<b class="nc"><i>44</i>&nbsp;        Frequencies freqs = (Frequencies) input.get();</b>
+<i>45</i>&nbsp;
+<b class="nc"><i>46</i>&nbsp;        JComboBox&lt;String&gt; comboBox = new JComboBox&lt;&gt;(new String[]{&quot;Estimated&quot;, &quot;Empirical&quot;, &quot;All equal&quot;});</b>
+<b class="nc"><i>47</i>&nbsp;        if (freqs.frequenciesInput.get() != null) {</b>
+<b class="nc"><i>48</i>&nbsp;            comboBox.setSelectedIndex(0);</b>
+<b class="nc"><i>49</i>&nbsp;            freqsParameter = freqs.frequenciesInput.get();</b>
+<b class="nc"><i>50</i>&nbsp;            alignment = (Alignment) getCandidate(freqs.dataInput, freqs);</b>
+<b class="nc"><i>51</i>&nbsp;        } else if (freqs.estimateInput.get()) {</b>
+<b class="nc"><i>52</i>&nbsp;            comboBox.setSelectedIndex(1);</b>
+<b class="nc"><i>53</i>&nbsp;            alignment = freqs.dataInput.get();</b>
+<b class="nc"><i>54</i>&nbsp;            freqsParameter = (RealParameter) getCandidate(freqs.frequenciesInput, freqs);</b>
+<i>55</i>&nbsp;        } else {
+<b class="nc"><i>56</i>&nbsp;            comboBox.setSelectedIndex(2);</b>
+<b class="nc"><i>57</i>&nbsp;            alignment = freqs.dataInput.get();</b>
+<b class="nc"><i>58</i>&nbsp;            freqsParameter = (RealParameter) getCandidate(freqs.frequenciesInput, freqs);</b>
+<i>59</i>&nbsp;        }
+<b class="nc"><i>60</i>&nbsp;        comboBox.addActionListener(e -&gt; {</b>
+<i>61</i>&nbsp;                //@SuppressWarnings(&quot;unchecked&quot;)
+<i>62</i>&nbsp;				//JComboBox&lt;String&gt; comboBox = (JComboBox&lt;String&gt;) e.getSource();
+<b class="nc"><i>63</i>&nbsp;                int selected = comboBox.getSelectedIndex();</b>
+<b class="nc"><i>64</i>&nbsp;                //Frequencies freqs = (Frequencies) m_input.get();</b>
+<i>65</i>&nbsp;                try {
+<b class="nc"><i>66</i>&nbsp;                    switch (selected) {</b>
+<b class="nc"><i>67</i>&nbsp;                        case 0:</b>
+<b class="nc"><i>68</i>&nbsp;                            freqs.frequenciesInput.setValue(freqsParameter, freqs);</b>
+<b class="nc"><i>69</i>&nbsp;                            freqs.dataInput.setValue(null, freqs);</b>
+<b class="nc"><i>70</i>&nbsp;                            break;</b>
+<b class="nc"><i>71</i>&nbsp;                        case 1:</b>
+<b class="nc"><i>72</i>&nbsp;                            freqs.frequenciesInput.setValue(null, freqs);</b>
+<b class="nc"><i>73</i>&nbsp;                            freqs.dataInput.setValue(alignment, freqs);</b>
+<b class="nc"><i>74</i>&nbsp;                            freqs.estimateInput.setValue(true, freqs);</b>
+<b class="nc"><i>75</i>&nbsp;                            break;</b>
+<i>76</i>&nbsp;                        case 2:
+<b class="nc"><i>77</i>&nbsp;                            freqs.frequenciesInput.setValue(null, freqs);</b>
+<b class="nc"><i>78</i>&nbsp;                            freqs.dataInput.setValue(alignment, freqs);</b>
+<b class="nc"><i>79</i>&nbsp;                            freqs.estimateInput.setValue(false, freqs);</b>
+<b class="nc"><i>80</i>&nbsp;                            break;</b>
+<i>81</i>&nbsp;                    }
+<b class="nc"><i>82</i>&nbsp;                } catch (Exception e2) {</b>
+<b class="nc"><i>83</i>&nbsp;                    e2.printStackTrace();</b>
+<b class="nc"><i>84</i>&nbsp;                }</b>
+<i>85</i>&nbsp;                //System.err.println(freqs.frequencies.get() + &quot; &quot; + freqs.m_data.get() + &quot; &quot; + freqs.m_bEstimate.get());
+<b class="nc"><i>86</i>&nbsp;            });</b>
+<b class="nc"><i>87</i>&nbsp;        box.add(comboBox);</b>
+<b class="nc"><i>88</i>&nbsp;    }</b>
+<b class="nc"><i>89</i>&nbsp;</b>
+<i>90</i>&nbsp;    private BEASTInterface getCandidate(Input&lt;?&gt; input, Frequencies freqs) {
+<b class="nc"><i>91</i>&nbsp;        return getDoc().getPartition(freqs);</b>
+<i>92</i>&nbsp;//		List&lt;String&gt; candidates = PluginPanel.getAvailablePlugins(input, freqs, null);
+<i>93</i>&nbsp;//		String id = candidates.get(0);
+<i>94</i>&nbsp;//		BEASTObject beastObject = PluginPanel.g_plugins.get(id);
+<i>95</i>&nbsp;//		return beastObject;
+<i>96</i>&nbsp;    }
+<i>97</i>&nbsp;
+<i>98</i>&nbsp;
+<i>99</i>&nbsp;    @Override
+<i>100</i>&nbsp;    /** suppress input label**/
+<i>101</i>&nbsp;    protected void addInputLabel() {
+<b class="nc"><i>102</i>&nbsp;        super.addInputLabel();</b>
+<b class="nc"><i>103</i>&nbsp;    }</b>
+<i>104</i>&nbsp;
+<i>105</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,128 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: IntUniformOperator</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.operators</a> ]
+</div>
+
+<h1>Coverage Summary for Class: IntUniformOperator (beast.evolution.operators)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IntUniformOperator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 8)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.operators;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import beast.core.Description;
+<i>4</i>&nbsp;import beast.core.Input;
+<i>5</i>&nbsp;import beast.core.Input.Validate;
+<i>6</i>&nbsp;import beast.core.Operator;
+<i>7</i>&nbsp;import beast.core.parameter.IntegerParameter;
+<i>8</i>&nbsp;import beast.core.util.Log;
+<i>9</i>&nbsp;import beast.util.Randomizer;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;@Description(&quot;A uniform random operator that selects a random dimension of the integer parameter and picks a new random value within the bounds.&quot;)
+<i>13</i>&nbsp;@Deprecated
+<b class="nc"><i>14</i>&nbsp;public class IntUniformOperator extends Operator {</b>
+<b class="nc"><i>15</i>&nbsp;    final public Input&lt;IntegerParameter&gt; parameterInput = new Input&lt;&gt;(&quot;parameter&quot;, &quot;the parameter to operate a random walk on.&quot;, Validate.REQUIRED);</b>
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;    @Override
+<i>19</i>&nbsp;	public void initAndValidate() {
+<b class="nc"><i>20</i>&nbsp;    	Log.warning.println(&quot;\n\nIntUniformOperator is depracated. Use UniformOperator instead.\n\n&quot;);</b>
+<i>21</i>&nbsp;    }
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;    /**
+<i>24</i>&nbsp;     * override this for proposals,
+<i>25</i>&nbsp;     * returns log of hastingRatio, or Double.NEGATIVE_INFINITY if proposal should not be accepted *
+<i>26</i>&nbsp;     */
+<i>27</i>&nbsp;    @Override
+<i>28</i>&nbsp;    public double proposal() {
+<i>29</i>&nbsp;
+<b class="nc"><i>30</i>&nbsp;        IntegerParameter param = parameterInput.get(this);</b>
+<i>31</i>&nbsp;
+<b class="nc"><i>32</i>&nbsp;        int i = Randomizer.nextInt(param.getDimension());</b>
+<b class="nc"><i>33</i>&nbsp;        int newValue = Randomizer.nextInt(param.getUpper() - param.getLower() + 1) + param.getLower();</b>
+<i>34</i>&nbsp;
+<b class="nc"><i>35</i>&nbsp;        param.setValue(i, newValue);</b>
+<i>36</i>&nbsp;
+<b class="nc"><i>37</i>&nbsp;        return 0.0;</b>
+<i>38</i>&nbsp;    }
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;    @Override
+<i>41</i>&nbsp;    public void optimize(double logAlpha) {
+<i>42</i>&nbsp;        // nothing to optimise
+<i>43</i>&nbsp;    }
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;} // class IntUniformOperator
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

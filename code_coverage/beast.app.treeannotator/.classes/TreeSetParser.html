@@ -1,0 +1,702 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TreeSetParser</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.treeannotator</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TreeSetParser (beast.app.treeannotator)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TreeSetParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 373)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;
+<i>3</i>&nbsp; * This program is free software; you can redistribute it and/or modify
+<i>4</i>&nbsp; * it under the terms of the GNU General Public License as published by
+<i>5</i>&nbsp; * the Free Software Foundation; either version 2 of the License, or
+<i>6</i>&nbsp; * (at your option) any later version.
+<i>7</i>&nbsp; * 
+<i>8</i>&nbsp; * This program is distributed in the hope that it will be useful,
+<i>9</i>&nbsp; * but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>10</i>&nbsp; * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>11</i>&nbsp; * GNU General Public License for more details.
+<i>12</i>&nbsp; * 
+<i>13</i>&nbsp; * You should have received a copy of the GNU General Public License
+<i>14</i>&nbsp; * along with this program; if not, write to the Free Software
+<i>15</i>&nbsp; * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+<i>16</i>&nbsp; */
+<i>17</i>&nbsp;/*
+<i>18</i>&nbsp; * TreeFileParser.java
+<i>19</i>&nbsp; * Copyright Remco Bouckaert remco@cs.auckland.ac.nz (C) 2011 
+<i>20</i>&nbsp;*/
+<i>21</i>&nbsp;package beast.app.treeannotator;
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;import java.io.BufferedReader;
+<i>24</i>&nbsp;import java.io.File;
+<i>25</i>&nbsp;import java.io.FileReader;
+<i>26</i>&nbsp;import java.io.IOException;
+<i>27</i>&nbsp;import java.util.ArrayList;
+<i>28</i>&nbsp;import java.util.List;
+<i>29</i>&nbsp;import java.util.Vector;
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;import beast.core.util.Log;
+<i>32</i>&nbsp;import beast.evolution.tree.Node;
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;public class TreeSetParser {
+<i>35</i>&nbsp;	/**
+<i>36</i>&nbsp;	 * default tree branch length, used when that info is not in the Newick tree
+<i>37</i>&nbsp;	 **/
+<i>38</i>&nbsp;	final static float DEFAULT_LENGTH = 0.001f;
+<i>39</i>&nbsp;
+<b class="nc"><i>40</i>&nbsp;	int m_nOffset = 0;</b>
+<i>41</i>&nbsp;	/** labels of leafs **/
+<i>42</i>&nbsp;	List&lt;String&gt; m_sLabels;
+<i>43</i>&nbsp;	/** position information for the leafs (if available) **/
+<i>44</i>&nbsp;	List&lt;Float&gt; m_fLongitude;
+<i>45</i>&nbsp;	List&lt;Float&gt; m_fLatitude;
+<i>46</i>&nbsp;	/** extreme values for position information **/
+<i>47</i>&nbsp;	float m_fMaxLong, m_fMaxLat, m_fMinLong, m_fMinLat;
+<i>48</i>&nbsp;	/** nr of labels in dataset **/
+<i>49</i>&nbsp;	int m_nNrOfLabels;
+<i>50</i>&nbsp;	/** burn in = nr of trees ignored at the start of tree file, can be set by command line option **/
+<b class="nc"><i>51</i>&nbsp;	int m_nBurnInPercentage = 0;</b>
+<i>52</i>&nbsp;	//DensiTree m_densiTree;
+<i>53</i>&nbsp;	/** for memory saving, set to true **/
+<b class="nc"><i>54</i>&nbsp;	boolean m_bSurpressMetadata = true;</b>
+<i>55</i>&nbsp;	/** if there is no translate block. This solves issues where the taxa labels are numbers e.g. in generated tree data **/
+<b class="nc"><i>56</i>&nbsp;	boolean m_bIsLabelledNewick = false;</b>
+<i>57</i>&nbsp;	/** flag to indicate that single child nodes are allowed **/
+<b class="nc"><i>58</i>&nbsp;	boolean m_bAllowSingleChild = false;</b>
+<i>59</i>&nbsp;	
+<b class="nc"><i>60</i>&nbsp;	public TreeSetParser(int burnInPercentage, boolean allowSingleChild) {</b>
+<b class="nc"><i>61</i>&nbsp;		m_sLabels = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>62</i>&nbsp;		m_fLongitude = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>63</i>&nbsp;		m_fLatitude = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>64</i>&nbsp;		m_nBurnInPercentage = Math.max(burnInPercentage, 0);</b>
+<b class="nc"><i>65</i>&nbsp;		m_fMinLat = 90; m_fMinLong = 180;</b>
+<b class="nc"><i>66</i>&nbsp;		m_fMaxLat = -90; m_fMaxLong = -180;</b>
+<b class="nc"><i>67</i>&nbsp;		m_bAllowSingleChild = allowSingleChild;</b>
+<b class="nc"><i>68</i>&nbsp;	} // c&#39;tor</b>
+<i>69</i>&nbsp;	
+<b class="nc"><i>70</i>&nbsp;	public TreeSetParser(List&lt;String&gt; labels, List&lt;Float&gt; longitude, List&lt;Float&gt; latitude, int burnInPercentage) {</b>
+<b class="nc"><i>71</i>&nbsp;		m_sLabels = labels;</b>
+<b class="nc"><i>72</i>&nbsp;		if (m_sLabels != null) {</b>
+<b class="nc"><i>73</i>&nbsp;			m_bIsLabelledNewick = true;</b>
+<b class="nc"><i>74</i>&nbsp;			m_nNrOfLabels = m_sLabels.size();</b>
+<i>75</i>&nbsp;		}
+<b class="nc"><i>76</i>&nbsp;		m_fLongitude = longitude;</b>
+<b class="nc"><i>77</i>&nbsp;		m_fLatitude = latitude;</b>
+<b class="nc"><i>78</i>&nbsp;		m_nBurnInPercentage = Math.max(burnInPercentage, 0);</b>
+<b class="nc"><i>79</i>&nbsp;		m_fMinLat = 90; m_fMinLong = 180;</b>
+<b class="nc"><i>80</i>&nbsp;		m_fMaxLat = -90; m_fMaxLong = -180;</b>
+<b class="nc"><i>81</i>&nbsp;	}</b>
+<i>82</i>&nbsp;	
+<i>83</i>&nbsp;	long fileStep;
+<b class="nc"><i>84</i>&nbsp;	long fileRead = 0;</b>
+<b class="nc"><i>85</i>&nbsp;	long fileMarked = 0;</b>
+<i>86</i>&nbsp;
+<i>87</i>&nbsp;	
+<i>88</i>&nbsp;	public Node [] parseFile(String fileName) throws IOException {
+<i>89</i>&nbsp;		//List&lt;String&gt; newickTrees = new List&lt;&gt;();
+<b class="nc"><i>90</i>&nbsp;		List&lt;Node&gt; trees = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>91</i>&nbsp;		m_nOffset = 0;</b>
+<i>92</i>&nbsp;		// parse Newick tree file
+<b class="nc"><i>93</i>&nbsp;		File file = new File(fileName);</b>
+<b class="nc"><i>94</i>&nbsp;		fileStep = Math.max(file.length() / 61, 1);</b>
+<b class="nc"><i>95</i>&nbsp;		fileRead = 0;</b>
+<b class="nc"><i>96</i>&nbsp;		fileMarked = 0;</b>
+<i>97</i>&nbsp;		
+<b class="nc"><i>98</i>&nbsp;		BufferedReader fin = new BufferedReader(new FileReader(fileName));</b>
+<i>99</i>&nbsp;		
+<b class="nc"><i>100</i>&nbsp;        int nrOfTrees = 0;</b>
+<i>101</i>&nbsp;        // first, sweep through the log file to determine the number of trees
+<b class="nc"><i>102</i>&nbsp;        while (fin.ready()) {</b>
+<b class="nc"><i>103</i>&nbsp;            if (fin.readLine().toLowerCase().startsWith(&quot;tree &quot;)) {</b>
+<b class="nc"><i>104</i>&nbsp;            	nrOfTrees++;</b>
+<i>105</i>&nbsp;            }
+<i>106</i>&nbsp;        }
+<b class="nc"><i>107</i>&nbsp;        fin.close();</b>
+<i>108</i>&nbsp;        
+<b class="nc"><i>109</i>&nbsp;        fin = new BufferedReader(new FileReader(fileName));</b>
+<b class="nc"><i>110</i>&nbsp;		String str = readLine(fin);</b>
+<i>111</i>&nbsp;		// grab translate block
+<b class="nc"><i>112</i>&nbsp;		while (fin.ready() &amp;&amp; str.toLowerCase().indexOf(&quot;translate&quot;) &lt; 0) {</b>
+<b class="nc"><i>113</i>&nbsp;			str = readLine(fin);</b>
+<i>114</i>&nbsp;		}
+<b class="nc"><i>115</i>&nbsp;		m_bIsLabelledNewick = false;</b>
+<b class="nc"><i>116</i>&nbsp;		m_nNrOfLabels = m_sLabels.size();</b>
+<b class="nc"><i>117</i>&nbsp;		boolean addLabels = (m_nNrOfLabels == 0);</b>
+<b class="nc"><i>118</i>&nbsp;		if (str.toLowerCase().indexOf(&quot;translate&quot;) &lt; 0) {</b>
+<b class="nc"><i>119</i>&nbsp;			m_bIsLabelledNewick = true;</b>
+<i>120</i>&nbsp;			// could not find translate block, assume it is a list of Newick trees instead of Nexus file
+<b class="nc"><i>121</i>&nbsp;			fin.close();</b>
+<b class="nc"><i>122</i>&nbsp;			fileRead = 0;</b>
+<b class="nc"><i>123</i>&nbsp;			fileMarked = 0;</b>
+<b class="nc"><i>124</i>&nbsp;			fin = new BufferedReader(new FileReader(fileName));</b>
+<b class="nc"><i>125</i>&nbsp;			while (fin.ready() &amp;&amp; m_nNrOfLabels == 0) {</b>
+<b class="nc"><i>126</i>&nbsp;				str = readLine(fin);</b>
+<b class="nc"><i>127</i>&nbsp;				fileRead += str.length();</b>
+<b class="nc"><i>128</i>&nbsp;				if (str.length() &gt; 2 &amp;&amp; str.indexOf(&quot;(&quot;) &gt;= 0) {</b>
+<b class="nc"><i>129</i>&nbsp;					String str2 = str;</b>
+<b class="nc"><i>130</i>&nbsp;					str2 = str2.substring(str2.indexOf(&quot;(&quot;));</b>
+<b class="nc"><i>131</i>&nbsp;					while (str2.indexOf(&#39;[&#39;) &gt;= 0) {</b>
+<b class="nc"><i>132</i>&nbsp;						int i0 = str2.indexOf(&#39;[&#39;);</b>
+<b class="nc"><i>133</i>&nbsp;						int i1 = str2.indexOf(&#39;]&#39;);</b>
+<b class="nc"><i>134</i>&nbsp;						str2 = str2.substring(0, i0) + str2.substring(i1 + 1);</b>
+<b class="nc"><i>135</i>&nbsp;					}</b>
+<b class="nc"><i>136</i>&nbsp;					str2 = str2.replaceAll(&quot;[;\\(\\),]&quot;,&quot; &quot;);</b>
+<b class="nc"><i>137</i>&nbsp;					str2 = str2.replaceAll(&quot;:[0-9\\.Ee-]+&quot;,&quot; &quot;);</b>
+<b class="nc"><i>138</i>&nbsp;					String [] labels = str2.split(&quot;\\s+&quot;);</b>
+<b class="nc"><i>139</i>&nbsp;					if (addLabels) {</b>
+<b class="nc"><i>140</i>&nbsp;						m_nNrOfLabels = 0;</b>
+<b class="nc"><i>141</i>&nbsp;						for (int i = 0; i &lt; labels.length; i++) {</b>
+<b class="nc"><i>142</i>&nbsp;							if (labels[i].length() &gt; 0) {</b>
+<b class="nc"><i>143</i>&nbsp;									m_sLabels.add(labels[i]);</b>
+<b class="nc"><i>144</i>&nbsp;								m_nNrOfLabels++;</b>
+<i>145</i>&nbsp;							}
+<i>146</i>&nbsp;						}
+<i>147</i>&nbsp;					}
+<b class="nc"><i>148</i>&nbsp;					Node tree = parseNewick(str);</b>
+<b class="nc"><i>149</i>&nbsp;					tree.sort();</b>
+<b class="nc"><i>150</i>&nbsp;					tree.labelInternalNodes(m_nNrOfLabels);</b>
+<b class="nc"><i>151</i>&nbsp;					trees.add(tree);</b>
+<i>152</i>&nbsp;//					newickTrees.add(str);
+<b class="nc"><i>153</i>&nbsp;				}</b>
+<i>154</i>&nbsp;			}
+<i>155</i>&nbsp;
+<b class="nc"><i>156</i>&nbsp;			while (fin.ready()) {</b>
+<b class="nc"><i>157</i>&nbsp;				str = readLine(fin);</b>
+<b class="nc"><i>158</i>&nbsp;				if (str.length() &gt; 2 &amp;&amp; str.indexOf(&quot;(&quot;) &gt;= 0) {</b>
+<b class="nc"><i>159</i>&nbsp;					Node tree = parseNewick(str);</b>
+<b class="nc"><i>160</i>&nbsp;					tree.sort();</b>
+<b class="nc"><i>161</i>&nbsp;					tree.labelInternalNodes(m_nNrOfLabels);</b>
+<b class="nc"><i>162</i>&nbsp;					trees.add(tree);</b>
+<b class="nc"><i>163</i>&nbsp;					if (trees.size() % 100 ==0) {if (m_nNrOfLabels&gt;=100||trees.size() % 1000 ==0) {Log.warning.print(trees.size() + &quot; &quot;);}}</b>
+<i>164</i>&nbsp;//					newickTrees.add(str);
+<b class="nc"><i>165</i>&nbsp;				}</b>
+<i>166</i>&nbsp;			}
+<i>167</i>&nbsp;			
+<i>168</i>&nbsp;		} else {
+<i>169</i>&nbsp;			// read tree set from file, and store in individual strings
+<b class="nc"><i>170</i>&nbsp;			str = readLine(fin);</b>
+<i>171</i>&nbsp;			//m_nNrOfLabels = 0;
+<b class="nc"><i>172</i>&nbsp;			boolean isLastLabel = false;</b>
+<b class="nc"><i>173</i>&nbsp;			while (fin.ready() &amp;&amp; !isLastLabel) {</b>
+<b class="nc"><i>174</i>&nbsp;				if (str.indexOf(&quot;;&quot;) &gt;= 0) {</b>
+<b class="nc"><i>175</i>&nbsp;					str = str.replace(&#39;;&#39;,&#39; &#39;);</b>
+<b class="nc"><i>176</i>&nbsp;					str = str.trim();</b>
+<b class="nc"><i>177</i>&nbsp;					if (str.isEmpty()) {</b>
+<b class="nc"><i>178</i>&nbsp;						break;</b>
+<i>179</i>&nbsp;					}
+<b class="nc"><i>180</i>&nbsp;					isLastLabel = true;</b>
+<i>181</i>&nbsp;				}
+<b class="nc"><i>182</i>&nbsp;				str = str.replaceAll(&quot;,&quot;, &quot;&quot;);</b>
+<b class="nc"><i>183</i>&nbsp;				str = str.replaceAll(&quot;^\\s+&quot;, &quot;&quot;);</b>
+<b class="nc"><i>184</i>&nbsp;				String[] strs = str.split(&quot;\\s+&quot;);</b>
+<b class="nc"><i>185</i>&nbsp;				int labelIndex = new Integer(strs[0]).intValue();</b>
+<b class="nc"><i>186</i>&nbsp;				String label = strs[1];</b>
+<b class="nc"><i>187</i>&nbsp;				if (m_sLabels.size() &lt; labelIndex) {</b>
+<i>188</i>&nbsp;					//m_sLabels.add(&quot;__dummy__&quot;);
+<b class="nc"><i>189</i>&nbsp;					m_nOffset = 1;</b>
+<i>190</i>&nbsp;				}
+<i>191</i>&nbsp;				// check if there is geographic info in the name
+<b class="nc"><i>192</i>&nbsp;				if (label.contains(&quot;(&quot;)) {</b>
+<b class="nc"><i>193</i>&nbsp;					int strIndex = label.indexOf(&#39;(&#39;);</b>
+<b class="nc"><i>194</i>&nbsp;					int str2 = label.indexOf(&#39;x&#39;, strIndex);</b>
+<b class="nc"><i>195</i>&nbsp;					if (str2 &gt;= 0) {</b>
+<b class="nc"><i>196</i>&nbsp;						int str3 = label.indexOf(&#39;)&#39;, str2);</b>
+<b class="nc"><i>197</i>&nbsp;						if (str3 &gt;= 0) {</b>
+<b class="nc"><i>198</i>&nbsp;							float lat = Float.parseFloat(label.substring(strIndex+1, str2));// + 180;</b>
+<b class="nc"><i>199</i>&nbsp;							float _long = Float.parseFloat(label.substring(str2+1, str3));// + 360)%360;</b>
+<b class="nc"><i>200</i>&nbsp;							if (lat!=0 || _long!=0) {</b>
+<b class="nc"><i>201</i>&nbsp;								m_fMinLat = Math.min(m_fMinLat, lat);</b>
+<b class="nc"><i>202</i>&nbsp;								m_fMaxLat = Math.max(m_fMaxLat, lat);</b>
+<b class="nc"><i>203</i>&nbsp;								m_fMinLong = Math.min(m_fMinLong, _long);</b>
+<b class="nc"><i>204</i>&nbsp;								m_fMaxLong = Math.max(m_fMaxLong, _long);</b>
+<i>205</i>&nbsp;							}
+<b class="nc"><i>206</i>&nbsp;							while (m_fLatitude.size() &lt; m_sLabels.size()) {</b>
+<b class="nc"><i>207</i>&nbsp;								m_fLatitude.add(0f);</b>
+<b class="nc"><i>208</i>&nbsp;								m_fLongitude.add(0f);</b>
+<i>209</i>&nbsp;							}
+<b class="nc"><i>210</i>&nbsp;							m_fLatitude.add(lat);</b>
+<b class="nc"><i>211</i>&nbsp;							m_fLongitude.add(_long);</b>
+<i>212</i>&nbsp;						}
+<i>213</i>&nbsp;					}
+<b class="nc"><i>214</i>&nbsp;					label = label.substring(0, label.indexOf(&quot;(&quot;));</b>
+<i>215</i>&nbsp;				}
+<b class="nc"><i>216</i>&nbsp;				if (addLabels) {</b>
+<b class="nc"><i>217</i>&nbsp;					m_sLabels.add(label);</b>
+<b class="nc"><i>218</i>&nbsp;					m_nNrOfLabels++;</b>
+<i>219</i>&nbsp;				}
+<b class="nc"><i>220</i>&nbsp;				if (!isLastLabel) {</b>
+<b class="nc"><i>221</i>&nbsp;					str = readLine(fin);</b>
+<i>222</i>&nbsp;				}
+<b class="nc"><i>223</i>&nbsp;			}</b>
+<i>224</i>&nbsp;			
+<i>225</i>&nbsp;			// read trees
+<i>226</i>&nbsp;			// read trees
+<b class="nc"><i>227</i>&nbsp;            int burnIn = m_nBurnInPercentage * nrOfTrees / 100;</b>
+<i>228</i>&nbsp;            //int k = 0;                    
+<b class="nc"><i>229</i>&nbsp;            while (fin.ready()) {</b>
+<b class="nc"><i>230</i>&nbsp;                    str = readLine(fin);</b>
+<b class="nc"><i>231</i>&nbsp;                    str = str.trim();</b>
+<b class="nc"><i>232</i>&nbsp;                    if (str.length() &gt; 5) {</b>
+<b class="nc"><i>233</i>&nbsp;                            String tree = str.substring(0,5);</b>
+<b class="nc"><i>234</i>&nbsp;                            if (tree.toLowerCase().startsWith(&quot;tree &quot;)) {</b>
+<i>235</i>&nbsp;                                    //k++;
+<b class="nc"><i>236</i>&nbsp;                                    if (burnIn &lt;= 0) {</b>
+<b class="nc"><i>237</i>&nbsp;                                            int i = str.indexOf(&#39;(&#39;);</b>
+<b class="nc"><i>238</i>&nbsp;                                            if (i &gt; 0) {</b>
+<b class="nc"><i>239</i>&nbsp;                                                    str = str.substring(i);</b>
+<i>240</i>&nbsp;                                            }
+<b class="nc"><i>241</i>&nbsp;                                            Node treeRoot = parseNewick(str);</b>
+<b class="nc"><i>242</i>&nbsp;                                            treeRoot.sort();</b>
+<b class="nc"><i>243</i>&nbsp;                                            treeRoot.labelInternalNodes(m_nNrOfLabels);</b>
+<b class="nc"><i>244</i>&nbsp;                                            trees.add(treeRoot);</b>
+<i>245</i>&nbsp;                                            //if (trees.size() % 100 ==0) {if (m_nNrOfLabels&gt;=100||trees.size() % 1000 ==0) {Log.warning.print(trees.size() + &quot; &quot;);}}
+<b class="nc"><i>246</i>&nbsp;                                    } else {</b>
+<b class="nc"><i>247</i>&nbsp;                                            burnIn--;</b>
+<i>248</i>&nbsp;                                    }
+<i>249</i>&nbsp;                            }
+<b class="nc"><i>250</i>&nbsp;                    }</b>
+<i>251</i>&nbsp;            }
+<b class="nc"><i>252</i>&nbsp;            fin.close();</b>
+<i>253</i>&nbsp;		}
+<i>254</i>&nbsp;		
+<i>255</i>&nbsp;		// discard burn-in percentage
+<i>256</i>&nbsp;//		int burnIn = m_nBurnInPercentage * trees.size() / 100;
+<i>257</i>&nbsp;//		for (int i = 0; i &lt; burnIn; i++) {
+<i>258</i>&nbsp;//			trees.remove(i);
+<i>259</i>&nbsp;//		}
+<i>260</i>&nbsp;		
+<i>261</i>&nbsp;		
+<i>262</i>&nbsp;		// convert lengths (stored as node heights) to heights
+<b class="nc"><i>263</i>&nbsp;		double maxHeight = 0;</b>
+<b class="nc"><i>264</i>&nbsp;		double [] heights = new double[trees.size()];</b>
+<b class="nc"><i>265</i>&nbsp;		for (int i = 0; i &lt; trees.size(); i++) {</b>
+<b class="nc"><i>266</i>&nbsp;			heights[i] = lengthToHeight(trees.get(i), 0);</b>
+<b class="nc"><i>267</i>&nbsp;			maxHeight = Math.max(maxHeight, heights[i]);</b>
+<i>268</i>&nbsp;		}
+<b class="nc"><i>269</i>&nbsp;		for (int i = 0; i &lt; trees.size(); i++) {</b>
+<b class="nc"><i>270</i>&nbsp;			offsetHeight(trees.get(i), heights[i]);</b>
+<i>271</i>&nbsp;		}
+<i>272</i>&nbsp;
+<b class="nc"><i>273</i>&nbsp;		Log.warning.println();</b>
+<i>274</i>&nbsp;		//System.err.println(&quot;Geo: &quot; +m_fMinLong + &quot;x&quot; + m_fMinLat + &quot; &quot; + m_fMaxLong + &quot;x&quot; + m_fMaxLat);
+<b class="nc"><i>275</i>&nbsp;		return trees.toArray(new Node[1]);</b>
+<i>276</i>&nbsp;	} // parseFile
+<i>277</i>&nbsp;
+<i>278</i>&nbsp;	
+<b class="nc"><i>279</i>&nbsp;	int k = 0;</b>
+<i>280</i>&nbsp;	private String readLine(BufferedReader fin) throws IOException {
+<b class="nc"><i>281</i>&nbsp;		String s = fin.readLine();</b>
+<b class="nc"><i>282</i>&nbsp;		fileRead += s.length();</b>
+<b class="nc"><i>283</i>&nbsp;		if (fileRead &gt; fileMarked - 10) {</b>
+<b class="nc"><i>284</i>&nbsp;			Log.warning.print(&quot;*&quot;);</b>
+<b class="nc"><i>285</i>&nbsp;			fileMarked += fileStep;</b>
+<b class="nc"><i>286</i>&nbsp;			k++;</b>
+<i>287</i>&nbsp;		}
+<i>288</i>&nbsp;//		System.err.println(fileRead + &quot; &quot; + fileMarked + &quot; &quot; + k);
+<b class="nc"><i>289</i>&nbsp;		return s;</b>
+<i>290</i>&nbsp;	}
+<i>291</i>&nbsp;
+<i>292</i>&nbsp;	/** move y-position of a tree with offset f **/
+<i>293</i>&nbsp;	public void offsetHeight(Node node, double f) {
+<b class="nc"><i>294</i>&nbsp;		if (!node.isLeaf()) {</b>
+<b class="nc"><i>295</i>&nbsp;			offsetHeight(node.getLeft(), f);</b>
+<b class="nc"><i>296</i>&nbsp;			if (node.getRight() != null) {</b>
+<b class="nc"><i>297</i>&nbsp;				offsetHeight(node.getRight(), f);</b>
+<i>298</i>&nbsp;			}
+<i>299</i>&nbsp;		}
+<b class="nc"><i>300</i>&nbsp;		node.setHeight(node.getHeight() + f);</b>
+<b class="nc"><i>301</i>&nbsp;	}</b>
+<i>302</i>&nbsp;
+<i>303</i>&nbsp;	/** convert length to height
+<i>304</i>&nbsp;	 *  and set ID of leafs
+<i>305</i>&nbsp;	 */
+<i>306</i>&nbsp;	private double lengthToHeight(Node node, double offSet) {
+<b class="nc"><i>307</i>&nbsp;		if (node.isLeaf()) {</b>
+<b class="nc"><i>308</i>&nbsp;			node.setHeight(-offSet - node.getHeight());</b>
+<b class="nc"><i>309</i>&nbsp;			node.setID(m_sLabels.get(node.getNr()));</b>
+<b class="nc"><i>310</i>&nbsp;			return -node.getHeight();</b>
+<i>311</i>&nbsp;		} else {
+<b class="nc"><i>312</i>&nbsp;			double posY = offSet + node.getHeight();</b>
+<b class="nc"><i>313</i>&nbsp;			double yMax = 0;</b>
+<b class="nc"><i>314</i>&nbsp;			yMax = Math.max(yMax, lengthToHeight(node.getLeft(), posY));</b>
+<b class="nc"><i>315</i>&nbsp;			if (node.getRight() != null) {</b>
+<b class="nc"><i>316</i>&nbsp;				yMax = Math.max(yMax, lengthToHeight(node.getRight(), posY));</b>
+<i>317</i>&nbsp;			}
+<b class="nc"><i>318</i>&nbsp;			node.setHeight(-posY);</b>
+<b class="nc"><i>319</i>&nbsp;			return yMax;</b>
+<i>320</i>&nbsp;		}
+<i>321</i>&nbsp;	}
+<i>322</i>&nbsp;
+<i>323</i>&nbsp;	/** Try to map str into an index. First, assume it is a number.
+<i>324</i>&nbsp;	 * If that does not work, look in list of labels to see whether it is there.
+<i>325</i>&nbsp;	 */
+<i>326</i>&nbsp;	private int getLabelIndex(String str) {
+<b class="nc"><i>327</i>&nbsp;		if (!m_bIsLabelledNewick) {</b>
+<i>328</i>&nbsp;			try {
+<b class="nc"><i>329</i>&nbsp;				return Integer.parseInt(str) - m_nOffset;</b>
+<b class="nc"><i>330</i>&nbsp;			} catch (Exception e) {</b>
+<i>331</i>&nbsp;			}
+<i>332</i>&nbsp;		}
+<b class="nc"><i>333</i>&nbsp;		for (int i = 0; i &lt; m_nNrOfLabels; i++) {</b>
+<b class="nc"><i>334</i>&nbsp;			if (str.equals(m_sLabels.get(i))) {</b>
+<b class="nc"><i>335</i>&nbsp;				return i;</b>
+<i>336</i>&nbsp;			}
+<i>337</i>&nbsp;		}
+<i>338</i>&nbsp;		// str may have (double) qoutes missing
+<b class="nc"><i>339</i>&nbsp;		for (int i = 0; i &lt; m_nNrOfLabels; i++) {</b>
+<b class="nc"><i>340</i>&nbsp;			String label = m_sLabels.get(i);</b>
+<b class="nc"><i>341</i>&nbsp;			if (label.startsWith(&quot;&#39;&quot;) &amp;&amp; label.endsWith(&quot;&#39;&quot;) ||</b>
+<b class="nc"><i>342</i>&nbsp;					label.startsWith(&quot;\&quot;&quot;) &amp;&amp; label.endsWith(&quot;\&quot;&quot;)) {</b>
+<b class="nc"><i>343</i>&nbsp;				label = label.substring(1, label.length()-1);</b>
+<b class="nc"><i>344</i>&nbsp;				if (str.equals(label)) {</b>
+<b class="nc"><i>345</i>&nbsp;					return i;</b>
+<i>346</i>&nbsp;				}
+<i>347</i>&nbsp;			}
+<i>348</i>&nbsp;		}
+<i>349</i>&nbsp;		// str may have extra (double) qoutes
+<b class="nc"><i>350</i>&nbsp;		if (str.startsWith(&quot;&#39;&quot;) &amp;&amp; str.endsWith(&quot;&#39;&quot;) ||</b>
+<b class="nc"><i>351</i>&nbsp;				str.startsWith(&quot;\&quot;&quot;) &amp;&amp; str.endsWith(&quot;\&quot;&quot;)) {</b>
+<b class="nc"><i>352</i>&nbsp;			str = str.substring(1, str.length()-1);</b>
+<b class="nc"><i>353</i>&nbsp;			return getLabelIndex(str);</b>
+<i>354</i>&nbsp;		}
+<b class="nc"><i>355</i>&nbsp;		throw new IllegalArgumentException(&quot;Label &#39;&quot; + str + &quot;&#39; in Newick tree could not be identified&quot;);</b>
+<i>356</i>&nbsp;	}
+<i>357</i>&nbsp;	
+<i>358</i>&nbsp;
+<i>359</i>&nbsp;	 double height(Node node) {
+<b class="nc"><i>360</i>&nbsp;		 if (node.isLeaf()) {</b>
+<b class="nc"><i>361</i>&nbsp;			 return node.getLength();</b>
+<i>362</i>&nbsp;		 } else {
+<b class="nc"><i>363</i>&nbsp;			 return node.getLength() + Math.max(height(node.getLeft()), height(node.getRight()));</b>
+<i>364</i>&nbsp;		 }
+<i>365</i>&nbsp;	 }
+<i>366</i>&nbsp;	 
+<i>367</i>&nbsp;	 char [] m_chars;
+<i>368</i>&nbsp;	 int m_iTokenStart;
+<i>369</i>&nbsp;	 int m_iTokenEnd;
+<i>370</i>&nbsp;	 final static int COMMA = 1;
+<i>371</i>&nbsp;	 final static int BRACE_OPEN = 3;
+<i>372</i>&nbsp;	 final static int BRACE_CLOSE = 4;
+<i>373</i>&nbsp;	 final static int COLON = 5;
+<i>374</i>&nbsp;	 final static int SEMI_COLON = 8;
+<i>375</i>&nbsp;	 final static int META_DATA = 6;
+<i>376</i>&nbsp;	 final static int TEXT = 7;
+<i>377</i>&nbsp;	 final static int UNKNOWN = 0;
+<i>378</i>&nbsp;	 
+<i>379</i>&nbsp;	 int nextToken() {
+<b class="nc"><i>380</i>&nbsp;		 m_iTokenStart = m_iTokenEnd;</b>
+<b class="nc"><i>381</i>&nbsp;		 while (m_iTokenEnd &lt; m_chars.length) {</b>
+<i>382</i>&nbsp;			 // skip spaces
+<b class="nc"><i>383</i>&nbsp;			 while (m_iTokenEnd &lt; m_chars.length &amp;&amp; (m_chars[m_iTokenEnd] == &#39; &#39; || m_chars[m_iTokenEnd] == &#39;\t&#39;)) {</b>
+<b class="nc"><i>384</i>&nbsp;				 m_iTokenStart++;</b>
+<b class="nc"><i>385</i>&nbsp;				 m_iTokenEnd++;</b>
+<i>386</i>&nbsp;			 }
+<b class="nc"><i>387</i>&nbsp;			 if (m_chars[m_iTokenEnd] == &#39;(&#39;) {</b>
+<b class="nc"><i>388</i>&nbsp;				 m_iTokenEnd++;</b>
+<b class="nc"><i>389</i>&nbsp;				 return BRACE_OPEN;</b>
+<i>390</i>&nbsp;			 }
+<b class="nc"><i>391</i>&nbsp;			 if (m_chars[m_iTokenEnd] == &#39;:&#39;) {</b>
+<b class="nc"><i>392</i>&nbsp;				 m_iTokenEnd++;</b>
+<b class="nc"><i>393</i>&nbsp;				 return COLON;</b>
+<i>394</i>&nbsp;			 }
+<b class="nc"><i>395</i>&nbsp;			 if (m_chars[m_iTokenEnd] == &#39;;&#39;) {</b>
+<b class="nc"><i>396</i>&nbsp;				 m_iTokenEnd++;</b>
+<b class="nc"><i>397</i>&nbsp;				 return SEMI_COLON;</b>
+<i>398</i>&nbsp;			 }
+<b class="nc"><i>399</i>&nbsp;			 if (m_chars[m_iTokenEnd] == &#39;)&#39;) {</b>
+<b class="nc"><i>400</i>&nbsp;				 m_iTokenEnd++;</b>
+<b class="nc"><i>401</i>&nbsp;				 return BRACE_CLOSE;</b>
+<i>402</i>&nbsp;			 }
+<b class="nc"><i>403</i>&nbsp;			 if (m_chars[m_iTokenEnd] == &#39;,&#39;) {</b>
+<b class="nc"><i>404</i>&nbsp;				 m_iTokenEnd++;</b>
+<b class="nc"><i>405</i>&nbsp;				 return COMMA;</b>
+<i>406</i>&nbsp;			 }
+<b class="nc"><i>407</i>&nbsp;			 if (m_chars[m_iTokenEnd] == &#39;[&#39;) {</b>
+<b class="nc"><i>408</i>&nbsp;				 m_iTokenEnd++;</b>
+<b class="nc"><i>409</i>&nbsp;				 while (m_iTokenEnd &lt; m_chars.length &amp;&amp; m_chars[m_iTokenEnd-1] != &#39;]&#39;) {</b>
+<b class="nc"><i>410</i>&nbsp;					 m_iTokenEnd++;</b>
+<i>411</i>&nbsp;				 }
+<b class="nc"><i>412</i>&nbsp;				 return META_DATA;</b>
+<i>413</i>&nbsp;			 }
+<b class="nc"><i>414</i>&nbsp;			 while (m_iTokenEnd &lt; m_chars.length &amp;&amp; (m_chars[m_iTokenEnd] != &#39; &#39; &amp;&amp; m_chars[m_iTokenEnd] != &#39;\t&#39;</b>
+<i>415</i>&nbsp;				 &amp;&amp; m_chars[m_iTokenEnd] != &#39;(&#39;  &amp;&amp; m_chars[m_iTokenEnd] != &#39;)&#39;  &amp;&amp; m_chars[m_iTokenEnd] != &#39;[&#39;
+<i>416</i>&nbsp;					 &amp;&amp; m_chars[m_iTokenEnd] != &#39;:&#39;&amp;&amp; m_chars[m_iTokenEnd] != &#39;,&#39;&amp;&amp; m_chars[m_iTokenEnd] != &#39;;&#39;)) {
+<b class="nc"><i>417</i>&nbsp;				 m_iTokenEnd++;</b>
+<i>418</i>&nbsp;			 }
+<b class="nc"><i>419</i>&nbsp;			 return TEXT;</b>
+<i>420</i>&nbsp;		 }
+<b class="nc"><i>421</i>&nbsp;		 return UNKNOWN;</b>
+<i>422</i>&nbsp;	 }
+<i>423</i>&nbsp;
+<i>424</i>&nbsp;	 public Node parseNewick(String str) {
+<i>425</i>&nbsp;		 try {
+<b class="nc"><i>426</i>&nbsp;		if (str == null || str.length() == 0) {</b>
+<b class="nc"><i>427</i>&nbsp;			return null;</b>
+<i>428</i>&nbsp;		}
+<i>429</i>&nbsp;		
+<b class="nc"><i>430</i>&nbsp;		m_chars = str.toCharArray();</b>
+<b class="nc"><i>431</i>&nbsp;		m_iTokenStart = str.indexOf(&#39;(&#39;);</b>
+<b class="nc"><i>432</i>&nbsp;		if (m_iTokenStart &lt; 0) {</b>
+<b class="nc"><i>433</i>&nbsp;			return null;</b>
+<i>434</i>&nbsp;		}
+<b class="nc"><i>435</i>&nbsp;		m_iTokenEnd = m_iTokenStart;</b>
+<b class="nc"><i>436</i>&nbsp;		Vector&lt;Node&gt; stack = new Vector&lt;&gt;();</b>
+<b class="nc"><i>437</i>&nbsp;		Vector&lt;Boolean&gt; isFirstChild =  new Vector&lt;&gt;();</b>
+<b class="nc"><i>438</i>&nbsp;		Vector&lt;String&gt; metaDataString =  new Vector&lt;&gt;();</b>
+<b class="nc"><i>439</i>&nbsp;		stack.add(new Node());</b>
+<b class="nc"><i>440</i>&nbsp;		isFirstChild.add(true);</b>
+<b class="nc"><i>441</i>&nbsp;		stack.lastElement().setHeight(DEFAULT_LENGTH);</b>
+<b class="nc"><i>442</i>&nbsp;		metaDataString.add(null);</b>
+<b class="nc"><i>443</i>&nbsp;		boolean isLabel = true;</b>
+<b class="nc"><i>444</i>&nbsp;		while (m_iTokenEnd &lt; m_chars.length) {</b>
+<b class="nc"><i>445</i>&nbsp;			switch (nextToken()) {</b>
+<i>446</i>&nbsp;			case BRACE_OPEN:
+<i>447</i>&nbsp;			{
+<b class="nc"><i>448</i>&nbsp;				Node node2 = new Node();</b>
+<b class="nc"><i>449</i>&nbsp;				node2.setHeight(DEFAULT_LENGTH);</b>
+<b class="nc"><i>450</i>&nbsp;				stack.add(node2);</b>
+<b class="nc"><i>451</i>&nbsp;				isFirstChild.add(true);</b>
+<b class="nc"><i>452</i>&nbsp;				metaDataString.add(null);</b>
+<b class="nc"><i>453</i>&nbsp;				isLabel = true;</b>
+<i>454</i>&nbsp;			}
+<b class="nc"><i>455</i>&nbsp;				break;</b>
+<i>456</i>&nbsp;			case BRACE_CLOSE:
+<i>457</i>&nbsp;			{
+<b class="nc"><i>458</i>&nbsp;				if (isFirstChild.lastElement()) {</b>
+<b class="nc"><i>459</i>&nbsp;					if (m_bAllowSingleChild) {</b>
+<i>460</i>&nbsp;						// process single child nodes
+<b class="nc"><i>461</i>&nbsp;						Node left = stack.lastElement();</b>
+<b class="nc"><i>462</i>&nbsp;						stack.remove(stack.size()-1);</b>
+<b class="nc"><i>463</i>&nbsp;						isFirstChild.remove(isFirstChild.size()-1);</b>
+<b class="nc"><i>464</i>&nbsp;						Node dummyparent = new Node();</b>
+<b class="nc"><i>465</i>&nbsp;						dummyparent.setHeight(DEFAULT_LENGTH);</b>
+<b class="nc"><i>466</i>&nbsp;						dummyparent.setLeft(left);</b>
+<b class="nc"><i>467</i>&nbsp;						left.setParent(dummyparent);</b>
+<b class="nc"><i>468</i>&nbsp;						dummyparent.setRight(null);</b>
+<b class="nc"><i>469</i>&nbsp;						Node parent = stack.lastElement();</b>
+<b class="nc"><i>470</i>&nbsp;						parent.setLeft(left);</b>
+<b class="nc"><i>471</i>&nbsp;						left.setParent(parent);</b>
+<b class="nc"><i>472</i>&nbsp;						String metaData = metaDataString.remove(metaDataString.size() - 1);</b>
+<b class="nc"><i>473</i>&nbsp;						left.metaDataString = metaData;</b>
+<b class="nc"><i>474</i>&nbsp;						parseMetaData(left, metaData);</b>
+<b class="nc"><i>475</i>&nbsp;						break;</b>
+<i>476</i>&nbsp;					} else {
+<i>477</i>&nbsp;						// don&#39;t know how to process single child nodes
+<b class="nc"><i>478</i>&nbsp;						throw new IllegalArgumentException(&quot;Node with single child found.&quot;);</b>
+<i>479</i>&nbsp;					}
+<i>480</i>&nbsp;				}
+<i>481</i>&nbsp;				// process multi(i.e. more than 2)-child nodes by pairwise merging.
+<b class="nc"><i>482</i>&nbsp;				while (isFirstChild.elementAt(isFirstChild.size()-2) == false) {</b>
+<b class="nc"><i>483</i>&nbsp;					Node right = stack.lastElement();</b>
+<b class="nc"><i>484</i>&nbsp;					stack.remove(stack.size()-1);</b>
+<b class="nc"><i>485</i>&nbsp;					isFirstChild.remove(isFirstChild.size()-1);</b>
+<b class="nc"><i>486</i>&nbsp;					Node left = stack.lastElement();</b>
+<b class="nc"><i>487</i>&nbsp;					stack.remove(stack.size()-1);</b>
+<b class="nc"><i>488</i>&nbsp;					isFirstChild.remove(isFirstChild.size()-1);</b>
+<b class="nc"><i>489</i>&nbsp;					Node dummyparent = new Node();</b>
+<b class="nc"><i>490</i>&nbsp;					dummyparent.setHeight(DEFAULT_LENGTH);</b>
+<b class="nc"><i>491</i>&nbsp;					dummyparent.setLeft(left);</b>
+<b class="nc"><i>492</i>&nbsp;					left.setParent (dummyparent);</b>
+<b class="nc"><i>493</i>&nbsp;					dummyparent.setRight(right);</b>
+<b class="nc"><i>494</i>&nbsp;					right.setParent(dummyparent);</b>
+<b class="nc"><i>495</i>&nbsp;					stack.add(dummyparent);</b>
+<b class="nc"><i>496</i>&nbsp;					isFirstChild.add(false);</b>
+<b class="nc"><i>497</i>&nbsp;					String metaData = metaDataString.remove(metaDataString.size() - 1);</b>
+<b class="nc"><i>498</i>&nbsp;					parseMetaData(left, metaData);</b>
+<b class="nc"><i>499</i>&nbsp;				}</b>
+<i>500</i>&nbsp;				// last two nodes on stack merged into single parent node 
+<b class="nc"><i>501</i>&nbsp;				Node right = stack.lastElement();</b>
+<b class="nc"><i>502</i>&nbsp;				stack.remove(stack.size()-1);</b>
+<b class="nc"><i>503</i>&nbsp;				isFirstChild.remove(isFirstChild.size()-1);</b>
+<b class="nc"><i>504</i>&nbsp;				String metaData = metaDataString.remove(metaDataString.size() - 1);</b>
+<b class="nc"><i>505</i>&nbsp;				parseMetaData(right, metaData);</b>
+<i>506</i>&nbsp;
+<b class="nc"><i>507</i>&nbsp;				Node left = stack.lastElement();</b>
+<b class="nc"><i>508</i>&nbsp;				stack.remove(stack.size()-1);</b>
+<b class="nc"><i>509</i>&nbsp;				isFirstChild.remove(isFirstChild.size()-1);</b>
+<b class="nc"><i>510</i>&nbsp;				metaData = metaDataString.remove(metaDataString.size() - 1);</b>
+<b class="nc"><i>511</i>&nbsp;				parseMetaData(left, metaData);</b>
+<i>512</i>&nbsp;
+<b class="nc"><i>513</i>&nbsp;				Node parent = stack.lastElement();</b>
+<b class="nc"><i>514</i>&nbsp;				parent.setLeft(left);</b>
+<b class="nc"><i>515</i>&nbsp;				left.setParent(parent);</b>
+<b class="nc"><i>516</i>&nbsp;				parent.setRight(right);</b>
+<b class="nc"><i>517</i>&nbsp;				right.setParent(parent);</b>
+<b class="nc"><i>518</i>&nbsp;				metaData = metaDataString.lastElement();</b>
+<b class="nc"><i>519</i>&nbsp;				parseMetaData(parent, metaData);</b>
+<i>520</i>&nbsp;			}
+<b class="nc"><i>521</i>&nbsp;				break;</b>
+<i>522</i>&nbsp;			case COMMA:
+<i>523</i>&nbsp;			{
+<b class="nc"><i>524</i>&nbsp;				Node node2 = new Node();</b>
+<b class="nc"><i>525</i>&nbsp;				node2.setHeight(DEFAULT_LENGTH);</b>
+<b class="nc"><i>526</i>&nbsp;				stack.add(node2);</b>
+<b class="nc"><i>527</i>&nbsp;				isFirstChild.add(false);</b>
+<b class="nc"><i>528</i>&nbsp;				metaDataString.add(null);</b>
+<b class="nc"><i>529</i>&nbsp;				isLabel = true;</b>
+<i>530</i>&nbsp;			}
+<b class="nc"><i>531</i>&nbsp;				break;</b>
+<i>532</i>&nbsp;			case COLON:
+<b class="nc"><i>533</i>&nbsp;				isLabel = false;</b>
+<b class="nc"><i>534</i>&nbsp;				break;</b>
+<i>535</i>&nbsp;			case TEXT:
+<b class="nc"><i>536</i>&nbsp;				if (isLabel) {</b>
+<b class="nc"><i>537</i>&nbsp;					String label = str.substring(m_iTokenStart, m_iTokenEnd);</b>
+<b class="nc"><i>538</i>&nbsp;					stack.lastElement().setNr(getLabelIndex(label)); </b>
+<b class="nc"><i>539</i>&nbsp;				} else {</b>
+<b class="nc"><i>540</i>&nbsp;					String length = str.substring(m_iTokenStart, m_iTokenEnd);</b>
+<b class="nc"><i>541</i>&nbsp;					stack.lastElement().setHeight(Float.parseFloat(length)); </b>
+<i>542</i>&nbsp;				}
+<b class="nc"><i>543</i>&nbsp;				break;</b>
+<i>544</i>&nbsp;			case META_DATA:
+<b class="nc"><i>545</i>&nbsp;				if (metaDataString.lastElement() == null) {</b>
+<b class="nc"><i>546</i>&nbsp;					metaDataString.set(metaDataString.size()-1, str.substring(m_iTokenStart+1, m_iTokenEnd-1));</b>
+<i>547</i>&nbsp;				} else {
+<b class="nc"><i>548</i>&nbsp;					metaDataString.set(metaDataString.size()-1, metaDataString.lastElement() </b>
+<b class="nc"><i>549</i>&nbsp;					 + (&quot;,&quot; +str.substring(m_iTokenStart+1, m_iTokenEnd-1)));</b>
+<i>550</i>&nbsp;				}
+<b class="nc"><i>551</i>&nbsp;				break;</b>
+<i>552</i>&nbsp;			case SEMI_COLON:
+<i>553</i>&nbsp;				//System.err.println(stack.lastElement().toString());
+<b class="nc"><i>554</i>&nbsp;				parseMetaData(stack.lastElement(), metaDataString.lastElement());</b>
+<b class="nc"><i>555</i>&nbsp;				return stack.lastElement();</b>
+<i>556</i>&nbsp;			default:
+<b class="nc"><i>557</i>&nbsp;				throw new IllegalArgumentException(&quot;parseNewick: unknown token&quot;);	</b>
+<i>558</i>&nbsp;			}
+<i>559</i>&nbsp;		}
+<b class="nc"><i>560</i>&nbsp;		return stack.lastElement();</b>
+<b class="nc"><i>561</i>&nbsp;		 } catch (Exception e) {</b>
+<b class="nc"><i>562</i>&nbsp;			 e.printStackTrace();</b>
+<b class="nc"><i>563</i>&nbsp;			 throw new IllegalArgumentException(e.getMessage() + &quot;: &quot; + str.substring(Math.max(0, m_iTokenStart-100), m_iTokenStart) + &quot; &gt;&gt;&gt;&quot; + str.substring(m_iTokenStart, m_iTokenEnd) + &quot; &lt;&lt;&lt; ...&quot;); </b>
+<i>564</i>&nbsp;		 }
+<i>565</i>&nbsp;		//return node;
+<i>566</i>&nbsp;	 }
+<i>567</i>&nbsp;	 
+<i>568</i>&nbsp;	 
+<i>569</i>&nbsp;		public void parseMetaData(Node node, String metaDataString) {
+<b class="nc"><i>570</i>&nbsp;			node.metaDataString = metaDataString;</b>
+<b class="nc"><i>571</i>&nbsp;			if (metaDataString == null) {</b>
+<b class="nc"><i>572</i>&nbsp;				return;</b>
+<i>573</i>&nbsp;			}
+<i>574</i>&nbsp;			// parse by key=value pairs
+<b class="nc"><i>575</i>&nbsp;			int i = 0;</b>
+<b class="nc"><i>576</i>&nbsp;			int start = 1;</b>
+<i>577</i>&nbsp;			try {
+<b class="nc"><i>578</i>&nbsp;				while ((i = metaDataString.indexOf(&#39;=&#39;, i)) &gt;= 0) {</b>
+<b class="nc"><i>579</i>&nbsp;					String key = metaDataString.substring(start, i).trim();</b>
+<b class="nc"><i>580</i>&nbsp;					String value = null;</b>
+<b class="nc"><i>581</i>&nbsp;					int k = 0;</b>
+<b class="nc"><i>582</i>&nbsp;					if ((k = metaDataString.indexOf(&#39;=&#39;, i+1)) &gt;= 0) {</b>
+<b class="nc"><i>583</i>&nbsp;						int j = metaDataString.lastIndexOf(&#39;,&#39;, k);</b>
+<b class="nc"><i>584</i>&nbsp;						value = metaDataString.substring(i + 1, j);</b>
+<b class="nc"><i>585</i>&nbsp;						start = j + 1;</b>
+<b class="nc"><i>586</i>&nbsp;					} else {</b>
+<b class="nc"><i>587</i>&nbsp;						value = metaDataString.substring(i+1);</b>
+<i>588</i>&nbsp;					}
+<b class="nc"><i>589</i>&nbsp;					if (value.length() &gt; 0 &amp;&amp; value.charAt(0) != &#39;{&#39;) {</b>
+<i>590</i>&nbsp;						try {
+<b class="nc"><i>591</i>&nbsp;							Double dvalue = Double.parseDouble(value);</b>
+<b class="nc"><i>592</i>&nbsp;							node.setMetaData(key, dvalue);</b>
+<i>593</i>&nbsp;							
+<b class="nc"><i>594</i>&nbsp;						} catch (Exception e) {</b>
+<b class="nc"><i>595</i>&nbsp;							node.setMetaData(key, value);</b>
+<b class="nc"><i>596</i>&nbsp;						}</b>
+<b class="nc"><i>597</i>&nbsp;					} else 	if (value.length() &gt; 0 &amp;&amp; value.charAt(0) == &#39;{&#39; &amp;&amp; value.charAt(value.length() - 1) == &#39;}&#39;) {</b>
+<i>598</i>&nbsp;						try {
+<b class="nc"><i>599</i>&nbsp;							String str = value.substring(1, value.length() - 1); </b>
+<b class="nc"><i>600</i>&nbsp;							String [] strs = str.split(&quot;,&quot;);</b>
+<b class="nc"><i>601</i>&nbsp;							Double [] values = new Double[strs.length];</b>
+<b class="nc"><i>602</i>&nbsp;							for (int j = 0; j &lt; strs.length; j++) {</b>
+<b class="nc"><i>603</i>&nbsp;								values[j] = Double.parseDouble(strs[j]); </b>
+<i>604</i>&nbsp;							}
+<b class="nc"><i>605</i>&nbsp;							node.setMetaData(key, values);</b>
+<b class="nc"><i>606</i>&nbsp;						} catch (Exception e) {</b>
+<b class="nc"><i>607</i>&nbsp;							node.setMetaData(key, value);</b>
+<b class="nc"><i>608</i>&nbsp;						}</b>
+<i>609</i>&nbsp;					} else {
+<b class="nc"><i>610</i>&nbsp;						node.setMetaData(key, value);</b>
+<i>611</i>&nbsp;					}
+<b class="nc"><i>612</i>&nbsp;					i++;</b>
+<b class="nc"><i>613</i>&nbsp;				}</b>
+<b class="nc"><i>614</i>&nbsp;			} catch (Exception e) {</b>
+<i>615</i>&nbsp;				// TODO: handle exception
+<b class="nc"><i>616</i>&nbsp;			}</b>
+<b class="nc"><i>617</i>&nbsp;		}</b>
+<i>618</i>&nbsp;
+<i>619</i>&nbsp;} // class TreeFileParser
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

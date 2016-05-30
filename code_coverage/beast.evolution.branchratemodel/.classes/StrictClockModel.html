@@ -1,0 +1,134 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: StrictClockModel</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.branchratemodel</a> ]
+</div>
+
+<h1>Coverage Summary for Class: StrictClockModel (beast.evolution.branchratemodel)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StrictClockModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (2/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    18.8%
+  </span>
+  <span class="absValue">
+    (3/ 16)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.branchratemodel;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import beast.core.Description;
+<i>4</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>5</i>&nbsp;import beast.evolution.tree.Node;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;/**
+<i>8</i>&nbsp; * @author Alexei Drummond
+<i>9</i>&nbsp; */
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;@Description(&quot;Defines a mean rate for each branch in the beast.tree.&quot;)
+<b class="fc"><i>12</i>&nbsp;public class StrictClockModel extends BranchRateModel.Base {</b>
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;    //public Input&lt;RealParameter&gt; muParameterInput = new Input&lt;&gt;(&quot;clock.rate&quot;, &quot;the clock rate (defaults to 1.0)&quot;);
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;    RealParameter muParameter;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;    @Override
+<i>19</i>&nbsp;    public void initAndValidate() {
+<b class="nc"><i>20</i>&nbsp;        muParameter = meanRateInput.get();</b>
+<b class="nc"><i>21</i>&nbsp;        if (muParameter != null) {</b>
+<b class="nc"><i>22</i>&nbsp;            muParameter.setBounds(Math.max(0.0, muParameter.getLower()), muParameter.getUpper());</b>
+<b class="nc"><i>23</i>&nbsp;            mu = muParameter.getValue();</b>
+<i>24</i>&nbsp;        }
+<b class="nc"><i>25</i>&nbsp;    }</b>
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;    @Override
+<i>28</i>&nbsp;    public double getRateForBranch(final Node node) {
+<b class="fc"><i>29</i>&nbsp;        return mu;</b>
+<i>30</i>&nbsp;    }
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;    @Override
+<i>33</i>&nbsp;    public boolean requiresRecalculation() {
+<b class="nc"><i>34</i>&nbsp;        mu = muParameter.getValue();</b>
+<b class="nc"><i>35</i>&nbsp;        return true;</b>
+<i>36</i>&nbsp;    }
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;    @Override
+<i>39</i>&nbsp;    protected void restore() {
+<b class="nc"><i>40</i>&nbsp;        mu = muParameter.getValue();</b>
+<b class="nc"><i>41</i>&nbsp;        super.restore();</b>
+<b class="nc"><i>42</i>&nbsp;    }</b>
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;    @Override
+<i>45</i>&nbsp;    protected void store() {
+<b class="nc"><i>46</i>&nbsp;        mu = muParameter.getValue();</b>
+<b class="nc"><i>47</i>&nbsp;        super.store();</b>
+<b class="nc"><i>48</i>&nbsp;    }</b>
+<i>49</i>&nbsp;
+<b class="fc"><i>50</i>&nbsp;    private double mu = 1.0;</b>
+<i>51</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

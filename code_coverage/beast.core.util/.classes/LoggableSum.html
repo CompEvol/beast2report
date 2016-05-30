@@ -1,0 +1,170 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: LoggableSum</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.core.util</a> ]
+</div>
+
+<h1>Coverage Summary for Class: LoggableSum (beast.core.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LoggableSum</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 14)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LoggableSum$Mode</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 15)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.core.util;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.io.PrintStream;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import beast.core.Description;
+<i>6</i>&nbsp;import beast.core.Function;
+<i>7</i>&nbsp;import beast.core.Input;
+<i>8</i>&nbsp;import beast.core.Loggable;
+<i>9</i>&nbsp;import beast.core.BEASTObject;
+<i>10</i>&nbsp;import beast.core.Input.Validate;
+<i>11</i>&nbsp;import beast.core.parameter.BooleanParameter;
+<i>12</i>&nbsp;import beast.core.parameter.IntegerParameter;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;@Description(&quot;Logs the sum of anything that is Valuable&quot;)
+<b class="nc"><i>17</i>&nbsp;public class LoggableSum extends BEASTObject implements Loggable {</b>
+<b class="nc"><i>18</i>&nbsp;	public Input&lt;Function&gt; m_valuableInput = new Input&lt;Function&gt;(&quot;value&quot;, &quot;Valuable Plugin that needs logging the sum of&quot;, Validate.REQUIRED);</b>
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;	Function m_valuable;
+<b class="nc"><i>21</i>&nbsp;	enum Mode {integer_mode, double_mode}</b>
+<i>22</i>&nbsp;	Mode m_mode;
+<i>23</i>&nbsp;	
+<i>24</i>&nbsp;	@Override
+<i>25</i>&nbsp;	public void initAndValidate() {
+<b class="nc"><i>26</i>&nbsp;		m_valuable =  m_valuableInput.get();</b>
+<b class="nc"><i>27</i>&nbsp;		if (m_valuable instanceof IntegerParameter || m_valuable instanceof BooleanParameter) {</b>
+<b class="nc"><i>28</i>&nbsp;			m_mode = Mode.integer_mode;</b>
+<i>29</i>&nbsp;		} else {
+<b class="nc"><i>30</i>&nbsp;			m_mode = Mode.double_mode;</b>
+<i>31</i>&nbsp;		}
+<i>32</i>&nbsp;	}
+<i>33</i>&nbsp;	
+<i>34</i>&nbsp;    /**
+<i>35</i>&nbsp;     * Loggable interface implementation follows  
+<i>36</i>&nbsp;     */
+<i>37</i>&nbsp;    @Override
+<i>38</i>&nbsp;	public void init(PrintStream out) {
+<b class="nc"><i>39</i>&nbsp;        out.print(&quot;sum(&quot;+((BEASTObject)m_valuable).getID() + &quot;)\t&quot;);</b>
+<i>40</i>&nbsp;    }
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;    @Override
+<i>43</i>&nbsp;	public void log(int nSample, PrintStream out) {
+<b class="nc"><i>44</i>&nbsp;        final int nDimension = m_valuable.getDimension();</b>
+<b class="nc"><i>45</i>&nbsp;        double fSum = 0;</b>
+<b class="nc"><i>46</i>&nbsp;        for (int iValue = 0; iValue &lt; nDimension; iValue++) {</b>
+<b class="nc"><i>47</i>&nbsp;        	fSum += m_valuable.getArrayValue(iValue);</b>
+<i>48</i>&nbsp;        }
+<b class="nc"><i>49</i>&nbsp;        if (m_mode == Mode.integer_mode) {</b>
+<b class="nc"><i>50</i>&nbsp;        	out.print((int)fSum + &quot;\t&quot;);</b>
+<i>51</i>&nbsp;        } else {
+<b class="nc"><i>52</i>&nbsp;        	out.print(fSum + &quot;\t&quot;);</b>
+<i>53</i>&nbsp;        }
+<i>54</i>&nbsp;	}
+<i>55</i>&nbsp;
+<i>56</i>&nbsp;    @Override
+<i>57</i>&nbsp;	public void close(PrintStream out) {
+<i>58</i>&nbsp;		// nothing to do
+<i>59</i>&nbsp;	}
+<i>60</i>&nbsp;	
+<i>61</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

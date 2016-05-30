@@ -1,0 +1,419 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TreeTraceAnalysis</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.tree</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TreeTraceAnalysis (beast.evolution.tree)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TreeTraceAnalysis</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 68)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TreeTraceAnalysis$Utils</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 78)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp; * Copyright (C) 2012 Tim Vaughan
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; * This program is free software: you can redistribute it and/or modify
+<i>5</i>&nbsp; * it under the terms of the GNU General Public License as published by
+<i>6</i>&nbsp; * the Free Software Foundation, either version 3 of the License, or
+<i>7</i>&nbsp; * (at your option) any later version.
+<i>8</i>&nbsp; *
+<i>9</i>&nbsp; * This program is distributed in the hope that it will be useful,
+<i>10</i>&nbsp; * but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>11</i>&nbsp; * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>12</i>&nbsp; * GNU General Public License for more details.
+<i>13</i>&nbsp; *
+<i>14</i>&nbsp; * You should have received a copy of the GNU General Public License
+<i>15</i>&nbsp; * along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+<i>16</i>&nbsp; */
+<i>17</i>&nbsp;package beast.evolution.tree;
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;import java.io.File;
+<i>21</i>&nbsp;import java.io.FileNotFoundException;
+<i>22</i>&nbsp;import java.io.FileOutputStream;
+<i>23</i>&nbsp;import java.io.IOException;
+<i>24</i>&nbsp;import java.io.PrintStream;
+<i>25</i>&nbsp;import java.util.ArrayList;
+<i>26</i>&nbsp;import java.util.List;
+<i>27</i>&nbsp;import java.util.Map;
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;import beast.util.CredibleSet;
+<i>30</i>&nbsp;import beast.util.FrequencySet;
+<i>31</i>&nbsp;import beast.util.NexusParser;
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;// TODO: Calculate mean node heights for trees in credible set.
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;/**
+<i>37</i>&nbsp; * Partial re-implementation of TreeTraceAnalysis from BEAST 1.
+<i>38</i>&nbsp; * &lt;p/&gt;
+<i>39</i>&nbsp; * Represents an analysis of a list of trees obtained either directly
+<i>40</i>&nbsp; * from a logger or from a trace file. The set of tree topologies is
+<i>41</i>&nbsp; * calculated by given credible set probability threshold (default 95%).
+<i>42</i>&nbsp; *
+<i>43</i>&nbsp; *
+<i>44</i>&nbsp; * @author Walter Xie
+<i>45</i>&nbsp; * @author Alexei Drummond
+<i>46</i>&nbsp; * @author Tim Vaughan
+<i>47</i>&nbsp; */
+<b class="nc"><i>48</i>&nbsp;public class TreeTraceAnalysis {</b>
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;    public static final double DEFAULT_BURN_IN_FRACTION = 0.1;
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;    protected List&lt;Tree&gt; treeInTrace;
+<i>53</i>&nbsp;
+<i>54</i>&nbsp;    protected int totalTrees; // total from original log
+<i>55</i>&nbsp;    protected int burnin;
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;    protected FrequencySet&lt;String&gt; topologiesFrequencySet;
+<i>58</i>&nbsp;    protected CredibleSet&lt;String&gt; credibleSet;
+<i>59</i>&nbsp;
+<b class="nc"><i>60</i>&nbsp;    protected boolean isTaxaLabel = true; // false to display node index instead</b>
+<i>61</i>&nbsp;
+<i>62</i>&nbsp;    public TreeTraceAnalysis(List&lt;Tree&gt; posteriorTreeList) {
+<b class="nc"><i>63</i>&nbsp;        this(posteriorTreeList, DEFAULT_BURN_IN_FRACTION);</b>
+<i>64</i>&nbsp;    }
+<i>65</i>&nbsp;
+<i>66</i>&nbsp;    /**
+<i>67</i>&nbsp;     * default credible set probability threshold 95%
+<i>68</i>&nbsp;     * analyze() needs after create TreeTraceAnalysis
+<i>69</i>&nbsp;     * @param posteriorTreeList
+<i>70</i>&nbsp;     * @param burninFraction
+<i>71</i>&nbsp;     */
+<b class="nc"><i>72</i>&nbsp;    public TreeTraceAnalysis(List&lt;Tree&gt; posteriorTreeList, double burninFraction) {</b>
+<b class="nc"><i>73</i>&nbsp;        assert posteriorTreeList != null;</b>
+<b class="nc"><i>74</i>&nbsp;        removeBurnin(posteriorTreeList, burninFraction);</b>
+<i>75</i>&nbsp;    }
+<i>76</i>&nbsp;
+<i>77</i>&nbsp;    /**
+<i>78</i>&nbsp;     * Analyse tree topologies, and set credSetProbability 95%
+<i>79</i>&nbsp;     */
+<i>80</i>&nbsp;    public void analyze() {
+<i>81</i>&nbsp;        // 0.95
+<b class="nc"><i>82</i>&nbsp;        analyze(FrequencySet.DEFAULT_CRED_SET);</b>
+<i>83</i>&nbsp;    }
+<i>84</i>&nbsp;
+<i>85</i>&nbsp;    /**
+<i>86</i>&nbsp;     * Analyse tree topologies, and set credSetProbability
+<i>87</i>&nbsp;     * @param credSetProbability
+<i>88</i>&nbsp;     */
+<i>89</i>&nbsp;    public void analyze(double credSetProbability) {
+<i>90</i>&nbsp;        // set credSetProbability
+<b class="nc"><i>91</i>&nbsp;        topologiesFrequencySet = new FrequencySet&lt;&gt;();</b>
+<b class="nc"><i>92</i>&nbsp;        topologiesFrequencySet.setCredSetProbability(credSetProbability);</b>
+<i>93</i>&nbsp;
+<b class="nc"><i>94</i>&nbsp;        for (Tree tree : treeInTrace) {</b>
+<b class="nc"><i>95</i>&nbsp;            String topology = uniqueNewick(tree.getRoot());</b>
+<b class="nc"><i>96</i>&nbsp;            topologiesFrequencySet.add(topology, 1);</b>
+<b class="nc"><i>97</i>&nbsp;        }</b>
+<i>98</i>&nbsp;
+<b class="nc"><i>99</i>&nbsp;        credibleSet = topologiesFrequencySet.getCredibleSet();</b>
+<i>100</i>&nbsp;    }
+<i>101</i>&nbsp;
+<i>102</i>&nbsp;    /**
+<i>103</i>&nbsp;     * report number of unique tree topologies and total trees in the credible set
+<i>104</i>&nbsp;     *
+<i>105</i>&nbsp;     * @param oStream Print stream to write output to.
+<i>106</i>&nbsp;     * @param verbose if true then print all trees
+<i>107</i>&nbsp;     */
+<i>108</i>&nbsp;    public void report(PrintStream oStream, boolean verbose) {
+<i>109</i>&nbsp;        // prefix non-tabular lines with # so file can be read into R
+<b class="nc"><i>110</i>&nbsp;        oStream.println(&quot;# burnin = &quot; + String.valueOf(burnin));</b>
+<b class="nc"><i>111</i>&nbsp;        oStream.println(&quot;# total trees used (total - burnin) = &quot;</b>
+<b class="nc"><i>112</i>&nbsp;                + String.valueOf(treeInTrace.size()));</b>
+<i>113</i>&nbsp;
+<i>114</i>&nbsp;        // prefix non-tabular lines with # so file can be read into R
+<b class="nc"><i>115</i>&nbsp;        oStream.print(&quot;# \n# &quot; + String.valueOf(topologiesFrequencySet.getCredSetProbability() * 100)</b>
+<i>116</i>&nbsp;                + &quot;% credible set&quot;);
+<i>117</i>&nbsp;
+<b class="nc"><i>118</i>&nbsp;        oStream.println(&quot; (&quot; + String.valueOf(credibleSet.credibleSetList.size())</b>
+<i>119</i>&nbsp;                + &quot; unique tree topologies, &quot;
+<b class="nc"><i>120</i>&nbsp;                + String.valueOf(credibleSet.sumFrequency)</b>
+<i>121</i>&nbsp;                + &quot; trees in total)&quot;);
+<i>122</i>&nbsp;
+<b class="nc"><i>123</i>&nbsp;        if (verbose) {</b>
+<b class="nc"><i>124</i>&nbsp;            oStream.println(&quot;Rank\tCount\tPercent\tRunning\tTree&quot;);</b>
+<b class="nc"><i>125</i>&nbsp;            double runningPercent = 0;</b>
+<b class="nc"><i>126</i>&nbsp;            for (int i = 0; i &lt; credibleSet.credibleSetList.size(); i++) {</b>
+<b class="nc"><i>127</i>&nbsp;                double percent = 100.0 * credibleSet.getFrequency(i, topologiesFrequencySet) / (totalTrees - burnin);</b>
+<b class="nc"><i>128</i>&nbsp;                runningPercent += percent;</b>
+<i>129</i>&nbsp;
+<b class="nc"><i>130</i>&nbsp;                oStream.print((i + 1) + &quot;\t&quot;);</b>
+<b class="nc"><i>131</i>&nbsp;                oStream.print(credibleSet.getFrequency(i, topologiesFrequencySet) + &quot;\t&quot;);</b>
+<b class="nc"><i>132</i>&nbsp;                oStream.format(&quot;%.2f%%\t&quot;, percent);</b>
+<b class="nc"><i>133</i>&nbsp;                oStream.format(&quot;%.2f%%\t&quot;, runningPercent);</b>
+<b class="nc"><i>134</i>&nbsp;                oStream.println(credibleSet.credibleSetList.get(i));</b>
+<i>135</i>&nbsp;            }
+<i>136</i>&nbsp;        }
+<i>137</i>&nbsp;    }
+<i>138</i>&nbsp;
+<i>139</i>&nbsp;
+<i>140</i>&nbsp;    public void report(PrintStream oStream) {
+<b class="nc"><i>141</i>&nbsp;        report(oStream, true);</b>
+<i>142</i>&nbsp;    }
+<i>143</i>&nbsp;
+<i>144</i>&nbsp;    /**
+<i>145</i>&nbsp;     * Recursive function for constructing a Newick tree representation
+<i>146</i>&nbsp;     * in the given buffer.
+<i>147</i>&nbsp;     *
+<i>148</i>&nbsp;     * @param node
+<i>149</i>&nbsp;     * @return
+<i>150</i>&nbsp;     */
+<i>151</i>&nbsp;    public String uniqueNewick(Node node) {
+<b class="nc"><i>152</i>&nbsp;        return TreeUtils.sortedNewickTopology(node, isTaxaLabel);</b>
+<i>153</i>&nbsp;    }
+<i>154</i>&nbsp;
+<i>155</i>&nbsp;    public boolean isTaxaLabel() {
+<b class="nc"><i>156</i>&nbsp;        return isTaxaLabel;</b>
+<i>157</i>&nbsp;    }
+<i>158</i>&nbsp;
+<i>159</i>&nbsp;    public void setTaxaLabel(boolean taxaLabel) {
+<b class="nc"><i>160</i>&nbsp;        this.isTaxaLabel = taxaLabel;</b>
+<i>161</i>&nbsp;    }
+<i>162</i>&nbsp;
+<i>163</i>&nbsp;    public int getBurnin() {
+<b class="nc"><i>164</i>&nbsp;        return burnin;</b>
+<i>165</i>&nbsp;    }
+<i>166</i>&nbsp;
+<i>167</i>&nbsp;    public double getBurninFraction() {
+<b class="nc"><i>168</i>&nbsp;        return (double) burnin / (double) totalTrees;</b>
+<i>169</i>&nbsp;    }
+<i>170</i>&nbsp;
+<i>171</i>&nbsp;    public double getCredSetProbability() {
+<b class="nc"><i>172</i>&nbsp;        return topologiesFrequencySet.getCredSetProbability();</b>
+<i>173</i>&nbsp;    }
+<i>174</i>&nbsp;
+<i>175</i>&nbsp;    /**
+<i>176</i>&nbsp;     * Obtain credible set of tree topologies
+<i>177</i>&nbsp;     *
+<i>178</i>&nbsp;     * @return List of tree topologies as Newick-formatted strings.
+<i>179</i>&nbsp;     */
+<i>180</i>&nbsp;    public List&lt;String&gt; getCredibleSetList() {
+<b class="nc"><i>181</i>&nbsp;        return credibleSet.credibleSetList;</b>
+<i>182</i>&nbsp;    }
+<i>183</i>&nbsp;
+<i>184</i>&nbsp;    /**
+<i>185</i>&nbsp;     * total from original log
+<i>186</i>&nbsp;     *
+<i>187</i>&nbsp;     * @return  Number of trees from log
+<i>188</i>&nbsp;     */
+<i>189</i>&nbsp;    public int getTotalTreesInLog() {
+<b class="nc"><i>190</i>&nbsp;        return totalTrees;</b>
+<i>191</i>&nbsp;    }
+<i>192</i>&nbsp;
+<i>193</i>&nbsp;    /**
+<i>194</i>&nbsp;     * Obtain total number of trees analysed after burnin removed.
+<i>195</i>&nbsp;     *
+<i>196</i>&nbsp;     * @return Number of trees analysed.
+<i>197</i>&nbsp;     */
+<i>198</i>&nbsp;    public int getTotalTreesBurninRemoved() {
+<b class="nc"><i>199</i>&nbsp;        return treeInTrace.size();</b>
+<i>200</i>&nbsp;    }
+<i>201</i>&nbsp;
+<i>202</i>&nbsp;    public Map&lt;String, Integer&gt; getTopologyCounts() {
+<b class="nc"><i>203</i>&nbsp;        return topologiesFrequencySet.getFrequencyMap();</b>
+<i>204</i>&nbsp;    }
+<i>205</i>&nbsp;
+<i>206</i>&nbsp;    /**
+<i>207</i>&nbsp;     * Obtain frequencies with which members of the credible set appeared
+<i>208</i>&nbsp;     * in the original tree list.
+<i>209</i>&nbsp;     *
+<i>210</i>&nbsp;     * @return List of absolute topology frequencies.
+<i>211</i>&nbsp;     */
+<i>212</i>&nbsp;//    public List&lt;Integer&gt; getCredibleSetFreqs() {
+<i>213</i>&nbsp;//        return credibleSetFreqs;
+<i>214</i>&nbsp;//    }
+<i>215</i>&nbsp;
+<i>216</i>&nbsp;    /**
+<i>217</i>&nbsp;     * static Utils
+<i>218</i>&nbsp;     */
+<b class="nc"><i>219</i>&nbsp;    public static class Utils {</b>
+<i>220</i>&nbsp;        /**
+<i>221</i>&nbsp;         * get list of trees from file
+<i>222</i>&nbsp;         * @param treeFile
+<i>223</i>&nbsp;         * @return
+<i>224</i>&nbsp;         * @throws IOException 
+<i>225</i>&nbsp;         */
+<i>226</i>&nbsp;        public static List&lt;Tree&gt; getTrees (File treeFile) throws IOException {
+<b class="nc"><i>227</i>&nbsp;            NexusParser parser = new NexusParser();</b>
+<b class="nc"><i>228</i>&nbsp;            parser.parseFile(treeFile);</b>
+<b class="nc"><i>229</i>&nbsp;            return parser.trees;</b>
+<i>230</i>&nbsp;        }
+<i>231</i>&nbsp;
+<i>232</i>&nbsp;        /**
+<i>233</i>&nbsp;         * get burn in from total and burninFraction
+<i>234</i>&nbsp;         * @param total
+<i>235</i>&nbsp;         * @param burninFraction
+<i>236</i>&nbsp;         * @return
+<i>237</i>&nbsp;         */
+<i>238</i>&nbsp;        public static int getBurnIn(int total, double burninFraction) {
+<i>239</i>&nbsp;            // Record original list length and burnin for report:
+<b class="nc"><i>240</i>&nbsp;            int burnin = (int) (total * burninFraction);</b>
+<b class="nc"><i>241</i>&nbsp;            assert burnin &lt; total;</b>
+<b class="nc"><i>242</i>&nbsp;            return burnin;</b>
+<i>243</i>&nbsp;        }
+<i>244</i>&nbsp;
+<i>245</i>&nbsp;        /**
+<i>246</i>&nbsp;         * get a subset of trees from total trees in a range.
+<i>247</i>&nbsp;         * it can be used to
+<i>248</i>&nbsp;         *
+<i>249</i>&nbsp;         * @param rawTreeList
+<i>250</i>&nbsp;         * @param start
+<i>251</i>&nbsp;         * @param end
+<i>252</i>&nbsp;         * @return
+<i>253</i>&nbsp;         */
+<i>254</i>&nbsp;        public static List&lt;Tree&gt; getSubListOfTrees(List&lt;Tree&gt; rawTreeList, int start, int end) {
+<b class="nc"><i>255</i>&nbsp;            assert start &lt; end;</b>
+<b class="nc"><i>256</i>&nbsp;            return new ArrayList&lt;&gt;(rawTreeList.subList(start, end));</b>
+<i>257</i>&nbsp;        }
+<i>258</i>&nbsp;
+<i>259</i>&nbsp;        public static List&lt;Tree&gt; getSubListOfTrees(List&lt;Tree&gt; rawTreeList, int start) {
+<b class="nc"><i>260</i>&nbsp;            return getSubListOfTrees(rawTreeList, start, rawTreeList.size());</b>
+<i>261</i>&nbsp;        }
+<i>262</i>&nbsp;    }
+<i>263</i>&nbsp;
+<i>264</i>&nbsp;    //******** protected *****
+<i>265</i>&nbsp;
+<i>266</i>&nbsp;    // Remove burnin
+<i>267</i>&nbsp;    protected void removeBurnin(List&lt;Tree&gt; posteriorTreeList, double burninFraction) {
+<b class="nc"><i>268</i>&nbsp;        totalTrees = posteriorTreeList.size();</b>
+<b class="nc"><i>269</i>&nbsp;        burnin = Utils.getBurnIn(totalTrees, burninFraction);</b>
+<i>270</i>&nbsp;
+<i>271</i>&nbsp;        // Remove burnin from trace:
+<b class="nc"><i>272</i>&nbsp;        treeInTrace = Utils.getSubListOfTrees(posteriorTreeList, burnin);</b>
+<i>273</i>&nbsp;    }
+<i>274</i>&nbsp;
+<i>275</i>&nbsp;    //******** main *****
+<i>276</i>&nbsp;    public static void main(String[] args) {
+<b class="nc"><i>277</i>&nbsp;        PrintStream out = System.out;</b>
+<b class="nc"><i>278</i>&nbsp;        File inputFile = null;</b>
+<i>279</i>&nbsp;
+<b class="nc"><i>280</i>&nbsp;        if (args.length &gt; 0) {</b>
+<b class="nc"><i>281</i>&nbsp;            System.out.println(&quot;Input file  = &quot; + args[0]);</b>
+<b class="nc"><i>282</i>&nbsp;            inputFile = new File(args[0]);</b>
+<i>283</i>&nbsp;        } else {
+<b class="nc"><i>284</i>&nbsp;            System.out.println(&quot;Error: Expected nexus file, but not file name was provided.&quot;);</b>
+<b class="nc"><i>285</i>&nbsp;            System.exit(1);</b>
+<i>286</i>&nbsp;        }
+<i>287</i>&nbsp;
+<b class="nc"><i>288</i>&nbsp;        if (args.length &gt; 1) {</b>
+<b class="nc"><i>289</i>&nbsp;            System.out.println(&quot;Output file = &quot; + args[1]);</b>
+<i>290</i>&nbsp;            try {
+<b class="nc"><i>291</i>&nbsp;                out = new PrintStream(new FileOutputStream(args[1]));</b>
+<b class="nc"><i>292</i>&nbsp;            } catch (FileNotFoundException e) {</b>
+<b class="nc"><i>293</i>&nbsp;                System.out.println(&quot;Error: Unable to create output file.&quot;);</b>
+<b class="nc"><i>294</i>&nbsp;                System.exit(1);</b>
+<b class="nc"><i>295</i>&nbsp;            }</b>
+<i>296</i>&nbsp;        }
+<i>297</i>&nbsp;
+<b class="nc"><i>298</i>&nbsp;        List&lt;Tree&gt; trees = null;</b>
+<i>299</i>&nbsp;        try {
+<b class="nc"><i>300</i>&nbsp;            trees = TreeTraceAnalysis.Utils.getTrees(inputFile);</b>
+<b class="nc"><i>301</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>302</i>&nbsp;            System.out.println(&quot;Error occurred while parsing input file.&quot;);</b>
+<b class="nc"><i>303</i>&nbsp;            System.exit(1);</b>
+<b class="nc"><i>304</i>&nbsp;        }</b>
+<b class="nc"><i>305</i>&nbsp;        TreeTraceAnalysis analysis = new TreeTraceAnalysis(trees); // default 0.1, 0.95</b>
+<b class="nc"><i>306</i>&nbsp;        analysis.analyze();</b>
+<b class="nc"><i>307</i>&nbsp;        analysis.report(out);</b>
+<i>308</i>&nbsp;    }
+<i>309</i>&nbsp;
+<i>310</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

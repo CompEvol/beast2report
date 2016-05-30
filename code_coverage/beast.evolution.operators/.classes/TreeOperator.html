@@ -1,0 +1,152 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TreeOperator</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.operators</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TreeOperator (beast.evolution.operators)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TreeOperator</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (9/ 12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;* File TreeOperator.java
+<i>3</i>&nbsp;*
+<i>4</i>&nbsp;* Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>5</i>&nbsp;*
+<i>6</i>&nbsp;* This file is part of BEAST2.
+<i>7</i>&nbsp;* See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp;* information regarding copyright ownership and licensing.
+<i>9</i>&nbsp;*
+<i>10</i>&nbsp;* BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp;* it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp;* published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp;* of the License, or (at your option) any later version.
+<i>14</i>&nbsp;*
+<i>15</i>&nbsp;*  BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp;*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp;*  GNU Lesser General Public License for more details.
+<i>19</i>&nbsp;*
+<i>20</i>&nbsp;* You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp;* License along with BEAST; if not, write to the
+<i>22</i>&nbsp;* Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp;* Boston, MA  02110-1301  USA
+<i>24</i>&nbsp;*/
+<i>25</i>&nbsp;package beast.evolution.operators;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;import beast.core.Description;
+<i>29</i>&nbsp;import beast.core.Input;
+<i>30</i>&nbsp;import beast.core.Input.Validate;
+<i>31</i>&nbsp;import beast.core.Operator;
+<i>32</i>&nbsp;import beast.evolution.tree.Node;
+<i>33</i>&nbsp;import beast.evolution.tree.Tree;
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;@Description(&quot;This operator changes a beast.tree.&quot;)
+<b class="fc"><i>37</i>&nbsp;abstract public class TreeOperator extends Operator {</b>
+<b class="fc"><i>38</i>&nbsp;    final public Input&lt;Tree&gt; treeInput = new Input&lt;&gt;(&quot;tree&quot;, &quot;beast.tree on which this operation is performed&quot;, Validate.REQUIRED);</b>
+<b class="fc"><i>39</i>&nbsp;    final public Input&lt;Boolean&gt; markCladesInput = new Input&lt;&gt;(&quot;markclades&quot;, &quot;Mark all ancestors of nodes changed by the operator as changed,&quot; +</b>
+<b class="fc"><i>40</i>&nbsp;            &quot; up to the MRCA of all nodes changed by the operator.&quot;, false);</b>
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;    /**
+<i>43</i>&nbsp;     * @param parent the parent
+<i>44</i>&nbsp;     * @param child  the child that you want the sister of
+<i>45</i>&nbsp;     * @return the other child of the given parent.
+<i>46</i>&nbsp;     */
+<i>47</i>&nbsp;    protected Node getOtherChild(final Node parent, final Node child) {
+<b class="nc"><i>48</i>&nbsp;        if (parent.getLeft().getNr() == child.getNr()) {</b>
+<b class="nc"><i>49</i>&nbsp;            return parent.getRight();</b>
+<i>50</i>&nbsp;        } else {
+<b class="nc"><i>51</i>&nbsp;            return parent.getLeft();</b>
+<i>52</i>&nbsp;        }
+<i>53</i>&nbsp;    }
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;    /**
+<i>56</i>&nbsp;     * replace child with another node
+<i>57</i>&nbsp;     *
+<i>58</i>&nbsp;     * @param node
+<i>59</i>&nbsp;     * @param child
+<i>60</i>&nbsp;     * @param replacement
+<i>61</i>&nbsp;     */
+<i>62</i>&nbsp;    public void replace(final Node node, final Node child, final Node replacement) {
+<b class="fc"><i>63</i>&nbsp;    	node.removeChild(child);</b>
+<b class="fc"><i>64</i>&nbsp;    	node.addChild(replacement);</b>
+<b class="fc"><i>65</i>&nbsp;        node.makeDirty(Tree.IS_FILTHY);</b>
+<b class="fc"><i>66</i>&nbsp;        replacement.makeDirty(Tree.IS_FILTHY);</b>
+<b class="fc"><i>67</i>&nbsp;    }</b>
+<i>68</i>&nbsp;
+<i>69</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

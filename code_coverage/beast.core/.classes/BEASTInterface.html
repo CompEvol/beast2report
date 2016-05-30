@@ -1,0 +1,510 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: BEASTInterface</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.core</a> ]
+</div>
+
+<h1>Coverage Summary for Class: BEASTInterface (beast.core)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BEASTInterface</td>
+<td class="coverageStat">
+  <span class="percent">
+    72.2%
+  </span>
+  <span class="absValue">
+    (13/ 18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    45%
+  </span>
+  <span class="absValue">
+    (72/ 160)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BEASTInterface$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    73.7%
+  </span>
+  <span class="absValue">
+    (14/ 19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    45.3%
+  </span>
+  <span class="absValue">
+    (73/ 161)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;*
+<i>3</i>&nbsp;* Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>4</i>&nbsp;*
+<i>5</i>&nbsp;* This file is part of BEAST2.
+<i>6</i>&nbsp;* See the NOTICE file distributed with this work for additional
+<i>7</i>&nbsp;* information regarding copyright ownership and licensing.
+<i>8</i>&nbsp;*
+<i>9</i>&nbsp;* BEAST is free software; you can redistribute it and/or modify
+<i>10</i>&nbsp;* it under the terms of the GNU Lesser General Public License as
+<i>11</i>&nbsp;* published by the Free Software Foundation; either version 2
+<i>12</i>&nbsp;* of the License, or (at your option) any later version.
+<i>13</i>&nbsp;*
+<i>14</i>&nbsp;*  BEAST is distributed in the hope that it will be useful,
+<i>15</i>&nbsp;*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>16</i>&nbsp;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>17</i>&nbsp;*  GNU Lesser General Public License for more details.
+<i>18</i>&nbsp;*
+<i>19</i>&nbsp;* You should have received a copy of the GNU Lesser General Public
+<i>20</i>&nbsp;* License along with BEAST; if not, write to the
+<i>21</i>&nbsp;* Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>22</i>&nbsp;* Boston, MA  02110-1301  USA
+<i>23</i>&nbsp;*/
+<i>24</i>&nbsp;package beast.core;
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;import java.lang.annotation.Annotation;
+<i>28</i>&nbsp;import java.lang.reflect.Constructor;
+<i>29</i>&nbsp;import java.lang.reflect.Field;
+<i>30</i>&nbsp;import java.lang.reflect.Method;
+<i>31</i>&nbsp;import java.lang.reflect.ParameterizedType;
+<i>32</i>&nbsp;import java.lang.reflect.Type;
+<i>33</i>&nbsp;import java.util.ArrayList;
+<i>34</i>&nbsp;import java.util.HashSet;
+<i>35</i>&nbsp;import java.util.List;
+<i>36</i>&nbsp;import java.util.Map;
+<i>37</i>&nbsp;import java.util.Set;
+<i>38</i>&nbsp;
+<b class="fc"><i>39</i>&nbsp;public interface BEASTInterface {</b>
+<i>40</i>&nbsp;	/**
+<i>41</i>&nbsp;	 * initAndValidate is supposed to check validity of values of inputs, and initialise. 
+<i>42</i>&nbsp;	 * If for some reason this fails, the most appropriate exception to throw is 
+<i>43</i>&nbsp;	 * IllegalArgumentException (if the combination of input values is not correct)
+<i>44</i>&nbsp;	 * or otherwise a RuntimeException.
+<i>45</i>&nbsp;	 */	
+<i>46</i>&nbsp;    public void initAndValidate();
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;	/** identifiable **/
+<i>49</i>&nbsp;	public String getID();
+<i>50</i>&nbsp;	public void setID(String ID);
+<i>51</i>&nbsp;	
+<i>52</i>&nbsp;	/** return set of Outputs, that is Objects for which this object is an Input **/
+<i>53</i>&nbsp;	public Set&lt;BEASTInterface&gt; getOutputs();
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;	/** return Map of Inputs containing both Inputs and InptForAnnotatedConstructors 
+<i>56</i>&nbsp;	 * indexed by Input name **/
+<i>57</i>&nbsp;	public Map&lt;String, Input&lt;?&gt;&gt; getInputs();
+<i>58</i>&nbsp;	
+<i>59</i>&nbsp;	
+<i>60</i>&nbsp;    /* Utility for testing purposes only.
+<i>61</i>&nbsp;     * This cannot be done in a constructor, since the
+<i>62</i>&nbsp;     * inputs will not exist yet at that point in time
+<i>63</i>&nbsp;     * and listInputs returns a list of nulls!
+<i>64</i>&nbsp;     * Assigns objects to inputs in order in which the
+<i>65</i>&nbsp;     * inputs are declared in the class, then calls
+<i>66</i>&nbsp;     * initAndValidate().
+<i>67</i>&nbsp;     */
+<i>68</i>&nbsp;   default public void init(final Object... objects) {
+<b class="nc"><i>69</i>&nbsp;       final List&lt;Input&lt;?&gt;&gt; inputs = listInputs();</b>
+<b class="nc"><i>70</i>&nbsp;       int i = 0;</b>
+<b class="nc"><i>71</i>&nbsp;       for (final Object object : objects) {</b>
+<b class="nc"><i>72</i>&nbsp;           inputs.get(i++).setValue(object, this);</b>
+<i>73</i>&nbsp;       }
+<b class="nc"><i>74</i>&nbsp;       initAndValidate();</b>
+<b class="nc"><i>75</i>&nbsp;   } // init</b>
+<i>76</i>&nbsp;
+<i>77</i>&nbsp;   /* Utility for testing purposes
+<i>78</i>&nbsp;    * The arguments are alternating input names and values,
+<i>79</i>&nbsp;    * and values are assigned to the input with the particular name.
+<i>80</i>&nbsp;    * For example initByName(&quot;kappa&quot;, 2.0, &quot;lambda&quot;, true)
+<i>81</i>&nbsp;    * assigns 2 to input kappa and true to input lambda.
+<i>82</i>&nbsp;    * After assigning inputs, initAndValidate() is called.
+<i>83</i>&nbsp;    */
+<i>84</i>&nbsp;  default public void initByName(final Object... objects) {
+<b class="fc"><i>85</i>&nbsp;      if (objects.length % 2 == 1) {</b>
+<b class="nc"><i>86</i>&nbsp;          throw new RuntimeException(&quot;Expected even number of arguments, name-value pairs&quot;);</b>
+<i>87</i>&nbsp;      }
+<b class="fc"><i>88</i>&nbsp;      for (int i = 0; i &lt; objects.length; i += 2) {</b>
+<b class="fc"><i>89</i>&nbsp;          if (objects[i] instanceof String) {</b>
+<b class="fc"><i>90</i>&nbsp;              final String name = (String) objects[i];</b>
+<b class="fc"><i>91</i>&nbsp;              setInputValue(name, objects[i + 1]);</b>
+<b class="fc"><i>92</i>&nbsp;          } else {</b>
+<b class="nc"><i>93</i>&nbsp;              throw new RuntimeException(&quot;Expected a String in &quot; + i + &quot;th argument &quot;);</b>
+<i>94</i>&nbsp;          }
+<i>95</i>&nbsp;      }
+<i>96</i>&nbsp;      try {
+<b class="fc"><i>97</i>&nbsp;          initAndValidate();</b>
+<b class="nc"><i>98</i>&nbsp;      } catch (Exception e) {</b>
+<b class="nc"><i>99</i>&nbsp;          e.printStackTrace();</b>
+<b class="nc"><i>100</i>&nbsp;          throw new RuntimeException(&quot;initAndValidate() failed! &quot; + e.getMessage());</b>
+<b class="fc"><i>101</i>&nbsp;      }</b>
+<b class="fc"><i>102</i>&nbsp;  } // initByName</b>
+<i>103</i>&nbsp;
+<i>104</i>&nbsp;	
+<i>105</i>&nbsp;	@SuppressWarnings({&quot;unchecked&quot;, &quot;rawtypes&quot; }) 
+<i>106</i>&nbsp;	static Set&lt;BEASTInterface&gt; getOutputs(Object object) {
+<i>107</i>&nbsp;    	try {
+<b class="nc"><i>108</i>&nbsp;            Method method = object.getClass().getMethod(&quot;getOutputs&quot;);</b>
+<b class="nc"><i>109</i>&nbsp;            Object outputs = method.invoke(object);</b>
+<b class="nc"><i>110</i>&nbsp;            if (outputs instanceof Set&lt;?&gt;) {</b>
+<b class="nc"><i>111</i>&nbsp;            	return (Set) outputs;</b>
+<i>112</i>&nbsp;            }
+<b class="nc"><i>113</i>&nbsp;    		throw new RuntimeException(&quot;call to getOutputs() on object did not return a java.util.Set&quot;);</b>
+<b class="nc"><i>114</i>&nbsp;    	} catch (Exception e) {</b>
+<b class="nc"><i>115</i>&nbsp;    		throw new RuntimeException(&quot;could not call getOutputs() on object: &quot; + e.getMessage());</b>
+<i>116</i>&nbsp;    	}
+<i>117</i>&nbsp;	}
+<i>118</i>&nbsp;
+<i>119</i>&nbsp;    /**
+<i>120</i>&nbsp;     * @return description from @Description annotation
+<i>121</i>&nbsp;     */
+<i>122</i>&nbsp;	default public String getDescription() {
+<b class="fc"><i>123</i>&nbsp;        final Annotation[] classAnnotations = this.getClass().getAnnotations();</b>
+<b class="fc"><i>124</i>&nbsp;        for (final Annotation annotation : classAnnotations) {</b>
+<b class="fc"><i>125</i>&nbsp;            if (annotation instanceof Description) {</b>
+<b class="fc"><i>126</i>&nbsp;                final Description description = (Description) annotation;</b>
+<b class="fc"><i>127</i>&nbsp;                return description.value();</b>
+<i>128</i>&nbsp;            }
+<i>129</i>&nbsp;        }
+<b class="nc"><i>130</i>&nbsp;        return &quot;Not documented!!!&quot;;</b>
+<i>131</i>&nbsp;    }
+<i>132</i>&nbsp;
+<i>133</i>&nbsp;    /**
+<i>134</i>&nbsp;     * @return citation from @Citation annotation *
+<i>135</i>&nbsp;     */
+<i>136</i>&nbsp;    default public Citation getCitation() {
+<b class="fc"><i>137</i>&nbsp;        final Annotation[] classAnnotations = this.getClass().getAnnotations();</b>
+<b class="fc"><i>138</i>&nbsp;        for (final Annotation annotation : classAnnotations) {</b>
+<b class="fc"><i>139</i>&nbsp;            if (annotation instanceof Citation) {</b>
+<b class="fc"><i>140</i>&nbsp;                return (Citation) annotation;</b>
+<i>141</i>&nbsp;            }
+<i>142</i>&nbsp;        }
+<b class="nc"><i>143</i>&nbsp;        return null;</b>
+<i>144</i>&nbsp;    }
+<i>145</i>&nbsp;
+<i>146</i>&nbsp;    /**
+<i>147</i>&nbsp;     * @return references for this plug in and all its inputs *
+<i>148</i>&nbsp;     */
+<i>149</i>&nbsp;    default public String getCitations() {
+<b class="nc"><i>150</i>&nbsp;        return getCitations(new HashSet&lt;&gt;(), new HashSet&lt;&gt;());</b>
+<i>151</i>&nbsp;    }
+<i>152</i>&nbsp;
+<i>153</i>&nbsp;    default String getCitations(final HashSet&lt;String&gt; citations, final HashSet&lt;String&gt; IDs) {
+<b class="nc"><i>154</i>&nbsp;        if (getID() != null) {</b>
+<b class="nc"><i>155</i>&nbsp;            if (IDs.contains(getID())) {</b>
+<b class="nc"><i>156</i>&nbsp;                return &quot;&quot;;</b>
+<i>157</i>&nbsp;            }
+<b class="nc"><i>158</i>&nbsp;            IDs.add(getID());</b>
+<i>159</i>&nbsp;        }
+<b class="nc"><i>160</i>&nbsp;        final StringBuilder buf = new StringBuilder();</b>
+<b class="nc"><i>161</i>&nbsp;        if (getCitation() != null) {</b>
+<i>162</i>&nbsp;            // only add citation if it is not already processed
+<b class="nc"><i>163</i>&nbsp;            if (!citations.contains(getCitation().value())) {</b>
+<i>164</i>&nbsp;                // and there is actually a citation to add
+<b class="nc"><i>165</i>&nbsp;                buf.append(&quot;\n&quot;);</b>
+<b class="nc"><i>166</i>&nbsp;                buf.append(getCitation().value());</b>
+<b class="nc"><i>167</i>&nbsp;                buf.append(&quot;\n&quot;);</b>
+<b class="nc"><i>168</i>&nbsp;                citations.add(getCitation().value());</b>
+<i>169</i>&nbsp;            }
+<i>170</i>&nbsp;            //return buf.toString();
+<i>171</i>&nbsp;        }
+<i>172</i>&nbsp;        try {
+<b class="nc"><i>173</i>&nbsp;            for (final BEASTInterface beastObject : listActiveBEASTObjects()) {</b>
+<b class="nc"><i>174</i>&nbsp;                buf.append(beastObject.getCitations(citations, IDs));</b>
+<b class="nc"><i>175</i>&nbsp;            }</b>
+<b class="nc"><i>176</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>177</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>178</i>&nbsp;        }</b>
+<b class="nc"><i>179</i>&nbsp;        return buf.toString();</b>
+<i>180</i>&nbsp;    } // getCitations
+<i>181</i>&nbsp;
+<i>182</i>&nbsp;
+<i>183</i>&nbsp;    /**
+<i>184</i>&nbsp;     * create list of inputs to this plug-in *
+<i>185</i>&nbsp;     */
+<i>186</i>&nbsp;    default public List&lt;Input&lt;?&gt;&gt; listInputs() { 
+<b class="fc"><i>187</i>&nbsp;        final List&lt;Input&lt;?&gt;&gt; inputs = new ArrayList&lt;&gt;();</b>
+<i>188</i>&nbsp;        
+<i>189</i>&nbsp;        // First, collect all Inputs
+<b class="fc"><i>190</i>&nbsp;        final Field[] fields = getClass().getFields();</b>
+<b class="fc"><i>191</i>&nbsp;        for (final Field field : fields) {</b>
+<b class="fc"><i>192</i>&nbsp;            if (field.getType().isAssignableFrom(Input.class)) {</b>
+<i>193</i>&nbsp;            	try {
+<b class="fc"><i>194</i>&nbsp;            		final Input&lt;?&gt; input = (Input&lt;?&gt;) field.get(this);</b>
+<b class="fc"><i>195</i>&nbsp;            		inputs.add(input);</b>
+<b class="nc"><i>196</i>&nbsp;            	} catch (IllegalAccessException e) {</b>
+<i>197</i>&nbsp;            		// not a publicly accessible input, ignore
+<b class="fc"><i>198</i>&nbsp;            	}</b>
+<i>199</i>&nbsp;            }
+<i>200</i>&nbsp;        }
+<i>201</i>&nbsp;        
+<i>202</i>&nbsp;        // Second, collect InputForAnnotatedConstructors of annotated constructor (if any)
+<b class="fc"><i>203</i>&nbsp;	    Constructor&lt;?&gt;[] allConstructors = this.getClass().getDeclaredConstructors();</b>
+<b class="fc"><i>204</i>&nbsp;	    for (Constructor&lt;?&gt; ctor : allConstructors) {</b>
+<b class="fc"><i>205</i>&nbsp;	    	Annotation[][] annotations = ctor.getParameterAnnotations();</b>
+<b class="fc"><i>206</i>&nbsp;	    	List&lt;Param&gt; paramAnnotations = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>207</i>&nbsp;	    	for (Annotation [] a0 : annotations) {</b>
+<b class="fc"><i>208</i>&nbsp;		    	for (Annotation a : a0) {</b>
+<b class="nc"><i>209</i>&nbsp;		    		if (a instanceof Param) {</b>
+<b class="nc"><i>210</i>&nbsp;		    			paramAnnotations.add((Param) a);</b>
+<i>211</i>&nbsp;		    		}
+<i>212</i>&nbsp;		    	}
+<i>213</i>&nbsp;	    	}
+<b class="fc"><i>214</i>&nbsp;	    	Class&lt;?&gt;[] types  = ctor.getParameterTypes();	    	</b>
+<b class="fc"><i>215</i>&nbsp;    		Type[] gtypes = ctor.getGenericParameterTypes();</b>
+<b class="fc"><i>216</i>&nbsp;	    	if (types.length &gt; 0 &amp;&amp; paramAnnotations.size() &gt; 0) {</b>
+<b class="nc"><i>217</i>&nbsp;	    		int offset = 0;</b>
+<b class="nc"><i>218</i>&nbsp;	    		if (types.length == paramAnnotations.size() + 1) {</b>
+<b class="nc"><i>219</i>&nbsp;	    			offset = 1;</b>
+<i>220</i>&nbsp;	    		}
+<b class="nc"><i>221</i>&nbsp;	    		for (int i = 0; i &lt; paramAnnotations.size(); i++) {</b>
+<b class="nc"><i>222</i>&nbsp;	    			Param param = paramAnnotations.get(i);</b>
+<b class="nc"><i>223</i>&nbsp;	    			Type type = types[i + offset];</b>
+<b class="nc"><i>224</i>&nbsp;	    			Class&lt;?&gt; clazz = null;</b>
+<i>225</i>&nbsp;					try {
+<b class="nc"><i>226</i>&nbsp;						clazz = Class.forName(type.getTypeName());</b>
+<b class="nc"><i>227</i>&nbsp;					} catch (ClassNotFoundException e) {</b>
+<i>228</i>&nbsp;						// TODO Auto-generated catch block
+<b class="nc"><i>229</i>&nbsp;						e.printStackTrace();</b>
+<b class="nc"><i>230</i>&nbsp;					}</b>
+<b class="nc"><i>231</i>&nbsp;	    			if (clazz.isAssignableFrom(List.class)) {</b>
+<b class="nc"><i>232</i>&nbsp;                        Type[] genericTypes2 = ((ParameterizedType) gtypes[i + offset]).getActualTypeArguments();</b>
+<b class="nc"><i>233</i>&nbsp;                        Class&lt;?&gt; theClass = (Class&lt;?&gt;) genericTypes2[0];</b>
+<b class="nc"><i>234</i>&nbsp;	    				InputForAnnotatedConstructor&lt;?&gt; t = null;</b>
+<i>235</i>&nbsp;						try {
+<b class="nc"><i>236</i>&nbsp;							t = new InputForAnnotatedConstructor&lt;&gt;(this, theClass, param);</b>
+<b class="nc"><i>237</i>&nbsp;						} catch (NoSuchMethodException | SecurityException e) {</b>
+<i>238</i>&nbsp;							// TODO Auto-generated catch block
+<b class="nc"><i>239</i>&nbsp;							e.printStackTrace();</b>
+<b class="nc"><i>240</i>&nbsp;						}</b>
+<b class="nc"><i>241</i>&nbsp;	    				inputs.add(t);</b>
+<b class="nc"><i>242</i>&nbsp;	    			} else {</b>
+<b class="nc"><i>243</i>&nbsp;	    				InputForAnnotatedConstructor&lt;?&gt; t = null;</b>
+<i>244</i>&nbsp;						try {
+<b class="nc"><i>245</i>&nbsp;							t = new InputForAnnotatedConstructor&lt;&gt;(this, types[i + offset], param);</b>
+<b class="nc"><i>246</i>&nbsp;						} catch (NoSuchMethodException | SecurityException e) {</b>
+<i>247</i>&nbsp;							// TODO Auto-generated catch block
+<b class="nc"><i>248</i>&nbsp;							e.printStackTrace();</b>
+<b class="nc"><i>249</i>&nbsp;						}</b>
+<b class="nc"><i>250</i>&nbsp;	    				inputs.add(t);</b>
+<i>251</i>&nbsp;	    			}
+<i>252</i>&nbsp;	    		}
+<i>253</i>&nbsp;	    	}
+<i>254</i>&nbsp;		}
+<i>255</i>&nbsp;	    
+<b class="fc"><i>256</i>&nbsp;	    return inputs;</b>
+<i>257</i>&nbsp;    } // listInputs
+<i>258</i>&nbsp;
+<i>259</i>&nbsp;    /**
+<i>260</i>&nbsp;     * create array of all plug-ins in the inputs that are instantiated.
+<i>261</i>&nbsp;     * If the input is a List of plug-ins, these individual plug-ins are
+<i>262</i>&nbsp;     * added to the list.
+<i>263</i>&nbsp;     *
+<i>264</i>&nbsp;     * @return list of all active plug-ins
+<i>265</i>&nbsp;     * @throws IllegalAccessException
+<i>266</i>&nbsp;     */
+<i>267</i>&nbsp;    default public List&lt;BEASTInterface&gt; listActiveBEASTObjects() {
+<b class="fc"><i>268</i>&nbsp;        final List&lt;BEASTInterface&gt; beastObjects = new ArrayList&lt;&gt;();</b>
+<i>269</i>&nbsp;
+<b class="fc"><i>270</i>&nbsp;        for (Input&lt;?&gt; input : getInputs().values()) {</b>
+<b class="fc"><i>271</i>&nbsp;        	if (input.get() != null) {</b>
+<b class="fc"><i>272</i>&nbsp;        		if (input.get() instanceof List&lt;?&gt;) {</b>
+<b class="nc"><i>273</i>&nbsp;        			final List&lt;?&gt; list = (List&lt;?&gt;) input.get();</b>
+<b class="nc"><i>274</i>&nbsp;        			for (final Object o : list) {</b>
+<b class="nc"><i>275</i>&nbsp;        				if (o instanceof BEASTInterface) {</b>
+<b class="nc"><i>276</i>&nbsp;        					beastObjects.add((BEASTInterface) o);</b>
+<i>277</i>&nbsp;        				}
+<b class="nc"><i>278</i>&nbsp;        			}</b>
+<b class="nc"><i>279</i>&nbsp;        		} else if (input.get() != null &amp;&amp; input.get() instanceof BEASTInterface) {</b>
+<b class="fc"><i>280</i>&nbsp;        			beastObjects.add((BEASTInterface) input.get());</b>
+<i>281</i>&nbsp;        		}
+<i>282</i>&nbsp;        	}
+<b class="fc"><i>283</i>&nbsp;        }</b>
+<b class="fc"><i>284</i>&nbsp;        return beastObjects;</b>
+<i>285</i>&nbsp;    }
+<i>286</i>&nbsp;
+<i>287</i>&nbsp;    @Deprecated /** use listActiveBEASTObjects instead **/
+<i>288</i>&nbsp;    default public List&lt;BEASTInterface&gt; listActivePlugins() throws IllegalArgumentException, IllegalAccessException {
+<b class="nc"><i>289</i>&nbsp;    	return listActiveBEASTObjects();</b>
+<i>290</i>&nbsp;    } // listActivePlugins
+<i>291</i>&nbsp;
+<i>292</i>&nbsp;    /**
+<i>293</i>&nbsp;     * get description of an input
+<i>294</i>&nbsp;     *
+<i>295</i>&nbsp;     * @param name of the input
+<i>296</i>&nbsp;     * @return description of input
+<i>297</i>&nbsp;     */
+<i>298</i>&nbsp;    default public String getTipText(final String name) throws IllegalArgumentException, IllegalAccessException {
+<i>299</i>&nbsp;		try {
+<b class="fc"><i>300</i>&nbsp;	    	Input&lt;?&gt; input = getInput(name);</b>
+<b class="fc"><i>301</i>&nbsp;	    	if (input != null) {</b>
+<b class="fc"><i>302</i>&nbsp;	    		return input.getTipText();</b>
+<i>303</i>&nbsp;	    	}
+<b class="nc"><i>304</i>&nbsp;		} catch (Exception e) {</b>
+<i>305</i>&nbsp;			// whatever happened, getting a tip text is no reason to interrupt anything,
+<i>306</i>&nbsp;			// so ignore and return null
+<b class="nc"><i>307</i>&nbsp;		}</b>
+<b class="nc"><i>308</i>&nbsp;        return null;</b>
+<i>309</i>&nbsp;    } // getTipText
+<i>310</i>&nbsp;
+<i>311</i>&nbsp;
+<i>312</i>&nbsp;    /**
+<i>313</i>&nbsp;     * check whether the input is an Integer, Double, Boolean or String *
+<i>314</i>&nbsp;     */
+<i>315</i>&nbsp;    default public boolean isPrimitive(final String name) {
+<b class="fc"><i>316</i>&nbsp;        final Input&lt;?&gt; input = getInput(name);</b>
+<b class="fc"><i>317</i>&nbsp;        final Class&lt;?&gt; inputType = input.getType();</b>
+<i>318</i>&nbsp;
+<b class="fc"><i>319</i>&nbsp;        if (inputType == null) {</b>
+<b class="nc"><i>320</i>&nbsp;            input.determineClass(this);</b>
+<i>321</i>&nbsp;        }
+<i>322</i>&nbsp;
+<b class="fc"><i>323</i>&nbsp;        assert inputType != null;</b>
+<b class="fc"><i>324</i>&nbsp;        for (final Class&lt;?&gt; c : new Class[]{Integer.class, Long.class, Double.class, Float.class, Boolean.class, String.class}) {</b>
+<b class="fc"><i>325</i>&nbsp;            if (inputType.isAssignableFrom(c)) {</b>
+<b class="fc"><i>326</i>&nbsp;                return true;</b>
+<i>327</i>&nbsp;            }
+<i>328</i>&nbsp;        }
+<b class="fc"><i>329</i>&nbsp;        return false;</b>
+<i>330</i>&nbsp;    } // isPrimitive
+<i>331</i>&nbsp;
+<i>332</i>&nbsp;    /**
+<i>333</i>&nbsp;     * get value of an input by input name *
+<i>334</i>&nbsp;     */
+<i>335</i>&nbsp;    default public Object getInputValue(final String name) {
+<b class="fc"><i>336</i>&nbsp;        final Input&lt;?&gt; input = getInput(name);</b>
+<b class="fc"><i>337</i>&nbsp;        return input.get();</b>
+<i>338</i>&nbsp;    } // getInputValue
+<i>339</i>&nbsp;
+<i>340</i>&nbsp;    /**
+<i>341</i>&nbsp;     * set value of an input by input name *
+<i>342</i>&nbsp;     */
+<i>343</i>&nbsp;    default public void setInputValue(final String name, final Object value) {
+<b class="fc"><i>344</i>&nbsp;        final Input&lt;?&gt; input = getInput(name);</b>
+<b class="fc"><i>345</i>&nbsp;        if (!input.canSetValue(value, this)) {</b>
+<b class="nc"><i>346</i>&nbsp;            throw new RuntimeException(&quot;Cannot set input value of &quot; + name);</b>
+<i>347</i>&nbsp;        }
+<b class="fc"><i>348</i>&nbsp;        input.setValue(value, this);</b>
+<b class="fc"><i>349</i>&nbsp;    } // setInputValue</b>
+<i>350</i>&nbsp;
+<i>351</i>&nbsp;    /**
+<i>352</i>&nbsp;     * get input by input name *
+<i>353</i>&nbsp;     */
+<i>354</i>&nbsp;    default public Input&lt;?&gt; getInput(final String name) {
+<i>355</i>&nbsp;    	
+<b class="fc"><i>356</i>&nbsp;    	Map&lt;String, Input&lt;?&gt;&gt; inputs = getInputs();</b>
+<b class="fc"><i>357</i>&nbsp;    	if (inputs.containsKey(name)) {</b>
+<b class="fc"><i>358</i>&nbsp;    		return inputs.get(name);</b>
+<i>359</i>&nbsp;    	}
+<i>360</i>&nbsp;
+<b class="nc"><i>361</i>&nbsp;        String inputNames = &quot; &quot;; // &lt;- space here to prevent error in .substring below</b>
+<b class="nc"><i>362</i>&nbsp;        for (final Input&lt;?&gt; input : listInputs()) {</b>
+<b class="nc"><i>363</i>&nbsp;            inputNames += input.getName() + &quot;,&quot;;</b>
+<b class="nc"><i>364</i>&nbsp;        }</b>
+<b class="nc"><i>365</i>&nbsp;        throw new IllegalArgumentException(&quot;This BEASTInterface (&quot; + (this.getID() == null ? this.getClass().getName() : this.getID()) + &quot;) has no input with name &quot; + name + &quot;. &quot; +</b>
+<b class="nc"><i>366</i>&nbsp;                &quot;Choose one of these inputs:&quot; + inputNames.substring(0, inputNames.length() - 1));</b>
+<i>367</i>&nbsp;    } // getInput
+<i>368</i>&nbsp;
+<i>369</i>&nbsp;
+<i>370</i>&nbsp;    /**
+<i>371</i>&nbsp;     * check validation rules for all its inputs
+<i>372</i>&nbsp;     * 
+<i>373</i>&nbsp;     * @throws IllegalArgumentException when validation fails
+<i>374</i>&nbsp;     */
+<i>375</i>&nbsp;    default public void validateInputs() {
+<b class="fc"><i>376</i>&nbsp;        for (final Input&lt;?&gt; input : listInputs()) {</b>
+<b class="fc"><i>377</i>&nbsp;            input.validate();</b>
+<b class="fc"><i>378</i>&nbsp;        }</b>
+<b class="fc"><i>379</i>&nbsp;    }</b>
+<i>380</i>&nbsp;
+<i>381</i>&nbsp;    /**
+<i>382</i>&nbsp;     * Collect all predecessors in the graph where inputs
+<i>383</i>&nbsp;     * represent incoming edges and plug-ins nodes.
+<i>384</i>&nbsp;     *
+<i>385</i>&nbsp;     * @param predecessors in partial order such that if
+<i>386</i>&nbsp;     *                     x is after y in the list then x is not an ancestor of y
+<i>387</i>&nbsp;     *                     (but x need not necessarily be a predecesor of y)
+<i>388</i>&nbsp;     */
+<i>389</i>&nbsp;
+<i>390</i>&nbsp;    default public void getPredecessors(final List&lt;BEASTInterface&gt; predecessors) {
+<b class="fc"><i>391</i>&nbsp;        predecessors.add(this);</b>
+<b class="fc"><i>392</i>&nbsp;        for (final BEASTInterface beastObject2 : listActiveBEASTObjects()) {</b>
+<b class="fc"><i>393</i>&nbsp;            if (!predecessors.contains(beastObject2)) {</b>
+<b class="nc"><i>394</i>&nbsp;                beastObject2.getPredecessors(predecessors);</b>
+<i>395</i>&nbsp;            }
+<b class="fc"><i>396</i>&nbsp;        }</b>
+<b class="fc"><i>397</i>&nbsp;    }</b>
+<i>398</i>&nbsp;
+<i>399</i>&nbsp;}
+<i>400</i>&nbsp;
+<i>401</i>&nbsp;
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

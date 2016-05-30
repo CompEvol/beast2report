@@ -1,0 +1,485 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: BeautiPanelConfig</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.beauti</a> ]
+</div>
+
+<h1>Coverage Summary for Class: BeautiPanelConfig (beast.app.beauti)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BeautiPanelConfig</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.3%
+  </span>
+  <span class="absValue">
+    (14/ 15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.1%
+  </span>
+  <span class="absValue">
+    (142/ 163)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BeautiPanelConfig$FlexibleInput</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/ 8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BeautiPanelConfig$Partition</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    95%
+  </span>
+  <span class="absValue">
+    (19/ 20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.9%
+  </span>
+  <span class="absValue">
+    (152/ 173)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.beauti;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import java.util.ArrayList;
+<i>5</i>&nbsp;import java.util.Arrays;
+<i>6</i>&nbsp;import java.util.List;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import beast.app.draw.BEASTObjectPanel;
+<i>9</i>&nbsp;import beast.app.draw.InputEditor;
+<i>10</i>&nbsp;import beast.core.BEASTInterface;
+<i>11</i>&nbsp;import beast.core.BEASTObject;
+<i>12</i>&nbsp;import beast.core.Description;
+<i>13</i>&nbsp;import beast.core.Input;
+<i>14</i>&nbsp;import beast.core.Input.Validate;
+<i>15</i>&nbsp;import beast.core.util.Log;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;@Description(&quot;Defines properties for custom panels in Beauti&quot;)
+<b class="fc"><i>21</i>&nbsp;public class BeautiPanelConfig extends BEASTObject {</b>
+<b class="fc"><i>22</i>&nbsp;    public enum Partition {</b>
+<b class="fc"><i>23</i>&nbsp;        none, Partition, SiteModel, ClockModel, Tree</b>
+<i>24</i>&nbsp;    }
+<i>25</i>&nbsp;
+<b class="fc"><i>26</i>&nbsp;    final public Input&lt;String&gt; nameInput = new Input&lt;&gt;(&quot;panelname&quot;, &quot;name of the panel, used to label the panel and in the visibility menu&quot;, Validate.REQUIRED);</b>
+<b class="fc"><i>27</i>&nbsp;    final public Input&lt;String&gt; tipTextInput = new Input&lt;&gt;(&quot;tiptext&quot;, &quot;tiptext shown when hovering over the tab&quot;, Validate.REQUIRED);</b>
+<i>28</i>&nbsp;
+<b class="fc"><i>29</i>&nbsp;    final public Input&lt;String&gt; pathInput = new Input&lt;&gt;(&quot;path&quot;, &quot;path of the BEASTObject to be shown in this panel, in xpath-like format. &quot; +</b>
+<i>30</i>&nbsp;            &quot;For example operator to edit the operator input of the top level run element. &quot; +
+<i>31</i>&nbsp;            &quot;distribution/distribution[id=&#39;prior&#39;] for prior distributions.&quot; +
+<i>32</i>&nbsp;            &quot;distribution/distribution[id=&#39;posterior&#39;]/traitset all posterior inputs with name traitset&quot;, Validate.REQUIRED);
+<i>33</i>&nbsp;
+<b class="fc"><i>34</i>&nbsp;    final public Input&lt;Partition&gt; hasPartitionsInput = new Input&lt;&gt;(&quot;hasPartitions&quot;, &quot;flag to indicate the panel has&quot; +</b>
+<b class="fc"><i>35</i>&nbsp;            &quot;a partition context (and hence a partition list), deafult none.  Possible values: &quot; + Arrays.toString(Partition.values()), Partition.none, Partition.values());</b>
+<i>36</i>&nbsp;
+<b class="fc"><i>37</i>&nbsp;    final public Input&lt;Boolean&gt; addButtonsInput = new Input&lt;&gt;(&quot;addButtons&quot;, &quot;flag to indicate buttons should be added, default true&quot;, true);</b>
+<b class="fc"><i>38</i>&nbsp;    final public Input&lt;Boolean&gt; isVisibleInput = new Input&lt;&gt;(&quot;isVisible&quot;, &quot;flag to indicate panel is visible on startup, default true&quot;, true);</b>
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;
+<b class="fc"><i>41</i>&nbsp;    final public Input&lt;String&gt; iconInput = new Input&lt;&gt;(&quot;icon&quot;, &quot;icon shown in the panel relative to /beast/app/beauti, default 0.png&quot;, &quot;0.png&quot;);</b>
+<i>42</i>&nbsp;
+<b class="fc"><i>43</i>&nbsp;    final public Input&lt;InputEditor.ExpandOption&gt; forceExpansionInput = new Input&lt;&gt;(&quot;forceExpansion&quot;, &quot;whether to expand the input(s)&quot; +</b>
+<b class="fc"><i>44</i>&nbsp;            &quot;This can be &quot; + Arrays.toString(InputEditor.ExpandOption.values()) + &quot; (default &#39;FALSE&#39;)&quot;, InputEditor.ExpandOption.FALSE, InputEditor.ExpandOption.values());</b>
+<b class="fc"><i>45</i>&nbsp;    final public Input&lt;String&gt; typeInput = new Input&lt;&gt;(&quot;type&quot;, &quot;type used for finding the appropriate beastObject editor. By default, type is determined &quot; +</b>
+<i>46</i>&nbsp;            &quot;by the input type of the last component of the path&quot;);
+<i>47</i>&nbsp;
+<b class="fc"><i>48</i>&nbsp;    final public Input&lt;Integer&gt; labelWidthInput = new Input&lt;&gt;(&quot;labelWidth&quot;, &quot;width of labels used to show name of inputs in input editors&quot;, 150);</b>
+<i>49</i>&nbsp;
+<b class="fc"><i>50</i>&nbsp;    final public Input&lt;InputEditor.ButtonStatus&gt; buttonStatusInput = new Input&lt;&gt;(&quot;buttonStatus&quot;, &quot;whether to show add and delete buttons. &quot; +</b>
+<b class="fc"><i>51</i>&nbsp;            &quot;This can be &quot; + Arrays.toString(InputEditor.ButtonStatus.values()) + &quot; (default &#39;ALL&#39;)&quot;, InputEditor.ButtonStatus.ALL, InputEditor.ButtonStatus.values());</b>
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;    String[] pathComponents;
+<i>54</i>&nbsp;    String[] conditionalAttribute;
+<i>55</i>&nbsp;    String[] conditionalValue;
+<i>56</i>&nbsp;    Class&lt;?&gt; type;
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;    /**
+<i>59</i>&nbsp;     * beastObjects associated with inputs *
+<i>60</i>&nbsp;     */
+<i>61</i>&nbsp;    List&lt;BEASTInterface&gt; inputs;
+<i>62</i>&nbsp;    /**
+<i>63</i>&nbsp;     * beastObjects associated with inputs before editing starts *
+<i>64</i>&nbsp;     */
+<i>65</i>&nbsp;    List&lt;BEASTInterface&gt; startInputs;
+<i>66</i>&nbsp;    /**
+<i>67</i>&nbsp;     * beastObjects that are parents, i.e. contain inputs of m_inputs *
+<i>68</i>&nbsp;     */
+<i>69</i>&nbsp;    List&lt;BEASTInterface&gt; parentBEASTObjects;
+<b class="fc"><i>70</i>&nbsp;    List&lt;Input&lt;?&gt;&gt; parentInputs = new ArrayList&lt;&gt;();</b>
+<i>71</i>&nbsp;    /**
+<i>72</i>&nbsp;     * flag to indicate we are dealing with a list input *
+<i>73</i>&nbsp;     */
+<i>74</i>&nbsp;    boolean isList;
+<i>75</i>&nbsp;
+<i>76</i>&nbsp;
+<i>77</i>&nbsp;    FlexibleInput&lt;?&gt; _input;
+<i>78</i>&nbsp;
+<b class="fc"><i>79</i>&nbsp;    class FlexibleInput&lt;T&gt; extends Input&lt;T&gt; {</b>
+<b class="fc"><i>80</i>&nbsp;        FlexibleInput() {</b>
+<i>81</i>&nbsp;            // sets name to something non-trivial This is used by canSetValue()
+<b class="fc"><i>82</i>&nbsp;            super(&quot;xx&quot;, &quot;&quot;);</b>
+<b class="fc"><i>83</i>&nbsp;        }</b>
+<i>84</i>&nbsp;
+<b class="fc"><i>85</i>&nbsp;        public FlexibleInput(T arrayList) {</b>
+<b class="fc"><i>86</i>&nbsp;            super(&quot;xx&quot;, &quot;&quot;, arrayList);</b>
+<b class="fc"><i>87</i>&nbsp;        }</b>
+<i>88</i>&nbsp;
+<i>89</i>&nbsp;        @Override
+<i>90</i>&nbsp;		public void setType(Class&lt;?&gt; type) {
+<b class="fc"><i>91</i>&nbsp;            theClass = type;</b>
+<b class="fc"><i>92</i>&nbsp;        }</b>
+<i>93</i>&nbsp;    }
+<i>94</i>&nbsp;
+<i>95</i>&nbsp;    @Override
+<i>96</i>&nbsp;    public void initAndValidate() {
+<b class="fc"><i>97</i>&nbsp;        pathComponents = pathInput.get().split(&quot;/&quot;);</b>
+<b class="fc"><i>98</i>&nbsp;        if (pathComponents[0].equals(&quot;&quot;)) {</b>
+<b class="fc"><i>99</i>&nbsp;            pathComponents = new String[0];</b>
+<i>100</i>&nbsp;        }
+<b class="fc"><i>101</i>&nbsp;        conditionalAttribute = new String[pathComponents.length];</b>
+<b class="fc"><i>102</i>&nbsp;        conditionalValue = new String[pathComponents.length];</b>
+<b class="fc"><i>103</i>&nbsp;        for (int i = 0; i &lt; pathComponents.length; i++) {</b>
+<b class="fc"><i>104</i>&nbsp;            int j = pathComponents[i].indexOf(&#39;[&#39;);</b>
+<b class="fc"><i>105</i>&nbsp;            if (j &gt;= 0) {</b>
+<b class="fc"><i>106</i>&nbsp;                String conditionalComponents = pathComponents[i].substring(j + 1, pathComponents[i].lastIndexOf(&#39;]&#39;));</b>
+<b class="fc"><i>107</i>&nbsp;                String[] strs = conditionalComponents.split(&quot;=&quot;);</b>
+<b class="fc"><i>108</i>&nbsp;                conditionalAttribute[i] = strs[0];</b>
+<b class="fc"><i>109</i>&nbsp;                conditionalValue[i] = strs[1].substring(1, strs[1].length() - 1);</b>
+<b class="fc"><i>110</i>&nbsp;                pathComponents[i] = pathComponents[i].substring(0, j);</b>
+<i>111</i>&nbsp;            }
+<i>112</i>&nbsp;        }
+<b class="fc"><i>113</i>&nbsp;        inputs = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>114</i>&nbsp;        startInputs = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>115</i>&nbsp;        BEASTObjectPanel.getID(this);</b>
+<b class="fc"><i>116</i>&nbsp;    }</b>
+<i>117</i>&nbsp;
+<i>118</i>&nbsp;    /**
+<i>119</i>&nbsp;     * more elegant getters for resolving Input values*
+<i>120</i>&nbsp;     */
+<i>121</i>&nbsp;    public String getName() {
+<b class="fc"><i>122</i>&nbsp;        return nameInput.get();</b>
+<i>123</i>&nbsp;    }
+<i>124</i>&nbsp;
+<i>125</i>&nbsp;    public Partition hasPartition() {
+<b class="fc"><i>126</i>&nbsp;        return hasPartitionsInput.get();</b>
+<i>127</i>&nbsp;    }
+<i>128</i>&nbsp;
+<i>129</i>&nbsp;    public boolean addButtons() {
+<b class="fc"><i>130</i>&nbsp;        return false;</b>
+<i>131</i>&nbsp;    }
+<i>132</i>&nbsp;
+<i>133</i>&nbsp;    public String getIcon() {
+<b class="fc"><i>134</i>&nbsp;        return iconInput.get();</b>
+<i>135</i>&nbsp;    }
+<i>136</i>&nbsp;
+<i>137</i>&nbsp;    public String getTipText() {
+<b class="fc"><i>138</i>&nbsp;        return tipTextInput.get();</b>
+<i>139</i>&nbsp;    }
+<i>140</i>&nbsp;
+<i>141</i>&nbsp;    public InputEditor.ExpandOption forceExpansion() {
+<b class="fc"><i>142</i>&nbsp;        return forceExpansionInput.get();</b>
+<i>143</i>&nbsp;    }
+<i>144</i>&nbsp;
+<i>145</i>&nbsp;    /**
+<i>146</i>&nbsp;     * Find the input associated with this panel
+<i>147</i>&nbsp;     * based on the path Input.
+<i>148</i>&nbsp;     */
+<i>149</i>&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+<i>150</i>&nbsp;    final public Input&lt;?&gt; resolveInput(BeautiDoc doc, int partitionIndex) {
+<i>151</i>&nbsp;        try {
+<i>152</i>&nbsp;//            if (parentBEASTObjects != null &amp;&amp; parentBEASTObjects.size() &gt; 0 &amp;&amp; _input != null)
+<i>153</i>&nbsp;//                System.err.println(&quot;sync &quot; + parentBEASTObjects.get(partitionIndex) + &quot;[?] = &quot; + _input.get());
+<i>154</i>&nbsp;
+<i>155</i>&nbsp;            List&lt;BEASTInterface&gt; beastObjects;
+<b class="fc"><i>156</i>&nbsp;            if (hasPartitionsInput.get() == Partition.none) {</b>
+<b class="fc"><i>157</i>&nbsp;                beastObjects = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>158</i>&nbsp;                beastObjects.add(doc.mcmc.get());</b>
+<i>159</i>&nbsp;            } else {
+<b class="fc"><i>160</i>&nbsp;                beastObjects = doc.getPartitions(hasPartitionsInput.get().toString());</b>
+<i>161</i>&nbsp;            }
+<b class="fc"><i>162</i>&nbsp;            parentBEASTObjects = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>163</i>&nbsp;            parentInputs = new ArrayList&lt;&gt;();</b>
+<i>164</i>&nbsp;
+<b class="fc"><i>165</i>&nbsp;            parentBEASTObjects.add(doc);</b>
+<b class="fc"><i>166</i>&nbsp;            parentInputs.add(doc.mcmc);</b>
+<b class="fc"><i>167</i>&nbsp;            type = doc.mcmc.getType();</b>
+<b class="fc"><i>168</i>&nbsp;            isList = false;</b>
+<b class="fc"><i>169</i>&nbsp;            for (int i = 0; i &lt; pathComponents.length; i++) {</b>
+<b class="fc"><i>170</i>&nbsp;                List&lt;BEASTInterface&gt; oldPlugins = beastObjects;</b>
+<b class="fc"><i>171</i>&nbsp;                beastObjects = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>172</i>&nbsp;                parentBEASTObjects = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>173</i>&nbsp;                parentInputs = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>174</i>&nbsp;                for (BEASTInterface beastObject : oldPlugins) {</b>
+<b class="fc"><i>175</i>&nbsp;                    final Input&lt;?&gt; namedInput = beastObject.getInput(pathComponents[i]);</b>
+<b class="fc"><i>176</i>&nbsp;                    type = namedInput.getType();</b>
+<b class="fc"><i>177</i>&nbsp;                    if (namedInput.get() instanceof List&lt;?&gt;) {</b>
+<b class="fc"><i>178</i>&nbsp;                        isList = true;</b>
+<b class="fc"><i>179</i>&nbsp;                        List&lt;?&gt; list = (List&lt;?&gt;) namedInput.get();</b>
+<b class="fc"><i>180</i>&nbsp;                        if (conditionalAttribute[i] == null) {</b>
+<b class="fc"><i>181</i>&nbsp;                            for (Object o : list) {</b>
+<b class="fc"><i>182</i>&nbsp;                                BEASTInterface beastObject2 = (BEASTInterface) o;</b>
+<b class="fc"><i>183</i>&nbsp;                                beastObjects.add(beastObject2);</b>
+<b class="fc"><i>184</i>&nbsp;                                parentBEASTObjects.add(beastObject);</b>
+<b class="fc"><i>185</i>&nbsp;                                parentInputs.add(namedInput);</b>
+<b class="fc"><i>186</i>&nbsp;                            }</b>
+<i>187</i>&nbsp;                            //throw new Exception (&quot;Don&#39;t know which element to pick from the list. List component should come with a condition. &quot; + m_sPathComponents[i]);
+<i>188</i>&nbsp;                        } else {
+<b class="fc"><i>189</i>&nbsp;                            int matches = 0;</b>
+<b class="fc"><i>190</i>&nbsp;                            for (int j = 0; j &lt; list.size(); j++) {</b>
+<b class="fc"><i>191</i>&nbsp;                                BEASTInterface beastObject2 = (BEASTInterface) list.get(j);</b>
+<b class="fc"><i>192</i>&nbsp;                                if (matches(beastObject2, conditionalAttribute[i], conditionalValue[i])) {</b>
+<b class="fc"><i>193</i>&nbsp;                                    beastObjects.add(beastObject2);</b>
+<b class="fc"><i>194</i>&nbsp;                                    parentBEASTObjects.add(beastObject);</b>
+<b class="fc"><i>195</i>&nbsp;                                    parentInputs.add(namedInput);</b>
+<b class="fc"><i>196</i>&nbsp;                                    matches++;</b>
+<b class="fc"><i>197</i>&nbsp;                                    break;</b>
+<i>198</i>&nbsp;                                }
+<i>199</i>&nbsp;                            }
+<b class="fc"><i>200</i>&nbsp;                            if (matches == 0) {</b>
+<b class="nc"><i>201</i>&nbsp;                                parentInputs.add(namedInput);</b>
+<b class="nc"><i>202</i>&nbsp;                                parentBEASTObjects.add(beastObject);</b>
+<i>203</i>&nbsp;                            }
+<i>204</i>&nbsp;                        }
+<b class="fc"><i>205</i>&nbsp;                    } else if (namedInput.get() instanceof BEASTInterface) {</b>
+<b class="fc"><i>206</i>&nbsp;                        isList = false;</b>
+<b class="fc"><i>207</i>&nbsp;                        if (conditionalAttribute[i] == null) {</b>
+<b class="fc"><i>208</i>&nbsp;                            beastObjects.add((BEASTInterface) namedInput.get());</b>
+<b class="fc"><i>209</i>&nbsp;                            parentBEASTObjects.add(beastObject);</b>
+<b class="fc"><i>210</i>&nbsp;                            parentInputs.add(namedInput);</b>
+<i>211</i>&nbsp;                        } else {
+<b class="nc"><i>212</i>&nbsp;                            if (matches(beastObject, conditionalAttribute[i], conditionalValue[i])) {</b>
+<i>213</i>&nbsp;//							if ((m_sConditionalAttribute[i].equals(&quot;id&quot;) &amp;&amp; beastObject.getID().equals(m_sConditionalValue[i])) ||
+<i>214</i>&nbsp;//							    (m_sConditionalAttribute[i].equals(&quot;type&quot;) &amp;&amp; beastObject.getClass().getName().equals(m_sConditionalValue[i]))) {
+<b class="nc"><i>215</i>&nbsp;                                beastObjects.add(beastObject);</b>
+<b class="nc"><i>216</i>&nbsp;                                parentBEASTObjects.add(beastObject);</b>
+<b class="nc"><i>217</i>&nbsp;                                parentInputs.add(namedInput);</b>
+<i>218</i>&nbsp;                            }
+<i>219</i>&nbsp;                        }
+<i>220</i>&nbsp;                    } else {
+<b class="nc"><i>221</i>&nbsp;                        throw new IllegalArgumentException(&quot;input &quot; + pathComponents[i] + &quot;  is not a beastObject or list&quot;);</b>
+<i>222</i>&nbsp;                    }
+<b class="fc"><i>223</i>&nbsp;                }</b>
+<i>224</i>&nbsp;            }
+<b class="fc"><i>225</i>&nbsp;            if (typeInput.get() != null) {</b>
+<b class="fc"><i>226</i>&nbsp;                type = Class.forName(typeInput.get());</b>
+<i>227</i>&nbsp;            }
+<i>228</i>&nbsp;            // sanity check
+<b class="fc"><i>229</i>&nbsp;            if (!isList &amp;&amp; (hasPartitionsInput.get() == Partition.none) &amp;&amp; beastObjects.size() &gt; 1) {</b>
+<b class="fc"><i>230</i>&nbsp;            	Log.warning.println(&quot;WARNING: multiple beastObjects match, but hasPartitions=none&quot;);</b>
+<i>231</i>&nbsp;                // this makes sure that all mathing beastObjects are available in one go
+<b class="fc"><i>232</i>&nbsp;                isList = true;</b>
+<i>233</i>&nbsp;                // this suppresses syncing
+<b class="fc"><i>234</i>&nbsp;                parentInputs.clear();</b>
+<i>235</i>&nbsp;            }
+<b class="fc"><i>236</i>&nbsp;            inputs.clear();</b>
+<b class="fc"><i>237</i>&nbsp;            startInputs.clear();</b>
+<b class="fc"><i>238</i>&nbsp;            for (BEASTInterface beastObject : beastObjects) {</b>
+<b class="fc"><i>239</i>&nbsp;                inputs.add(beastObject);</b>
+<b class="fc"><i>240</i>&nbsp;                startInputs.add(beastObject);</b>
+<b class="fc"><i>241</i>&nbsp;            }</b>
+<i>242</i>&nbsp;
+<b class="fc"><i>243</i>&nbsp;            if (!isList) {</b>
+<b class="fc"><i>244</i>&nbsp;                _input = new FlexibleInput&lt;&gt;();</b>
+<i>245</i>&nbsp;            } else {
+<b class="fc"><i>246</i>&nbsp;                _input = new FlexibleInput&lt;&gt;(new ArrayList&lt;&gt;());</b>
+<i>247</i>&nbsp;            }
+<b class="fc"><i>248</i>&nbsp;            _input.setRule(Validate.REQUIRED);</b>
+<b class="fc"><i>249</i>&nbsp;            syncTo(partitionIndex);</b>
+<i>250</i>&nbsp;//            if (parentBEASTObjects != null &amp;&amp; parentBEASTObjects.size() &gt; 0)
+<i>251</i>&nbsp;//                System.err.println(&quot;sync &quot; + parentBEASTObjects.get(partitionIndex) + &quot;[?] = &quot; + _input.get());
+<i>252</i>&nbsp;
+<i>253</i>&nbsp;
+<b class="fc"><i>254</i>&nbsp;            if (isList) {</b>
+<b class="fc"><i>255</i>&nbsp;                checkForDups((List&lt;Object&gt;) _input.get());</b>
+<i>256</i>&nbsp;            }
+<i>257</i>&nbsp;
+<b class="fc"><i>258</i>&nbsp;            return _input;</b>
+<b class="nc"><i>259</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>260</i>&nbsp;            Log.err.println(&quot;Warning: could not find objects in path &quot; + Arrays.toString(pathComponents));</b>
+<i>261</i>&nbsp;        }
+<b class="nc"><i>262</i>&nbsp;        return null;</b>
+<i>263</i>&nbsp;    } // resolveInputs
+<i>264</i>&nbsp;
+<i>265</i>&nbsp;    private void checkForDups(List&lt;Object&gt; list) {
+<b class="fc"><i>266</i>&nbsp;        for (int i = 0; i &lt; list.size(); i++) {</b>
+<b class="fc"><i>267</i>&nbsp;            if (list.lastIndexOf(list.get(i)) != i) {</b>
+<b class="nc"><i>268</i>&nbsp;            	Log.warning.println(&quot;We have a dup: &quot; + list.get(i));</b>
+<b class="nc"><i>269</i>&nbsp;                list.remove(i);</b>
+<b class="nc"><i>270</i>&nbsp;                i--;</b>
+<i>271</i>&nbsp;            }
+<i>272</i>&nbsp;        }
+<i>273</i>&nbsp;
+<b class="fc"><i>274</i>&nbsp;    }</b>
+<i>275</i>&nbsp;
+<i>276</i>&nbsp;    private boolean matches(BEASTInterface beastObject2, String conditionalAttribute, String conditionalValue) {
+<b class="fc"><i>277</i>&nbsp;        if (conditionalAttribute.equals(&quot;id&quot;) &amp;&amp; beastObject2.getID().equals(conditionalValue)) return true;</b>
+<b class="fc"><i>278</i>&nbsp;        if (conditionalAttribute.equals(&quot;type&quot;) &amp;&amp; beastObject2.getClass().getName().equals(conditionalValue)) return true;</b>
+<b class="fc"><i>279</i>&nbsp;        if (conditionalAttribute.equals(&quot;type!&quot;) &amp;&amp; !beastObject2.getClass().getName().equals(conditionalValue))</b>
+<b class="nc"><i>280</i>&nbsp;            return true;</b>
+<b class="fc"><i>281</i>&nbsp;        return false;</b>
+<i>282</i>&nbsp;    }
+<i>283</i>&nbsp;
+<i>284</i>&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+<i>285</i>&nbsp;    public void sync(int partitionIndex) {
+<b class="fc"><i>286</i>&nbsp;        if (parentInputs.size() &gt; 0 &amp;&amp; _input.get() != null) {</b>
+<b class="fc"><i>287</i>&nbsp;            final Input&lt;?&gt; input = parentInputs.get(partitionIndex);</b>
+<b class="fc"><i>288</i>&nbsp;            if (isList) {</b>
+<b class="fc"><i>289</i>&nbsp;                List&lt;Object&gt; list = (List&lt;Object&gt;) _input.get();</b>
+<b class="fc"><i>290</i>&nbsp;                List&lt;Object&gt; targetList = ((List&lt;Object&gt;) input.get());</b>
+<i>291</i>&nbsp;                //targetList.clear();
+<i>292</i>&nbsp;                // only clear former members
+<b class="fc"><i>293</i>&nbsp;                for (BEASTInterface beastObject : startInputs) {</b>
+<b class="fc"><i>294</i>&nbsp;                    targetList.remove(beastObject);</b>
+<b class="fc"><i>295</i>&nbsp;                }</b>
+<b class="fc"><i>296</i>&nbsp;                targetList.addAll(list);</b>
+<i>297</i>&nbsp;                // sync outputs of items in list
+<b class="fc"><i>298</i>&nbsp;                for (Object o : list) {</b>
+<b class="fc"><i>299</i>&nbsp;                	if (o instanceof BEASTInterface) {</b>
+<b class="fc"><i>300</i>&nbsp;                		((BEASTInterface)o).getOutputs().add(parentBEASTObjects.get(partitionIndex));</b>
+<i>301</i>&nbsp;                	}
+<b class="fc"><i>302</i>&nbsp;                }</b>
+<b class="fc"><i>303</i>&nbsp;            } else {</b>
+<i>304</i>&nbsp;                try {
+<i>305</i>&nbsp;                    //System.err.println(&quot;sync &quot; + parentBEASTObjects.get(partitionIndex) + &quot;[&quot; + input.getName() + &quot;] = &quot; + _input.get());
+<b class="fc"><i>306</i>&nbsp;                    input.setValue(_input.get(), parentBEASTObjects.get(partitionIndex));</b>
+<b class="nc"><i>307</i>&nbsp;                } catch (Exception e) {</b>
+<b class="nc"><i>308</i>&nbsp;                    e.printStackTrace();</b>
+<b class="fc"><i>309</i>&nbsp;                }</b>
+<i>310</i>&nbsp;            }
+<i>311</i>&nbsp;        }
+<b class="fc"><i>312</i>&nbsp;    }</b>
+<i>313</i>&nbsp;
+<i>314</i>&nbsp;    /**
+<i>315</i>&nbsp;     * initialise m_input, and either m_beastObject or m_pluginList *
+<i>316</i>&nbsp;     */
+<i>317</i>&nbsp;    public void syncTo(int partitionIndex) {
+<b class="fc"><i>318</i>&nbsp;        _input.setType(type);</b>
+<i>319</i>&nbsp;        try {
+<b class="fc"><i>320</i>&nbsp;            if (isList) {</b>
+<b class="fc"><i>321</i>&nbsp;                for (BEASTInterface beastObject : inputs) {</b>
+<b class="fc"><i>322</i>&nbsp;                    _input.setValue(beastObject, this);</b>
+<b class="fc"><i>323</i>&nbsp;                }</b>
+<i>324</i>&nbsp;            } else {
+<b class="fc"><i>325</i>&nbsp;            	if (inputs.size() &gt; 0) {</b>
+<b class="fc"><i>326</i>&nbsp;	                BEASTInterface beastObject = inputs.get(partitionIndex);</b>
+<b class="fc"><i>327</i>&nbsp;	                _input.setValue(beastObject, this);</b>
+<i>328</i>&nbsp;            	}
+<i>329</i>&nbsp;            }
+<b class="nc"><i>330</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>331</i>&nbsp;            e.printStackTrace();</b>
+<b class="fc"><i>332</i>&nbsp;        }</b>
+<b class="fc"><i>333</i>&nbsp;    }</b>
+<i>334</i>&nbsp;
+<i>335</i>&nbsp;    final Input&lt;?&gt; getInput() {
+<b class="nc"><i>336</i>&nbsp;        return _input;</b>
+<i>337</i>&nbsp;    }
+<i>338</i>&nbsp;
+<i>339</i>&nbsp;    /**
+<i>340</i>&nbsp;     * returns name of the beastObject *
+<i>341</i>&nbsp;     */
+<i>342</i>&nbsp;    public String getType() {
+<b class="fc"><i>343</i>&nbsp;        if (isList) {</b>
+<b class="nc"><i>344</i>&nbsp;            return inputs.get(0).getClass().getName();</b>
+<i>345</i>&nbsp;        }
+<b class="fc"><i>346</i>&nbsp;        if (_input == null) {</b>
+<b class="nc"><i>347</i>&nbsp;            return null;</b>
+<i>348</i>&nbsp;        }
+<b class="fc"><i>349</i>&nbsp;        return _input.get().getClass().getName();</b>
+<i>350</i>&nbsp;    }
+<i>351</i>&nbsp;
+<i>352</i>&nbsp;//	public void addItem(BEASTObject beastObject) {
+<i>353</i>&nbsp;//		m_parentInputs.add(m_parentInputs.get(m_parentInputs.size()-1));
+<i>354</i>&nbsp;//		m_parentPlugins.add(m_parentPlugins.get(m_parentPlugins.size()-1));
+<i>355</i>&nbsp;//	}
+<i>356</i>&nbsp;
+<i>357</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,289 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: ReplaceSequenceInXML</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.util</a> ]
+</div>
+
+<h1>Coverage Summary for Class: ReplaceSequenceInXML (beast.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">ReplaceSequenceInXML</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.util;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.io.*;
+<i>4</i>&nbsp;//import java.nio.file.Files;
+<i>5</i>&nbsp;//import java.nio.file.Path;
+<i>6</i>&nbsp;//import java.nio.file.Paths;
+<i>7</i>&nbsp;import java.util.*;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;/**
+<i>10</i>&nbsp; * Given nex file(s) to replace sequence in the xml, but tip names have to be same.
+<i>11</i>&nbsp; * use java 1.7 File.copy
+<i>12</i>&nbsp; * @author Walter Xie
+<i>13</i>&nbsp; *
+<i>14</i>&nbsp; * move to New Zealand Genomic Observatory Toolkit
+<i>15</i>&nbsp; * https://github.com/CompEvol/NZGOT/tree/master/src/nzgo/toolkit/beast
+<i>16</i>&nbsp; */
+<i>17</i>&nbsp;@Deprecated
+<i>18</i>&nbsp;public class ReplaceSequenceInXML {
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;    private static int treeTotal = 128;
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;    public static void main(String[] args) throws IOException {
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;        if (args.length != 2)
+<i>25</i>&nbsp;            throw new IllegalArgumentException(&quot;XML input file and folder containing nex files are missing !&quot;);
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;        String xmlFilePath = args[0];
+<i>28</i>&nbsp;        String nexFilePath = args[1];
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;        String stem_old = &quot;tree_0_&quot;;
+<i>31</i>&nbsp;        String stem_end = &quot;_new.xml&quot;;
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;        String xmlFileName = xmlFilePath + File.separator + &quot;tree_&quot; + treeTotal + &quot;_0&quot; + stem_end;
+<i>34</i>&nbsp;//        Path source = Paths.get(xmlFileName);
+<i>35</i>&nbsp;//        if (!Files.exists(source)) throw new IllegalArgumentException(&quot;Cannot find input xml &quot; + xmlFileName);
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;        // copy sample XML to target folder
+<i>38</i>&nbsp;//        Path target = Paths.get(nexFilePath + File.separator + &quot;xml&quot; + File.separator + &quot;tree_&quot; + treeTotal + &quot;_0.xml&quot;);
+<i>39</i>&nbsp;//        Files.copy(source, target);
+<i>40</i>&nbsp;//        System.out.println(&quot;\nCopy sample XML to &quot; + target + &quot; ...&quot;);
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;        for (int i = 0; i &lt; 100; i++) { // 100
+<i>43</i>&nbsp;            String stem = &quot;tree_&quot; + Integer.toString(i) + &quot;_&quot;;
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;            System.out.println(&quot;\nReading all nex files from &quot; + nexFilePath + &quot;, stem = &quot; + stem);
+<i>46</i>&nbsp;            Map&lt;String, String&gt; parserMap = readAllNexus(nexFilePath, stem);
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;            try {
+<i>49</i>&nbsp;                // read XML
+<i>50</i>&nbsp;                BufferedReader reader = new BufferedReader(new FileReader(xmlFileName));
+<i>51</i>&nbsp;                System.out.println(&quot;\nReading XML &quot; + xmlFileName + &quot; ...&quot;);
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;                // write new XML
+<i>54</i>&nbsp;                String outFile = xmlFilePath + File.separator + treeTotal + File.separator +
+<i>55</i>&nbsp;                        &quot;tree_&quot; + treeTotal + &quot;_&quot; + Integer.toString(i) + stem_end;
+<i>56</i>&nbsp;                PrintStream out = new PrintStream(new FileOutputStream(outFile));
+<i>57</i>&nbsp;                System.out.println(&quot;\nWriting new XML &quot; + outFile + &quot; ...&quot;);
+<i>58</i>&nbsp;
+<i>59</i>&nbsp;                String line = reader.readLine();
+<i>60</i>&nbsp;                while (line != null) {
+<i>61</i>&nbsp;//                    if (line.contains(&quot;&lt;?xml&quot;)) {
+<i>62</i>&nbsp;//                        out.println(line);
+<i>63</i>&nbsp;//                        line = reader.readLine();
+<i>64</i>&nbsp;//                        // skip some empty lines
+<i>65</i>&nbsp;//                        while (line.trim().equals(&quot;&quot;)) line = reader.readLine();
+<i>66</i>&nbsp;//                    }
+<i>67</i>&nbsp;                    if (line.contains(&quot;&lt;data id=&quot;) || line.contains(&quot;&lt;sequence id=&quot;) || line.contains(&quot;&lt;/data&gt;&quot;)
+<i>68</i>&nbsp;                            || line.contains(&quot;&lt;taxon id=&quot;) || line.contains(&quot;&lt;/taxon&gt;&quot;)) {
+<i>69</i>&nbsp;                        // skip sequence or species - individuals mapping
+<i>70</i>&nbsp;                    } else if (line.contains(&quot;beast.math.distributions.Beta&quot;)) {
+<i>71</i>&nbsp;                        // trigger to print new sequence
+<i>72</i>&nbsp;                        for (String xml : parserMap.values()) {
+<i>73</i>&nbsp;                            out.println(xml);
+<i>74</i>&nbsp;                        }
+<i>75</i>&nbsp;                        out.println(line);
+<i>76</i>&nbsp;                    } else if (line.contains(&quot;&lt;taxonset id=\&quot;taxonsuperset\&quot;&quot;)) {
+<i>77</i>&nbsp;                        // trigger to print new species - individuals mapping
+<i>78</i>&nbsp;                        out.println(line);
+<i>79</i>&nbsp;                        writeSpIndMapping(out);
+<i>80</i>&nbsp;                    } else {
+<i>81</i>&nbsp;                        String newLine = line.replaceAll(stem_old, stem);
+<i>82</i>&nbsp;                        out.println(newLine);
+<i>83</i>&nbsp;                    }
+<i>84</i>&nbsp;
+<i>85</i>&nbsp;                    line = reader.readLine();
+<i>86</i>&nbsp;                }
+<i>87</i>&nbsp;
+<i>88</i>&nbsp;                reader.close();
+<i>89</i>&nbsp;                out.flush();
+<i>90</i>&nbsp;                out.close();
+<i>91</i>&nbsp;
+<i>92</i>&nbsp;            } catch (Exception e) {
+<i>93</i>&nbsp;                e.printStackTrace();
+<i>94</i>&nbsp;            }
+<i>95</i>&nbsp;
+<i>96</i>&nbsp;        }
+<i>97</i>&nbsp;    } // main
+<i>98</i>&nbsp;
+<i>99</i>&nbsp;    private static Map&lt;String, String&gt; readAllNexus(String nexFilePath, String stem) {
+<i>100</i>&nbsp;        File folder = new File(nexFilePath);
+<i>101</i>&nbsp;        File[] listOfFiles = folder.listFiles();
+<i>102</i>&nbsp;
+<i>103</i>&nbsp;        Map&lt;String, String&gt; parserMap = new HashMap&lt;String, String&gt;();
+<i>104</i>&nbsp;        for (File file : listOfFiles) {
+<i>105</i>&nbsp;            String fileName = file.getName();
+<i>106</i>&nbsp;            if (file.isFile() &amp;&amp; fileName.endsWith(&quot;nex&quot;) &amp;&amp; fileName.startsWith(stem)) {
+<i>107</i>&nbsp;                try {
+<i>108</i>&nbsp;                    String index = fileName.substring(fileName.lastIndexOf(&quot;_&quot;)+1, fileName.lastIndexOf(&quot;.&quot;));
+<i>109</i>&nbsp;                    System.out.println(&quot;\nReading nex &quot; + file + &quot;, index = &quot; + index);
+<i>110</i>&nbsp;
+<i>111</i>&nbsp;                    if (parserMap.containsKey(index)) throw new IllegalArgumentException(&quot;parser map already had index = &quot; + index);
+<i>112</i>&nbsp;
+<i>113</i>&nbsp;                    if (Integer.parseInt(index) &lt; treeTotal) {
+<i>114</i>&nbsp;                        NexusParser parser = new NexusParser();
+<i>115</i>&nbsp;                        parser.parseFile(file);
+<i>116</i>&nbsp;
+<i>117</i>&nbsp;//                    if (parser.m_taxa != null) {
+<i>118</i>&nbsp;//                        System.out.println(parser.m_taxa.size() + &quot; taxa&quot;);
+<i>119</i>&nbsp;//                        System.out.println(Arrays.toString(parser.m_taxa.toArray(new String[0])));
+<i>120</i>&nbsp;//                    } else {
+<i>121</i>&nbsp;//                        throw new IllegalArgumentException(&quot;No taxa in nexus file &quot; + fileName);
+<i>122</i>&nbsp;//                    }
+<i>123</i>&nbsp;//                    if (parser.m_trees != null) {
+<i>124</i>&nbsp;//                        System.out.println(parser.m_trees.size() + &quot; trees&quot;);
+<i>125</i>&nbsp;//                    }
+<i>126</i>&nbsp;                        if (parser.m_alignment != null) {
+<i>127</i>&nbsp;                            String sXML = new XMLProducer().toRawXML(parser.m_alignment, &quot;alignment&quot;);
+<i>128</i>&nbsp;//                            System.out.println(sXML);
+<i>129</i>&nbsp;                            parserMap.put(index, sXML);
+<i>130</i>&nbsp;                        } else {
+<i>131</i>&nbsp;                            throw new IllegalArgumentException(&quot;No alignment in nexus file &quot; + fileName);
+<i>132</i>&nbsp;                        }
+<i>133</i>&nbsp;//                    if (parser.m_traitSet != null) {
+<i>134</i>&nbsp;//                        String sXML = new XMLProducer().toXML(parser.m_traitSet);
+<i>135</i>&nbsp;//                        System.out.println(sXML);
+<i>136</i>&nbsp;//                    }
+<i>137</i>&nbsp;                    }
+<i>138</i>&nbsp;                } catch (Exception e) {
+<i>139</i>&nbsp;                    e.printStackTrace();
+<i>140</i>&nbsp;                }
+<i>141</i>&nbsp;
+<i>142</i>&nbsp;            }
+<i>143</i>&nbsp;        }
+<i>144</i>&nbsp;        System.out.println(&quot;\nRead &quot; + parserMap.size() + &quot; nex files in total&quot;);
+<i>145</i>&nbsp;        return parserMap;
+<i>146</i>&nbsp;    }
+<i>147</i>&nbsp;
+<i>148</i>&nbsp;    private static void writeSpIndMapping(PrintStream out) {
+<i>149</i>&nbsp;        StringBuilder xml = new StringBuilder(&quot;                &lt;taxon id=\&quot;s0\&quot; spec=\&quot;TaxonSet\&quot;&gt;\n&quot; +
+<i>150</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s0_tip6\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>151</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s0_tip61\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>152</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s0_tip5\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>153</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s0_tip51\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>154</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s0_tip7\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>155</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s0_tip71\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>156</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s0_tip2\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>157</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s0_tip21\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>158</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s0_tip1\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>159</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s0_tip11\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>160</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s0_tip4\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>161</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s0_tip41\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>162</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s0_tip3\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>163</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s0_tip31\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>164</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s0_tip0\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>165</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s0_tip01\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>166</i>&nbsp;                &quot;                &lt;/taxon&gt;\n&quot; +
+<i>167</i>&nbsp;                &quot;                &lt;taxon id=\&quot;s2\&quot; spec=\&quot;TaxonSet\&quot;&gt;\n&quot; +
+<i>168</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s2_tip4\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>169</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s2_tip41\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>170</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s2_tip3\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>171</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s2_tip31\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>172</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s2_tip6\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>173</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s2_tip61\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>174</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s2_tip5\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>175</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s2_tip51\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>176</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s2_tip7\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>177</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s2_tip71\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>178</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s2_tip0\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>179</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s2_tip01\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>180</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s2_tip2\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>181</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s2_tip21\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>182</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s2_tip1\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>183</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s2_tip11\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>184</i>&nbsp;                &quot;                &lt;/taxon&gt;\n&quot; +
+<i>185</i>&nbsp;                &quot;                &lt;taxon id=\&quot;s1\&quot; spec=\&quot;TaxonSet\&quot;&gt;\n&quot; +
+<i>186</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s1_tip3\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>187</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s1_tip31\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>188</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s1_tip2\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>189</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s1_tip21\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>190</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s1_tip5\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>191</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s1_tip51\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>192</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s1_tip4\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>193</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s1_tip41\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>194</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s1_tip7\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>195</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s1_tip71\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>196</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s1_tip6\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>197</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s1_tip61\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>198</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s1_tip1\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>199</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s1_tip11\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>200</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s1_tip0\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>201</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s1_tip01\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>202</i>&nbsp;                &quot;                &lt;/taxon&gt;\n&quot; +
+<i>203</i>&nbsp;                &quot;                &lt;taxon id=\&quot;s3\&quot; spec=\&quot;TaxonSet\&quot;&gt;\n&quot; +
+<i>204</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s3_tip7\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>205</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s3_tip71\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>206</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s3_tip6\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>207</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s3_tip61\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>208</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s3_tip5\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>209</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s3_tip51\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>210</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s3_tip4\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>211</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s3_tip41\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>212</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s3_tip3\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>213</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s3_tip31\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>214</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s3_tip2\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>215</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s3_tip21\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>216</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s3_tip1\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>217</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s3_tip11\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>218</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s3_tip0\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>219</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s3_tip01\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>220</i>&nbsp;                &quot;                &lt;/taxon&gt;\n&quot; +
+<i>221</i>&nbsp;                &quot;                &lt;taxon id=\&quot;s4\&quot; spec=\&quot;TaxonSet\&quot;&gt;\n&quot; +
+<i>222</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s4_tip6\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>223</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s4_tip61\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>224</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s4_tip5\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>225</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s4_tip51\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>226</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s4_tip7\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>227</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s4_tip71\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>228</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s4_tip2\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>229</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s4_tip21\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>230</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s4_tip1\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>231</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s4_tip11\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>232</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s4_tip4\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>233</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s4_tip41\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>234</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s4_tip3\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>235</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s4_tip31\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>236</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s4_tip0\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>237</i>&nbsp;                &quot;                    &lt;taxon id=\&quot;s4_tip01\&quot; spec=\&quot;Taxon\&quot;/&gt;\n&quot; +
+<i>238</i>&nbsp;                &quot;                &lt;/taxon&gt;\n&quot;);
+<i>239</i>&nbsp;
+<i>240</i>&nbsp;        out.print(xml);
+<i>241</i>&nbsp;    }
+<i>242</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

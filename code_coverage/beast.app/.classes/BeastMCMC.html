@@ -1,0 +1,713 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: BeastMCMC</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app</a> ]
+</div>
+
+<h1>Coverage Summary for Class: BeastMCMC (beast.app)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BeastMCMC</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.3%
+  </span>
+  <span class="absValue">
+    (1/ 7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    1.5%
+  </span>
+  <span class="absValue">
+    (2/ 132)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BeastMCMC$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BeastMCMC$BeastStartDialog</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 126)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BeastMCMC$BeastStartDialog$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 14)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BeastMCMC$BeastStartDialog$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BeastMCMC$BeastStartDialog$3</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    3.7%
+  </span>
+  <span class="absValue">
+    (1/ 27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0.7%
+  </span>
+  <span class="absValue">
+    (2/ 288)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;* File BeastMCMC.java
+<i>3</i>&nbsp;*
+<i>4</i>&nbsp;* Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>5</i>&nbsp;*
+<i>6</i>&nbsp;* This file is part of BEAST2.
+<i>7</i>&nbsp;* See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp;* information regarding copyright ownership and licensing.
+<i>9</i>&nbsp;*
+<i>10</i>&nbsp;* BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp;* it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp;* published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp;* of the License, or (at your option) any later version.
+<i>14</i>&nbsp;*
+<i>15</i>&nbsp;*  BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp;*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp;*  GNU Lesser General Public License for more details.
+<i>19</i>&nbsp;*
+<i>20</i>&nbsp;* You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp;* License along with BEAST; if not, write to the
+<i>22</i>&nbsp;* Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp;* Boston, MA  02110-1301  USA
+<i>24</i>&nbsp;*/
+<i>25</i>&nbsp;package beast.app;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;import java.awt.BorderLayout;
+<i>29</i>&nbsp;import java.awt.Component;
+<i>30</i>&nbsp;import java.awt.Dimension;
+<i>31</i>&nbsp;import java.io.File;
+<i>32</i>&nbsp;import java.io.IOException;
+<i>33</i>&nbsp;import java.net.URL;
+<i>34</i>&nbsp;import java.util.ArrayList;
+<i>35</i>&nbsp;import java.util.Arrays;
+<i>36</i>&nbsp;import java.util.List;
+<i>37</i>&nbsp;import java.util.concurrent.ExecutorService;
+<i>38</i>&nbsp;import java.util.concurrent.Executors;
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;import javax.swing.BorderFactory;
+<i>41</i>&nbsp;import javax.swing.Box;
+<i>42</i>&nbsp;import javax.swing.ImageIcon;
+<i>43</i>&nbsp;import javax.swing.JButton;
+<i>44</i>&nbsp;import javax.swing.JCheckBox;
+<i>45</i>&nbsp;import javax.swing.JComboBox;
+<i>46</i>&nbsp;import javax.swing.JDialog;
+<i>47</i>&nbsp;import javax.swing.JFileChooser;
+<i>48</i>&nbsp;import javax.swing.JFrame;
+<i>49</i>&nbsp;import javax.swing.JLabel;
+<i>50</i>&nbsp;import javax.swing.JOptionPane;
+<i>51</i>&nbsp;import javax.swing.JTextField;
+<i>52</i>&nbsp;import javax.swing.SwingConstants;
+<i>53</i>&nbsp;import javax.swing.WindowConstants;
+<i>54</i>&nbsp;import javax.swing.border.EtchedBorder;
+<i>55</i>&nbsp;import javax.swing.filechooser.FileFilter;
+<i>56</i>&nbsp;import javax.xml.parsers.ParserConfigurationException;
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;import org.json.JSONException;
+<i>59</i>&nbsp;import org.xml.sax.SAXException;
+<i>60</i>&nbsp;
+<i>61</i>&nbsp;import beagle.BeagleFlag;
+<i>62</i>&nbsp;import beast.app.beastapp.BeastDialog;
+<i>63</i>&nbsp;import beast.app.beastapp.BeastMain;
+<i>64</i>&nbsp;import beast.app.beauti.Beauti;
+<i>65</i>&nbsp;import beast.app.draw.ExtensionFileFilter;
+<i>66</i>&nbsp;import beast.app.util.Version;
+<i>67</i>&nbsp;import beast.core.Logger;
+<i>68</i>&nbsp;import beast.core.Runnable;
+<i>69</i>&nbsp;import beast.core.util.Log;
+<i>70</i>&nbsp;import beast.util.AddOnManager;
+<i>71</i>&nbsp;import beast.util.JSONParser;
+<i>72</i>&nbsp;import beast.util.JSONParserException;
+<i>73</i>&nbsp;import beast.util.Randomizer;
+<i>74</i>&nbsp;import beast.util.XMLParser;
+<i>75</i>&nbsp;import beast.util.XMLParserException;
+<i>76</i>&nbsp;import jam.util.IconUtils;
+<i>77</i>&nbsp;
+<i>78</i>&nbsp;/**
+<i>79</i>&nbsp; * Main application for performing MCMC runs.
+<i>80</i>&nbsp; * See getUsage() for command line options.
+<i>81</i>&nbsp; */
+<b class="nc"><i>82</i>&nbsp;public class BeastMCMC {</b>
+<i>83</i>&nbsp;    final public static String VERSION = &quot;2.0 Release candidate&quot;;
+<i>84</i>&nbsp;    final public static String DEVELOPERS = &quot;Beast 2 development team&quot;;
+<i>85</i>&nbsp;    final public static String COPYRIGHT = &quot;Beast 2 development team 2011&quot;;
+<i>86</i>&nbsp;
+<i>87</i>&nbsp;    /**
+<i>88</i>&nbsp;     * number of threads used to run the likelihood beast.core *
+<i>89</i>&nbsp;     */
+<b class="fc"><i>90</i>&nbsp;    static public int m_nThreads = 1;</b>
+<i>91</i>&nbsp;    /**
+<i>92</i>&nbsp;     * thread pool *
+<i>93</i>&nbsp;     */
+<b class="fc"><i>94</i>&nbsp;    public static ExecutorService g_exec = Executors.newFixedThreadPool(m_nThreads);</b>
+<i>95</i>&nbsp;    /**
+<i>96</i>&nbsp;     * random number seed used to initialise Randomizer *
+<i>97</i>&nbsp;     */
+<b class="nc"><i>98</i>&nbsp;    long m_nSeed = 127;</b>
+<i>99</i>&nbsp;
+<i>100</i>&nbsp;    /**
+<i>101</i>&nbsp;     * MCMC object to execute *
+<i>102</i>&nbsp;     */
+<i>103</i>&nbsp;    Runnable m_runnable;
+<i>104</i>&nbsp;
+<i>105</i>&nbsp;    /**
+<i>106</i>&nbsp;     * parse command line arguments, and load file if specified
+<i>107</i>&nbsp;     * @throws IOException 
+<i>108</i>&nbsp;     * @throws JSONException 
+<i>109</i>&nbsp;     * @throws JSONParserException 
+<i>110</i>&nbsp;     */
+<i>111</i>&nbsp;    public void parseArgs(String[] args) throws IOException, XMLParserException, JSONException {
+<b class="nc"><i>112</i>&nbsp;        int i = 0;</b>
+<b class="nc"><i>113</i>&nbsp;        boolean resume = false;</b>
+<i>114</i>&nbsp;
+<b class="nc"><i>115</i>&nbsp;        File beastFile = null;</b>
+<i>116</i>&nbsp;
+<i>117</i>&nbsp;        try {
+<b class="nc"><i>118</i>&nbsp;            while (i &lt; args.length) {</b>
+<b class="nc"><i>119</i>&nbsp;                int old = i;</b>
+<b class="nc"><i>120</i>&nbsp;                if (i &lt; args.length) {</b>
+<b class="nc"><i>121</i>&nbsp;                    if (args[i].equals(&quot;&quot;)) {</b>
+<b class="nc"><i>122</i>&nbsp;                        i += 1;</b>
+<b class="nc"><i>123</i>&nbsp;                    } else if (args[i].equals(&quot;-batch&quot;)) {</b>
+<b class="nc"><i>124</i>&nbsp;                        Logger.FILE_MODE = Logger.LogFileMode.only_new_or_exit;</b>
+<b class="nc"><i>125</i>&nbsp;                        i += 1;</b>
+<b class="nc"><i>126</i>&nbsp;                    } else if (args[i].equals(&quot;-resume&quot;)) {</b>
+<b class="nc"><i>127</i>&nbsp;                        resume = true;</b>
+<b class="nc"><i>128</i>&nbsp;                        Logger.FILE_MODE = Logger.LogFileMode.resume;</b>
+<b class="nc"><i>129</i>&nbsp;                        System.setProperty(&quot;beast.resume&quot;, &quot;true&quot;);</b>
+<b class="nc"><i>130</i>&nbsp;                        System.setProperty(&quot;beast.debug&quot;, &quot;false&quot;);</b>
+<b class="nc"><i>131</i>&nbsp;                        i += 1;</b>
+<b class="nc"><i>132</i>&nbsp;                    } else if (args[i].equals(&quot;-overwrite&quot;)) {</b>
+<b class="nc"><i>133</i>&nbsp;                        Logger.FILE_MODE = Logger.LogFileMode.overwrite;</b>
+<b class="nc"><i>134</i>&nbsp;                        i += 1;</b>
+<b class="nc"><i>135</i>&nbsp;                    } else if (args[i].equals(&quot;-seed&quot;)) {</b>
+<b class="nc"><i>136</i>&nbsp;                        if (args[i + 1].equals(&quot;random&quot;)) {</b>
+<b class="nc"><i>137</i>&nbsp;                            m_nSeed = Randomizer.getSeed();</b>
+<i>138</i>&nbsp;                        } else {
+<b class="nc"><i>139</i>&nbsp;                            m_nSeed = Long.parseLong(args[i + 1]);</b>
+<i>140</i>&nbsp;                        }
+<b class="nc"><i>141</i>&nbsp;                        i += 2;</b>
+<i>142</i>&nbsp;
+<b class="nc"><i>143</i>&nbsp;                    } else if (args[i].equals(&quot;-threads&quot;)) {</b>
+<b class="nc"><i>144</i>&nbsp;                        m_nThreads = Integer.parseInt(args[i + 1]);</b>
+<b class="nc"><i>145</i>&nbsp;                        g_exec = Executors.newFixedThreadPool(m_nThreads);</b>
+<b class="nc"><i>146</i>&nbsp;                        i += 2;</b>
+<i>147</i>&nbsp;// use BEAST environment variable to set Beast directories as colon separated list						
+<i>148</i>&nbsp;//					} else if (args[i].equals(&quot;-beastlib&quot;)) {
+<i>149</i>&nbsp;//						ClassDiscovery.setJarPath(args[i + 1]);
+<i>150</i>&nbsp;//						i += 2;
+<b class="nc"><i>151</i>&nbsp;                    } else if (args[i].equals(&quot;-prefix&quot;)) {</b>
+<b class="nc"><i>152</i>&nbsp;                        System.setProperty(&quot;file.name.prefix&quot;, args[i + 1].trim());</b>
+<b class="nc"><i>153</i>&nbsp;                        i += 2;</b>
+<i>154</i>&nbsp;                    }
+<b class="nc"><i>155</i>&nbsp;                    if (i == old) {</b>
+<b class="nc"><i>156</i>&nbsp;                        if (i == args.length - 1) {</b>
+<b class="nc"><i>157</i>&nbsp;                            beastFile = new File(args[i]);</b>
+<b class="nc"><i>158</i>&nbsp;                            i++;</b>
+<i>159</i>&nbsp;                        } else {
+<b class="nc"><i>160</i>&nbsp;                            throw new IllegalArgumentException(&quot;Wrong argument&quot;);</b>
+<i>161</i>&nbsp;                        }
+<i>162</i>&nbsp;                    }
+<i>163</i>&nbsp;                }
+<b class="nc"><i>164</i>&nbsp;            }</b>
+<b class="nc"><i>165</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>166</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>167</i>&nbsp;            throw new IllegalArgumentException(&quot;Error parsing command line arguments: &quot; + Arrays.toString(args) + &quot;\nArguments ignored\n\n&quot; + getUsage());</b>
+<b class="nc"><i>168</i>&nbsp;        }</b>
+<i>169</i>&nbsp;
+<b class="nc"><i>170</i>&nbsp;        if (beastFile == null) {</b>
+<i>171</i>&nbsp;            // Not resuming so get starting options...
+<i>172</i>&nbsp;
+<b class="nc"><i>173</i>&nbsp;            List&lt;String&gt; MCMCargs = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>174</i>&nbsp;            Version version = new BEASTVersion2();</b>
+<b class="nc"><i>175</i>&nbsp;            String titleString = &quot;&lt;html&gt;&lt;center&gt;&lt;p&gt;Bayesian Evolutionary Analysis Sampling Trees&lt;br&gt;&quot; +</b>
+<b class="nc"><i>176</i>&nbsp;                    &quot;Version &quot; + version.getVersionString() + &quot;, &quot; + version.getDateString() + &quot;&lt;/p&gt;&lt;/center&gt;&lt;/html&gt;&quot;;</b>
+<b class="nc"><i>177</i>&nbsp;            javax.swing.Icon icon = IconUtils.getIcon(BeastMain.class, &quot;images/beast.png&quot;);</b>
+<b class="nc"><i>178</i>&nbsp;            String nameString = &quot;BEAST &quot; + version.getVersionString();</b>
+<i>179</i>&nbsp;
+<b class="nc"><i>180</i>&nbsp;            BeastDialog dialog = new BeastDialog(new JFrame(), titleString, icon);</b>
+<i>181</i>&nbsp;
+<b class="nc"><i>182</i>&nbsp;            if (!dialog.showDialog(nameString, m_nSeed)) {</b>
+<b class="nc"><i>183</i>&nbsp;                return;</b>
+<i>184</i>&nbsp;            }
+<i>185</i>&nbsp;
+<b class="nc"><i>186</i>&nbsp;            switch (dialog.getLogginMode()) {</b>
+<i>187</i>&nbsp;                case 0:/* do not ovewrite */
+<b class="nc"><i>188</i>&nbsp;                    break;</b>
+<i>189</i>&nbsp;                case 1:
+<b class="nc"><i>190</i>&nbsp;                    MCMCargs.add(&quot;-overwrite&quot;);</b>
+<b class="nc"><i>191</i>&nbsp;                    break;</b>
+<i>192</i>&nbsp;                case 2:
+<b class="nc"><i>193</i>&nbsp;                    MCMCargs.add(&quot;-resume&quot;);</b>
+<i>194</i>&nbsp;                    break;
+<i>195</i>&nbsp;            }
+<b class="nc"><i>196</i>&nbsp;            MCMCargs.add(&quot;-seed&quot;);</b>
+<b class="nc"><i>197</i>&nbsp;            MCMCargs.add(dialog.getSeed() + &quot;&quot;);</b>
+<i>198</i>&nbsp;
+<b class="nc"><i>199</i>&nbsp;            if (dialog.getThreadPoolSize() &gt; 0) {</b>
+<b class="nc"><i>200</i>&nbsp;                MCMCargs.add(&quot;-threads&quot;);</b>
+<b class="nc"><i>201</i>&nbsp;                MCMCargs.add(dialog.getThreadPoolSize() + &quot;&quot;);</b>
+<i>202</i>&nbsp;            }
+<i>203</i>&nbsp;
+<b class="nc"><i>204</i>&nbsp;            boolean useBeagle = dialog.useBeagle();</b>
+<b class="nc"><i>205</i>&nbsp;            boolean beagleShowInfo = false;</b>
+<b class="nc"><i>206</i>&nbsp;            long beagleFlags = 0;</b>
+<b class="nc"><i>207</i>&nbsp;            if (useBeagle) {</b>
+<b class="nc"><i>208</i>&nbsp;                beagleShowInfo = dialog.showBeagleInfo();</b>
+<b class="nc"><i>209</i>&nbsp;                if (dialog.preferBeagleCPU()) {</b>
+<b class="nc"><i>210</i>&nbsp;                    beagleFlags |= BeagleFlag.PROCESSOR_CPU.getMask();</b>
+<i>211</i>&nbsp;                }
+<b class="nc"><i>212</i>&nbsp;                if (dialog.preferBeagleSSE()) {</b>
+<b class="nc"><i>213</i>&nbsp;                    beagleFlags |= BeagleFlag.VECTOR_SSE.getMask();</b>
+<i>214</i>&nbsp;                }
+<b class="nc"><i>215</i>&nbsp;                if (dialog.preferBeagleGPU()) {</b>
+<b class="nc"><i>216</i>&nbsp;                    beagleFlags |= BeagleFlag.PROCESSOR_GPU.getMask();</b>
+<i>217</i>&nbsp;                }
+<b class="nc"><i>218</i>&nbsp;                if (dialog.preferBeagleDouble()) {</b>
+<b class="nc"><i>219</i>&nbsp;                    beagleFlags |= BeagleFlag.PRECISION_DOUBLE.getMask();</b>
+<i>220</i>&nbsp;                }
+<b class="nc"><i>221</i>&nbsp;                if (dialog.preferBeagleSingle()) {</b>
+<b class="nc"><i>222</i>&nbsp;                    beagleFlags |= BeagleFlag.PRECISION_SINGLE.getMask();</b>
+<i>223</i>&nbsp;                }
+<i>224</i>&nbsp;            }
+<b class="nc"><i>225</i>&nbsp;            if (beagleFlags != 0) {</b>
+<b class="nc"><i>226</i>&nbsp;                System.setProperty(&quot;beagle.preferred.flags&quot;, Long.toString(beagleFlags));</b>
+<i>227</i>&nbsp;            }
+<b class="nc"><i>228</i>&nbsp;            if (!useBeagle) {</b>
+<b class="nc"><i>229</i>&nbsp;                System.setProperty(&quot;java.only&quot;, &quot;true&quot;);</b>
+<i>230</i>&nbsp;            }
+<i>231</i>&nbsp;
+<b class="nc"><i>232</i>&nbsp;            File inputFile = dialog.getInputFile();</b>
+<b class="nc"><i>233</i>&nbsp;            if (!beagleShowInfo &amp;&amp; inputFile == null) {</b>
+<b class="nc"><i>234</i>&nbsp;                System.err.println(&quot;No input file specified&quot;);</b>
+<b class="nc"><i>235</i>&nbsp;                System.exit(1);</b>
+<i>236</i>&nbsp;            }
+<b class="nc"><i>237</i>&nbsp;            MCMCargs.add(inputFile.getAbsolutePath());</b>
+<i>238</i>&nbsp;
+<i>239</i>&nbsp;//			BeastStartDialog dlg = new BeastStartDialog();
+<i>240</i>&nbsp;//			if (dlg.m_bOK) {
+<i>241</i>&nbsp;//				parseArgs(dlg.getArgs());
+<i>242</i>&nbsp;//			}
+<b class="nc"><i>243</i>&nbsp;            parseArgs(MCMCargs.toArray(new String[0]));</b>
+<b class="nc"><i>244</i>&nbsp;            return;</b>
+<i>245</i>&nbsp;        }
+<i>246</i>&nbsp;
+<b class="nc"><i>247</i>&nbsp;        Log.warning.println(&quot;File: &quot; + beastFile.getName() + &quot; seed: &quot; + m_nSeed + &quot; threads: &quot; + m_nThreads);</b>
+<b class="nc"><i>248</i>&nbsp;        if (resume) {</b>
+<b class="nc"><i>249</i>&nbsp;            Log.info.println(&quot;Resuming from file&quot;);</b>
+<i>250</i>&nbsp;        }
+<i>251</i>&nbsp;
+<b class="nc"><i>252</i>&nbsp;        AddOnManager.loadExternalJars();</b>
+<i>253</i>&nbsp;        // parse xml
+<b class="nc"><i>254</i>&nbsp;        Randomizer.setSeed(m_nSeed);</b>
+<b class="nc"><i>255</i>&nbsp;        if (beastFile.getPath().toLowerCase().endsWith(&quot;.json&quot;)) {</b>
+<b class="nc"><i>256</i>&nbsp;            m_runnable = new JSONParser().parseFile(beastFile);</b>
+<i>257</i>&nbsp;        } else {        	
+<i>258</i>&nbsp;        	try {
+<b class="nc"><i>259</i>&nbsp;				m_runnable = new XMLParser().parseFile(beastFile);</b>
+<b class="nc"><i>260</i>&nbsp;			} catch (SAXException | ParserConfigurationException e) {</b>
+<b class="nc"><i>261</i>&nbsp;				throw new IllegalArgumentException(e);</b>
+<b class="nc"><i>262</i>&nbsp;			}</b>
+<i>263</i>&nbsp;        }
+<b class="nc"><i>264</i>&nbsp;        m_runnable.setStateFile(beastFile.getName() + &quot;.state&quot;, resume);</b>
+<b class="nc"><i>265</i>&nbsp;    } // parseArgs</b>
+<i>266</i>&nbsp;
+<i>267</i>&nbsp;
+<i>268</i>&nbsp;    public static String getUsage() {
+<b class="nc"><i>269</i>&nbsp;        return &quot;Usage: BeastMCMC [options] &lt;Beast.xml&gt;\n&quot; +</b>
+<i>270</i>&nbsp;                &quot;where &lt;Beast.xml&gt; the name of a file specifying a Beast run\n&quot; +
+<i>271</i>&nbsp;                &quot;and the following options are allowed:\n&quot; +
+<i>272</i>&nbsp;                &quot;-resume : read state that was stored at the end of the last run from file and append log file\n&quot; +
+<i>273</i>&nbsp;                &quot;-overwrite : overwrite existing log files (if any). By default, existing files will not be overwritten.\n&quot; +
+<i>274</i>&nbsp;                &quot;-seed [&lt;int&gt;|random] : sets random number seed (default 127), or picks a random seed\n&quot; +
+<i>275</i>&nbsp;                &quot;-threads &lt;int&gt; : sets number of threads (default 1)\n&quot; +
+<i>276</i>&nbsp;                &quot;-prefix &lt;name&gt; : use name as prefix for all log files\n&quot; +
+<i>277</i>&nbsp;                &quot;-beastlib &lt;path&gt; : Colon separated list of directories. All jar files in the path are loaded. (default &#39;beastlib&#39;)&quot;;
+<i>278</i>&nbsp;    } // getUsage
+<i>279</i>&nbsp;
+<i>280</i>&nbsp;    /**
+<i>281</i>&nbsp;     * open file dialog for prompting the user to specify an xml script file to process *
+<i>282</i>&nbsp;     */
+<i>283</i>&nbsp;    String getFileNameByDialog() {
+<b class="nc"><i>284</i>&nbsp;        JFileChooser fc = new JFileChooser(System.getProperty(&quot;user.dir&quot;));</b>
+<b class="nc"><i>285</i>&nbsp;        fc.addChoosableFileFilter(new FileFilter() {</b>
+<i>286</i>&nbsp;            @Override
+<i>287</i>&nbsp;			public boolean accept(File f) {
+<b class="nc"><i>288</i>&nbsp;                if (f.isDirectory()) {</b>
+<b class="nc"><i>289</i>&nbsp;                    return true;</b>
+<i>290</i>&nbsp;                }
+<b class="nc"><i>291</i>&nbsp;                String name = f.getName().toLowerCase();</b>
+<b class="nc"><i>292</i>&nbsp;                if (name.endsWith(&quot;.xml&quot;)) {</b>
+<b class="nc"><i>293</i>&nbsp;                    return true;</b>
+<i>294</i>&nbsp;                }
+<b class="nc"><i>295</i>&nbsp;                return false;</b>
+<i>296</i>&nbsp;            }
+<i>297</i>&nbsp;
+<i>298</i>&nbsp;            // The description of this filter
+<i>299</i>&nbsp;            @Override
+<i>300</i>&nbsp;			public String getDescription() {
+<b class="nc"><i>301</i>&nbsp;                return &quot;xml files&quot;;</b>
+<i>302</i>&nbsp;            }
+<i>303</i>&nbsp;        });
+<i>304</i>&nbsp;
+<b class="nc"><i>305</i>&nbsp;        fc.setDialogTitle(&quot;Load xml file&quot;);</b>
+<b class="nc"><i>306</i>&nbsp;        int rval = fc.showOpenDialog(null);</b>
+<i>307</i>&nbsp;
+<b class="nc"><i>308</i>&nbsp;        if (rval == JFileChooser.APPROVE_OPTION) {</b>
+<b class="nc"><i>309</i>&nbsp;            return fc.getSelectedFile().toString();</b>
+<i>310</i>&nbsp;        }
+<b class="nc"><i>311</i>&nbsp;        return null;</b>
+<i>312</i>&nbsp;    } // getFileNameByDialog
+<i>313</i>&nbsp;
+<i>314</i>&nbsp;    public void run() throws Exception {
+<b class="nc"><i>315</i>&nbsp;        g_exec = Executors.newFixedThreadPool(m_nThreads);</b>
+<b class="nc"><i>316</i>&nbsp;        m_runnable.run();</b>
+<b class="nc"><i>317</i>&nbsp;        g_exec.shutdown();</b>
+<b class="nc"><i>318</i>&nbsp;        g_exec.shutdownNow();</b>
+<b class="nc"><i>319</i>&nbsp;    } // run</b>
+<i>320</i>&nbsp;
+<i>321</i>&nbsp;
+<i>322</i>&nbsp;    /**
+<i>323</i>&nbsp;     * class for starting Beast with a dialog *
+<i>324</i>&nbsp;     */
+<b class="nc"><i>325</i>&nbsp;    class BeastStartDialog extends JDialog {</b>
+<i>326</i>&nbsp;        private static final long serialVersionUID = 1L;
+<b class="nc"><i>327</i>&nbsp;        boolean m_bOK = false;</b>
+<i>328</i>&nbsp;        JTextField m_fileEntry;
+<i>329</i>&nbsp;        JTextField m_seedEntry;
+<i>330</i>&nbsp;        JCheckBox m_bUseGPU;
+<i>331</i>&nbsp;        JComboBox&lt;String&gt; m_mode;
+<i>332</i>&nbsp;
+<b class="nc"><i>333</i>&nbsp;        public BeastStartDialog() {</b>
+<b class="nc"><i>334</i>&nbsp;            setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);</b>
+<b class="nc"><i>335</i>&nbsp;            setModalityType(DEFAULT_MODALITY_TYPE);</b>
+<b class="nc"><i>336</i>&nbsp;            init();</b>
+<b class="nc"><i>337</i>&nbsp;            setVisible(true);</b>
+<b class="nc"><i>338</i>&nbsp;        }</b>
+<i>339</i>&nbsp;
+<i>340</i>&nbsp;        String[] getArgs() {
+<b class="nc"><i>341</i>&nbsp;            List&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>342</i>&nbsp;            args.add(&quot;-seed&quot;);</b>
+<b class="nc"><i>343</i>&nbsp;            args.add(m_seedEntry.getText());</b>
+<b class="nc"><i>344</i>&nbsp;            switch (m_mode.getSelectedIndex()) {</b>
+<i>345</i>&nbsp;                case 0:
+<b class="nc"><i>346</i>&nbsp;                    break;</b>
+<i>347</i>&nbsp;                case 1:
+<b class="nc"><i>348</i>&nbsp;                    args.add(&quot;-overwrite&quot;);</b>
+<b class="nc"><i>349</i>&nbsp;                    break;</b>
+<i>350</i>&nbsp;                case 2:
+<b class="nc"><i>351</i>&nbsp;                    args.add(&quot;-resume&quot;);</b>
+<i>352</i>&nbsp;                    break;
+<i>353</i>&nbsp;            }
+<i>354</i>&nbsp;//			if (m_bUseGPU.isSelected()) {
+<i>355</i>&nbsp;//				args.add(&quot;-useGPU&quot;);
+<i>356</i>&nbsp;//			}
+<b class="nc"><i>357</i>&nbsp;            args.add(m_fileEntry.getText());</b>
+<b class="nc"><i>358</i>&nbsp;            return args.toArray(new String[0]);</b>
+<i>359</i>&nbsp;        }
+<i>360</i>&nbsp;
+<i>361</i>&nbsp;        void init() {
+<i>362</i>&nbsp;            try {
+<b class="nc"><i>363</i>&nbsp;                setTitle(&quot;Beast Start Dialog&quot;);</b>
+<b class="nc"><i>364</i>&nbsp;                Box box = Box.createVerticalBox();</b>
+<i>365</i>&nbsp;
+<b class="nc"><i>366</i>&nbsp;                box.add(createHeader());</b>
+<b class="nc"><i>367</i>&nbsp;                box.add(Box.createVerticalStrut(10));</b>
+<b class="nc"><i>368</i>&nbsp;                box.add(createFileInput());</b>
+<b class="nc"><i>369</i>&nbsp;                box.add(Box.createVerticalStrut(10));</b>
+<b class="nc"><i>370</i>&nbsp;                box.add(Box.createVerticalBox());</b>
+<b class="nc"><i>371</i>&nbsp;                box.add(Box.createVerticalStrut(10));</b>
+<b class="nc"><i>372</i>&nbsp;                box.add(createSeedInput());</b>
+<i>373</i>&nbsp;//		        box.add(Box.createVerticalStrut(10));
+<i>374</i>&nbsp;//		        box.add(createBeagleInput());
+<b class="nc"><i>375</i>&nbsp;                box.add(Box.createVerticalStrut(10));</b>
+<b class="nc"><i>376</i>&nbsp;                box.add(createModeInput());</b>
+<i>377</i>&nbsp;
+<b class="nc"><i>378</i>&nbsp;                box.add(Box.createVerticalGlue());</b>
+<b class="nc"><i>379</i>&nbsp;                box.add(createRunQuitButtons());</b>
+<b class="nc"><i>380</i>&nbsp;                add(box);</b>
+<b class="nc"><i>381</i>&nbsp;                setSize(new Dimension(600, 500));</b>
+<b class="nc"><i>382</i>&nbsp;            } catch (Exception e) {</b>
+<b class="nc"><i>383</i>&nbsp;                e.printStackTrace();</b>
+<b class="nc"><i>384</i>&nbsp;                JOptionPane.showMessageDialog(this, &quot;Could not create dialog: &quot; + e.getMessage());</b>
+<b class="nc"><i>385</i>&nbsp;            }</b>
+<b class="nc"><i>386</i>&nbsp;        } // BeastStartDialog::init</b>
+<i>387</i>&nbsp;
+<i>388</i>&nbsp;        private Component createHeader() {
+<b class="nc"><i>389</i>&nbsp;            Box box = Box.createHorizontalBox();</b>
+<i>390</i>&nbsp;
+<b class="nc"><i>391</i>&nbsp;            String iconLocation = &quot;beast/app/draw/icons/beast.png&quot;;</b>
+<b class="nc"><i>392</i>&nbsp;            ImageIcon icon = null;</b>
+<i>393</i>&nbsp;            try {
+<b class="nc"><i>394</i>&nbsp;                URL url = ClassLoader.getSystemResource(iconLocation);</b>
+<b class="nc"><i>395</i>&nbsp;                if (url == null) {</b>
+<b class="nc"><i>396</i>&nbsp;                    System.err.println(&quot;Cannot find icon &quot; + iconLocation);</b>
+<b class="nc"><i>397</i>&nbsp;                    return null;</b>
+<i>398</i>&nbsp;                }
+<b class="nc"><i>399</i>&nbsp;                icon = new ImageIcon(url);</b>
+<b class="nc"><i>400</i>&nbsp;            } catch (Exception e) {</b>
+<b class="nc"><i>401</i>&nbsp;                System.err.println(&quot;Cannot load icon &quot; + iconLocation + &quot; &quot; + e.getMessage());</b>
+<b class="nc"><i>402</i>&nbsp;                return null;</b>
+<b class="nc"><i>403</i>&nbsp;            }</b>
+<i>404</i>&nbsp;
+<i>405</i>&nbsp;
+<b class="nc"><i>406</i>&nbsp;            JLabel label = new JLabel(icon);</b>
+<b class="nc"><i>407</i>&nbsp;            label.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));</b>
+<b class="nc"><i>408</i>&nbsp;            box.add(label, BorderLayout.WEST);</b>
+<b class="nc"><i>409</i>&nbsp;            label = new JLabel(&quot;&lt;html&gt;&lt;center&gt;BEAST&lt;br&gt;Version: &quot; + VERSION + &quot;&lt;br&gt;Developers: &quot; + DEVELOPERS + &quot;&lt;br&gt;Copyright: &quot; + COPYRIGHT + &quot;&lt;/html&gt;&quot;);</b>
+<b class="nc"><i>410</i>&nbsp;            label.setHorizontalAlignment(SwingConstants.CENTER);</b>
+<b class="nc"><i>411</i>&nbsp;            box.add(label);</b>
+<b class="nc"><i>412</i>&nbsp;            return box;</b>
+<i>413</i>&nbsp;        } // BeastStartDialog::createHeader
+<i>414</i>&nbsp;
+<i>415</i>&nbsp;        private Component createFileInput() {
+<b class="nc"><i>416</i>&nbsp;            Box box = Box.createHorizontalBox();</b>
+<b class="nc"><i>417</i>&nbsp;            box.add(new JLabel(&quot;Beast XML File: &quot;));</b>
+<b class="nc"><i>418</i>&nbsp;            m_fileEntry = new JTextField();</b>
+<b class="nc"><i>419</i>&nbsp;            Dimension size = new Dimension(300, 20);</b>
+<b class="nc"><i>420</i>&nbsp;            m_fileEntry.setMinimumSize(size);</b>
+<b class="nc"><i>421</i>&nbsp;            m_fileEntry.setPreferredSize(size);</b>
+<b class="nc"><i>422</i>&nbsp;            m_fileEntry.setSize(size);</b>
+<b class="nc"><i>423</i>&nbsp;            m_fileEntry.setToolTipText(&quot;Enter file name of Beast 2 XML file&quot;);</b>
+<b class="nc"><i>424</i>&nbsp;            m_fileEntry.setMaximumSize(new Dimension(1024, 20));</b>
+<b class="nc"><i>425</i>&nbsp;            box.add(m_fileEntry);</b>
+<b class="nc"><i>426</i>&nbsp;            //box.add(Box.createHorizontalGlue());</b>
+<b class="nc"><i>427</i>&nbsp;</b>
+<b class="nc"><i>428</i>&nbsp;            JButton button = new JButton(&quot;Choose file&quot;);</b>
+<b class="nc"><i>429</i>&nbsp;            button.addActionListener(e -&gt; {</b>
+<b class="nc"><i>430</i>&nbsp;                    JFileChooser fileChooser = new JFileChooser(Beauti.g_sDir);</b>
+<b class="nc"><i>431</i>&nbsp;                    File file = new File(m_fileEntry.getText());</b>
+<b class="nc"><i>432</i>&nbsp;                    if (file.exists())</b>
+<b class="nc"><i>433</i>&nbsp;                        fileChooser.setSelectedFile(file);</b>
+<b class="nc"><i>434</i>&nbsp;                    fileChooser.addChoosableFileFilter(new ExtensionFileFilter(&quot;.xml&quot;, &quot;Beast xml file (*.xml)&quot;));</b>
+<b class="nc"><i>435</i>&nbsp;                    fileChooser.setDialogTitle(&quot;Select Beast 2 XML file&quot;);</b>
+<b class="nc"><i>436</i>&nbsp;                    int rval = fileChooser.showOpenDialog(null);</b>
+<b class="nc"><i>437</i>&nbsp;                    if (rval == JFileChooser.APPROVE_OPTION) {</b>
+<b class="nc"><i>438</i>&nbsp;                        String fileName = fileChooser.getSelectedFile().toString();</b>
+<b class="nc"><i>439</i>&nbsp;                        if (fileName.lastIndexOf(&#39;/&#39;) &gt; 0) {</b>
+<b class="nc"><i>440</i>&nbsp;                            Beauti.g_sDir = fileName.substring(0, fileName.lastIndexOf(&#39;/&#39;));</b>
+<i>441</i>&nbsp;                        }
+<b class="nc"><i>442</i>&nbsp;                        m_fileEntry.setText(fileName);</b>
+<i>443</i>&nbsp;                    }
+<b class="nc"><i>444</i>&nbsp;                });</b>
+<b class="nc"><i>445</i>&nbsp;            box.add(button);</b>
+<i>446</i>&nbsp;
+<b class="nc"><i>447</i>&nbsp;            return box;</b>
+<i>448</i>&nbsp;        } // BeastStartDialog::createFileInput
+<i>449</i>&nbsp;
+<i>450</i>&nbsp;        private Component createSeedInput() {
+<b class="nc"><i>451</i>&nbsp;            Box box = Box.createHorizontalBox();</b>
+<b class="nc"><i>452</i>&nbsp;            box.add(new JLabel(&quot;Random number seed: &quot;));</b>
+<b class="nc"><i>453</i>&nbsp;            m_seedEntry = new JTextField(&quot;127&quot;);</b>
+<b class="nc"><i>454</i>&nbsp;            m_seedEntry.setHorizontalAlignment(SwingConstants.RIGHT);</b>
+<b class="nc"><i>455</i>&nbsp;            Dimension size = new Dimension(100, 20);</b>
+<b class="nc"><i>456</i>&nbsp;            m_seedEntry.setMinimumSize(size);</b>
+<b class="nc"><i>457</i>&nbsp;            m_seedEntry.setPreferredSize(size);</b>
+<b class="nc"><i>458</i>&nbsp;            m_seedEntry.setSize(size);</b>
+<b class="nc"><i>459</i>&nbsp;            m_seedEntry.setToolTipText(&quot;Enter seed number used for initialising the random number generator&quot;);</b>
+<b class="nc"><i>460</i>&nbsp;            m_seedEntry.setMaximumSize(new Dimension(1024, 20));</b>
+<b class="nc"><i>461</i>&nbsp;            box.add(m_seedEntry);</b>
+<b class="nc"><i>462</i>&nbsp;            box.add(Box.createHorizontalGlue());</b>
+<b class="nc"><i>463</i>&nbsp;            return box;</b>
+<i>464</i>&nbsp;        } // BeastStartDialog::createSeedInput
+<i>465</i>&nbsp;
+<i>466</i>&nbsp;        private Component createModeInput() {
+<b class="nc"><i>467</i>&nbsp;            Box box = Box.createHorizontalBox();</b>
+<b class="nc"><i>468</i>&nbsp;            box.add(new JLabel(&quot;Mode of running: &quot;));</b>
+<b class="nc"><i>469</i>&nbsp;            m_mode = new JComboBox&lt;&gt;(new String[]{&quot;default: only write new log files&quot;,</b>
+<i>470</i>&nbsp;                    &quot;overwrite: overwrite log files&quot;,
+<i>471</i>&nbsp;                    &quot;resume: appends log to existing files (if any)&quot;});
+<b class="nc"><i>472</i>&nbsp;            Dimension size = new Dimension(350, 20);</b>
+<b class="nc"><i>473</i>&nbsp;            m_mode.setMinimumSize(size);</b>
+<b class="nc"><i>474</i>&nbsp;            m_mode.setPreferredSize(size);</b>
+<b class="nc"><i>475</i>&nbsp;            m_mode.setSize(size);</b>
+<b class="nc"><i>476</i>&nbsp;            m_mode.setMaximumSize(size);</b>
+<i>477</i>&nbsp;
+<b class="nc"><i>478</i>&nbsp;            m_mode.setSelectedIndex(0);</b>
+<b class="nc"><i>479</i>&nbsp;            box.add(m_mode);</b>
+<b class="nc"><i>480</i>&nbsp;            box.add(Box.createHorizontalGlue());</b>
+<b class="nc"><i>481</i>&nbsp;            return box;</b>
+<i>482</i>&nbsp;        } // BeastStartDialog::createModeInput
+<i>483</i>&nbsp;
+<i>484</i>&nbsp;        Component createRunQuitButtons() {
+<b class="nc"><i>485</i>&nbsp;            Box cancelOkBox = Box.createHorizontalBox();</b>
+<b class="nc"><i>486</i>&nbsp;            cancelOkBox.setBorder(new EtchedBorder());</b>
+<b class="nc"><i>487</i>&nbsp;            JButton okButton = new JButton(&quot;Run&quot;);</b>
+<b class="nc"><i>488</i>&nbsp;            okButton.addActionListener(e -&gt; {</b>
+<b class="nc"><i>489</i>&nbsp;                    m_bOK = true;</b>
+<b class="nc"><i>490</i>&nbsp;                    dispose();</b>
+<b class="nc"><i>491</i>&nbsp;                });</b>
+<b class="nc"><i>492</i>&nbsp;            JButton cancelButton = new JButton(&quot;Quit&quot;);</b>
+<b class="nc"><i>493</i>&nbsp;            cancelButton.addActionListener(e -&gt; {</b>
+<b class="nc"><i>494</i>&nbsp;                    dispose();</b>
+<b class="nc"><i>495</i>&nbsp;                    System.exit(0);</b>
+<b class="nc"><i>496</i>&nbsp;                });</b>
+<b class="nc"><i>497</i>&nbsp;            cancelOkBox.add(Box.createHorizontalGlue());</b>
+<b class="nc"><i>498</i>&nbsp;            cancelOkBox.add(cancelButton);</b>
+<b class="nc"><i>499</i>&nbsp;            cancelOkBox.add(Box.createHorizontalStrut(20));</b>
+<b class="nc"><i>500</i>&nbsp;            cancelOkBox.add(okButton);</b>
+<b class="nc"><i>501</i>&nbsp;            cancelOkBox.add(Box.createHorizontalStrut(20));</b>
+<b class="nc"><i>502</i>&nbsp;            return cancelOkBox;</b>
+<i>503</i>&nbsp;        } // BeastStartDialog::createRunQuitButtons
+<i>504</i>&nbsp;
+<i>505</i>&nbsp;    } // class BeastStartDialog
+<i>506</i>&nbsp;
+<i>507</i>&nbsp;
+<i>508</i>&nbsp;    public static void main(String[] args) {
+<i>509</i>&nbsp;        try {
+<b class="nc"><i>510</i>&nbsp;            System.setProperty(&quot;beast.debug&quot;, &quot;true&quot;);</b>
+<b class="nc"><i>511</i>&nbsp;            BeastMCMC app = new BeastMCMC();</b>
+<b class="nc"><i>512</i>&nbsp;            app.parseArgs(args);</b>
+<i>513</i>&nbsp;
+<b class="nc"><i>514</i>&nbsp;            app.run();</b>
+<b class="nc"><i>515</i>&nbsp;        } catch (XMLParserException e) {</b>
+<b class="nc"><i>516</i>&nbsp;            System.out.println(e.getMessage());</b>
+<i>517</i>&nbsp;            //e.printStackTrace();
+<b class="nc"><i>518</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>519</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>520</i>&nbsp;            System.out.println(BeastMCMC.getUsage());</b>
+<b class="nc"><i>521</i>&nbsp;        }</b>
+<b class="nc"><i>522</i>&nbsp;        if (System.getProperty(&quot;beast.useWindow&quot;) == null) {</b>
+<i>523</i>&nbsp;            // this indicates no window is open
+<b class="nc"><i>524</i>&nbsp;            System.exit(0);</b>
+<i>525</i>&nbsp;        }
+<b class="nc"><i>526</i>&nbsp;    } // main</b>
+<i>527</i>&nbsp;
+<i>528</i>&nbsp;} // BeastMCMC
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

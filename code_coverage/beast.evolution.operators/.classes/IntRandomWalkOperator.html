@@ -1,0 +1,141 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: IntRandomWalkOperator</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.operators</a> ]
+</div>
+
+<h1>Coverage Summary for Class: IntRandomWalkOperator (beast.evolution.operators)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IntRandomWalkOperator</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.1%
+  </span>
+  <span class="absValue">
+    (16/ 17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.operators;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import beast.core.Description;
+<i>4</i>&nbsp;import beast.core.Input;
+<i>5</i>&nbsp;import beast.core.Input.Validate;
+<i>6</i>&nbsp;import beast.core.Operator;
+<i>7</i>&nbsp;import beast.core.parameter.IntegerParameter;
+<i>8</i>&nbsp;import beast.util.Randomizer;
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;@Description(&quot;A random walk operator that selects a random dimension of the integer parameter and perturbs the value a &quot; +
+<i>12</i>&nbsp;        &quot;random amount within +/- windowSize.&quot;)
+<b class="fc"><i>13</i>&nbsp;public class IntRandomWalkOperator extends Operator {</b>
+<b class="fc"><i>14</i>&nbsp;    final public Input&lt;Integer&gt; windowSizeInput =</b>
+<i>15</i>&nbsp;            new Input&lt;&gt;(&quot;windowSize&quot;, &quot;the size of the window both up and down&quot;, Validate.REQUIRED);
+<b class="fc"><i>16</i>&nbsp;    final public Input&lt;IntegerParameter&gt; parameterInput =</b>
+<i>17</i>&nbsp;            new Input&lt;&gt;(&quot;parameter&quot;, &quot;the parameter to operate a random walk on.&quot;, Validate.REQUIRED);
+<i>18</i>&nbsp;
+<b class="fc"><i>19</i>&nbsp;    int windowSize = 1;</b>
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;    @Override
+<i>22</i>&nbsp;	public void initAndValidate() {
+<b class="fc"><i>23</i>&nbsp;        windowSize = windowSizeInput.get();</b>
+<b class="fc"><i>24</i>&nbsp;    }</b>
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;    /**
+<i>27</i>&nbsp;     * override this for proposals,
+<i>28</i>&nbsp;     * returns log of hastingRatio, or Double.NEGATIVE_INFINITY if proposal should not be accepted *
+<i>29</i>&nbsp;     */
+<i>30</i>&nbsp;    @Override
+<i>31</i>&nbsp;    public double proposal() {
+<i>32</i>&nbsp;
+<b class="fc"><i>33</i>&nbsp;        final IntegerParameter param = parameterInput.get(this);</b>
+<i>34</i>&nbsp;
+<b class="fc"><i>35</i>&nbsp;        final int i = Randomizer.nextInt(param.getDimension());</b>
+<b class="fc"><i>36</i>&nbsp;        final int value = param.getValue(i);</b>
+<b class="fc"><i>37</i>&nbsp;        final int newValue = value + Randomizer.nextInt(2 * windowSize + 1) - windowSize;</b>
+<i>38</i>&nbsp;
+<b class="fc"><i>39</i>&nbsp;        if (newValue &lt; param.getLower() || newValue &gt; param.getUpper()) {</b>
+<i>40</i>&nbsp;            // invalid move, can be rejected immediately
+<b class="fc"><i>41</i>&nbsp;            return Double.NEGATIVE_INFINITY;</b>
+<i>42</i>&nbsp;        }
+<b class="fc"><i>43</i>&nbsp;        if (newValue == value) {</b>
+<i>44</i>&nbsp;            // this saves calculating the posterior
+<b class="fc"><i>45</i>&nbsp;            return Double.NEGATIVE_INFINITY;</b>
+<i>46</i>&nbsp;        }
+<i>47</i>&nbsp;
+<b class="fc"><i>48</i>&nbsp;        param.setValue(i, newValue);</b>
+<i>49</i>&nbsp;
+<b class="fc"><i>50</i>&nbsp;        return 0.0;</b>
+<i>51</i>&nbsp;    }
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;    @Override
+<i>54</i>&nbsp;    public void optimize(final double logAlpha) {
+<i>55</i>&nbsp;        // nothing to optimise
+<b class="nc"><i>56</i>&nbsp;    }</b>
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;} // class IntRandomWalkOperator
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

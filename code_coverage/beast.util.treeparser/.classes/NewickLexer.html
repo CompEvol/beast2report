@@ -1,0 +1,219 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: NewickLexer</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.util.treeparser</a> ]
+</div>
+
+<h1>Coverage Summary for Class: NewickLexer (beast.util.treeparser)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NewickLexer</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    22.2%
+  </span>
+  <span class="absValue">
+    (2/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.7%
+  </span>
+  <span class="absValue">
+    (23/ 30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;// Generated from Newick.g4 by ANTLR 4.5.1
+<i>2</i>&nbsp;package beast.util.treeparser;
+<i>3</i>&nbsp;import org.antlr.v4.runtime.Lexer;
+<i>4</i>&nbsp;import org.antlr.v4.runtime.CharStream;
+<i>5</i>&nbsp;import org.antlr.v4.runtime.Token;
+<i>6</i>&nbsp;import org.antlr.v4.runtime.TokenStream;
+<i>7</i>&nbsp;import org.antlr.v4.runtime.*;
+<i>8</i>&nbsp;import org.antlr.v4.runtime.atn.*;
+<i>9</i>&nbsp;import org.antlr.v4.runtime.dfa.DFA;
+<i>10</i>&nbsp;import org.antlr.v4.runtime.misc.*;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;@SuppressWarnings({&quot;all&quot;, &quot;warnings&quot;, &quot;unchecked&quot;, &quot;unused&quot;, &quot;cast&quot;})
+<i>13</i>&nbsp;public class NewickLexer extends Lexer {
+<b class="fc"><i>14</i>&nbsp;	static { RuntimeMetaData.checkVersion(&quot;4.5.1&quot;, RuntimeMetaData.VERSION); }</b>
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;	protected static final DFA[] _decisionToDFA;
+<b class="fc"><i>17</i>&nbsp;	protected static final PredictionContextCache _sharedContextCache =</b>
+<i>18</i>&nbsp;		new PredictionContextCache();
+<i>19</i>&nbsp;	public static final int
+<i>20</i>&nbsp;		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
+<i>21</i>&nbsp;		T__9=10, FLOAT=11, INT=12, STRING=13, WHITESPACE=14;
+<b class="fc"><i>22</i>&nbsp;	public static String[] modeNames = {</b>
+<i>23</i>&nbsp;		&quot;DEFAULT_MODE&quot;
+<i>24</i>&nbsp;	};
+<i>25</i>&nbsp;
+<b class="fc"><i>26</i>&nbsp;	public static final String[] ruleNames = {</b>
+<i>27</i>&nbsp;		&quot;T__0&quot;, &quot;T__1&quot;, &quot;T__2&quot;, &quot;T__3&quot;, &quot;T__4&quot;, &quot;T__5&quot;, &quot;T__6&quot;, &quot;T__7&quot;, &quot;T__8&quot;, 
+<i>28</i>&nbsp;		&quot;T__9&quot;, &quot;FLOAT&quot;, &quot;INT&quot;, &quot;NNINT&quot;, &quot;NZD&quot;, &quot;D&quot;, &quot;STRING&quot;, &quot;WHITESPACE&quot;
+<i>29</i>&nbsp;	};
+<i>30</i>&nbsp;
+<b class="fc"><i>31</i>&nbsp;	private static final String[] _LITERAL_NAMES = {</b>
+<i>32</i>&nbsp;		null, &quot;&#39;;&#39;&quot;, &quot;&#39;(&#39;&quot;, &quot;&#39;,&#39;&quot;, &quot;&#39;)&#39;&quot;, &quot;&#39;:&#39;&quot;, &quot;&#39;[&amp;&#39;&quot;, &quot;&#39;]&#39;&quot;, &quot;&#39;=&#39;&quot;, &quot;&#39;{&#39;&quot;, 
+<i>33</i>&nbsp;		&quot;&#39;}&#39;&quot;
+<i>34</i>&nbsp;	};
+<b class="fc"><i>35</i>&nbsp;	private static final String[] _SYMBOLIC_NAMES = {</b>
+<i>36</i>&nbsp;		null, null, null, null, null, null, null, null, null, null, null, &quot;FLOAT&quot;, 
+<i>37</i>&nbsp;		&quot;INT&quot;, &quot;STRING&quot;, &quot;WHITESPACE&quot;
+<i>38</i>&nbsp;	};
+<b class="fc"><i>39</i>&nbsp;	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);</b>
+<i>40</i>&nbsp;
+<i>41</i>&nbsp;	/**
+<i>42</i>&nbsp;	 * @deprecated Use {@link #VOCABULARY} instead.
+<i>43</i>&nbsp;	 */
+<i>44</i>&nbsp;	@Deprecated
+<i>45</i>&nbsp;	public static final String[] tokenNames;
+<i>46</i>&nbsp;	static {
+<b class="fc"><i>47</i>&nbsp;		tokenNames = new String[_SYMBOLIC_NAMES.length];</b>
+<b class="fc"><i>48</i>&nbsp;		for (int i = 0; i &lt; tokenNames.length; i++) {</b>
+<b class="fc"><i>49</i>&nbsp;			tokenNames[i] = VOCABULARY.getLiteralName(i);</b>
+<b class="fc"><i>50</i>&nbsp;			if (tokenNames[i] == null) {</b>
+<b class="fc"><i>51</i>&nbsp;				tokenNames[i] = VOCABULARY.getSymbolicName(i);</b>
+<i>52</i>&nbsp;			}
+<i>53</i>&nbsp;
+<b class="fc"><i>54</i>&nbsp;			if (tokenNames[i] == null) {</b>
+<b class="fc"><i>55</i>&nbsp;				tokenNames[i] = &quot;&lt;INVALID&gt;&quot;;</b>
+<i>56</i>&nbsp;			}
+<i>57</i>&nbsp;		}
+<i>58</i>&nbsp;	}
+<i>59</i>&nbsp;
+<i>60</i>&nbsp;	@Override
+<i>61</i>&nbsp;	@Deprecated
+<i>62</i>&nbsp;	public String[] getTokenNames() {
+<b class="nc"><i>63</i>&nbsp;		return tokenNames;</b>
+<i>64</i>&nbsp;	}
+<i>65</i>&nbsp;
+<i>66</i>&nbsp;	@Override
+<i>67</i>&nbsp;
+<i>68</i>&nbsp;	public Vocabulary getVocabulary() {
+<b class="nc"><i>69</i>&nbsp;		return VOCABULARY;</b>
+<i>70</i>&nbsp;	}
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;
+<i>73</i>&nbsp;	public NewickLexer(CharStream input) {
+<b class="fc"><i>74</i>&nbsp;		super(input);</b>
+<b class="fc"><i>75</i>&nbsp;		_interp = new LexerATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);</b>
+<b class="fc"><i>76</i>&nbsp;	}</b>
+<i>77</i>&nbsp;
+<i>78</i>&nbsp;	@Override
+<b class="nc"><i>79</i>&nbsp;	public String getGrammarFileName() { return &quot;Newick.g4&quot;; }</b>
+<i>80</i>&nbsp;
+<i>81</i>&nbsp;	@Override
+<b class="nc"><i>82</i>&nbsp;	public String[] getRuleNames() { return ruleNames; }</b>
+<i>83</i>&nbsp;
+<i>84</i>&nbsp;	@Override
+<b class="nc"><i>85</i>&nbsp;	public String getSerializedATN() { return _serializedATN; }</b>
+<i>86</i>&nbsp;
+<i>87</i>&nbsp;	@Override
+<b class="nc"><i>88</i>&nbsp;	public String[] getModeNames() { return modeNames; }</b>
+<i>89</i>&nbsp;
+<i>90</i>&nbsp;	@Override
+<b class="nc"><i>91</i>&nbsp;	public ATN getATN() { return _ATN; }</b>
+<i>92</i>&nbsp;
+<i>93</i>&nbsp;	public static final String _serializedATN =
+<i>94</i>&nbsp;		&quot;\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\2\20\u0081\b\1\4\2&quot;+
+<i>95</i>&nbsp;		&quot;\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4&quot;+
+<i>96</i>&nbsp;		&quot;\13\t\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22&quot;+
+<i>97</i>&nbsp;		&quot;\t\22\3\2\3\2\3\3\3\3\3\4\3\4\3\5\3\5\3\6\3\6\3\7\3\7\3\7\3\b\3\b\3\t&quot;+
+<i>98</i>&nbsp;		&quot;\3\t\3\n\3\n\3\13\3\13\3\f\5\f&lt;\n\f\3\f\3\f\3\f\7\fA\n\f\f\f\16\fD\13&quot;+
+<i>99</i>&nbsp;		&quot;\f\3\f\3\f\5\fH\n\f\3\f\6\fK\n\f\r\f\16\fL\5\fO\n\f\3\r\5\rR\n\r\3\r\3&quot;+
+<i>100</i>&nbsp;		&quot;\r\3\16\3\16\3\16\7\16Y\n\16\f\16\16\16\\\13\16\5\16^\n\16\3\17\3\17\3&quot;+
+<i>101</i>&nbsp;		&quot;\20\3\20\3\21\6\21e\n\21\r\21\16\21f\3\21\3\21\7\21k\n\21\f\21\16\21n&quot;+
+<i>102</i>&nbsp;		&quot;\13\21\3\21\3\21\3\21\7\21s\n\21\f\21\16\21v\13\21\3\21\5\21y\n\21\3\22&quot;+
+<i>103</i>&nbsp;		&quot;\6\22|\n\22\r\22\16\22}\3\22\3\22\4lt\2\23\3\3\5\4\7\5\t\6\13\7\r\b\17&quot;+
+<i>104</i>&nbsp;		&quot;\t\21\n\23\13\25\f\27\r\31\16\33\2\35\2\37\2!\17#\20\3\2\7\4\2GGgg\3\2&quot;+
+<i>105</i>&nbsp;		&quot;\63;\3\2\62;\n\2%%\&#39;(,-/;C\\aac|~~\5\2\13\f\17\17\&quot;\&quot;\u008b\2\3\3\2\2&quot;+
+<i>106</i>&nbsp;		&quot;\2\2\5\3\2\2\2\2\7\3\2\2\2\2\t\3\2\2\2\2\13\3\2\2\2\2\r\3\2\2\2\2\17\3&quot;+
+<i>107</i>&nbsp;		&quot;\2\2\2\2\21\3\2\2\2\2\23\3\2\2\2\2\25\3\2\2\2\2\27\3\2\2\2\2\31\3\2\2&quot;+
+<i>108</i>&nbsp;		&quot;\2\2!\3\2\2\2\2#\3\2\2\2\3%\3\2\2\2\5\&#39;\3\2\2\2\7)\3\2\2\2\t+\3\2\2\2&quot;+
+<i>109</i>&nbsp;		&quot;\13-\3\2\2\2\r/\3\2\2\2\17\62\3\2\2\2\21\64\3\2\2\2\23\66\3\2\2\2\258&quot;+
+<i>110</i>&nbsp;		&quot;\3\2\2\2\27;\3\2\2\2\31Q\3\2\2\2\33]\3\2\2\2\35_\3\2\2\2\37a\3\2\2\2!&quot;+
+<i>111</i>&nbsp;		&quot;x\3\2\2\2#{\3\2\2\2%&amp;\7=\2\2&amp;\4\3\2\2\2\&#39;(\7*\2\2(\6\3\2\2\2)*\7.\2\2&quot;+
+<i>112</i>&nbsp;		&quot;*\b\3\2\2\2+,\7+\2\2,\n\3\2\2\2-.\7&lt;\2\2.\f\3\2\2\2/\60\7]\2\2\60\61\7&quot;+
+<i>113</i>&nbsp;		&quot;(\2\2\61\16\3\2\2\2\62\63\7_\2\2\63\20\3\2\2\2\64\65\7?\2\2\65\22\3\2&quot;+
+<i>114</i>&nbsp;		&quot;\2\2\66\67\7}\2\2\67\24\3\2\2\289\7\177\2\29\26\3\2\2\2:&lt;\7/\2\2;:\3\2&quot;+
+<i>115</i>&nbsp;		&quot;\2\2;&lt;\3\2\2\2&lt;=\3\2\2\2=&gt;\5\33\16\2&gt;B\7\60\2\2?A\5\37\20\2@?\3\2\2\2&quot;+
+<i>116</i>&nbsp;		&quot;AD\3\2\2\2B@\3\2\2\2BC\3\2\2\2CN\3\2\2\2DB\3\2\2\2EG\t\2\2\2FH\7/\2\2&quot;+
+<i>117</i>&nbsp;		&quot;GF\3\2\2\2GH\3\2\2\2HJ\3\2\2\2IK\5\37\20\2JI\3\2\2\2KL\3\2\2\2LJ\3\2\2&quot;+
+<i>118</i>&nbsp;		&quot;\2LM\3\2\2\2MO\3\2\2\2NE\3\2\2\2NO\3\2\2\2O\30\3\2\2\2PR\7/\2\2QP\3\2&quot;+
+<i>119</i>&nbsp;		&quot;\2\2QR\3\2\2\2RS\3\2\2\2ST\5\33\16\2T\32\3\2\2\2U^\7\62\2\2VZ\5\35\17&quot;+
+<i>120</i>&nbsp;		&quot;\2WY\5\37\20\2XW\3\2\2\2Y\\\3\2\2\2ZX\3\2\2\2Z[\3\2\2\2[^\3\2\2\2\\Z\3&quot;+
+<i>121</i>&nbsp;		&quot;\2\2\2]U\3\2\2\2]V\3\2\2\2^\34\3\2\2\2_`\t\3\2\2`\36\3\2\2\2ab\t\4\2\2&quot;+
+<i>122</i>&nbsp;		&quot;b \3\2\2\2ce\t\5\2\2dc\3\2\2\2ef\3\2\2\2fd\3\2\2\2fg\3\2\2\2gy\3\2\2\2&quot;+
+<i>123</i>&nbsp;		&quot;hl\7$\2\2ik\13\2\2\2ji\3\2\2\2kn\3\2\2\2lm\3\2\2\2lj\3\2\2\2mo\3\2\2\2&quot;+
+<i>124</i>&nbsp;		&quot;nl\3\2\2\2oy\7$\2\2pt\7)\2\2qs\13\2\2\2rq\3\2\2\2sv\3\2\2\2tu\3\2\2\2&quot;+
+<i>125</i>&nbsp;		&quot;tr\3\2\2\2uw\3\2\2\2vt\3\2\2\2wy\7)\2\2xd\3\2\2\2xh\3\2\2\2xp\3\2\2\2&quot;+
+<i>126</i>&nbsp;		&quot;y\&quot;\3\2\2\2z|\t\6\2\2{z\3\2\2\2|}\3\2\2\2}{\3\2\2\2}~\3\2\2\2~\177\3\2&quot;+
+<i>127</i>&nbsp;		&quot;\2\2\177\u0080\b\22\2\2\u0080$\3\2\2\2\20\2;BGLNQZ]fltx}\3\b\2\2&quot;;
+<b class="fc"><i>128</i>&nbsp;	public static final ATN _ATN =</b>
+<b class="fc"><i>129</i>&nbsp;		new ATNDeserializer().deserialize(_serializedATN.toCharArray());</b>
+<i>130</i>&nbsp;	static {
+<b class="fc"><i>131</i>&nbsp;		_decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];</b>
+<b class="fc"><i>132</i>&nbsp;		for (int i = 0; i &lt; _ATN.getNumberOfDecisions(); i++) {</b>
+<b class="fc"><i>133</i>&nbsp;			_decisionToDFA[i] = new DFA(_ATN.getDecisionState(i), i);</b>
+<i>134</i>&nbsp;		}
+<b class="fc"><i>135</i>&nbsp;	}</b>
+<i>136</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

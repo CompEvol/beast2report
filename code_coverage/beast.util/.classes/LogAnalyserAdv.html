@@ -1,0 +1,312 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: LogAnalyserAdv</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.util</a> ]
+</div>
+
+<h1>Coverage Summary for Class: LogAnalyserAdv (beast.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">LogAnalyserAdv</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.util;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import beast.core.Citation;
+<i>4</i>&nbsp;import beast.core.Description;
+<i>5</i>&nbsp;import test.beast.beast2vs1.trace.LogFileTraces;
+<i>6</i>&nbsp;import test.beast.beast2vs1.trace.TraceException;
+<i>7</i>&nbsp;import test.beast.beast2vs1.trace.TraceStatistics;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;import java.io.BufferedReader;
+<i>10</i>&nbsp;import java.io.File;
+<i>11</i>&nbsp;import java.io.FileReader;
+<i>12</i>&nbsp;import java.io.IOException;
+<i>13</i>&nbsp;import java.nio.file.Path;
+<i>14</i>&nbsp;import java.nio.file.Paths;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;@Description(&quot;Advanced Log Analyser: auto optimizing burnin to analyse batch proceeded logs. &quot; +
+<i>17</i>&nbsp;        &quot;It is modified from Log Analyser in BEAST 1 created by Alexei Drummond.\n&quot; +
+<i>18</i>&nbsp;        &quot;The input has to fit into a specified folder structure: workPath / tree / replicate. &quot; +
+<i>19</i>&nbsp;        &quot;For example, tree=2 and replicate=88, then analyser looks for files workPath/2/88/*.log.\n&quot; +
+<i>20</i>&nbsp;        &quot;traceNames define the logged parameters to be analysed.\n&quot; +
+<i>21</i>&nbsp;        &quot;trees and replicates provide the folder structure from batch processes, and could be changed according different simulations.\n&quot; +
+<i>22</i>&nbsp;        &quot;isCombined determines (true) to analyse combined logs, (false) to analyse an individual resumed/initial log.\n&quot; +
+<i>23</i>&nbsp;        &quot;percLower and percUpper are the percentage of all states to start and end for auto optimizing burnin.\n&quot; +
+<i>24</i>&nbsp;        &quot;percIncremental defines the incremental of percentage each search for auto optimizing burnin.\n&quot; +
+<i>25</i>&nbsp;        &quot;&quot;)
+<i>26</i>&nbsp;@Citation(value= &quot;Alexei J. Drummond, Joseph Heled, and Dong Xie, &quot; +
+<i>27</i>&nbsp;        &quot;Bayesian Species Tree Estimation: Computational Performance and Comparison to Concatenation, &quot; +
+<i>28</i>&nbsp;        &quot;Systematic Biology&quot;)
+<i>29</i>&nbsp;public class LogAnalyserAdv {
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;    /**
+<i>32</i>&nbsp;     * @param file the name of the log file to analyze
+<i>33</i>&nbsp;     * @param traceNames only print the given trace, if traceName == null, print all traces
+<i>34</i>&nbsp;     * @return TraceStatistics     an array og analyses of the statistics in a log file
+<i>35</i>&nbsp;     * @throws java.io.IOException if general error reading file
+<i>36</i>&nbsp;     * @throws test.beast.beast2vs1.trace.TraceException      if trace file in wrong format or corrupted
+<i>37</i>&nbsp;     */
+<i>38</i>&nbsp;    public static LogFileTraces analyzeLogFileAutoBurnin(File file, String[] traceNames) throws java.io.IOException, TraceException {
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;        LogFileTraces traces = new LogFileTraces(file.getName(), file);
+<i>41</i>&nbsp;        traces.loadTraces();
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;        final int percLower = 5; // included
+<i>44</i>&nbsp;        final int percUpper = 80; // included
+<i>45</i>&nbsp;        final int percIncremental = 5;
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;        // get all ess, record burnin
+<i>48</i>&nbsp;        double[][] essMatrix = new double[traceNames.length][(percUpper-percLower)/percIncremental+1];
+<i>49</i>&nbsp;        int[] percentages = new int[essMatrix[0].length];
+<i>50</i>&nbsp;        int p = 0;
+<i>51</i>&nbsp;        for (int percentage = percLower; percentage &lt;= percUpper; percentage+=percIncremental) {
+<i>52</i>&nbsp;            long burnin = (traces.getMaxState() / 100) * percentage; // state of burnin
+<i>53</i>&nbsp;            traces.setBurnIn(burnin);
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;            for (int n = 0; n &lt; traceNames.length; n++) {
+<i>56</i>&nbsp;                int traceIndex = traces.getTraceIndex(traceNames[n]);
+<i>57</i>&nbsp;                TraceStatistics distribution = traces.analyseTrace(traceIndex);
+<i>58</i>&nbsp;                essMatrix[n][p] = distribution.getESS();
+<i>59</i>&nbsp;            }
+<i>60</i>&nbsp;            percentages[p] = percentage;
+<i>61</i>&nbsp;            p++;
+<i>62</i>&nbsp;        }
+<i>63</i>&nbsp;
+<i>64</i>&nbsp;        long selectedBurnin = getBestBurninPercentage(essMatrix, percentages);
+<i>65</i>&nbsp;        long burnin = (traces.getMaxState() / 100) * selectedBurnin; // best burnin detemined by max of sum of ess
+<i>66</i>&nbsp;        traces.setBurnIn(burnin);
+<i>67</i>&nbsp;        for (int i = 0; i &lt; traces.getTraceCount(); i++) {
+<i>68</i>&nbsp;            TraceStatistics distribution = traces.analyseTrace(i);
+<i>69</i>&nbsp;        }
+<i>70</i>&nbsp;
+<i>71</i>&nbsp;        return traces;
+<i>72</i>&nbsp;    }
+<i>73</i>&nbsp;
+<i>74</i>&nbsp;    // choose best burnin: max of sum of ratio of ess and max ess
+<i>75</i>&nbsp;    // essMatrix: 1st [] is traces, 2nd [] is percentage incremental
+<i>76</i>&nbsp;    public static int getBestBurninPercentage(double[][] essMatrix, int[] percentages) {
+<i>77</i>&nbsp;        final double essThre = 200;
+<i>78</i>&nbsp;
+<i>79</i>&nbsp;        double[] maxESS = new double[essMatrix.length];
+<i>80</i>&nbsp;        for (int p = 0; p &lt; essMatrix[0].length; p++) {
+<i>81</i>&nbsp;            for (int n = 0; n &lt; essMatrix.length; n++) {
+<i>82</i>&nbsp;                if (essMatrix[n][p] &gt; maxESS[n])
+<i>83</i>&nbsp;                    maxESS[n] = essMatrix[n][p];
+<i>84</i>&nbsp;            }
+<i>85</i>&nbsp;        }
+<i>86</i>&nbsp;
+<i>87</i>&nbsp;        int bestPerc = 0;
+<i>88</i>&nbsp;        int bestPerc1 = 0;
+<i>89</i>&nbsp;        double maxESSSumRatio = 0;
+<i>90</i>&nbsp;        double maxESSSumRatio1 = 0;
+<i>91</i>&nbsp;
+<i>92</i>&nbsp;        for (int p = 0; p &lt; essMatrix[0].length; p++) {
+<i>93</i>&nbsp;            double ratioSum = 0;
+<i>94</i>&nbsp;            boolean allSucc = true;
+<i>95</i>&nbsp;            for (int n = 0; n &lt; essMatrix.length; n++) {
+<i>96</i>&nbsp;                ratioSum += essMatrix[n][p] / maxESS[n];
+<i>97</i>&nbsp;                allSucc = allSucc &amp;&amp; essMatrix[n][p] &gt;= essThre;
+<i>98</i>&nbsp;            }
+<i>99</i>&nbsp;            if (allSucc) {
+<i>100</i>&nbsp;                if (ratioSum &gt; maxESSSumRatio) {
+<i>101</i>&nbsp;                    maxESSSumRatio = ratioSum;
+<i>102</i>&nbsp;                    bestPerc = percentages[p];
+<i>103</i>&nbsp;                }
+<i>104</i>&nbsp;            } else {
+<i>105</i>&nbsp;                if (ratioSum &gt; maxESSSumRatio1) {
+<i>106</i>&nbsp;                    maxESSSumRatio1 = ratioSum;
+<i>107</i>&nbsp;                    bestPerc1 = percentages[p];
+<i>108</i>&nbsp;                }
+<i>109</i>&nbsp;            }
+<i>110</i>&nbsp;        }
+<i>111</i>&nbsp;
+<i>112</i>&nbsp;        return (bestPerc &gt; 0) ? bestPerc : bestPerc1;
+<i>113</i>&nbsp;    }
+<i>114</i>&nbsp;
+<i>115</i>&nbsp;    /**
+<i>116</i>&nbsp;     * @param traces   LogFileTraces instance
+<i>117</i>&nbsp;     * @param traceNames only print the given trace,
+<i>118</i>&nbsp;     * @return an array og analyses of the statistics in a log file.
+<i>119</i>&nbsp;     * @throws java.io.IOException if general error reading file
+<i>120</i>&nbsp;     * @throws test.beast.beast2vs1.trace.TraceException      if trace file in wrong format or corrupted
+<i>121</i>&nbsp;     */
+<i>122</i>&nbsp;    public static void shortReport(LogFileTraces traces, String[] traceNames) throws java.io.IOException, TraceException {
+<i>123</i>&nbsp;        System.out.print(traces.getName() + &quot;\t&quot; + traces.getMaxState() + &quot;\t&quot; + traces.getBurnIn());
+<i>124</i>&nbsp;
+<i>125</i>&nbsp;        for (String traceName : traceNames) {
+<i>126</i>&nbsp;//            if (traceName != null &amp;&amp; traceName.equalsIgnoreCase(traces.getTraceName(i))) {
+<i>127</i>&nbsp;            int traceIndex = traces.getTraceIndex(traceName);
+<i>128</i>&nbsp;            TraceStatistics distribution = traces.analyseTrace(traceIndex);
+<i>129</i>&nbsp;
+<i>130</i>&nbsp;//            System.out.print(&quot;\t&quot; + traceName);
+<i>131</i>&nbsp;
+<i>132</i>&nbsp;            System.out.print(&quot;\t&quot; + distribution.getMean());
+<i>133</i>&nbsp;//            System.out.print(&quot;\t&quot; + distribution.getStdev());
+<i>134</i>&nbsp;
+<i>135</i>&nbsp;//            System.out.print(&quot;\t&quot; + distribution.getHpdLower());
+<i>136</i>&nbsp;//            System.out.print(&quot;\t&quot; + distribution.getHpdUpper());
+<i>137</i>&nbsp;
+<i>138</i>&nbsp;//                System.out.print(&quot;\t&quot; + formatter.format(distribution.getStdErrorOfMean()));
+<i>139</i>&nbsp;//                System.out.print(&quot;\t&quot; + formatter.format(distribution.getMinimum()));
+<i>140</i>&nbsp;//                System.out.print(&quot;\t&quot; + formatter.format(distribution.getMaximum()));
+<i>141</i>&nbsp;//                System.out.print(&quot;\t&quot; + formatter.format(distribution.getMedian()));
+<i>142</i>&nbsp;//                System.out.print(&quot;\t&quot; + formatter.format(distribution.getGeometricMean()));
+<i>143</i>&nbsp;//                System.out.print(&quot;\t&quot; + formatter.format(distribution.getVariance()));
+<i>144</i>&nbsp;//                System.out.print(&quot;\t&quot; + formatter.format(distribution.getCpdLower()));
+<i>145</i>&nbsp;//                System.out.print(&quot;\t&quot; + formatter.format(distribution.getCpdUpper()));
+<i>146</i>&nbsp;            System.out.print(&quot;\t&quot; + distribution.getAutoCorrelationTime());
+<i>147</i>&nbsp;//                System.out.print(&quot;\t&quot; + formatter.format(distribution.getStdevAutoCorrelationTime()));
+<i>148</i>&nbsp;
+<i>149</i>&nbsp;            double ess = distribution.getESS();
+<i>150</i>&nbsp;            System.out.print(&quot;\t&quot; + distribution.getESS());
+<i>151</i>&nbsp;//            if (ess &lt; 100) System.out.print(&quot;\t&quot; + &quot;*&quot;);
+<i>152</i>&nbsp;//            System.out.println();
+<i>153</i>&nbsp;        }
+<i>154</i>&nbsp;        System.out.println();
+<i>155</i>&nbsp;    }
+<i>156</i>&nbsp;
+<i>157</i>&nbsp;    public static void shortReportHeader(String[] traceNames) {
+<i>158</i>&nbsp;        System.out.print(&quot;file.name\tchain.length\tburnin&quot;);
+<i>159</i>&nbsp;        for (String traceName : traceNames) {
+<i>160</i>&nbsp;            System.out.print(&quot;\tmean.&quot; + traceName + &quot;\tact.&quot; + traceName + &quot;\tess.&quot; + traceName);
+<i>161</i>&nbsp;        }
+<i>162</i>&nbsp;        System.out.println();
+<i>163</i>&nbsp;    }
+<i>164</i>&nbsp;
+<i>165</i>&nbsp;    //Main method
+<i>166</i>&nbsp;    public static void main(final String[] args) throws IOException, TraceException {
+<i>167</i>&nbsp;        Path workPath = Paths.get(System.getProperty(&quot;user.home&quot;) + &quot;/Projects/BEAST2/PerfAccuStarBEAST/sp5-2/&quot;);
+<i>168</i>&nbsp;        System.out.println(&quot;\nWorking path = &quot; + workPath);
+<i>169</i>&nbsp;
+<i>170</i>&nbsp;        String[] traceNames = new String[]{&quot;posterior&quot;, &quot;TreeHeight.Species&quot;}; //&quot;posterior&quot;, &quot;TreeHeight.Species&quot;
+<i>171</i>&nbsp;//        int burnIN = -1;
+<i>172</i>&nbsp;        int[] trees = new int[] {256}; //2,4,8,16,32,64,128,256
+<i>173</i>&nbsp;        boolean isCombined = true; // &quot;true&quot; analyses combined logs, &quot;false&quot; analyses an individual resumed/initial log
+<i>174</i>&nbsp;        int replicates = 100;
+<i>175</i>&nbsp;
+<i>176</i>&nbsp;        if (!isCombined) {
+<i>177</i>&nbsp;            // read non-combined beast log, and std output file for time
+<i>178</i>&nbsp;            for (int tree : trees) {
+<i>179</i>&nbsp;                String folderName = Integer.toString(tree) + &quot;-resume8&quot;;
+<i>180</i>&nbsp;                System.out.println(&quot;Logs folder = &quot; + folderName);
+<i>181</i>&nbsp;                for (int r=0; r&lt;replicates; r++) {
+<i>182</i>&nbsp;//                System.out.println(&quot;\nGo to folder &quot; + tree + &quot;/&quot; + r + &quot; ...&quot;);
+<i>183</i>&nbsp;                    Path folder = Paths.get(workPath.toString(), folderName, Integer.toString(r));
+<i>184</i>&nbsp;                    File[] listOfFiles = folder.toFile().listFiles();
+<i>185</i>&nbsp;                    assert listOfFiles != null;
+<i>186</i>&nbsp;
+<i>187</i>&nbsp;                    int log = 0;
+<i>188</i>&nbsp;                    for (File file : listOfFiles) {
+<i>189</i>&nbsp;                        if (file.isFile()) {
+<i>190</i>&nbsp;                            String fileName = file.getName();
+<i>191</i>&nbsp;                            if (fileName.endsWith(&quot;stdout.txt&quot;)) {
+<i>192</i>&nbsp;//                            System.out.println(&quot;\nReading screen log &quot; + fileName + &quot; ...&quot;);
+<i>193</i>&nbsp;                                BufferedReader reader = new BufferedReader(new FileReader(file));
+<i>194</i>&nbsp;                                String line = reader.readLine();
+<i>195</i>&nbsp;                                String time = &quot;?&quot;;
+<i>196</i>&nbsp;                                while (line != null) {
+<i>197</i>&nbsp;                                    if (line.startsWith(&quot;Total calculation time:&quot;)) {
+<i>198</i>&nbsp;                                        String[] fields = line.split(&quot; &quot;, -1);
+<i>199</i>&nbsp;                                        time = fields[3];
+<i>200</i>&nbsp;                                    }
+<i>201</i>&nbsp;                                    line = reader.readLine();
+<i>202</i>&nbsp;                                }
+<i>203</i>&nbsp;                                reader.close();
+<i>204</i>&nbsp;                                System.out.println(r + &quot;\t&quot; + time + &quot;\tseconds&quot;);
+<i>205</i>&nbsp;                            } else if (fileName.endsWith(&quot;.log&quot;)) {
+<i>206</i>&nbsp;                                log++;
+<i>207</i>&nbsp;                            }
+<i>208</i>&nbsp;                        }
+<i>209</i>&nbsp;                    }
+<i>210</i>&nbsp;
+<i>211</i>&nbsp;                    if (log &lt; 1) {
+<i>212</i>&nbsp;                        System.err.println(r + &quot;\tno log !&quot;);
+<i>213</i>&nbsp;                    } else if (log &gt; 1) {
+<i>214</i>&nbsp;                        System.err.println(r + &quot;\t&quot; + log + &quot; logs !&quot;);
+<i>215</i>&nbsp;                    }
+<i>216</i>&nbsp;                }
+<i>217</i>&nbsp;            }
+<i>218</i>&nbsp;        }
+<i>219</i>&nbsp;
+<i>220</i>&nbsp;        // read combined beast log
+<i>221</i>&nbsp;        for (int tree : trees) {
+<i>222</i>&nbsp;            System.out.print(&quot;folder\treplicate\t&quot;);
+<i>223</i>&nbsp;            shortReportHeader(traceNames);
+<i>224</i>&nbsp;            for (int r=0; r&lt;replicates; r++) {
+<i>225</i>&nbsp;                String folderName = isCombined ? Integer.toString(tree) + &quot;-combined&quot; : Integer.toString(tree);
+<i>226</i>&nbsp;                System.out.print(folderName + &quot;\t&quot; + r + &quot;\t&quot;);
+<i>227</i>&nbsp;                Path folder = Paths.get(workPath.toString(), folderName, Integer.toString(r));
+<i>228</i>&nbsp;                File[] listOfFiles = folder.toFile().listFiles();
+<i>229</i>&nbsp;                assert listOfFiles != null;
+<i>230</i>&nbsp;
+<i>231</i>&nbsp;                for (File file : listOfFiles) {
+<i>232</i>&nbsp;                    if (file.isFile()) {
+<i>233</i>&nbsp;                        String fileName = file.getName();
+<i>234</i>&nbsp;                        if (fileName.endsWith(&quot;.log&quot;)) {
+<i>235</i>&nbsp;//                            System.out.println(&quot;\nReading beast log &quot; + fileName + &quot; ...&quot;);
+<i>236</i>&nbsp;                            LogFileTraces traces = analyzeLogFileAutoBurnin(file, traceNames);
+<i>237</i>&nbsp;                            shortReport(traces, traceNames);
+<i>238</i>&nbsp;                        }
+<i>239</i>&nbsp;                    }
+<i>240</i>&nbsp;                }
+<i>241</i>&nbsp;            }
+<i>242</i>&nbsp;        }
+<i>243</i>&nbsp;
+<i>244</i>&nbsp;//        for (int tree : trees) {
+<i>245</i>&nbsp;//            for (int r=0; r&lt;replicates; r++) {
+<i>246</i>&nbsp;////                System.out.println(&quot;\nGo to folder &quot; + tree + &quot;/&quot; + r + &quot; ...&quot;);
+<i>247</i>&nbsp;//                File folder = new File(workPath + tree + File.separator + r);
+<i>248</i>&nbsp;//                File[] listOfFiles = folder.listFiles();
+<i>249</i>&nbsp;//
+<i>250</i>&nbsp;//                for (int i = 0; i &lt; listOfFiles.length; i++) {
+<i>251</i>&nbsp;//                    File file = listOfFiles[i];
+<i>252</i>&nbsp;//                    if (file.isFile()) {
+<i>253</i>&nbsp;//                        String fileName = file.getName();
+<i>254</i>&nbsp;//                        if (fileName.endsWith(&quot;.log&quot;)) {
+<i>255</i>&nbsp;////                            System.out.println(&quot;\nReading beast log &quot; + fileName + &quot; ...&quot;);
+<i>256</i>&nbsp;//                            shortReport(file, burnIN, &quot;TreeHeight.Species&quot;);
+<i>257</i>&nbsp;//                        }
+<i>258</i>&nbsp;//                    }
+<i>259</i>&nbsp;//                }
+<i>260</i>&nbsp;//            }
+<i>261</i>&nbsp;//        }
+<i>262</i>&nbsp;        System.out.println(&quot;\nDone&quot;);
+<i>263</i>&nbsp;    }
+<i>264</i>&nbsp;
+<i>265</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,913 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Alignment</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.alignment</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Alignment (beast.evolution.alignment)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Alignment</td>
+<td class="coverageStat">
+  <span class="percent">
+    73.2%
+  </span>
+  <span class="absValue">
+    (30/ 41)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (224/ 280)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Alignment$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Alignment$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Alignment$SiteComparator</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/ 7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    68.1%
+  </span>
+  <span class="absValue">
+    (32/ 47)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    79.4%
+  </span>
+  <span class="absValue">
+    (231/ 291)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;* File Alignment.java
+<i>3</i>&nbsp;*
+<i>4</i>&nbsp;* Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>5</i>&nbsp;*
+<i>6</i>&nbsp;* This file is part of BEAST2.
+<i>7</i>&nbsp;* See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp;* information regarding copyright ownership and licensing.
+<i>9</i>&nbsp;*
+<i>10</i>&nbsp;* BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp;* it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp;* published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp;* of the License, or (at your option) any later version.
+<i>14</i>&nbsp;*
+<i>15</i>&nbsp;*  BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp;*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp;*  GNU Lesser General Public License for more details.
+<i>19</i>&nbsp;*
+<i>20</i>&nbsp;* You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp;* License along with BEAST; if not, write to the
+<i>22</i>&nbsp;* Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp;* Boston, MA  02110-1301  USA
+<i>24</i>&nbsp;*/
+<i>25</i>&nbsp;package beast.evolution.alignment;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;import java.util.ArrayList;
+<i>28</i>&nbsp;import java.util.Arrays;
+<i>29</i>&nbsp;import java.util.Collections;
+<i>30</i>&nbsp;import java.util.Comparator;
+<i>31</i>&nbsp;import java.util.HashSet;
+<i>32</i>&nbsp;import java.util.List;
+<i>33</i>&nbsp;import java.util.Set;
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;import beast.core.Description;
+<i>36</i>&nbsp;import beast.core.Input;
+<i>37</i>&nbsp;import beast.core.Input.Validate;
+<i>38</i>&nbsp;import beast.core.parameter.Map;
+<i>39</i>&nbsp;import beast.core.util.Log;
+<i>40</i>&nbsp;import beast.evolution.datatype.DataType;
+<i>41</i>&nbsp;import beast.evolution.datatype.StandardData;
+<i>42</i>&nbsp;import beast.util.AddOnManager;
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;@Description(&quot;Class representing alignment data&quot;)
+<i>45</i>&nbsp;public class Alignment extends Map&lt;String&gt; {
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;    @Override
+<i>48</i>&nbsp;	protected Class&lt;?&gt; mapType() {
+<b class="fc"><i>49</i>&nbsp;        return String.class;</b>
+<i>50</i>&nbsp;    }
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;    /**
+<i>53</i>&nbsp;     * default data type *
+<i>54</i>&nbsp;     */
+<i>55</i>&nbsp;    protected final static String NUCLEOTIDE = &quot;nucleotide&quot;;
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;    /**
+<i>58</i>&nbsp;     * directory to pick up data types from *
+<i>59</i>&nbsp;     */
+<b class="fc"><i>60</i>&nbsp;    final static String[] IMPLEMENTATION_DIR = {&quot;beast.evolution.datatype&quot;};</b>
+<i>61</i>&nbsp;
+<i>62</i>&nbsp;    /**
+<i>63</i>&nbsp;     * list of data type descriptions, obtained from DataType classes *
+<i>64</i>&nbsp;     */
+<b class="fc"><i>65</i>&nbsp;    static List&lt;String&gt; types = new ArrayList&lt;&gt;();</b>
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;    static {
+<b class="fc"><i>68</i>&nbsp;        findDataTypes();</b>
+<b class="fc"><i>69</i>&nbsp;    }</b>
+<i>70</i>&nbsp;
+<i>71</i>&nbsp;    static public void findDataTypes() {
+<i>72</i>&nbsp;        // build up list of data types
+<b class="fc"><i>73</i>&nbsp;        List&lt;String&gt; m_sDataTypes = AddOnManager.find(beast.evolution.datatype.DataType.class, IMPLEMENTATION_DIR);</b>
+<b class="fc"><i>74</i>&nbsp;        for (String dataTypeName : m_sDataTypes) {</b>
+<i>75</i>&nbsp;            try {
+<b class="fc"><i>76</i>&nbsp;                DataType dataType = (DataType) Class.forName(dataTypeName).newInstance();</b>
+<b class="fc"><i>77</i>&nbsp;                if (dataType.isStandard()) {</b>
+<b class="fc"><i>78</i>&nbsp;                    String description = dataType.getTypeDescription();</b>
+<b class="fc"><i>79</i>&nbsp;                    if (!types.contains(description)) {</b>
+<b class="fc"><i>80</i>&nbsp;                        types.add(description);</b>
+<i>81</i>&nbsp;                    }
+<i>82</i>&nbsp;                }
+<b class="nc"><i>83</i>&nbsp;            } catch (Exception e) {</b>
+<i>84</i>&nbsp;                // TODO: handle exception
+<b class="fc"><i>85</i>&nbsp;            }</b>
+<b class="fc"><i>86</i>&nbsp;        }</b>
+<b class="fc"><i>87</i>&nbsp;    }</b>
+<i>88</i>&nbsp;
+<b class="fc"><i>89</i>&nbsp;    final public Input&lt;List&lt;Sequence&gt;&gt; sequenceInput =</b>
+<i>90</i>&nbsp;            new Input&lt;&gt;(&quot;sequence&quot;, &quot;sequence and meta data for particular taxon&quot;, new ArrayList&lt;&gt;(), Validate.OPTIONAL);
+<i>91</i>&nbsp;
+<b class="fc"><i>92</i>&nbsp;    final public Input&lt;TaxonSet&gt; taxonSetInput =</b>
+<i>93</i>&nbsp;            new Input&lt;&gt;(&quot;taxa&quot;, &quot;An optional taxon-set used only to sort the sequences into the same order as they appear in the taxon-set.&quot;, new TaxonSet(), Validate.OPTIONAL);
+<i>94</i>&nbsp;
+<b class="fc"><i>95</i>&nbsp;    final public Input&lt;Integer&gt; stateCountInput = new Input&lt;&gt;(&quot;statecount&quot;, &quot;maximum number of states in all sequences&quot;);</b>
+<b class="fc"><i>96</i>&nbsp;    final public Input&lt;String&gt; dataTypeInput = new Input&lt;&gt;(&quot;dataType&quot;, &quot;data type, one of &quot; + types, NUCLEOTIDE, types.toArray(new String[0]));</b>
+<b class="fc"><i>97</i>&nbsp;    final public Input&lt;DataType.Base&gt; userDataTypeInput = new Input&lt;&gt;(&quot;userDataType&quot;, &quot;non-standard, user specified data type, if specified &#39;dataType&#39; is ignored&quot;);</b>
+<b class="fc"><i>98</i>&nbsp;    final public Input&lt;Boolean&gt; stripInvariantSitesInput = new Input&lt;&gt;(&quot;strip&quot;, &quot;sets weight to zero for sites that are invariant (e.g. all 1, all A or all unkown)&quot;, false);</b>
+<b class="fc"><i>99</i>&nbsp;    final public Input&lt;String&gt; siteWeightsInput = new Input&lt;&gt;(&quot;weights&quot;, &quot;comma separated list of weights, one for each site in the sequences. If not specified, each site has weight 1&quot;);</b>
+<i>100</i>&nbsp;
+<b class="fc"><i>101</i>&nbsp;    final public Input&lt;Boolean&gt; isAscertainedInput = new Input&lt;&gt;(&quot;ascertained&quot;, &quot;is true if the alignment allows ascertainment correction, i.e., conditioning the &quot; +</b>
+<b class="fc"><i>102</i>&nbsp;            &quot;Felsenstein likelihood on excluding constant sites from the alignment&quot;, false);</b>
+<i>103</i>&nbsp;    /**
+<i>104</i>&nbsp;     * Inputs from AscertainedAlignment
+<i>105</i>&nbsp;     */
+<b class="fc"><i>106</i>&nbsp;    final public Input&lt;Integer&gt; excludefromInput = new Input&lt;&gt;(&quot;excludefrom&quot;, &quot;first site to condition on, default 0&quot;, 0);</b>
+<b class="fc"><i>107</i>&nbsp;    final public Input&lt;Integer&gt; excludetoInput = new Input&lt;&gt;(&quot;excludeto&quot;, &quot;last site to condition on (but excluding this site), default 0&quot;, 0);</b>
+<b class="fc"><i>108</i>&nbsp;    final public Input&lt;Integer&gt; excludeeveryInput = new Input&lt;&gt;(&quot;excludeevery&quot;, &quot;interval between sites to condition on (default 1)&quot;, 1);</b>
+<i>109</i>&nbsp;
+<i>110</i>&nbsp;    /**
+<i>111</i>&nbsp;     * list of sequences in the alignment *
+<i>112</i>&nbsp;     */
+<b class="fc"><i>113</i>&nbsp;    protected List&lt;Sequence&gt; sequences = new ArrayList&lt;&gt;();</b>
+<i>114</i>&nbsp;
+<i>115</i>&nbsp;    /**
+<i>116</i>&nbsp;     * list of taxa names defined through the sequences in the alignment *
+<i>117</i>&nbsp;     */
+<b class="fc"><i>118</i>&nbsp;    protected List&lt;String&gt; taxaNames = new ArrayList&lt;&gt;();</b>
+<i>119</i>&nbsp;
+<i>120</i>&nbsp;    /**
+<i>121</i>&nbsp;     * list of state counts for each of the sequences, typically these are
+<i>122</i>&nbsp;     * constant throughout the whole alignment.
+<i>123</i>&nbsp;     */
+<b class="fc"><i>124</i>&nbsp;    protected List&lt;Integer&gt; stateCounts = new ArrayList&lt;&gt;();</b>
+<i>125</i>&nbsp;
+<i>126</i>&nbsp;    /**
+<i>127</i>&nbsp;     * maximum of m_nStateCounts *
+<i>128</i>&nbsp;     */
+<i>129</i>&nbsp;    protected int maxStateCount;
+<i>130</i>&nbsp;
+<i>131</i>&nbsp;    /**
+<i>132</i>&nbsp;     * state codes for the sequences *
+<i>133</i>&nbsp;     */
+<b class="fc"><i>134</i>&nbsp;    protected List&lt;List&lt;Integer&gt;&gt; counts = new ArrayList&lt;&gt;();</b>
+<i>135</i>&nbsp;
+<i>136</i>&nbsp;    /**
+<i>137</i>&nbsp;     * data type, useful for converting String sequence to Code sequence, and back *
+<i>138</i>&nbsp;     */
+<i>139</i>&nbsp;    protected DataType m_dataType;
+<i>140</i>&nbsp;
+<i>141</i>&nbsp;    /**
+<i>142</i>&nbsp;     * weight over the columns of a matrix *
+<i>143</i>&nbsp;     */
+<i>144</i>&nbsp;    protected int[] patternWeight;
+<i>145</i>&nbsp;
+<i>146</i>&nbsp;    /**
+<i>147</i>&nbsp;     * weights of sites -- assumed 1 for each site if not specified
+<i>148</i>&nbsp;     */
+<b class="fc"><i>149</i>&nbsp;    protected int[] siteWeights = null;</b>
+<i>150</i>&nbsp;
+<i>151</i>&nbsp;    /**
+<i>152</i>&nbsp;     * Probabilities associated with each tip of the tree, for use when the
+<i>153</i>&nbsp;     * characters are uncertain.
+<i>154</i>&nbsp;     */
+<b class="fc"><i>155</i>&nbsp;    public List&lt;double[][]&gt; tipLikelihoods = new ArrayList&lt;&gt;(); // #taxa x #sites x #states</b>
+<b class="fc"><i>156</i>&nbsp;    private boolean usingTipLikelihoods = false;</b>
+<i>157</i>&nbsp;    
+<i>158</i>&nbsp;    /**
+<i>159</i>&nbsp;     * pattern state encodings *
+<i>160</i>&nbsp;     */
+<i>161</i>&nbsp;    protected int [][] sitePatterns; // #patterns x #taxa
+<i>162</i>&nbsp;
+<i>163</i>&nbsp;    /**
+<i>164</i>&nbsp;     * maps site nr to pattern nr *
+<i>165</i>&nbsp;     */
+<i>166</i>&nbsp;    protected int[] patternIndex;
+<i>167</i>&nbsp;
+<i>168</i>&nbsp;    /**
+<i>169</i>&nbsp;     * From AscertainedAlignment
+<i>170</i>&nbsp;     */
+<i>171</i>&nbsp;    Set&lt;Integer&gt; excludedPatterns;
+<i>172</i>&nbsp;
+<i>173</i>&nbsp;    /**
+<i>174</i>&nbsp;     * A flag to indicate if the alignment is ascertained
+<i>175</i>&nbsp;     */
+<i>176</i>&nbsp;    public boolean isAscertained;
+<i>177</i>&nbsp;
+<b class="fc"><i>178</i>&nbsp;    public Alignment() {</b>
+<b class="fc"><i>179</i>&nbsp;    }</b>
+<i>180</i>&nbsp;
+<i>181</i>&nbsp;    /**
+<i>182</i>&nbsp;     * Constructor for testing purposes.
+<i>183</i>&nbsp;     *
+<i>184</i>&nbsp;     * @param sequences
+<i>185</i>&nbsp;     * @param stateCount
+<i>186</i>&nbsp;     * @param dataType
+<i>187</i>&nbsp;     * @deprecated This is the deprecated legacy form and will be removed
+<i>188</i>&nbsp;     * at some point. Use {@link #Alignment(List, String)} instead.
+<i>189</i>&nbsp;     */
+<i>190</i>&nbsp;    @Deprecated
+<i>191</i>&nbsp;    public Alignment(List&lt;Sequence&gt; sequences, Integer stateCount, String dataType) {
+<b class="nc"><i>192</i>&nbsp;        this(sequences, dataType);</b>
+<b class="nc"><i>193</i>&nbsp;    }</b>
+<i>194</i>&nbsp;
+<i>195</i>&nbsp;    /**
+<i>196</i>&nbsp;     * Constructor for testing purposes.
+<i>197</i>&nbsp;     *
+<i>198</i>&nbsp;     * @param sequences
+<i>199</i>&nbsp;     * @param dataType
+<i>200</i>&nbsp;     */
+<b class="fc"><i>201</i>&nbsp;    public Alignment(List&lt;Sequence&gt; sequences, String dataType) {</b>
+<b class="fc"><i>202</i>&nbsp;        for (Sequence sequence : sequences) {</b>
+<b class="fc"><i>203</i>&nbsp;            sequenceInput.setValue(sequence, this);</b>
+<b class="fc"><i>204</i>&nbsp;        }</b>
+<b class="fc"><i>205</i>&nbsp;        dataTypeInput.setValue(dataType, this);</b>
+<b class="fc"><i>206</i>&nbsp;        initAndValidate();</b>
+<b class="fc"><i>207</i>&nbsp;    }</b>
+<i>208</i>&nbsp;
+<i>209</i>&nbsp;    @Override
+<i>210</i>&nbsp;    public void initAndValidate() {
+<i>211</i>&nbsp;
+<b class="fc"><i>212</i>&nbsp;        if (sequenceInput.get().size() == 0 &amp;&amp; defaultInput.get().size() == 0) {</b>
+<b class="nc"><i>213</i>&nbsp;            throw new IllegalArgumentException(&quot;Either a sequence input must be specified, or a map of strings must be specified&quot;);</b>
+<i>214</i>&nbsp;        }
+<i>215</i>&nbsp;
+<b class="fc"><i>216</i>&nbsp;        if (siteWeightsInput.get() != null) {</b>
+<b class="fc"><i>217</i>&nbsp;            String str = siteWeightsInput.get().trim();</b>
+<b class="fc"><i>218</i>&nbsp;            String[] strs = str.split(&quot;,&quot;);</b>
+<b class="fc"><i>219</i>&nbsp;            siteWeights = new int[strs.length];</b>
+<b class="fc"><i>220</i>&nbsp;            for (int i = 0; i &lt; strs.length; i++) {</b>
+<b class="fc"><i>221</i>&nbsp;                siteWeights[i] = Integer.parseInt(strs[i].trim());</b>
+<i>222</i>&nbsp;            }
+<i>223</i>&nbsp;        }
+<i>224</i>&nbsp;
+<i>225</i>&nbsp;        // determine data type, either user defined or one of the standard ones
+<b class="fc"><i>226</i>&nbsp;        if (userDataTypeInput.get() != null) {</b>
+<b class="fc"><i>227</i>&nbsp;            m_dataType = userDataTypeInput.get();</b>
+<i>228</i>&nbsp;        } else {
+<b class="fc"><i>229</i>&nbsp;            if (types.indexOf(dataTypeInput.get()) &lt; 0) {</b>
+<b class="nc"><i>230</i>&nbsp;                throw new IllegalArgumentException(&quot;data type + &#39;&quot; + dataTypeInput.get() + &quot;&#39; cannot be found. &quot; +</b>
+<b class="nc"><i>231</i>&nbsp;                        &quot;Choose one of &quot; + Arrays.toString(types.toArray(new String[0])));</b>
+<i>232</i>&nbsp;            }
+<i>233</i>&nbsp;            // seems to spend forever in there??
+<b class="fc"><i>234</i>&nbsp;            List&lt;String&gt; dataTypes = AddOnManager.find(beast.evolution.datatype.DataType.class, IMPLEMENTATION_DIR);</b>
+<b class="fc"><i>235</i>&nbsp;            for (String dataTypeName : dataTypes) {</b>
+<i>236</i>&nbsp;                DataType dataType;
+<i>237</i>&nbsp;				try {
+<b class="fc"><i>238</i>&nbsp;					dataType = (DataType) Class.forName(dataTypeName).newInstance();</b>
+<b class="fc"><i>239</i>&nbsp;	                if (dataTypeInput.get().equals(dataType.getTypeDescription())) {</b>
+<b class="fc"><i>240</i>&nbsp;	                    m_dataType = dataType;</b>
+<b class="fc"><i>241</i>&nbsp;	                    break;</b>
+<i>242</i>&nbsp;	                }
+<b class="nc"><i>243</i>&nbsp;				} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {</b>
+<b class="nc"><i>244</i>&nbsp;					throw new IllegalArgumentException(e.getMessage());</b>
+<b class="fc"><i>245</i>&nbsp;				}</b>
+<b class="fc"><i>246</i>&nbsp;            }</b>
+<i>247</i>&nbsp;        }
+<i>248</i>&nbsp;
+<i>249</i>&nbsp;        // initialize the sequence list
+<b class="fc"><i>250</i>&nbsp;        if (sequenceInput.get().size() &gt; 0) {</b>
+<b class="fc"><i>251</i>&nbsp;            sequences = sequenceInput.get();</b>
+<i>252</i>&nbsp;        } else {
+<i>253</i>&nbsp;            // alignment defined by a map of id -&gt; sequence
+<b class="fc"><i>254</i>&nbsp;            List&lt;String&gt; taxa = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>255</i>&nbsp;            taxa.addAll(map.keySet());</b>
+<b class="fc"><i>256</i>&nbsp;            sequences.clear();</b>
+<b class="fc"><i>257</i>&nbsp;            for (String key : taxa) {</b>
+<b class="fc"><i>258</i>&nbsp;                String sequence = map.get(key);</b>
+<b class="fc"><i>259</i>&nbsp;                sequences.add(new Sequence(key, sequence));</b>
+<b class="fc"><i>260</i>&nbsp;            }</b>
+<i>261</i>&nbsp;        }
+<i>262</i>&nbsp;
+<i>263</i>&nbsp;        // initialize the alignment from the given list of sequences
+<b class="fc"><i>264</i>&nbsp;        initializeWithSequenceList(sequences, true);</b>
+<i>265</i>&nbsp;
+<b class="fc"><i>266</i>&nbsp;        if (taxonSetInput.get() != null &amp;&amp; taxonSetInput.get().getTaxonCount() &gt; 0) {</b>
+<b class="fc"><i>267</i>&nbsp;            sortByTaxonSet(taxonSetInput.get());</b>
+<i>268</i>&nbsp;        }
+<b class="fc"><i>269</i>&nbsp;        Log.info.println(toString(false));</b>
+<b class="fc"><i>270</i>&nbsp;    }</b>
+<i>271</i>&nbsp;
+<i>272</i>&nbsp;    /**
+<i>273</i>&nbsp;     * Initializes the alignment given the provided list of sequences and no other information.
+<i>274</i>&nbsp;     * It site weights and/or data type have been previously set up with initAndValidate then they
+<i>275</i>&nbsp;     * remain in place. This method is used mainly to re-order the sequences to a new taxon order
+<i>276</i>&nbsp;     * when an analysis of multiple alignments on the same taxa are undertaken.
+<i>277</i>&nbsp;     *
+<i>278</i>&nbsp;     * @param sequences
+<i>279</i>&nbsp;     */
+<i>280</i>&nbsp;    private void initializeWithSequenceList(List&lt;Sequence&gt; sequences, boolean log) {
+<b class="fc"><i>281</i>&nbsp;        this.sequences = sequences;</b>
+<b class="fc"><i>282</i>&nbsp;        taxaNames.clear();</b>
+<b class="fc"><i>283</i>&nbsp;        stateCounts.clear();</b>
+<b class="fc"><i>284</i>&nbsp;        counts.clear();</b>
+<i>285</i>&nbsp;        try {
+<b class="fc"><i>286</i>&nbsp;            for (Sequence seq : sequences) {</b>
+<i>287</i>&nbsp;
+<b class="fc"><i>288</i>&nbsp;                counts.add(seq.getSequence(m_dataType));</b>
+<b class="fc"><i>289</i>&nbsp;                if (taxaNames.contains(seq.getTaxon())) {</b>
+<b class="nc"><i>290</i>&nbsp;                    throw new RuntimeException(&quot;Duplicate taxon found in alignment: &quot; + seq.getTaxon());</b>
+<i>291</i>&nbsp;                }
+<b class="fc"><i>292</i>&nbsp;                taxaNames.add(seq.getTaxon());</b>
+<b class="fc"><i>293</i>&nbsp;                tipLikelihoods.add(seq.getLikelihoods());</b>
+<i>294</i>&nbsp;                // if seq.isUncertain() == false then the above line adds &#39;null&#39;
+<i>295</i>&nbsp;	            // to the list, indicating that this particular sequence has no tip likelihood information
+<b class="fc"><i>296</i>&nbsp;                usingTipLikelihoods |= (seq.getLikelihoods() != null);	            </b>
+<i>297</i>&nbsp;
+<b class="fc"><i>298</i>&nbsp;                if (seq.totalCountInput.get() != null) {</b>
+<b class="fc"><i>299</i>&nbsp;                    stateCounts.add(seq.totalCountInput.get());</b>
+<i>300</i>&nbsp;                } else {
+<b class="nc"><i>301</i>&nbsp;                    stateCounts.add(m_dataType.getStateCount());</b>
+<i>302</i>&nbsp;                }
+<b class="fc"><i>303</i>&nbsp;            }</b>
+<b class="fc"><i>304</i>&nbsp;            if (counts.size() == 0) {</b>
+<i>305</i>&nbsp;                // no sequence data
+<b class="nc"><i>306</i>&nbsp;                throw new RuntimeException(&quot;Sequence data expected, but none found&quot;);</b>
+<i>307</i>&nbsp;            }
+<b class="nc"><i>308</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>309</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>310</i>&nbsp;            System.exit(1);</b>
+<b class="fc"><i>311</i>&nbsp;        }</b>
+<b class="fc"><i>312</i>&nbsp;        sanityCheckCalcPatternsSetUpAscertainment(log);</b>
+<b class="fc"><i>313</i>&nbsp;    }</b>
+<i>314</i>&nbsp;
+<i>315</i>&nbsp;    /**
+<i>316</i>&nbsp;     * Checks that sequences are all the same length, calculates patterns and sets up ascertainment.
+<i>317</i>&nbsp;     */
+<i>318</i>&nbsp;    private void sanityCheckCalcPatternsSetUpAscertainment(boolean log) {
+<i>319</i>&nbsp;        // Sanity check: make sure sequences are of same length
+<b class="fc"><i>320</i>&nbsp;        int length = counts.get(0).size();</b>
+<b class="fc"><i>321</i>&nbsp;        if (!(m_dataType instanceof StandardData)) {</b>
+<b class="fc"><i>322</i>&nbsp;            for (List&lt;Integer&gt; seq : counts) {</b>
+<b class="fc"><i>323</i>&nbsp;                if (seq.size() != length) {</b>
+<b class="nc"><i>324</i>&nbsp;                    throw new RuntimeException(&quot;Two sequences with different length found: &quot; + length + &quot; != &quot; + seq.size());</b>
+<i>325</i>&nbsp;                }
+<b class="fc"><i>326</i>&nbsp;            }</b>
+<i>327</i>&nbsp;        }
+<b class="fc"><i>328</i>&nbsp;        if (siteWeights != null &amp;&amp; siteWeights.length != length) {</b>
+<b class="fc"><i>329</i>&nbsp;            throw new RuntimeException(&quot;Number of weights (&quot; + siteWeights.length + &quot;) does not match sequence length (&quot; + length + &quot;)&quot;);</b>
+<i>330</i>&nbsp;        }
+<i>331</i>&nbsp;
+<b class="fc"><i>332</i>&nbsp;        calcPatterns(log);</b>
+<b class="fc"><i>333</i>&nbsp;        setupAscertainment();</b>
+<b class="fc"><i>334</i>&nbsp;    }</b>
+<i>335</i>&nbsp;
+<i>336</i>&nbsp;    /**
+<b class="nc"><i>337</i>&nbsp;     * Sorts an alignment by a provided TaxonSet, so that the sequence/taxon pairs in the alignment match the order</b>
+<i>338</i>&nbsp;     * that the taxa appear in the TaxonSet (i.e. not necessarily alphabetically).
+<i>339</i>&nbsp;     *
+<b class="nc"><i>340</i>&nbsp;     * @param toSortBy the taxon set that species the order on the taxa.</b>
+<i>341</i>&nbsp;     */
+<i>342</i>&nbsp;    public void sortByTaxonSet(TaxonSet toSortBy) {
+<i>343</i>&nbsp;
+<b class="fc"><i>344</i>&nbsp;        List&lt;Sequence&gt; sortedSeqs = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>345</i>&nbsp;        sortedSeqs.addAll(sequences);</b>
+<b class="fc"><i>346</i>&nbsp;        Collections.sort(sortedSeqs, (Sequence o1, Sequence o2) -&gt; {</b>
+<b class="fc"><i>347</i>&nbsp;                return Integer.compare(toSortBy.getTaxonIndex(o1.getTaxon()), toSortBy.getTaxonIndex(o2.getTaxon()));</b>
+<i>348</i>&nbsp;            }
+<i>349</i>&nbsp;        );
+<b class="fc"><i>350</i>&nbsp;        initializeWithSequenceList(sortedSeqs, false);</b>
+<b class="fc"><i>351</i>&nbsp;    }</b>
+<i>352</i>&nbsp;
+<i>353</i>&nbsp;    void setupAscertainment() {
+<b class="fc"><i>354</i>&nbsp;        isAscertained = isAscertainedInput.get();</b>
+<i>355</i>&nbsp;
+<b class="fc"><i>356</i>&nbsp;        if (isAscertained) {</b>
+<i>357</i>&nbsp;            //From AscertainedAlignment
+<b class="fc"><i>358</i>&nbsp;            int from = excludefromInput.get();</b>
+<b class="fc"><i>359</i>&nbsp;            int to = excludetoInput.get();</b>
+<b class="fc"><i>360</i>&nbsp;            int every = excludeeveryInput.get();</b>
+<b class="fc"><i>361</i>&nbsp;            excludedPatterns = new HashSet&lt;&gt;();</b>
+<b class="fc"><i>362</i>&nbsp;            for (int i = from; i &lt; to; i += every) {</b>
+<b class="fc"><i>363</i>&nbsp;                int patternIndex_ = patternIndex[i];</b>
+<i>364</i>&nbsp;                // reduce weight, so it does not confuse the tree likelihood
+<b class="fc"><i>365</i>&nbsp;                patternWeight[patternIndex_] = 0;</b>
+<b class="fc"><i>366</i>&nbsp;                excludedPatterns.add(patternIndex_);</b>
+<i>367</i>&nbsp;            }
+<b class="fc"><i>368</i>&nbsp;        } else {</b>
+<i>369</i>&nbsp;        	// sanity check
+<b class="fc"><i>370</i>&nbsp;            int from = excludefromInput.get();</b>
+<b class="fc"><i>371</i>&nbsp;            int to = excludetoInput.get();</b>
+<b class="fc"><i>372</i>&nbsp;            if (from != excludefromInput.defaultValue || to != excludetoInput.defaultValue) {</b>
+<b class="nc"><i>373</i>&nbsp;            	Log.warning.println(&quot;WARNING: excludefrom or excludeto is specified, but &#39;ascertained&#39; flag is not set to true&quot;);</b>
+<b class="nc"><i>374</i>&nbsp;            	Log.warning.println(&quot;WARNING: to suppress this warning, remove the excludefrom or excludeto attributes (if no astertainment correction is required)&quot;);</b>
+<b class="nc"><i>375</i>&nbsp;            	Log.warning.println(&quot;WARNING: or set the &#39;ascertained&#39; flag to true on element with id=&quot; + getID());</b>
+<i>376</i>&nbsp;            }
+<i>377</i>&nbsp;        }
+<i>378</i>&nbsp;
+<b class="fc"><i>379</i>&nbsp;    } // initAndValidate</b>
+<i>380</i>&nbsp;
+<i>381</i>&nbsp;    static String getSequence(Alignment data, int taxonIndex) {
+<i>382</i>&nbsp;
+<b class="nc"><i>383</i>&nbsp;        int[] states = new int[data.getPatternCount()];</b>
+<b class="nc"><i>384</i>&nbsp;        for (int i = 0; i &lt; data.getPatternCount(); i++) {</b>
+<b class="nc"><i>385</i>&nbsp;            int[] sitePattern = data.getPattern(i);</b>
+<b class="nc"><i>386</i>&nbsp;            states[i] = sitePattern[taxonIndex];</b>
+<i>387</i>&nbsp;        }
+<i>388</i>&nbsp;        try {
+<b class="nc"><i>389</i>&nbsp;            return data.getDataType().state2string(states);</b>
+<b class="nc"><i>390</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>391</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>392</i>&nbsp;            System.exit(1);</b>
+<i>393</i>&nbsp;        }
+<b class="nc"><i>394</i>&nbsp;        return null;</b>
+<i>395</i>&nbsp;    }
+<i>396</i>&nbsp;
+<i>397</i>&nbsp;
+<i>398</i>&nbsp;    /*
+<i>399</i>&nbsp;     * assorted getters and setters *
+<i>400</i>&nbsp;     */
+<i>401</i>&nbsp;    public List&lt;String&gt; getTaxaNames() {
+<b class="fc"><i>402</i>&nbsp;        if (taxaNames.size() == 0) {</b>
+<i>403</i>&nbsp;            try {
+<b class="nc"><i>404</i>&nbsp;                initAndValidate();</b>
+<b class="nc"><i>405</i>&nbsp;            } catch (Exception e) {</b>
+<b class="nc"><i>406</i>&nbsp;                e.printStackTrace();</b>
+<b class="nc"><i>407</i>&nbsp;                throw new RuntimeException(e);</b>
+<b class="nc"><i>408</i>&nbsp;            }</b>
+<i>409</i>&nbsp;        }
+<b class="fc"><i>410</i>&nbsp;        return taxaNames;</b>
+<i>411</i>&nbsp;    }
+<i>412</i>&nbsp;
+<i>413</i>&nbsp;    public List&lt;Integer&gt; getStateCounts() {
+<b class="nc"><i>414</i>&nbsp;        return stateCounts;</b>
+<i>415</i>&nbsp;    }
+<i>416</i>&nbsp;
+<i>417</i>&nbsp;    /**
+<i>418</i>&nbsp;     * Returns a List of Integer Lists where each Integer List represents
+<i>419</i>&nbsp;     * the sequence corresponding to a taxon.  The taxon is identified by
+<i>420</i>&nbsp;     * the position of the Integer List in the outer List, which corresponds
+<i>421</i>&nbsp;     * to the nodeNr of the corresponding leaf node and the position of the
+<i>422</i>&nbsp;     * taxon name in the taxaNames list.
+<i>423</i>&nbsp;     *
+<i>424</i>&nbsp;     * @return integer representation of sequence alignment
+<i>425</i>&nbsp;     */
+<i>426</i>&nbsp;    public List&lt;List&lt;Integer&gt;&gt; getCounts() {
+<b class="fc"><i>427</i>&nbsp;        return counts;</b>
+<i>428</i>&nbsp;    }
+<i>429</i>&nbsp;
+<i>430</i>&nbsp;    public DataType getDataType() {
+<b class="fc"><i>431</i>&nbsp;        return m_dataType;</b>
+<i>432</i>&nbsp;    }
+<i>433</i>&nbsp;
+<i>434</i>&nbsp;    /**
+<i>435</i>&nbsp;     * @return number of taxa in Alignment.
+<i>436</i>&nbsp;     */
+<i>437</i>&nbsp;    public int getTaxonCount() {
+<i>438</i>&nbsp;        //if (taxonsetInput.get() != null) {
+<i>439</i>&nbsp;        //	return taxonsetInput.get().getTaxonCount();
+<i>440</i>&nbsp;        //}
+<b class="fc"><i>441</i>&nbsp;        return taxaNames.size();</b>
+<i>442</i>&nbsp;    }
+<i>443</i>&nbsp;
+<i>444</i>&nbsp;    /**
+<i>445</i>&nbsp;     * @return number of taxa in Alignment.
+<i>446</i>&nbsp;     * @deprecated Use getTaxonCount() instead.
+<i>447</i>&nbsp;     */
+<i>448</i>&nbsp;    @Deprecated
+<i>449</i>&nbsp;    public int getNrTaxa() {
+<b class="nc"><i>450</i>&nbsp;        return getTaxonCount();</b>
+<i>451</i>&nbsp;    }
+<i>452</i>&nbsp;
+<i>453</i>&nbsp;    public int getTaxonIndex(String id) {
+<b class="fc"><i>454</i>&nbsp;        return taxaNames.indexOf(id);</b>
+<i>455</i>&nbsp;    }
+<i>456</i>&nbsp;
+<i>457</i>&nbsp;    /**
+<i>458</i>&nbsp;     * @return Number of unique character patterns in alignment.
+<i>459</i>&nbsp;     */
+<i>460</i>&nbsp;    public int getPatternCount() {
+<b class="fc"><i>461</i>&nbsp;        return sitePatterns.length;</b>
+<i>462</i>&nbsp;    }
+<i>463</i>&nbsp;
+<i>464</i>&nbsp;    public int[] getPattern(int patternIndex_) {
+<b class="fc"><i>465</i>&nbsp;        return sitePatterns[patternIndex_];</b>
+<i>466</i>&nbsp;    }
+<i>467</i>&nbsp;
+<i>468</i>&nbsp;    public int getPattern(int taxonIndex, int patternIndex_) {
+<b class="fc"><i>469</i>&nbsp;        return sitePatterns[patternIndex_][taxonIndex];</b>
+<i>470</i>&nbsp;    }
+<i>471</i>&nbsp;
+<i>472</i>&nbsp;    /**
+<i>473</i>&nbsp;     * Retrieve the &quot;weight&quot; of a particular pattern: the number of sites
+<i>474</i>&nbsp;     * having that pattern.
+<i>475</i>&nbsp;     *
+<i>476</i>&nbsp;     * @param patternIndex_ Index into pattern array.
+<i>477</i>&nbsp;     * @return pattern weight
+<i>478</i>&nbsp;     */
+<i>479</i>&nbsp;    public int getPatternWeight(int patternIndex_) {
+<b class="fc"><i>480</i>&nbsp;        return patternWeight[patternIndex_];</b>
+<i>481</i>&nbsp;    }
+<i>482</i>&nbsp;
+<i>483</i>&nbsp;    public int getMaxStateCount() {
+<b class="fc"><i>484</i>&nbsp;        return maxStateCount;</b>
+<i>485</i>&nbsp;    }
+<i>486</i>&nbsp;
+<i>487</i>&nbsp;    /**
+<i>488</i>&nbsp;     * Retrieve index of pattern corresponding to a particular site.
+<i>489</i>&nbsp;     *
+<i>490</i>&nbsp;     * @param site Index of site.
+<i>491</i>&nbsp;     * @return Index of pattern.
+<i>492</i>&nbsp;     */
+<i>493</i>&nbsp;    public int getPatternIndex(int site) {
+<b class="fc"><i>494</i>&nbsp;        return patternIndex[site];</b>
+<i>495</i>&nbsp;    }
+<i>496</i>&nbsp;
+<i>497</i>&nbsp;    /**
+<i>498</i>&nbsp;     * @return Total number of sites in alignment.
+<i>499</i>&nbsp;     */
+<i>500</i>&nbsp;    public int getSiteCount() {
+<b class="fc"><i>501</i>&nbsp;        return patternIndex.length;</b>
+<i>502</i>&nbsp;    }
+<i>503</i>&nbsp;
+<i>504</i>&nbsp;    /**
+<i>505</i>&nbsp;     * Retrieve an array containing the number of times each character pattern
+<i>506</i>&nbsp;     * occurs in the alignment.
+<i>507</i>&nbsp;     *
+<i>508</i>&nbsp;     * @return Pattern weight array.
+<i>509</i>&nbsp;     */
+<i>510</i>&nbsp;    public int[] getWeights() {
+<b class="fc"><i>511</i>&nbsp;        return patternWeight;</b>
+<i>512</i>&nbsp;    }
+<i>513</i>&nbsp;
+<i>514</i>&nbsp;
+<i>515</i>&nbsp;    /**
+<i>516</i>&nbsp;     * SiteComparator is used for ordering the sites,
+<i>517</i>&nbsp;     * which makes it easy to identify patterns.
+<i>518</i>&nbsp;     */
+<b class="fc"><i>519</i>&nbsp;    class SiteComparator implements Comparator&lt;int[]&gt; {</b>
+<i>520</i>&nbsp;        @Override
+<i>521</i>&nbsp;		public int compare(int[] o1, int[] o2) {
+<b class="fc"><i>522</i>&nbsp;            for (int i = 0; i &lt; o1.length; i++) {</b>
+<b class="fc"><i>523</i>&nbsp;                if (o1[i] &gt; o2[i]) {</b>
+<b class="fc"><i>524</i>&nbsp;                    return 1;</b>
+<i>525</i>&nbsp;                }
+<b class="fc"><i>526</i>&nbsp;                if (o1[i] &lt; o2[i]) {</b>
+<b class="fc"><i>527</i>&nbsp;                    return -1;</b>
+<i>528</i>&nbsp;                }
+<i>529</i>&nbsp;            }
+<b class="fc"><i>530</i>&nbsp;            return 0;</b>
+<i>531</i>&nbsp;        }
+<i>532</i>&nbsp;    } // class SiteComparator
+<i>533</i>&nbsp;
+<i>534</i>&nbsp;
+<i>535</i>&nbsp;    protected void calcPatterns() {
+<b class="nc"><i>536</i>&nbsp;        calcPatterns(true);</b>
+<b class="nc"><i>537</i>&nbsp;    }</b>
+<i>538</i>&nbsp;
+<i>539</i>&nbsp;        /**
+<i>540</i>&nbsp;         * calculate patterns from sequence data
+<i>541</i>&nbsp;         * *
+<i>542</i>&nbsp;         */
+<i>543</i>&nbsp;    private void calcPatterns(boolean log) {
+<b class="fc"><i>544</i>&nbsp;        int taxonCount = counts.size();</b>
+<b class="fc"><i>545</i>&nbsp;        int siteCount = counts.get(0).size();</b>
+<i>546</i>&nbsp;
+<i>547</i>&nbsp;        // convert data to transposed int array
+<b class="fc"><i>548</i>&nbsp;        int[][] data = new int[siteCount][taxonCount];</b>
+<b class="fc"><i>549</i>&nbsp;        for (int i = 0; i &lt; taxonCount; i++) {</b>
+<b class="fc"><i>550</i>&nbsp;            List&lt;Integer&gt; sites = counts.get(i);</b>
+<b class="fc"><i>551</i>&nbsp;            for (int j = 0; j &lt; siteCount; j++) {</b>
+<b class="fc"><i>552</i>&nbsp;                data[j][i] = sites.get(j);</b>
+<i>553</i>&nbsp;            }
+<i>554</i>&nbsp;        }
+<i>555</i>&nbsp;
+<i>556</i>&nbsp;        // sort data
+<b class="fc"><i>557</i>&nbsp;        SiteComparator comparator = new SiteComparator();</b>
+<b class="fc"><i>558</i>&nbsp;        Arrays.sort(data, comparator);</b>
+<i>559</i>&nbsp;
+<i>560</i>&nbsp;        // count patterns in sorted data
+<i>561</i>&nbsp;        // if (siteWeights != null) the weights are recalculated below
+<b class="fc"><i>562</i>&nbsp;        int patterns = 1;</b>
+<b class="fc"><i>563</i>&nbsp;        int[] weights = new int[siteCount];</b>
+<b class="fc"><i>564</i>&nbsp;        weights[0] = 1;</b>
+<b class="fc"><i>565</i>&nbsp;        for (int i = 1; i &lt; siteCount; i++) {</b>
+<b class="fc"><i>566</i>&nbsp;            if (usingTipLikelihoods || comparator.compare(data[i - 1], data[i]) != 0) {</b>
+<i>567</i>&nbsp;            	// In the case where we&#39;re using tip probabilities, we need to treat each 
+<i>568</i>&nbsp;            	// site as a unique pattern, because it could have a unique probability vector.
+<b class="fc"><i>569</i>&nbsp;                patterns++;</b>
+<b class="fc"><i>570</i>&nbsp;                data[patterns - 1] = data[i];</b>
+<i>571</i>&nbsp;            }
+<b class="fc"><i>572</i>&nbsp;            weights[patterns - 1]++;</b>
+<i>573</i>&nbsp;        }
+<i>574</i>&nbsp;
+<i>575</i>&nbsp;        // reserve memory for patterns
+<b class="fc"><i>576</i>&nbsp;        patternWeight = new int[patterns];</b>
+<b class="fc"><i>577</i>&nbsp;        sitePatterns = new int[patterns][taxonCount];</b>
+<b class="fc"><i>578</i>&nbsp;        for (int i = 0; i &lt; patterns; i++) {</b>
+<b class="fc"><i>579</i>&nbsp;            patternWeight[i] = weights[i];</b>
+<b class="fc"><i>580</i>&nbsp;            sitePatterns[i] = data[i];</b>
+<i>581</i>&nbsp;        }
+<i>582</i>&nbsp;
+<i>583</i>&nbsp;        // find patterns for the sites
+<b class="fc"><i>584</i>&nbsp;        patternIndex = new int[siteCount];</b>
+<b class="fc"><i>585</i>&nbsp;        for (int i = 0; i &lt; siteCount; i++) {</b>
+<b class="fc"><i>586</i>&nbsp;            int[] sites = new int[taxonCount];</b>
+<b class="fc"><i>587</i>&nbsp;            for (int j = 0; j &lt; taxonCount; j++) {</b>
+<b class="fc"><i>588</i>&nbsp;                sites[j] = counts.get(j).get(i);</b>
+<i>589</i>&nbsp;            }
+<b class="fc"><i>590</i>&nbsp;            patternIndex[i] = Arrays.binarySearch(sitePatterns, sites, comparator);</b>
+<i>591</i>&nbsp;        }
+<i>592</i>&nbsp;
+<b class="fc"><i>593</i>&nbsp;        if (siteWeights != null) {</b>
+<b class="fc"><i>594</i>&nbsp;            Arrays.fill(patternWeight, 0);</b>
+<b class="fc"><i>595</i>&nbsp;            for (int i = 0; i &lt; siteCount; i++) {</b>
+<b class="fc"><i>596</i>&nbsp;                patternWeight[patternIndex[i]] += siteWeights[i];</b>
+<i>597</i>&nbsp;            }
+<i>598</i>&nbsp;        }
+<i>599</i>&nbsp;
+<i>600</i>&nbsp;        // determine maximum state count
+<i>601</i>&nbsp;        // Usually, the state count is equal for all sites,
+<i>602</i>&nbsp;        // though for SnAP analysis, this is typically not the case.
+<b class="fc"><i>603</i>&nbsp;        maxStateCount = 0;</b>
+<b class="fc"><i>604</i>&nbsp;        for (int m_nStateCount1 : stateCounts) {</b>
+<b class="fc"><i>605</i>&nbsp;            maxStateCount = Math.max(maxStateCount, m_nStateCount1);</b>
+<b class="fc"><i>606</i>&nbsp;        }</b>
+<i>607</i>&nbsp;        // report some statistics
+<b class="fc"><i>608</i>&nbsp;        if (log &amp;&amp; taxaNames.size() &lt; 30) {</b>
+<b class="fc"><i>609</i>&nbsp;            for (int i = 0; i &lt; taxaNames.size(); i++) {</b>
+<b class="fc"><i>610</i>&nbsp;                Log.info.println(taxaNames.get(i) + &quot;: &quot; + counts.get(i).size() + &quot; &quot; + stateCounts.get(i));</b>
+<i>611</i>&nbsp;            }
+<i>612</i>&nbsp;        }
+<i>613</i>&nbsp;
+<b class="fc"><i>614</i>&nbsp;        if (stripInvariantSitesInput.get()) {</b>
+<i>615</i>&nbsp;            // don&#39;t add patterns that are invariant, e.g. all gaps
+<b class="fc"><i>616</i>&nbsp;            if (log) Log.info.println(&quot;Stripping invariant sites&quot;);</b>
+<i>617</i>&nbsp;
+<b class="fc"><i>618</i>&nbsp;            int removedSites = 0;</b>
+<b class="fc"><i>619</i>&nbsp;            for (int i = 0; i &lt; patterns; i++) {</b>
+<b class="fc"><i>620</i>&nbsp;                int[] pattern = sitePatterns[i];</b>
+<b class="fc"><i>621</i>&nbsp;                int value = pattern[0];</b>
+<b class="fc"><i>622</i>&nbsp;                boolean isInvariant = true;</b>
+<b class="fc"><i>623</i>&nbsp;                for (int k = 1; k &lt; pattern.length; k++) {</b>
+<b class="fc"><i>624</i>&nbsp;                    if (pattern[k] != value) {</b>
+<b class="fc"><i>625</i>&nbsp;                        isInvariant = false;</b>
+<b class="fc"><i>626</i>&nbsp;                        break;</b>
+<i>627</i>&nbsp;                    }
+<i>628</i>&nbsp;                }
+<b class="fc"><i>629</i>&nbsp;                if (isInvariant) {</b>
+<b class="fc"><i>630</i>&nbsp;                    removedSites += patternWeight[i];</b>
+<b class="fc"><i>631</i>&nbsp;                    patternWeight[i] = 0;</b>
+<i>632</i>&nbsp;
+<b class="fc"><i>633</i>&nbsp;                    if (log) Log.info.print(&quot; &lt;&quot; + value + &quot;&gt; &quot;);</b>
+<i>634</i>&nbsp;                }
+<i>635</i>&nbsp;            }
+<b class="fc"><i>636</i>&nbsp;            if (log) Log.info.println(&quot; removed &quot; + removedSites + &quot; sites &quot;);</b>
+<i>637</i>&nbsp;        }
+<b class="fc"><i>638</i>&nbsp;    } // calcPatterns</b>
+<i>639</i>&nbsp;
+<i>640</i>&nbsp;    /**
+<i>641</i>&nbsp;     * @return the total weight of all the patterns (this is the effective number of sites)
+<i>642</i>&nbsp;     */
+<i>643</i>&nbsp;    private long getTotalWeight() {
+<b class="fc"><i>644</i>&nbsp;        long totalWeight = 0;</b>
+<b class="fc"><i>645</i>&nbsp;        for (int weight : patternWeight) {</b>
+<b class="fc"><i>646</i>&nbsp;            totalWeight += weight;</b>
+<i>647</i>&nbsp;        }
+<b class="fc"><i>648</i>&nbsp;        return totalWeight;</b>
+<i>649</i>&nbsp;    }
+<i>650</i>&nbsp;
+<i>651</i>&nbsp;    /**
+<i>652</i>&nbsp;     * Pretty printing of vital statistics of an alignment including id, #taxa, #sites, #patterns and totalweight
+<i>653</i>&nbsp;     *
+<i>654</i>&nbsp;     * @param singleLine true if the string should fit on one line
+<i>655</i>&nbsp;     * @return string representing this alignment
+<i>656</i>&nbsp;     */
+<i>657</i>&nbsp;    public String toString(boolean singleLine) {
+<b class="fc"><i>658</i>&nbsp;        long totalWeight = getTotalWeight();</b>
+<b class="fc"><i>659</i>&nbsp;        StringBuilder builder = new StringBuilder();</b>
+<b class="fc"><i>660</i>&nbsp;        builder.append(getClass().getSimpleName() + &quot;(&quot; + getID() + &quot;)&quot;);</b>
+<i>661</i>&nbsp;
+<b class="fc"><i>662</i>&nbsp;        if (singleLine) {</b>
+<b class="fc"><i>663</i>&nbsp;            builder.append(&quot;: [taxa, patterns, sites] = [&quot; + getTaxonCount() + &quot;, &quot; + getPatternCount());</b>
+<b class="fc"><i>664</i>&nbsp;            builder.append(&quot;, &quot; + getTotalWeight() + &quot;]&quot;);</b>
+<i>665</i>&nbsp;        } else {
+<i>666</i>&nbsp;
+<b class="fc"><i>667</i>&nbsp;            long siteCount = getSiteCount();</b>
+<i>668</i>&nbsp;
+<b class="fc"><i>669</i>&nbsp;            builder.append(&#39;\n&#39;);</b>
+<b class="fc"><i>670</i>&nbsp;            builder.append(&quot;  &quot; + getTaxonCount() + &quot; taxa&quot;);</b>
+<b class="fc"><i>671</i>&nbsp;            builder.append(&#39;\n&#39;);</b>
+<b class="fc"><i>672</i>&nbsp;            builder.append(&quot;  &quot; + siteCount + (siteCount == 1 ? &quot; site&quot; : &quot; sites&quot;) + (totalWeight == getSiteCount() ? &quot;&quot; : &quot; with weight &quot; + totalWeight + &quot;&quot;));</b>
+<b class="fc"><i>673</i>&nbsp;            builder.append(&#39;\n&#39;);</b>
+<b class="fc"><i>674</i>&nbsp;            if (siteCount &gt; 1) {</b>
+<b class="fc"><i>675</i>&nbsp;                builder.append(&quot;  &quot; + getPatternCount() + &quot; patterns&quot;);</b>
+<b class="fc"><i>676</i>&nbsp;                builder.append(&#39;\n&#39;);</b>
+<i>677</i>&nbsp;            }
+<i>678</i>&nbsp;        }
+<b class="fc"><i>679</i>&nbsp;        return builder.toString();</b>
+<i>680</i>&nbsp;    }
+<i>681</i>&nbsp;
+<i>682</i>&nbsp;    public double[] getTipLikelihoods(int taxonIndex, int patternIndex_) {
+<b class="fc"><i>683</i>&nbsp;    	if (taxonIndex &gt;= tipLikelihoods.size() || tipLikelihoods.get(taxonIndex) == null) { </b>
+<b class="fc"><i>684</i>&nbsp;    		return null; </b>
+<i>685</i>&nbsp;    	} else { 
+<b class="fc"><i>686</i>&nbsp;    		return tipLikelihoods.get(taxonIndex)[patternIndex_];</b>
+<i>687</i>&nbsp;    	}
+<i>688</i>&nbsp;    	
+<i>689</i>&nbsp;    }
+<i>690</i>&nbsp;    /**
+<i>691</i>&nbsp;     * returns an array containing the non-ambiguous states that this state represents.
+<i>692</i>&nbsp;     */
+<i>693</i>&nbsp;    public boolean[] getStateSet(int state) {
+<b class="fc"><i>694</i>&nbsp;        return m_dataType.getStateSet(state);</b>
+<i>695</i>&nbsp;//        if (!isAmbiguousState(state)) {
+<i>696</i>&nbsp;//            boolean[] stateSet = new boolean[m_nMaxStateCount];
+<i>697</i>&nbsp;//            stateSet[state] = true;
+<i>698</i>&nbsp;//            return stateSet;
+<i>699</i>&nbsp;//        } else {
+<i>700</i>&nbsp;//        }
+<i>701</i>&nbsp;    }
+<i>702</i>&nbsp;
+<i>703</i>&nbsp;    boolean isAmbiguousState(int state) {
+<b class="nc"><i>704</i>&nbsp;        return (state &gt;= 0 &amp;&amp; state &lt; maxStateCount);</b>
+<i>705</i>&nbsp;    }
+<i>706</i>&nbsp;
+<i>707</i>&nbsp;    //Methods from AscertainedAlignment
+<i>708</i>&nbsp;    public Set&lt;Integer&gt; getExcludedPatternIndices() {
+<b class="nc"><i>709</i>&nbsp;        return excludedPatterns;</b>
+<i>710</i>&nbsp;    }
+<i>711</i>&nbsp;
+<i>712</i>&nbsp;    public int getExcludedPatternCount() {
+<b class="nc"><i>713</i>&nbsp;        return excludedPatterns.size();</b>
+<i>714</i>&nbsp;    }
+<i>715</i>&nbsp;
+<i>716</i>&nbsp;    public double getAscertainmentCorrection(double[] patternLogProbs) {
+<b class="fc"><i>717</i>&nbsp;        double excludeProb = 0, includeProb = 0, returnProb = 1.0;</b>
+<i>718</i>&nbsp;
+<b class="fc"><i>719</i>&nbsp;        for (int i : excludedPatterns) {</b>
+<b class="fc"><i>720</i>&nbsp;            excludeProb += Math.exp(patternLogProbs[i]);</b>
+<b class="fc"><i>721</i>&nbsp;        }</b>
+<i>722</i>&nbsp;
+<b class="fc"><i>723</i>&nbsp;        if (includeProb == 0.0) {</b>
+<b class="fc"><i>724</i>&nbsp;            returnProb -= excludeProb;</b>
+<b class="nc"><i>725</i>&nbsp;        } else if (excludeProb == 0.0) {</b>
+<b class="nc"><i>726</i>&nbsp;            returnProb = includeProb;</b>
+<i>727</i>&nbsp;        } else {
+<b class="nc"><i>728</i>&nbsp;            returnProb = includeProb - excludeProb;</b>
+<i>729</i>&nbsp;        }
+<b class="pc"><i>730</i>&nbsp;        return Math.log(returnProb);</b>
+<i>731</i>&nbsp;    } // getAscertainmentCorrection
+<i>732</i>&nbsp;
+<b class="nc"><i>733</i>&nbsp;    /**</b>
+<i>734</i>&nbsp;     * Should not be used. No special order of taxa are assumed. Taxa order should be left to user input.
+<i>735</i>&nbsp;     */
+<i>736</i>&nbsp;    @Deprecated
+<i>737</i>&nbsp;    static public void sortByTaxonName(List&lt;Sequence&gt; seqs) {
+<b class="nc"><i>738</i>&nbsp;        Collections.sort(seqs, (Sequence o1, Sequence o2) -&gt; {</b>
+<b class="nc"><i>739</i>&nbsp;                return o1.taxonInput.get().compareTo(o2.taxonInput.get());</b>
+<i>740</i>&nbsp;            }
+<i>741</i>&nbsp;        );
+<b class="nc"><i>742</i>&nbsp;    }</b>
+<i>743</i>&nbsp;
+<i>744</i>&nbsp;    /** 
+<i>745</i>&nbsp;     * Get String representation of a sequence according to the current datatype
+<i>746</i>&nbsp;     * @param taxon the name of the taxon to get the sequence from in the alignment
+<i>747</i>&nbsp;     * @return sequence in String representation
+<i>748</i>&nbsp;     */
+<i>749</i>&nbsp;	public String getSequenceAsString(String taxon) {
+<b class="nc"><i>750</i>&nbsp;		int i = getTaxonIndex(taxon);		</b>
+<i>751</i>&nbsp;
+<i>752</i>&nbsp;		// build up string from underlying data using the current datatype
+<b class="nc"><i>753</i>&nbsp;		int [] states = new int[getSiteCount()];</b>
+<b class="nc"><i>754</i>&nbsp;		for (int k = 0; k &lt; getSiteCount(); k++) {</b>
+<b class="nc"><i>755</i>&nbsp;			int d = sitePatterns[patternIndex[k]][i];</b>
+<b class="nc"><i>756</i>&nbsp;			states[k] = d;</b>
+<i>757</i>&nbsp;		}
+<b class="nc"><i>758</i>&nbsp;		String seq = null;</b>
+<i>759</i>&nbsp;		try {
+<b class="nc"><i>760</i>&nbsp;			seq = m_dataType.state2string(states);</b>
+<b class="nc"><i>761</i>&nbsp;		} catch (Exception e) {</b>
+<b class="nc"><i>762</i>&nbsp;			e.printStackTrace();</b>
+<b class="nc"><i>763</i>&nbsp;		}</b>
+<b class="nc"><i>764</i>&nbsp;		return seq;</b>
+<i>765</i>&nbsp;	}
+<i>766</i>&nbsp;} // class Data
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

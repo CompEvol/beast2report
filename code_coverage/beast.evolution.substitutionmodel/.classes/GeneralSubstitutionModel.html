@@ -1,0 +1,371 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: GeneralSubstitutionModel</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.substitutionmodel</a> ]
+</div>
+
+<h1>Coverage Summary for Class: GeneralSubstitutionModel (beast.evolution.substitutionmodel)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GeneralSubstitutionModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (6/ 12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    73.8%
+  </span>
+  <span class="absValue">
+    (76/ 103)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;* File GeneralSubstitutionModel.java
+<i>3</i>&nbsp;*
+<i>4</i>&nbsp;* Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>5</i>&nbsp;*
+<i>6</i>&nbsp;* This file is not copyright Remco! It is copied from BEAST 1.
+<i>7</i>&nbsp;*
+<i>8</i>&nbsp;* This file is part of BEAST2.
+<i>9</i>&nbsp;* See the NOTICE file distributed with this work for additional
+<i>10</i>&nbsp;* information regarding copyright ownership and licensing.
+<i>11</i>&nbsp;*
+<i>12</i>&nbsp;* BEAST is free software; you can redistribute it and/or modify
+<i>13</i>&nbsp;* it under the terms of the GNU Lesser General Public License as
+<i>14</i>&nbsp;* published by the Free Software Foundation; either version 2
+<i>15</i>&nbsp;* of the License, or (at your option) any later version.
+<i>16</i>&nbsp;*
+<i>17</i>&nbsp;*  BEAST is distributed in the hope that it will be useful,
+<i>18</i>&nbsp;*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>19</i>&nbsp;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>20</i>&nbsp;*  GNU Lesser General Public License for more details.
+<i>21</i>&nbsp;*
+<i>22</i>&nbsp;* You should have received a copy of the GNU Lesser General Public
+<i>23</i>&nbsp;* License along with BEAST; if not, write to the
+<i>24</i>&nbsp;* Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>25</i>&nbsp;* Boston, MA  02110-1301  USA
+<i>26</i>&nbsp;*/
+<i>27</i>&nbsp;package beast.evolution.substitutionmodel;
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;import java.lang.reflect.Constructor;
+<i>31</i>&nbsp;import java.lang.reflect.InvocationTargetException;
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;import beast.core.Description;
+<i>34</i>&nbsp;import beast.core.Function;
+<i>35</i>&nbsp;import beast.core.Input;
+<i>36</i>&nbsp;import beast.core.Input.Validate;
+<i>37</i>&nbsp;import beast.evolution.datatype.DataType;
+<i>38</i>&nbsp;import beast.evolution.tree.Node;
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;@Description(&quot;Specifies transition probability matrix with no restrictions on the rates other &quot; +
+<i>43</i>&nbsp;        &quot;than that one of the is equal to one and the others are specified relative to &quot; +
+<i>44</i>&nbsp;        &quot;this unit rate. Works for any number of states.&quot;)
+<b class="fc"><i>45</i>&nbsp;public class GeneralSubstitutionModel extends SubstitutionModel.Base {</b>
+<b class="fc"><i>46</i>&nbsp;    final public Input&lt;Function&gt; ratesInput =</b>
+<i>47</i>&nbsp;            new Input&lt;&gt;(&quot;rates&quot;, &quot;Rate parameter which defines the transition rate matrix. &quot; +
+<i>48</i>&nbsp;                    &quot;Only the off-diagonal entries need to be specified (diagonal makes row sum to zero in a &quot; +
+<i>49</i>&nbsp;                    &quot;rate matrix). Entry i specifies the rate from floor(i/(n-1)) to i%(n-1)+delta where &quot; +
+<i>50</i>&nbsp;                    &quot;n is the number of states and delta=1 if floor(i/(n-1)) &gt;= i%(n-1) and 0 otherwise.&quot;, Validate.REQUIRED);
+<i>51</i>&nbsp;
+<b class="fc"><i>52</i>&nbsp;    final public Input&lt;String&gt; eigenSystemClass = new Input&lt;&gt;(&quot;eigenSystem&quot;, &quot;Name of the class used for creating an EigenSystem&quot;, DefaultEigenSystem.class.getName());</b>
+<i>53</i>&nbsp;    /**
+<i>54</i>&nbsp;     * a square m_nStates x m_nStates matrix containing current rates  *
+<i>55</i>&nbsp;     */
+<i>56</i>&nbsp;    protected double[][] rateMatrix;
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;
+<i>59</i>&nbsp;    @Override
+<i>60</i>&nbsp;    public void initAndValidate() {
+<b class="fc"><i>61</i>&nbsp;        super.initAndValidate();</b>
+<b class="fc"><i>62</i>&nbsp;        updateMatrix = true;</b>
+<b class="fc"><i>63</i>&nbsp;        nrOfStates = frequencies.getFreqs().length;</b>
+<b class="fc"><i>64</i>&nbsp;        if (ratesInput.get().getDimension() != nrOfStates * (nrOfStates - 1)) {</b>
+<b class="nc"><i>65</i>&nbsp;            throw new IllegalArgumentException(&quot;Dimension of input &#39;rates&#39; is &quot; + ratesInput.get().getDimension() + &quot; but a &quot; +</b>
+<i>66</i>&nbsp;                    &quot;rate matrix of dimension &quot; + nrOfStates + &quot;x&quot; + (nrOfStates - 1) + &quot;=&quot; + nrOfStates * (nrOfStates - 1) + &quot; was &quot; +
+<i>67</i>&nbsp;                    &quot;expected&quot;);
+<i>68</i>&nbsp;        }
+<i>69</i>&nbsp;
+<i>70</i>&nbsp;        try {
+<b class="fc"><i>71</i>&nbsp;			eigenSystem = createEigenSystem();</b>
+<b class="nc"><i>72</i>&nbsp;		} catch (SecurityException | ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException</b>
+<i>73</i>&nbsp;				| InvocationTargetException e) {
+<b class="nc"><i>74</i>&nbsp;			throw new IllegalArgumentException(e.getMessage());</b>
+<b class="fc"><i>75</i>&nbsp;		}</b>
+<i>76</i>&nbsp;        //eigenSystem = new DefaultEigenSystem(m_nStates);
+<i>77</i>&nbsp;
+<b class="fc"><i>78</i>&nbsp;        rateMatrix = new double[nrOfStates][nrOfStates];</b>
+<b class="fc"><i>79</i>&nbsp;        relativeRates = new double[ratesInput.get().getDimension()];</b>
+<b class="fc"><i>80</i>&nbsp;        storedRelativeRates = new double[ratesInput.get().getDimension()];</b>
+<b class="fc"><i>81</i>&nbsp;    } // initAndValidate</b>
+<i>82</i>&nbsp;
+<i>83</i>&nbsp;    /**
+<i>84</i>&nbsp;     * create an EigenSystem of the class indicated by the eigenSystemClass input 
+<i>85</i>&nbsp;     * @throws ClassNotFoundException 
+<i>86</i>&nbsp;     * @throws SecurityException 
+<i>87</i>&nbsp;     * @throws InvocationTargetException 
+<i>88</i>&nbsp;     * @throws IllegalArgumentException 
+<i>89</i>&nbsp;     * @throws IllegalAccessException 
+<i>90</i>&nbsp;     * @throws InstantiationException *
+<i>91</i>&nbsp;     */
+<i>92</i>&nbsp;    protected EigenSystem createEigenSystem() throws SecurityException, ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+<b class="fc"><i>93</i>&nbsp;        Constructor&lt;?&gt;[] ctors = Class.forName(eigenSystemClass.get()).getDeclaredConstructors();</b>
+<b class="fc"><i>94</i>&nbsp;        Constructor&lt;?&gt; ctor = null;</b>
+<b class="fc"><i>95</i>&nbsp;        for (int i = 0; i &lt; ctors.length; i++) {</b>
+<b class="fc"><i>96</i>&nbsp;            ctor = ctors[i];</b>
+<b class="fc"><i>97</i>&nbsp;            if (ctor.getGenericParameterTypes().length == 1)</b>
+<b class="fc"><i>98</i>&nbsp;                break;</b>
+<i>99</i>&nbsp;        }
+<b class="fc"><i>100</i>&nbsp;        ctor.setAccessible(true);</b>
+<b class="fc"><i>101</i>&nbsp;        return (EigenSystem) ctor.newInstance(nrOfStates);</b>
+<i>102</i>&nbsp;    }
+<i>103</i>&nbsp;
+<i>104</i>&nbsp;    protected double[] relativeRates;
+<i>105</i>&nbsp;    protected double[] storedRelativeRates;
+<i>106</i>&nbsp;
+<i>107</i>&nbsp;    protected EigenSystem eigenSystem;
+<i>108</i>&nbsp;
+<i>109</i>&nbsp;    protected EigenDecomposition eigenDecomposition;
+<i>110</i>&nbsp;    private EigenDecomposition storedEigenDecomposition;
+<i>111</i>&nbsp;
+<b class="fc"><i>112</i>&nbsp;    protected boolean updateMatrix = true;</b>
+<b class="fc"><i>113</i>&nbsp;    private boolean storedUpdateMatrix = true;</b>
+<i>114</i>&nbsp;
+<i>115</i>&nbsp;    @Override
+<i>116</i>&nbsp;    public void getTransitionProbabilities(Node node, double startTime, double endTime, double rate, double[] matrix) {
+<b class="fc"><i>117</i>&nbsp;        double distance = (startTime - endTime) * rate;</b>
+<i>118</i>&nbsp;
+<i>119</i>&nbsp;        int i, j, k;
+<i>120</i>&nbsp;        double temp;
+<i>121</i>&nbsp;
+<i>122</i>&nbsp;        // this must be synchronized to avoid being called simultaneously by
+<i>123</i>&nbsp;        // two different likelihood threads - AJD
+<b class="fc"><i>124</i>&nbsp;        synchronized (this) {</b>
+<b class="fc"><i>125</i>&nbsp;            if (updateMatrix) {</b>
+<b class="fc"><i>126</i>&nbsp;                setupRelativeRates();</b>
+<b class="fc"><i>127</i>&nbsp;                setupRateMatrix();</b>
+<b class="fc"><i>128</i>&nbsp;                eigenDecomposition = eigenSystem.decomposeMatrix(rateMatrix);</b>
+<b class="fc"><i>129</i>&nbsp;                updateMatrix = false;</b>
+<i>130</i>&nbsp;            }
+<b class="fc"><i>131</i>&nbsp;        }</b>
+<i>132</i>&nbsp;
+<i>133</i>&nbsp;        // is the following really necessary?
+<i>134</i>&nbsp;        // implemented a pool of iexp matrices to support multiple threads
+<i>135</i>&nbsp;        // without creating a new matrix each call. - AJD
+<i>136</i>&nbsp;        // a quick timing experiment shows no difference - RRB
+<b class="fc"><i>137</i>&nbsp;        double[] iexp = new double[nrOfStates * nrOfStates];</b>
+<i>138</i>&nbsp;        // Eigen vectors
+<b class="fc"><i>139</i>&nbsp;        double[] Evec = eigenDecomposition.getEigenVectors();</b>
+<i>140</i>&nbsp;        // inverse Eigen vectors
+<b class="fc"><i>141</i>&nbsp;        double[] Ievc = eigenDecomposition.getInverseEigenVectors();</b>
+<i>142</i>&nbsp;        // Eigen values
+<b class="fc"><i>143</i>&nbsp;        double[] Eval = eigenDecomposition.getEigenValues();</b>
+<b class="fc"><i>144</i>&nbsp;        for (i = 0; i &lt; nrOfStates; i++) {</b>
+<b class="fc"><i>145</i>&nbsp;            temp = Math.exp(distance * Eval[i]);</b>
+<b class="fc"><i>146</i>&nbsp;            for (j = 0; j &lt; nrOfStates; j++) {</b>
+<b class="fc"><i>147</i>&nbsp;                iexp[i * nrOfStates + j] = Ievc[i * nrOfStates + j] * temp;</b>
+<i>148</i>&nbsp;            }
+<i>149</i>&nbsp;        }
+<i>150</i>&nbsp;
+<b class="fc"><i>151</i>&nbsp;        int u = 0;</b>
+<b class="fc"><i>152</i>&nbsp;        for (i = 0; i &lt; nrOfStates; i++) {</b>
+<b class="fc"><i>153</i>&nbsp;            for (j = 0; j &lt; nrOfStates; j++) {</b>
+<b class="fc"><i>154</i>&nbsp;                temp = 0.0;</b>
+<b class="fc"><i>155</i>&nbsp;                for (k = 0; k &lt; nrOfStates; k++) {</b>
+<b class="fc"><i>156</i>&nbsp;                    temp += Evec[i * nrOfStates + k] * iexp[k * nrOfStates + j];</b>
+<i>157</i>&nbsp;                }
+<i>158</i>&nbsp;
+<b class="fc"><i>159</i>&nbsp;                matrix[u] = Math.abs(temp);</b>
+<b class="fc"><i>160</i>&nbsp;                u++;</b>
+<i>161</i>&nbsp;            }
+<i>162</i>&nbsp;        }
+<b class="fc"><i>163</i>&nbsp;    } // getTransitionProbabilities</b>
+<i>164</i>&nbsp;
+<i>165</i>&nbsp;    /**
+<i>166</i>&nbsp;     * access to (copy of) rate matrix *
+<i>167</i>&nbsp;     */
+<i>168</i>&nbsp;    protected double[][] getRateMatrix() {
+<b class="nc"><i>169</i>&nbsp;        return rateMatrix.clone();</b>
+<i>170</i>&nbsp;    }
+<i>171</i>&nbsp;
+<i>172</i>&nbsp;    protected void setupRelativeRates() {
+<b class="fc"><i>173</i>&nbsp;        Function rates = this.ratesInput.get();</b>
+<b class="fc"><i>174</i>&nbsp;        for (int i = 0; i &lt; rates.getDimension(); i++) {</b>
+<b class="fc"><i>175</i>&nbsp;            relativeRates[i] = rates.getArrayValue(i);</b>
+<i>176</i>&nbsp;        }
+<b class="fc"><i>177</i>&nbsp;    }</b>
+<i>178</i>&nbsp;
+<i>179</i>&nbsp;    /**
+<i>180</i>&nbsp;     * sets up rate matrix *
+<i>181</i>&nbsp;     */
+<i>182</i>&nbsp;    protected void setupRateMatrix() {
+<b class="fc"><i>183</i>&nbsp;        double[] freqs = frequencies.getFreqs();</b>
+<b class="fc"><i>184</i>&nbsp;        for (int i = 0; i &lt; nrOfStates; i++) {</b>
+<b class="fc"><i>185</i>&nbsp;            rateMatrix[i][i] = 0;</b>
+<b class="fc"><i>186</i>&nbsp;            for (int j = 0; j &lt; i; j++) {</b>
+<b class="fc"><i>187</i>&nbsp;                rateMatrix[i][j] = relativeRates[i * (nrOfStates - 1) + j];</b>
+<i>188</i>&nbsp;            }
+<b class="fc"><i>189</i>&nbsp;            for (int j = i + 1; j &lt; nrOfStates; j++) {</b>
+<b class="fc"><i>190</i>&nbsp;                rateMatrix[i][j] = relativeRates[i * (nrOfStates - 1) + j - 1];</b>
+<i>191</i>&nbsp;            }
+<i>192</i>&nbsp;        }
+<i>193</i>&nbsp;        // bring in frequencies
+<b class="fc"><i>194</i>&nbsp;        for (int i = 0; i &lt; nrOfStates; i++) {</b>
+<b class="fc"><i>195</i>&nbsp;            for (int j = i + 1; j &lt; nrOfStates; j++) {</b>
+<b class="fc"><i>196</i>&nbsp;                rateMatrix[i][j] *= freqs[j];</b>
+<b class="fc"><i>197</i>&nbsp;                rateMatrix[j][i] *= freqs[i];</b>
+<i>198</i>&nbsp;            }
+<i>199</i>&nbsp;        }
+<i>200</i>&nbsp;        // set up diagonal
+<b class="fc"><i>201</i>&nbsp;        for (int i = 0; i &lt; nrOfStates; i++) {</b>
+<b class="fc"><i>202</i>&nbsp;            double sum = 0.0;</b>
+<b class="fc"><i>203</i>&nbsp;            for (int j = 0; j &lt; nrOfStates; j++) {</b>
+<b class="fc"><i>204</i>&nbsp;                if (i != j)</b>
+<b class="fc"><i>205</i>&nbsp;                    sum += rateMatrix[i][j];</b>
+<i>206</i>&nbsp;            }
+<b class="fc"><i>207</i>&nbsp;            rateMatrix[i][i] = -sum;</b>
+<i>208</i>&nbsp;        }
+<i>209</i>&nbsp;        // normalise rate matrix to one expected substitution per unit time
+<b class="fc"><i>210</i>&nbsp;        double subst = 0.0;</b>
+<b class="fc"><i>211</i>&nbsp;        for (int i = 0; i &lt; nrOfStates; i++)</b>
+<b class="fc"><i>212</i>&nbsp;            subst += -rateMatrix[i][i] * freqs[i];</b>
+<i>213</i>&nbsp;
+<b class="fc"><i>214</i>&nbsp;        for (int i = 0; i &lt; nrOfStates; i++) {</b>
+<b class="fc"><i>215</i>&nbsp;            for (int j = 0; j &lt; nrOfStates; j++) {</b>
+<b class="fc"><i>216</i>&nbsp;                rateMatrix[i][j] = rateMatrix[i][j] / subst;</b>
+<i>217</i>&nbsp;            }
+<i>218</i>&nbsp;        }
+<b class="fc"><i>219</i>&nbsp;    } // setupRateMatrix</b>
+<i>220</i>&nbsp;
+<i>221</i>&nbsp;
+<i>222</i>&nbsp;    /**
+<i>223</i>&nbsp;     * CalculationNode implementation follows *
+<i>224</i>&nbsp;     */
+<i>225</i>&nbsp;    @Override
+<i>226</i>&nbsp;    public void store() {
+<b class="nc"><i>227</i>&nbsp;        storedUpdateMatrix = updateMatrix;</b>
+<b class="nc"><i>228</i>&nbsp;        if( eigenDecomposition != null ) {</b>
+<b class="nc"><i>229</i>&nbsp;            storedEigenDecomposition = eigenDecomposition.copy();</b>
+<i>230</i>&nbsp;        }
+<i>231</i>&nbsp;//        System.arraycopy(relativeRates, 0, storedRelativeRates, 0, relativeRates.length);
+<i>232</i>&nbsp;
+<b class="nc"><i>233</i>&nbsp;        super.store();</b>
+<b class="nc"><i>234</i>&nbsp;    }</b>
+<i>235</i>&nbsp;
+<i>236</i>&nbsp;    /**
+<i>237</i>&nbsp;     * Restore the additional stored state
+<i>238</i>&nbsp;     */
+<i>239</i>&nbsp;    @Override
+<i>240</i>&nbsp;    public void restore() {
+<i>241</i>&nbsp;
+<b class="nc"><i>242</i>&nbsp;        updateMatrix = storedUpdateMatrix;</b>
+<i>243</i>&nbsp;
+<i>244</i>&nbsp;        // To restore all this stuff just swap the pointers...
+<i>245</i>&nbsp;//        double[] tmp1 = storedRelativeRates;
+<i>246</i>&nbsp;//        storedRelativeRates = relativeRates;
+<i>247</i>&nbsp;//        relativeRates = tmp1;
+<b class="nc"><i>248</i>&nbsp;        if( storedEigenDecomposition != null ) {</b>
+<b class="nc"><i>249</i>&nbsp;            EigenDecomposition tmp = storedEigenDecomposition;</b>
+<b class="nc"><i>250</i>&nbsp;            storedEigenDecomposition = eigenDecomposition;</b>
+<b class="nc"><i>251</i>&nbsp;            eigenDecomposition = tmp;</b>
+<i>252</i>&nbsp;        }
+<b class="nc"><i>253</i>&nbsp;        super.restore();</b>
+<i>254</i>&nbsp;
+<b class="nc"><i>255</i>&nbsp;    }</b>
+<i>256</i>&nbsp;
+<i>257</i>&nbsp;    @Override
+<i>258</i>&nbsp;    protected boolean requiresRecalculation() {
+<i>259</i>&nbsp;        // we only get here if something is dirty
+<b class="nc"><i>260</i>&nbsp;        updateMatrix = true;</b>
+<b class="nc"><i>261</i>&nbsp;        return true;</b>
+<i>262</i>&nbsp;    }
+<i>263</i>&nbsp;
+<i>264</i>&nbsp;
+<i>265</i>&nbsp;    /**
+<i>266</i>&nbsp;     * This function returns the Eigen vectors.
+<i>267</i>&nbsp;     *
+<i>268</i>&nbsp;     * @return the array
+<i>269</i>&nbsp;     */
+<i>270</i>&nbsp;    @Override
+<i>271</i>&nbsp;    public EigenDecomposition getEigenDecomposition(Node node) {
+<b class="nc"><i>272</i>&nbsp;        synchronized (this) {</b>
+<b class="nc"><i>273</i>&nbsp;            if (updateMatrix) {</b>
+<b class="nc"><i>274</i>&nbsp;                setupRelativeRates();</b>
+<b class="nc"><i>275</i>&nbsp;                setupRateMatrix();</b>
+<b class="nc"><i>276</i>&nbsp;                eigenDecomposition = eigenSystem.decomposeMatrix(rateMatrix);</b>
+<b class="nc"><i>277</i>&nbsp;                updateMatrix = false;</b>
+<i>278</i>&nbsp;            }
+<b class="nc"><i>279</i>&nbsp;        }</b>
+<b class="nc"><i>280</i>&nbsp;        return eigenDecomposition;</b>
+<i>281</i>&nbsp;    }
+<i>282</i>&nbsp;
+<i>283</i>&nbsp;    @Override
+<i>284</i>&nbsp;    public boolean canHandleDataType(DataType dataType) {
+<b class="nc"><i>285</i>&nbsp;        return dataType.getStateCount() != Integer.MAX_VALUE;</b>
+<i>286</i>&nbsp;    }
+<i>287</i>&nbsp;
+<i>288</i>&nbsp;} // class GeneralSubstitutionModel
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

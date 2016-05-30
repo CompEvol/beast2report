@@ -1,0 +1,260 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TaxonSet</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.alignment</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TaxonSet (beast.evolution.alignment)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TaxonSet</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    44.4%
+  </span>
+  <span class="absValue">
+    (8/ 18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    46%
+  </span>
+  <span class="absValue">
+    (29/ 63)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.alignment;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import java.util.ArrayList;
+<i>6</i>&nbsp;import java.util.Collection;
+<i>7</i>&nbsp;import java.util.Collections;
+<i>8</i>&nbsp;import java.util.HashSet;
+<i>9</i>&nbsp;import java.util.List;
+<i>10</i>&nbsp;import java.util.Set;
+<i>11</i>&nbsp;import java.util.TreeSet;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;import beast.core.Description;
+<i>14</i>&nbsp;import beast.core.Input;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;@Description(&quot;A TaxonSet is an ordered set of taxa. The order on the taxa is provided at the time of construction&quot; +
+<i>18</i>&nbsp;        &quot; either from a list of taxon objects or an alignment.&quot;)
+<i>19</i>&nbsp;public class TaxonSet extends Taxon {
+<i>20</i>&nbsp;
+<b class="fc"><i>21</i>&nbsp;    final public Input&lt;List&lt;Taxon&gt;&gt; taxonsetInput = new Input&lt;&gt;(&quot;taxon&quot;, &quot;list of taxa making up the set&quot;, new ArrayList&lt;&gt;());</b>
+<i>22</i>&nbsp;
+<b class="fc"><i>23</i>&nbsp;    final public Input&lt;Alignment&gt; alignmentInput = new Input&lt;&gt;(&quot;alignment&quot;, &quot;alignment where each sequence represents a taxon&quot;);</b>
+<i>24</i>&nbsp;
+<i>25</i>&nbsp;    protected List&lt;String&gt; taxaNames;
+<i>26</i>&nbsp;    protected List&lt;Taxon&gt; taxonList;
+<i>27</i>&nbsp;
+<b class="fc"><i>28</i>&nbsp;    public TaxonSet() {</b>
+<b class="fc"><i>29</i>&nbsp;    }</b>
+<i>30</i>&nbsp;
+<b class="fc"><i>31</i>&nbsp;    public TaxonSet(final List&lt;Taxon&gt; taxa) {</b>
+<b class="fc"><i>32</i>&nbsp;        taxonsetInput.setValue(taxa, this);</b>
+<b class="fc"><i>33</i>&nbsp;        initAndValidate();</b>
+<b class="fc"><i>34</i>&nbsp;    }</b>
+<i>35</i>&nbsp;    
+<b class="fc"><i>36</i>&nbsp;    public TaxonSet(final Alignment alignment) {</b>
+<b class="fc"><i>37</i>&nbsp;        alignmentInput.setValue(alignment, this);</b>
+<b class="fc"><i>38</i>&nbsp;        initAndValidate();</b>
+<b class="fc"><i>39</i>&nbsp;    }</b>
+<i>40</i>&nbsp;
+<i>41</i>&nbsp;    // for testing purposes (Huw)
+<b class="nc"><i>42</i>&nbsp;    public TaxonSet(final String id, final List&lt;Taxon&gt; taxa) {</b>
+<b class="nc"><i>43</i>&nbsp;        setID(id);</b>
+<b class="nc"><i>44</i>&nbsp;        taxonsetInput.setValue(taxa, this);</b>
+<b class="nc"><i>45</i>&nbsp;        initAndValidate();</b>
+<b class="nc"><i>46</i>&nbsp;    }</b>
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;    @Override
+<i>49</i>&nbsp;    public void initAndValidate() {
+<b class="fc"><i>50</i>&nbsp;        taxonList = taxonsetInput.get();</b>
+<b class="fc"><i>51</i>&nbsp;        if (alignmentInput.get() != null) {</b>
+<b class="fc"><i>52</i>&nbsp;            if (taxonList.size() &gt; 0) {</b>
+<b class="nc"><i>53</i>&nbsp;                throw new IllegalArgumentException(&quot;Only one of taxon and alignment should be specified, not both.&quot;);</b>
+<i>54</i>&nbsp;            }
+<b class="fc"><i>55</i>&nbsp;            taxaNames = alignmentInput.get().taxaNames;</b>
+<i>56</i>&nbsp;        } else {
+<b class="fc"><i>57</i>&nbsp;            if (taxonList.size() == 0) {</b>
+<b class="nc"><i>58</i>&nbsp;                throw new IllegalArgumentException(&quot;Either taxon or alignment should be specified.&quot;);</b>
+<i>59</i>&nbsp;            }
+<b class="fc"><i>60</i>&nbsp;            taxaNames = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>61</i>&nbsp;            for (final Taxon taxon : taxonList) {</b>
+<b class="fc"><i>62</i>&nbsp;            	taxaNames.add(taxon.getID());</b>
+<b class="fc"><i>63</i>&nbsp;            }</b>
+<i>64</i>&nbsp;        }
+<b class="fc"><i>65</i>&nbsp;    }</b>
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;    public Set&lt;Taxon&gt; getTaxonSet() {
+<b class="nc"><i>68</i>&nbsp;        final Set&lt;Taxon&gt; unorderedTaxa = new HashSet&lt;&gt;(taxonList);</b>
+<b class="nc"><i>69</i>&nbsp;        return unorderedTaxa;</b>
+<i>70</i>&nbsp;    }
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;    /**
+<i>73</i>&nbsp;     * @return an unmodifiable list of taxa names as strings.
+<i>74</i>&nbsp;     */
+<i>75</i>&nbsp;    public List&lt;String&gt; asStringList() {
+<b class="fc"><i>76</i>&nbsp;        if (taxaNames == null) return null;</b>
+<b class="fc"><i>77</i>&nbsp;        return Collections.unmodifiableList(taxaNames);</b>
+<i>78</i>&nbsp;    }
+<i>79</i>&nbsp;
+<i>80</i>&nbsp;    /**
+<i>81</i>&nbsp;     * @return the taxa names as a set of strings.
+<i>82</i>&nbsp;     */
+<i>83</i>&nbsp;    public Set&lt;String&gt; getTaxaNames() {
+<b class="nc"><i>84</i>&nbsp;        return new TreeSet&lt;&gt;(taxaNames);</b>
+<i>85</i>&nbsp;    }
+<i>86</i>&nbsp;
+<i>87</i>&nbsp;    /**
+<i>88</i>&nbsp;     * @return the ID of the i&#39;th taxon.
+<i>89</i>&nbsp;     */
+<i>90</i>&nbsp;    public String getTaxonId(int taxonIndex) {
+<b class="fc"><i>91</i>&nbsp;        return taxaNames.get(taxonIndex);</b>
+<i>92</i>&nbsp;    }
+<i>93</i>&nbsp;
+<i>94</i>&nbsp;    /**
+<i>95</i>&nbsp;     * return index of given Taxon name
+<i>96</i>&nbsp;     * @param id
+<i>97</i>&nbsp;     * @return  -1 if not found
+<i>98</i>&nbsp;     */
+<i>99</i>&nbsp;    public int getTaxonIndex(String id) {
+<b class="fc"><i>100</i>&nbsp;        for (int i = 0; i &lt; taxaNames.size(); i++) {</b>
+<b class="fc"><i>101</i>&nbsp;            if (getTaxonId(i).contentEquals(id)) return i;</b>
+<i>102</i>&nbsp;        }
+<b class="nc"><i>103</i>&nbsp;        return -1;</b>
+<i>104</i>&nbsp;    }
+<i>105</i>&nbsp;
+<i>106</i>&nbsp;    //  convenience methods
+<i>107</i>&nbsp;
+<i>108</i>&nbsp;    public boolean containsAny(final Collection&lt;String&gt; taxa) {
+<b class="nc"><i>109</i>&nbsp;        final List&lt;String&gt; me = asStringList();</b>
+<b class="nc"><i>110</i>&nbsp;        for (final String taxon : taxa ) {</b>
+<b class="nc"><i>111</i>&nbsp;            if (me.contains(taxon)) {</b>
+<b class="nc"><i>112</i>&nbsp;                return true;</b>
+<i>113</i>&nbsp;            }
+<b class="nc"><i>114</i>&nbsp;        }</b>
+<b class="nc"><i>115</i>&nbsp;        return false;</b>
+<i>116</i>&nbsp;    }
+<i>117</i>&nbsp;
+<i>118</i>&nbsp;    public boolean containsAll(final Collection&lt;String&gt; taxa) {
+<b class="nc"><i>119</i>&nbsp;        final List&lt;String&gt; me = asStringList();</b>
+<b class="nc"><i>120</i>&nbsp;        for (final String taxon : taxa ) {</b>
+<b class="nc"><i>121</i>&nbsp;            if (!me.contains(taxon)) {</b>
+<b class="nc"><i>122</i>&nbsp;                return false;</b>
+<i>123</i>&nbsp;            }
+<b class="nc"><i>124</i>&nbsp;        }</b>
+<b class="nc"><i>125</i>&nbsp;        return true;</b>
+<i>126</i>&nbsp;    }
+<i>127</i>&nbsp;
+<i>128</i>&nbsp;    /**
+<i>129</i>&nbsp;     * @return true if at least 1 member of taxa contained in this set.
+<i>130</i>&nbsp;     * @param taxa a collection of taxa
+<i>131</i>&nbsp;     */
+<i>132</i>&nbsp;    public boolean containsAny(final TaxonSet taxa) {
+<b class="nc"><i>133</i>&nbsp;        return containsAny(taxa.asStringList());</b>
+<i>134</i>&nbsp;    }
+<i>135</i>&nbsp;
+<i>136</i>&nbsp;    /**
+<i>137</i>&nbsp;     * @return true if taxa is a subset of this set
+<i>138</i>&nbsp;     * @param    taxa
+<i>139</i>&nbsp;     */
+<i>140</i>&nbsp;    public boolean containsAll(final TaxonSet taxa) {
+<b class="nc"><i>141</i>&nbsp;        return containsAll(taxa.asStringList());</b>
+<i>142</i>&nbsp;    }
+<i>143</i>&nbsp;    
+<i>144</i>&nbsp;    /**
+<i>145</i>&nbsp;     * @return number of taxa in this taxon set
+<i>146</i>&nbsp;     */
+<i>147</i>&nbsp;    public int getTaxonCount() {
+<b class="fc"><i>148</i>&nbsp;        if (taxaNames == null) return 0;</b>
+<b class="fc"><i>149</i>&nbsp;        return taxaNames.size();</b>
+<i>150</i>&nbsp;    }
+<i>151</i>&nbsp;    
+<i>152</i>&nbsp;    /**
+<i>153</i>&nbsp;     * @return number of taxa in this taxon set
+<i>154</i>&nbsp;     * @deprecated Exists only for consistency with method in Alignment. Use
+<i>155</i>&nbsp;     * getTaxonCount() instead.
+<i>156</i>&nbsp;     */
+<i>157</i>&nbsp;    @Deprecated
+<i>158</i>&nbsp;    public int getNrTaxa() {
+<b class="nc"><i>159</i>&nbsp;        return getTaxonCount();</b>
+<i>160</i>&nbsp;    }
+<i>161</i>&nbsp;    
+<i>162</i>&nbsp;    @Override
+<i>163</i>&nbsp;    public String toString() {
+<b class="nc"><i>164</i>&nbsp;    	return toString(&quot;\t&quot;);</b>
+<i>165</i>&nbsp;    }
+<i>166</i>&nbsp;
+<i>167</i>&nbsp;    @Override
+<i>168</i>&nbsp;	protected String toString(String indent) {
+<b class="nc"><i>169</i>&nbsp;		final StringBuilder buf = new StringBuilder();</b>
+<b class="nc"><i>170</i>&nbsp;		buf.append(indent).append(getID()).append(&quot;\n&quot;);</b>
+<b class="nc"><i>171</i>&nbsp;		indent += &quot;\t&quot;;</b>
+<b class="nc"><i>172</i>&nbsp;		for (final Taxon taxon : taxonsetInput.get()) {</b>
+<b class="nc"><i>173</i>&nbsp;			buf.append(taxon.toString(indent));</b>
+<b class="nc"><i>174</i>&nbsp;		}</b>
+<b class="nc"><i>175</i>&nbsp;		return buf.toString();</b>
+<i>176</i>&nbsp;	}
+<i>177</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

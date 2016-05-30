@@ -1,0 +1,629 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TaxonSetInputEditor</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.draw</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TaxonSetInputEditor (beast.app.draw)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+</tr>
+  <tr>
+    <td class="name">TaxonSetInputEditor$1</td>
+  </tr>
+  <tr>
+    <td class="name">TaxonSetInputEditor$2</td>
+  </tr>
+  <tr>
+    <td class="name">TaxonSetInputEditor$3</td>
+  </tr>
+  <tr>
+    <td class="name">TaxonSetInputEditor$4</td>
+  </tr>
+  <tr>
+    <td class="name">TaxonSetInputEditor$5</td>
+  </tr>
+  <tr>
+    <td class="name">TaxonSetInputEditor$TreeTransferHandler</td>
+  </tr>
+  <tr>
+    <td class="name">TaxonSetInputEditor$TreeTransferHandler$NodesTransferable</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.draw;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.awt.Color;
+<i>4</i>&nbsp;import java.awt.Component;
+<i>5</i>&nbsp;import java.awt.Dimension;
+<i>6</i>&nbsp;import java.awt.datatransfer.*;
+<i>7</i>&nbsp;import java.awt.event.ActionEvent;
+<i>8</i>&nbsp;import java.awt.event.ActionListener;
+<i>9</i>&nbsp;import java.util.*;
+<i>10</i>&nbsp;import java.util.regex.PatternSyntaxException;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;import javax.swing.*;
+<i>13</i>&nbsp;import javax.swing.event.DocumentEvent;
+<i>14</i>&nbsp;import javax.swing.event.DocumentListener;
+<i>15</i>&nbsp;import javax.swing.event.TreeModelEvent;
+<i>16</i>&nbsp;import javax.swing.event.TreeModelListener;
+<i>17</i>&nbsp;import javax.swing.tree.*;
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;import beast.app.beauti.BeautiDoc;
+<i>20</i>&nbsp;import beast.app.draw.ListInputEditor;
+<i>21</i>&nbsp;import beast.core.BEASTInterface;
+<i>22</i>&nbsp;import beast.core.Input;
+<i>23</i>&nbsp;import beast.core.BEASTObject;
+<i>24</i>&nbsp;import beast.evolution.alignment.Alignment;
+<i>25</i>&nbsp;import beast.evolution.alignment.Taxon;
+<i>26</i>&nbsp;import beast.evolution.alignment.TaxonSet;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;public class TaxonSetInputEditor extends ListInputEditor implements TreeModelListener {
+<i>31</i>&nbsp;	public TaxonSetInputEditor(BeautiDoc doc) {
+<i>32</i>&nbsp;		super(doc);
+<i>33</i>&nbsp;	}
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;	private static final long serialVersionUID = 1L;
+<i>36</i>&nbsp;	List&lt;TaxonSet&gt; m_taxonset;
+<i>37</i>&nbsp;	Map&lt;String,Taxon&gt; m_taxonMap;
+<i>38</i>&nbsp;	DefaultTreeModel m_treemodel;
+<i>39</i>&nbsp;	JTree m_tree;
+<i>40</i>&nbsp;	JTextField filterEntry;
+<i>41</i>&nbsp;	String m_sFilter = &quot;.*&quot;;
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;	@Override
+<i>44</i>&nbsp;	public Class&lt;?&gt; type() {
+<i>45</i>&nbsp;		return List.class;
+<i>46</i>&nbsp;	}
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;	@Override
+<i>49</i>&nbsp;	public Class&lt;?&gt; baseType() {
+<i>50</i>&nbsp;		return TaxonSet.class;
+<i>51</i>&nbsp;	}
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;	@Override
+<i>54</i>&nbsp;	public void init(Input&lt;?&gt; input, BEASTInterface plugin, int itemNr, ExpandOption bExpand, boolean bAddButtons) {
+<i>55</i>&nbsp;		this.itemNr = itemNr;
+<i>56</i>&nbsp;		List&lt;TaxonSet&gt; taxonset = (List&lt;TaxonSet&gt;) input.get();
+<i>57</i>&nbsp;		add(getContent(taxonset));
+<i>58</i>&nbsp;	}
+<i>59</i>&nbsp;
+<i>60</i>&nbsp;
+<i>61</i>&nbsp;	private Component getContent(List&lt;TaxonSet&gt; taxonset) {
+<i>62</i>&nbsp;		m_taxonset = taxonset;
+<i>63</i>&nbsp;		m_taxonMap = new HashMap&lt;String, Taxon&gt;();
+<i>64</i>&nbsp;		for (Taxon taxonset2 : m_taxonset) {
+<i>65</i>&nbsp;			for (Taxon taxon : ((TaxonSet)taxonset2).taxonsetInput.get()) {
+<i>66</i>&nbsp;				m_taxonMap.put(taxon.getID(), taxon);
+<i>67</i>&nbsp;			}
+<i>68</i>&nbsp;		}
+<i>69</i>&nbsp;
+<i>70</i>&nbsp;		DefaultMutableTreeNode Node = new DefaultMutableTreeNode(&quot;Taxon sets&quot;);
+<i>71</i>&nbsp;		m_treemodel = new DefaultTreeModel(Node);
+<i>72</i>&nbsp;		m_treemodel.addTreeModelListener(this);
+<i>73</i>&nbsp;
+<i>74</i>&nbsp;		taxonSetToModel();
+<i>75</i>&nbsp;
+<i>76</i>&nbsp;		m_tree = new JTree(m_treemodel);
+<i>77</i>&nbsp;		m_tree.setDragEnabled(true);
+<i>78</i>&nbsp;		m_tree.setEditable(true);
+<i>79</i>&nbsp;		// tree.setRootVisible(false);
+<i>80</i>&nbsp;		m_tree.setDropMode(DropMode.ON_OR_INSERT);
+<i>81</i>&nbsp;		m_tree.setTransferHandler(new TreeTransferHandler());
+<i>82</i>&nbsp;		m_tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+<i>83</i>&nbsp;		expandTree(m_tree);
+<i>84</i>&nbsp;
+<i>85</i>&nbsp;		m_tree.setCellRenderer(new DefaultTreeCellRenderer() {
+<i>86</i>&nbsp;		      public Component getTreeCellRendererComponent(JTree tree,
+<i>87</i>&nbsp;		          Object value, boolean sel, boolean expanded, boolean leaf,
+<i>88</i>&nbsp;		          int row, boolean hasFocus) {
+<i>89</i>&nbsp;			        super.getTreeCellRendererComponent(tree, value, sel, expanded,
+<i>90</i>&nbsp;				            leaf, row, hasFocus);
+<i>91</i>&nbsp;				DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+<i>92</i>&nbsp;		        if (node != m_treemodel.getRoot() &amp;&amp;
+<i>93</i>&nbsp;		        		node.getParent() != m_treemodel.getRoot() &amp;&amp; !node.toString().matches(m_sFilter)) {
+<i>94</i>&nbsp;		          setForeground(Color.lightGray);
+<i>95</i>&nbsp;		        }
+<i>96</i>&nbsp;		        return this;
+<i>97</i>&nbsp;		      }
+<i>98</i>&nbsp;		    });
+<i>99</i>&nbsp;
+<i>100</i>&nbsp;		m_tree.setCellEditor(new DefaultTreeCellEditor(m_tree, (DefaultTreeCellRenderer) m_tree.getCellRenderer()) {
+<i>101</i>&nbsp;			public boolean isCellEditable(EventObject event) {
+<i>102</i>&nbsp;				boolean returnValue = super.isCellEditable(event);
+<i>103</i>&nbsp;				if (returnValue) {
+<i>104</i>&nbsp;					// don&#39;t edit if it is not a child
+<i>105</i>&nbsp;					Object node = tree.getLastSelectedPathComponent();
+<i>106</i>&nbsp;					if ((node != null) &amp;&amp; (node instanceof TreeNode)) {
+<i>107</i>&nbsp;						TreeNode treeNode = (TreeNode) node;
+<i>108</i>&nbsp;						returnValue = treeNode.getParent() == m_treemodel.getRoot();
+<i>109</i>&nbsp;						//!treeNode.isLeaf() &amp;&amp; treeNode.getParent() != null;
+<i>110</i>&nbsp;					}
+<i>111</i>&nbsp;				}
+<i>112</i>&nbsp;				return returnValue;
+<i>113</i>&nbsp;			}
+<i>114</i>&nbsp;
+<i>115</i>&nbsp;		});
+<i>116</i>&nbsp;
+<i>117</i>&nbsp;		JScrollPane pane = new JScrollPane(m_tree);
+<i>118</i>&nbsp;
+<i>119</i>&nbsp;		Box box = Box.createVerticalBox();
+<i>120</i>&nbsp;		box.add(createFilterBox());
+<i>121</i>&nbsp;		box.add(pane);
+<i>122</i>&nbsp;		box.add(createButtonBox());
+<i>123</i>&nbsp;		return box;
+<i>124</i>&nbsp;	}
+<i>125</i>&nbsp;
+<i>126</i>&nbsp;	private Component createFilterBox() {
+<i>127</i>&nbsp;		Box filterBox = Box.createHorizontalBox();
+<i>128</i>&nbsp;		filterBox.add(new JLabel(&quot;filter: &quot;));
+<i>129</i>&nbsp;		Dimension size = new Dimension(100,20);
+<i>130</i>&nbsp;		filterEntry = new JTextField();
+<i>131</i>&nbsp;		filterEntry.setMinimumSize(size);
+<i>132</i>&nbsp;		filterEntry.setPreferredSize(size);
+<i>133</i>&nbsp;		filterEntry.setSize(size);
+<i>134</i>&nbsp;		filterEntry.setToolTipText(&quot;Enter regular expression to match taxa&quot;);
+<i>135</i>&nbsp;		filterEntry.setMaximumSize(new Dimension(1024, 20));
+<i>136</i>&nbsp;		filterBox.add(filterEntry);
+<i>137</i>&nbsp;		filterEntry.getDocument().addDocumentListener(new DocumentListener() {
+<i>138</i>&nbsp;			@Override
+<i>139</i>&nbsp;			public void removeUpdate(DocumentEvent e) {
+<i>140</i>&nbsp;				processFilter();
+<i>141</i>&nbsp;			}
+<i>142</i>&nbsp;			@Override
+<i>143</i>&nbsp;			public void insertUpdate(DocumentEvent e) {
+<i>144</i>&nbsp;				processFilter();
+<i>145</i>&nbsp;			}
+<i>146</i>&nbsp;			@Override
+<i>147</i>&nbsp;			public void changedUpdate(DocumentEvent e) {
+<i>148</i>&nbsp;				processFilter();
+<i>149</i>&nbsp;			}
+<i>150</i>&nbsp;			private void processFilter() {
+<i>151</i>&nbsp;				String sFilter = &quot;.*&quot; + filterEntry.getText() + &quot;.*&quot;;
+<i>152</i>&nbsp;				try {
+<i>153</i>&nbsp;					// sanity check: make sure the filter is legit
+<i>154</i>&nbsp;					sFilter.matches(sFilter);
+<i>155</i>&nbsp;					m_sFilter = sFilter;
+<i>156</i>&nbsp;					m_tree.repaint();
+<i>157</i>&nbsp;				} catch (PatternSyntaxException e) {
+<i>158</i>&nbsp;					// ignore
+<i>159</i>&nbsp;				}
+<i>160</i>&nbsp;			}
+<i>161</i>&nbsp;		});
+<i>162</i>&nbsp;		return filterBox;
+<i>163</i>&nbsp;	}
+<i>164</i>&nbsp;
+<i>165</i>&nbsp;	/** for adding and deleting taxon sets **/
+<i>166</i>&nbsp;	private Box createButtonBox() {
+<i>167</i>&nbsp;		Box buttonBox = Box.createHorizontalBox();
+<i>168</i>&nbsp;
+<i>169</i>&nbsp;		JButton delButton = new JButton(&quot;Delete&quot;);
+<i>170</i>&nbsp;		delButton.addActionListener(new ActionListener() {
+<i>171</i>&nbsp;			@Override
+<i>172</i>&nbsp;			public void actionPerformed(ActionEvent e) {
+<i>173</i>&nbsp;				int[] selRows = m_tree.getSelectionRows();
+<i>174</i>&nbsp;				if (selRows.length == 0) {
+<i>175</i>&nbsp;					return;
+<i>176</i>&nbsp;				}
+<i>177</i>&nbsp;				TreePath path = m_tree.getPathForRow(selRows[0]);
+<i>178</i>&nbsp;				DefaultMutableTreeNode firstNode = (DefaultMutableTreeNode) path.getLastPathComponent();
+<i>179</i>&nbsp;				if (firstNode.getChildCount() &gt; 0) {
+<i>180</i>&nbsp;					JOptionPane.showMessageDialog(m_tree, &quot;Cannot delete &quot; + firstNode.toString() + &quot;:there are still children left&quot;);
+<i>181</i>&nbsp;					return;
+<i>182</i>&nbsp;				}
+<i>183</i>&nbsp;				if (firstNode.getParent() == null) {
+<i>184</i>&nbsp;					JOptionPane.showMessageDialog(m_tree, &quot;Cannot delete root&quot;);
+<i>185</i>&nbsp;					return;
+<i>186</i>&nbsp;				}
+<i>187</i>&nbsp;				if (firstNode.getParent().getParent() != null) {
+<i>188</i>&nbsp;					JOptionPane.showMessageDialog(m_tree, &quot;Cannot delete taxon&quot;);
+<i>189</i>&nbsp;					return;
+<i>190</i>&nbsp;				}
+<i>191</i>&nbsp;				m_treemodel.removeNodeFromParent(firstNode);
+<i>192</i>&nbsp;				modelToTaxonset();
+<i>193</i>&nbsp;			}
+<i>194</i>&nbsp;		});
+<i>195</i>&nbsp;		buttonBox.add(Box.createHorizontalGlue());
+<i>196</i>&nbsp;		buttonBox.add(delButton);
+<i>197</i>&nbsp;		buttonBox.add(Box.createHorizontalGlue());
+<i>198</i>&nbsp;
+<i>199</i>&nbsp;
+<i>200</i>&nbsp;		JButton addButton = new JButton(&quot;New&quot;);
+<i>201</i>&nbsp;		addButton.addActionListener(new ActionListener() {
+<i>202</i>&nbsp;			@Override
+<i>203</i>&nbsp;			public void actionPerformed(ActionEvent e) {
+<i>204</i>&nbsp;				DefaultMutableTreeNode root = (DefaultMutableTreeNode) m_treemodel.getRoot();
+<i>205</i>&nbsp;				DefaultMutableTreeNode Kid = new DefaultMutableTreeNode(&quot;New taxonset&quot;);
+<i>206</i>&nbsp;				m_treemodel.insertNodeInto(Kid, root, m_taxonset.size());
+<i>207</i>&nbsp;				modelToTaxonset();
+<i>208</i>&nbsp;			}
+<i>209</i>&nbsp;		});
+<i>210</i>&nbsp;		buttonBox.add(addButton);
+<i>211</i>&nbsp;		buttonBox.add(Box.createHorizontalGlue());
+<i>212</i>&nbsp;		return buttonBox;
+<i>213</i>&nbsp;	}
+<i>214</i>&nbsp;
+<i>215</i>&nbsp;	/** for convert taxon sets to table model **/
+<i>216</i>&nbsp;	private void taxonSetToModel() {
+<i>217</i>&nbsp;		List&lt;TaxonSet&gt; taxonsets = m_taxonset;
+<i>218</i>&nbsp;		DefaultMutableTreeNode root = (DefaultMutableTreeNode) m_treemodel.getRoot();
+<i>219</i>&nbsp;		for (int i = root.getChildCount()-1; i &gt;= 0 ; i--) {
+<i>220</i>&nbsp;			DefaultMutableTreeNode child = (DefaultMutableTreeNode) root.getChildAt(i);
+<i>221</i>&nbsp;			m_treemodel.removeNodeFromParent(child);
+<i>222</i>&nbsp;		}
+<i>223</i>&nbsp;
+<i>224</i>&nbsp;		for (int i = 0; i &lt; taxonsets.size(); i++) {
+<i>225</i>&nbsp;			DefaultMutableTreeNode Kid = new DefaultMutableTreeNode(taxonsets.get(i).getID());
+<i>226</i>&nbsp;			m_treemodel.insertNodeInto(Kid, root, i);
+<i>227</i>&nbsp;			List&lt;Taxon&gt; taxa = ((TaxonSet) taxonsets.get(i)).taxonsetInput.get();
+<i>228</i>&nbsp;			for (int j = 0; j &lt; taxa.size(); j++) {
+<i>229</i>&nbsp;				DefaultMutableTreeNode GKid = new DefaultMutableTreeNode(taxa.get(j).getID());
+<i>230</i>&nbsp;				GKid.setAllowsChildren(false);
+<i>231</i>&nbsp;				m_treemodel.insertNodeInto(GKid, Kid, j);
+<i>232</i>&nbsp;			}
+<i>233</i>&nbsp;		}
+<i>234</i>&nbsp;	}
+<i>235</i>&nbsp;
+<i>236</i>&nbsp;	/** for convert table model to taxon sets **/
+<i>237</i>&nbsp;	private void modelToTaxonset() {
+<i>238</i>&nbsp;		List&lt;TaxonSet&gt; taxonsets = m_taxonset;
+<i>239</i>&nbsp;		taxonsets.clear();
+<i>240</i>&nbsp;
+<i>241</i>&nbsp;		DefaultMutableTreeNode root = (DefaultMutableTreeNode) m_treemodel.getRoot();
+<i>242</i>&nbsp;		for (int i = 0; i &lt; root.getChildCount(); i++) {
+<i>243</i>&nbsp;			DefaultMutableTreeNode child = (DefaultMutableTreeNode) root.getChildAt(i);
+<i>244</i>&nbsp;			TaxonSet taxonset = new TaxonSet();
+<i>245</i>&nbsp;			taxonset.setID(child.toString());
+<i>246</i>&nbsp;			for (int j = 0; j &lt; child.getChildCount(); j++) {
+<i>247</i>&nbsp;				DefaultMutableTreeNode gchild = (DefaultMutableTreeNode) child.getChildAt(j);
+<i>248</i>&nbsp;				Taxon taxon = m_taxonMap.get(gchild.toString());
+<i>249</i>&nbsp;				try {
+<i>250</i>&nbsp;					taxonset.taxonsetInput.setValue(taxon, taxonset);
+<i>251</i>&nbsp;				} catch (Exception e) {
+<i>252</i>&nbsp;					// TODO Auto-generated catch block
+<i>253</i>&nbsp;					e.printStackTrace();
+<i>254</i>&nbsp;				}
+<i>255</i>&nbsp;			}
+<i>256</i>&nbsp;			taxonsets.add(taxonset);
+<i>257</i>&nbsp;		}
+<i>258</i>&nbsp;		//System.err.println(new XMLProducer().toXML(m_taxonset));
+<i>259</i>&nbsp;
+<i>260</i>&nbsp;	}
+<i>261</i>&nbsp;
+<i>262</i>&nbsp;
+<i>263</i>&nbsp;	private void expandTree(JTree tree) {
+<i>264</i>&nbsp;		DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
+<i>265</i>&nbsp;		Enumeration&lt;?&gt; e = root.breadthFirstEnumeration();
+<i>266</i>&nbsp;		while (e.hasMoreElements()) {
+<i>267</i>&nbsp;			DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement();
+<i>268</i>&nbsp;			if (node.isLeaf())
+<i>269</i>&nbsp;				continue;
+<i>270</i>&nbsp;			int row = tree.getRowForPath(new TreePath(node.getPath()));
+<i>271</i>&nbsp;			tree.expandRow(row);
+<i>272</i>&nbsp;		}
+<i>273</i>&nbsp;	}
+<i>274</i>&nbsp;
+<i>275</i>&nbsp;//	public static void main(String[] args) {
+<i>276</i>&nbsp;//		JFrame f = new JFrame();
+<i>277</i>&nbsp;//		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+<i>278</i>&nbsp;//
+<i>279</i>&nbsp;//		TaxonSet taxonset1 = newTaxonSet(&quot;animal&quot;, newTaxon(&quot;first&quot;), newTaxon(&quot;second&quot;), newTaxon(&quot;third&quot;));
+<i>280</i>&nbsp;//		TaxonSet taxonset2 = newTaxonSet(&quot;plant&quot;, newTaxon(&quot;firstA&quot;), newTaxon(&quot;secondA&quot;), newTaxon(&quot;thirdA&quot;));
+<i>281</i>&nbsp;//		TaxonSet taxonset3 = newTaxonSet(&quot;bacteria&quot;, newTaxon(&quot;firstB&quot;), newTaxon(&quot;secondB&quot;), newTaxon(&quot;thirdB&quot;));
+<i>282</i>&nbsp;//		TaxonSet taxonset = newTaxonSet(&quot;top&quot;, taxonset1, taxonset2, taxonset3);
+<i>283</i>&nbsp;//
+<i>284</i>&nbsp;//		f.add(new DataInputEditor().getContent(taxonset));
+<i>285</i>&nbsp;//		f.setSize(400, 400);
+<i>286</i>&nbsp;//		f.setLocation(200, 200);
+<i>287</i>&nbsp;//		f.setVisible(true);
+<i>288</i>&nbsp;//	}
+<i>289</i>&nbsp;
+<i>290</i>&nbsp;	private static TaxonSet newTaxonSet(String sID, Taxon newTaxon, Taxon newTaxon2, Taxon newTaxon3) {
+<i>291</i>&nbsp;		TaxonSet taxonset = new TaxonSet();
+<i>292</i>&nbsp;		taxonset.setID(sID);
+<i>293</i>&nbsp;		try {
+<i>294</i>&nbsp;			taxonset.taxonsetInput.setValue(newTaxon, taxonset);
+<i>295</i>&nbsp;			taxonset.taxonsetInput.setValue(newTaxon2, taxonset);
+<i>296</i>&nbsp;			taxonset.taxonsetInput.setValue(newTaxon3, taxonset);
+<i>297</i>&nbsp;		} catch (Exception e) {
+<i>298</i>&nbsp;			// TODO Auto-generated catch block
+<i>299</i>&nbsp;			e.printStackTrace();
+<i>300</i>&nbsp;		}
+<i>301</i>&nbsp;		return taxonset;
+<i>302</i>&nbsp;	}
+<i>303</i>&nbsp;
+<i>304</i>&nbsp;	private static Taxon newTaxon(String sID) {
+<i>305</i>&nbsp;		Taxon taxon = new Taxon();
+<i>306</i>&nbsp;		taxon.setID(sID);
+<i>307</i>&nbsp;		return taxon;
+<i>308</i>&nbsp;	}
+<i>309</i>&nbsp;
+<i>310</i>&nbsp;	public class TreeTransferHandler extends TransferHandler {
+<i>311</i>&nbsp;		private static final long serialVersionUID = 1L;
+<i>312</i>&nbsp;
+<i>313</i>&nbsp;		DataFlavor nodesFlavor;
+<i>314</i>&nbsp;		DataFlavor[] flavors = new DataFlavor[1];
+<i>315</i>&nbsp;		DefaultMutableTreeNode[] nodesToRemove;
+<i>316</i>&nbsp;
+<i>317</i>&nbsp;		public TreeTransferHandler() {
+<i>318</i>&nbsp;			try {
+<i>319</i>&nbsp;				String mimeType = DataFlavor.javaJVMLocalObjectMimeType + &quot;;class=\&quot;&quot;
+<i>320</i>&nbsp;						+ javax.swing.tree.DefaultMutableTreeNode[].class.getName() + &quot;\&quot;&quot;;
+<i>321</i>&nbsp;				nodesFlavor = new DataFlavor(mimeType);
+<i>322</i>&nbsp;				flavors[0] = nodesFlavor;
+<i>323</i>&nbsp;			} catch (ClassNotFoundException e) {
+<i>324</i>&nbsp;				System.out.println(&quot;ClassNotFound: &quot; + e.getMessage());
+<i>325</i>&nbsp;			}
+<i>326</i>&nbsp;		}
+<i>327</i>&nbsp;
+<i>328</i>&nbsp;
+<i>329</i>&nbsp;
+<i>330</i>&nbsp;		public boolean canImport(TransferHandler.TransferSupport support) {
+<i>331</i>&nbsp;			if (!support.isDrop()) {
+<i>332</i>&nbsp;				return false;
+<i>333</i>&nbsp;			}
+<i>334</i>&nbsp;			support.setShowDropLocation(true);
+<i>335</i>&nbsp;			if (!support.isDataFlavorSupported(nodesFlavor)) {
+<i>336</i>&nbsp;				return false;
+<i>337</i>&nbsp;			}
+<i>338</i>&nbsp;			// Do not allow a drop on the drag source selections.
+<i>339</i>&nbsp;			JTree.DropLocation dl = (JTree.DropLocation) support.getDropLocation();
+<i>340</i>&nbsp;			JTree tree = (JTree) support.getComponent();
+<i>341</i>&nbsp;			int dropRow = tree.getRowForPath(dl.getPath());
+<i>342</i>&nbsp;			int[] selRows = tree.getSelectionRows();
+<i>343</i>&nbsp;			for (int i = 0; i &lt; selRows.length; i++) {
+<i>344</i>&nbsp;				if (selRows[i] == dropRow) {
+<i>345</i>&nbsp;					return false;
+<i>346</i>&nbsp;				}
+<i>347</i>&nbsp;			}
+<i>348</i>&nbsp;			// Do not allow MOVE-action drops if a non-leaf node is
+<i>349</i>&nbsp;			// selected unless all of its children are also selected.
+<i>350</i>&nbsp;			int action = support.getDropAction();
+<i>351</i>&nbsp;			if (action == MOVE) {
+<i>352</i>&nbsp;				return haveCompleteNode(tree);
+<i>353</i>&nbsp;			}
+<i>354</i>&nbsp;			// Do not allow a non-leaf node to be copied to a level
+<i>355</i>&nbsp;			// which is less than its source level.
+<i>356</i>&nbsp;			TreePath dest = dl.getPath();
+<i>357</i>&nbsp;			DefaultMutableTreeNode target = (DefaultMutableTreeNode) dest.getLastPathComponent();
+<i>358</i>&nbsp;			TreePath path = tree.getPathForRow(selRows[0]);
+<i>359</i>&nbsp;			DefaultMutableTreeNode firstNode = (DefaultMutableTreeNode) path.getLastPathComponent();
+<i>360</i>&nbsp;			if (firstNode.getChildCount() &gt; 0 &amp;&amp; target.getLevel() &lt; firstNode.getLevel()) {
+<i>361</i>&nbsp;				return false;
+<i>362</i>&nbsp;			}
+<i>363</i>&nbsp;			return true;
+<i>364</i>&nbsp;		}
+<i>365</i>&nbsp;
+<i>366</i>&nbsp;		private boolean haveCompleteNode(JTree tree) {
+<i>367</i>&nbsp;			int[] selRows = tree.getSelectionRows();
+<i>368</i>&nbsp;			TreePath path = tree.getPathForRow(selRows[0]);
+<i>369</i>&nbsp;			DefaultMutableTreeNode first = (DefaultMutableTreeNode) path.getLastPathComponent();
+<i>370</i>&nbsp;			int childCount = first.getChildCount();
+<i>371</i>&nbsp;			// first has children and no children are selected.
+<i>372</i>&nbsp;			if (childCount &gt; 0 &amp;&amp; selRows.length == 1)
+<i>373</i>&nbsp;				return false;
+<i>374</i>&nbsp;			// first may have children.
+<i>375</i>&nbsp;			for (int i = 1; i &lt; selRows.length; i++) {
+<i>376</i>&nbsp;				path = tree.getPathForRow(selRows[i]);
+<i>377</i>&nbsp;				DefaultMutableTreeNode next = (DefaultMutableTreeNode) path.getLastPathComponent();
+<i>378</i>&nbsp;				if (first.isNodeChild(next)) {
+<i>379</i>&nbsp;					// Found a child of first.
+<i>380</i>&nbsp;					if (childCount &gt; selRows.length - 1) {
+<i>381</i>&nbsp;						// Not all children of first are selected.
+<i>382</i>&nbsp;						return false;
+<i>383</i>&nbsp;					}
+<i>384</i>&nbsp;				}
+<i>385</i>&nbsp;			}
+<i>386</i>&nbsp;			return true;
+<i>387</i>&nbsp;		}
+<i>388</i>&nbsp;
+<i>389</i>&nbsp;		protected Transferable createTransferable(JComponent c) {
+<i>390</i>&nbsp;			JTree tree = (JTree) c;
+<i>391</i>&nbsp;			TreePath[] paths = tree.getSelectionPaths();
+<i>392</i>&nbsp;			if (paths != null) {
+<i>393</i>&nbsp;				// Make up a node array of copies for transfer and
+<i>394</i>&nbsp;				// another for/of the nodes that will be removed in
+<i>395</i>&nbsp;				// exportDone after a successful drop.
+<i>396</i>&nbsp;				List&lt;DefaultMutableTreeNode&gt; copies = new ArrayList&lt;DefaultMutableTreeNode&gt;();
+<i>397</i>&nbsp;				List&lt;DefaultMutableTreeNode&gt; toRemove = new ArrayList&lt;DefaultMutableTreeNode&gt;();
+<i>398</i>&nbsp;				DefaultMutableTreeNode node = (DefaultMutableTreeNode) paths[0].getLastPathComponent();
+<i>399</i>&nbsp;				DefaultMutableTreeNode copy = copy(node);
+<i>400</i>&nbsp;				copies.add(copy);
+<i>401</i>&nbsp;				toRemove.add(node);
+<i>402</i>&nbsp;				for (int i = 1; i &lt; paths.length; i++) {
+<i>403</i>&nbsp;					DefaultMutableTreeNode next = (DefaultMutableTreeNode) paths[i].getLastPathComponent();
+<i>404</i>&nbsp;					// Do not allow higher level nodes to be added to list.
+<i>405</i>&nbsp;					if (next.getLevel() &lt; node.getLevel()) {
+<i>406</i>&nbsp;						break;
+<i>407</i>&nbsp;					} else if (next.getLevel() &gt; node.getLevel()) { // child
+<i>408</i>&nbsp;																	// node
+<i>409</i>&nbsp;						copy.add(copy(next));
+<i>410</i>&nbsp;						// node already contains child
+<i>411</i>&nbsp;					} else { // sibling
+<i>412</i>&nbsp;						copies.add(copy(next));
+<i>413</i>&nbsp;						toRemove.add(next);
+<i>414</i>&nbsp;					}
+<i>415</i>&nbsp;				}
+<i>416</i>&nbsp;				DefaultMutableTreeNode[] nodes = copies.toArray(new DefaultMutableTreeNode[copies.size()]);
+<i>417</i>&nbsp;				nodesToRemove = toRemove.toArray(new DefaultMutableTreeNode[toRemove.size()]);
+<i>418</i>&nbsp;				return new NodesTransferable(nodes);
+<i>419</i>&nbsp;			}
+<i>420</i>&nbsp;			return null;
+<i>421</i>&nbsp;		}
+<i>422</i>&nbsp;
+<i>423</i>&nbsp;		/** Defensive copy used in createTransferable. */
+<i>424</i>&nbsp;		private DefaultMutableTreeNode copy(TreeNode node) {
+<i>425</i>&nbsp;			return new DefaultMutableTreeNode(node);
+<i>426</i>&nbsp;		}
+<i>427</i>&nbsp;
+<i>428</i>&nbsp;		protected void exportDone(JComponent source, Transferable data, int action) {
+<i>429</i>&nbsp;			if ((action &amp; MOVE) == MOVE) {
+<i>430</i>&nbsp;				JTree tree = (JTree) source;
+<i>431</i>&nbsp;				DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+<i>432</i>&nbsp;				// Remove nodes saved in nodesToRemove in createTransferable.
+<i>433</i>&nbsp;				for (int i = 0; i &lt; nodesToRemove.length; i++) {
+<i>434</i>&nbsp;					model.removeNodeFromParent(nodesToRemove[i]);
+<i>435</i>&nbsp;				}
+<i>436</i>&nbsp;			}
+<i>437</i>&nbsp;			modelToTaxonset();
+<i>438</i>&nbsp;		}
+<i>439</i>&nbsp;
+<i>440</i>&nbsp;
+<i>441</i>&nbsp;		public int getSourceActions(JComponent c) {
+<i>442</i>&nbsp;			return COPY_OR_MOVE;
+<i>443</i>&nbsp;		}
+<i>444</i>&nbsp;
+<i>445</i>&nbsp;		public boolean importData(TransferHandler.TransferSupport support) {
+<i>446</i>&nbsp;			if (!canImport(support)) {
+<i>447</i>&nbsp;				return false;
+<i>448</i>&nbsp;			}
+<i>449</i>&nbsp;			// Extract transfer data.
+<i>450</i>&nbsp;			DefaultMutableTreeNode[] nodes = null;
+<i>451</i>&nbsp;			try {
+<i>452</i>&nbsp;				Transferable t = support.getTransferable();
+<i>453</i>&nbsp;				nodes = (DefaultMutableTreeNode[]) t.getTransferData(nodesFlavor);
+<i>454</i>&nbsp;			} catch (UnsupportedFlavorException ufe) {
+<i>455</i>&nbsp;				System.out.println(&quot;UnsupportedFlavor: &quot; + ufe.getMessage());
+<i>456</i>&nbsp;			} catch (java.io.IOException ioe) {
+<i>457</i>&nbsp;				System.out.println(&quot;I/O error: &quot; + ioe.getMessage());
+<i>458</i>&nbsp;			}
+<i>459</i>&nbsp;			// Get drop location info.
+<i>460</i>&nbsp;			JTree.DropLocation dl = (JTree.DropLocation) support.getDropLocation();
+<i>461</i>&nbsp;			int childIndex = dl.getChildIndex();
+<i>462</i>&nbsp;			TreePath dest = dl.getPath();
+<i>463</i>&nbsp;
+<i>464</i>&nbsp;			DefaultMutableTreeNode parent = (DefaultMutableTreeNode) dest.getLastPathComponent();
+<i>465</i>&nbsp;			JTree tree = (JTree) support.getComponent();
+<i>466</i>&nbsp;			DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+<i>467</i>&nbsp;
+<i>468</i>&nbsp;			// only drop into a first level entry
+<i>469</i>&nbsp;			DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
+<i>470</i>&nbsp;			if (parent == root) {
+<i>471</i>&nbsp;				for (int i = 0; i &lt; nodes.length; i++) {
+<i>472</i>&nbsp;					if (nodes[i].getParent() != root) {
+<i>473</i>&nbsp;						return false;
+<i>474</i>&nbsp;					}
+<i>475</i>&nbsp;				}
+<i>476</i>&nbsp;			} else {
+<i>477</i>&nbsp;				if (parent.getParent() != root) {
+<i>478</i>&nbsp;					parent = (DefaultMutableTreeNode) parent.getParent();
+<i>479</i>&nbsp;				}
+<i>480</i>&nbsp;				// only drop second level entries
+<i>481</i>&nbsp;				for (int i = 0; i &lt; nodes.length; i++) {
+<i>482</i>&nbsp;					if (nodes[i].getParent() == root) {
+<i>483</i>&nbsp;						return false;
+<i>484</i>&nbsp;					}
+<i>485</i>&nbsp;				}
+<i>486</i>&nbsp;			}
+<i>487</i>&nbsp;			// Configure for drop mode.
+<i>488</i>&nbsp;			int index = childIndex; // DropMode.INSERT
+<i>489</i>&nbsp;			if (childIndex == -1) { // DropMode.ON
+<i>490</i>&nbsp;				index = parent.getChildCount();
+<i>491</i>&nbsp;			}
+<i>492</i>&nbsp;			// Add data to model.
+<i>493</i>&nbsp;			for (int i = 0; i &lt; nodes.length; i++) {
+<i>494</i>&nbsp;				model.insertNodeInto(nodes[i], parent, index++);
+<i>495</i>&nbsp;			}
+<i>496</i>&nbsp;
+<i>497</i>&nbsp;			return true;
+<i>498</i>&nbsp;		}
+<i>499</i>&nbsp;
+<i>500</i>&nbsp;
+<i>501</i>&nbsp;		public String toString() {
+<i>502</i>&nbsp;			return getClass().getName();
+<i>503</i>&nbsp;		}
+<i>504</i>&nbsp;
+<i>505</i>&nbsp;		public class NodesTransferable implements Transferable {
+<i>506</i>&nbsp;			DefaultMutableTreeNode[] nodes;
+<i>507</i>&nbsp;
+<i>508</i>&nbsp;			public NodesTransferable(DefaultMutableTreeNode[] nodes) {
+<i>509</i>&nbsp;				this.nodes = nodes;
+<i>510</i>&nbsp;			}
+<i>511</i>&nbsp;
+<i>512</i>&nbsp;			public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
+<i>513</i>&nbsp;				if (!isDataFlavorSupported(flavor))
+<i>514</i>&nbsp;					throw new UnsupportedFlavorException(flavor);
+<i>515</i>&nbsp;				return nodes;
+<i>516</i>&nbsp;			}
+<i>517</i>&nbsp;
+<i>518</i>&nbsp;			public DataFlavor[] getTransferDataFlavors() {
+<i>519</i>&nbsp;				return flavors;
+<i>520</i>&nbsp;			}
+<i>521</i>&nbsp;
+<i>522</i>&nbsp;			public boolean isDataFlavorSupported(DataFlavor flavor) {
+<i>523</i>&nbsp;				return nodesFlavor.equals(flavor);
+<i>524</i>&nbsp;			}
+<i>525</i>&nbsp;		}
+<i>526</i>&nbsp;	}
+<i>527</i>&nbsp;
+<i>528</i>&nbsp;	@Override
+<i>529</i>&nbsp;	public void treeNodesChanged(TreeModelEvent e) {
+<i>530</i>&nbsp;		TreePath tp = e.getTreePath();
+<i>531</i>&nbsp;		Object[] children = e.getChildren();
+<i>532</i>&nbsp;		DefaultMutableTreeNode changedNode;
+<i>533</i>&nbsp;		if (children != null)
+<i>534</i>&nbsp;			changedNode = (DefaultMutableTreeNode) children[0];
+<i>535</i>&nbsp;		else
+<i>536</i>&nbsp;			changedNode = (DefaultMutableTreeNode) tp.getLastPathComponent();
+<i>537</i>&nbsp;
+<i>538</i>&nbsp;		System.out.println(&quot;Model change path: &quot; + tp + &quot;New data: &quot; + changedNode.getUserObject());
+<i>539</i>&nbsp;		modelToTaxonset();
+<i>540</i>&nbsp;	}
+<i>541</i>&nbsp;
+<i>542</i>&nbsp;	@Override
+<i>543</i>&nbsp;	public void treeNodesInserted(TreeModelEvent e) {
+<i>544</i>&nbsp;		// TODO Auto-generated method stub
+<i>545</i>&nbsp;
+<i>546</i>&nbsp;	}
+<i>547</i>&nbsp;
+<i>548</i>&nbsp;	@Override
+<i>549</i>&nbsp;	public void treeNodesRemoved(TreeModelEvent e) {
+<i>550</i>&nbsp;		// TODO Auto-generated method stub
+<i>551</i>&nbsp;
+<i>552</i>&nbsp;	}
+<i>553</i>&nbsp;
+<i>554</i>&nbsp;	@Override
+<i>555</i>&nbsp;	public void treeStructureChanged(TreeModelEvent e) {
+<i>556</i>&nbsp;		// TODO Auto-generated method stub
+<i>557</i>&nbsp;
+<i>558</i>&nbsp;	}
+<i>559</i>&nbsp;
+<i>560</i>&nbsp;
+<i>561</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,771 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: GeneralParameterList</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.core.parameter</a> ]
+</div>
+
+<h1>Coverage Summary for Class: GeneralParameterList (beast.core.parameter)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GeneralParameterList</td>
+<td class="coverageStat">
+  <span class="percent">
+    43.3%
+  </span>
+  <span class="absValue">
+    (13/ 30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    63%
+  </span>
+  <span class="absValue">
+    (121/ 192)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GeneralParameterList$QuietParameter</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (11/ 22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    63.3%
+  </span>
+  <span class="absValue">
+    (31/ 49)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    46.2%
+  </span>
+  <span class="absValue">
+    (24/ 52)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    63.1%
+  </span>
+  <span class="absValue">
+    (152/ 241)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp; * Copyright (C) 2013 Tim Vaughan &lt;tgvaughan@gmail.com&gt;.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; * This library is free software; you can redistribute it and/or
+<i>5</i>&nbsp; * modify it under the terms of the GNU Lesser General Public
+<i>6</i>&nbsp; * License as published by the Free Software Foundation; either
+<i>7</i>&nbsp; * version 2.1 of the License, or (at your option) any later version.
+<i>8</i>&nbsp; *
+<i>9</i>&nbsp; * This library is distributed in the hope that it will be useful,
+<i>10</i>&nbsp; * but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>11</i>&nbsp; * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+<i>12</i>&nbsp; * Lesser General Public License for more details.
+<i>13</i>&nbsp; *
+<i>14</i>&nbsp; * You should have received a copy of the GNU Lesser General Public
+<i>15</i>&nbsp; * License along with this library; if not, write to the Free Software
+<i>16</i>&nbsp; * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+<i>17</i>&nbsp; * MA 02110-1301  USA
+<i>18</i>&nbsp; */
+<i>19</i>&nbsp;package beast.core.parameter;
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;import java.io.PrintStream;
+<i>22</i>&nbsp;import java.util.ArrayList;
+<i>23</i>&nbsp;import java.util.List;
+<i>24</i>&nbsp;import java.util.TreeSet;
+<i>25</i>&nbsp;import java.util.regex.Matcher;
+<i>26</i>&nbsp;import java.util.regex.Pattern;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;import org.w3c.dom.Node;
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;import beast.core.Description;
+<i>31</i>&nbsp;import beast.core.Input;
+<i>32</i>&nbsp;import beast.core.StateNode;
+<i>33</i>&nbsp;import beast.core.util.Log;
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;/**
+<i>36</i>&nbsp; * @author Tim Vaughan &lt;tgvaughan@gmail.com&gt;
+<i>37</i>&nbsp; * @param &lt;T&gt; Type of parameters in list.
+<i>38</i>&nbsp; */
+<i>39</i>&nbsp;@Description(&quot;State node representing a list of parameter objects, used for &quot;
+<i>40</i>&nbsp;        + &quot;model selection problems. The parameters involved are not instances &quot;
+<i>41</i>&nbsp;        + &quot;of Parameter.Base, but are instead instances of a local class &quot;
+<i>42</i>&nbsp;        + &quot;QuietParameter which is not itself a StateNode.  All constituent &quot;
+<i>43</i>&nbsp;        + &quot;parameters must have identical dimensions and bounds.&quot;)
+<i>44</i>&nbsp;public abstract class GeneralParameterList&lt;T&gt; extends StateNode {
+<i>45</i>&nbsp;    
+<b class="fc"><i>46</i>&nbsp;    final public Input&lt;List&lt;Parameter.Base&lt;T&gt;&gt;&gt; initialParamsInput = new Input&lt;&gt;(</b>
+<i>47</i>&nbsp;            &quot;initialParam&quot;,
+<i>48</i>&nbsp;            &quot;Parameter whose value will initially be in parameter list.&quot;,
+<i>49</i>&nbsp;            new ArrayList&lt;&gt;());
+<i>50</i>&nbsp;    
+<b class="fc"><i>51</i>&nbsp;    final public Input&lt;Integer&gt; dimensionInput = new Input&lt;&gt;(&quot;dimension&quot;,</b>
+<b class="fc"><i>52</i>&nbsp;            &quot;Dimension of individual parameters in list.  Default 1.&quot;, 1);</b>
+<i>53</i>&nbsp;    
+<b class="fc"><i>54</i>&nbsp;    final public Input&lt;Integer&gt; minorDimensionInput = new Input&lt;&gt;(&quot;minordimension&quot;,</b>
+<b class="fc"><i>55</i>&nbsp;            &quot;Minor dimension of individual parameters in list. Default 1.&quot;, 1);</b>
+<i>56</i>&nbsp;    
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;    
+<i>59</i>&nbsp;    protected List&lt;QuietParameter&gt; pList, pListStored;
+<i>60</i>&nbsp;    
+<i>61</i>&nbsp;    protected TreeSet&lt;Integer&gt; deallocatedKeys, deallocatedKeysStored;
+<i>62</i>&nbsp;    protected int nextUnallocatedKey, nextUnallocatedKeyStored;
+<i>63</i>&nbsp;    
+<i>64</i>&nbsp;    protected int dimension, minorDimension;
+<i>65</i>&nbsp;    protected T lowerBound, upperBound;
+<i>66</i>&nbsp;
+<b class="fc"><i>67</i>&nbsp;    public GeneralParameterList() { };</b>
+<i>68</i>&nbsp;    
+<i>69</i>&nbsp;    @Override
+<i>70</i>&nbsp;    public void initAndValidate() {
+<b class="fc"><i>71</i>&nbsp;        pList = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>72</i>&nbsp;        pListStored = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>73</i>&nbsp;        deallocatedKeys = new TreeSet&lt;&gt;();</b>
+<b class="fc"><i>74</i>&nbsp;        deallocatedKeysStored = new TreeSet&lt;&gt;();</b>
+<b class="fc"><i>75</i>&nbsp;        nextUnallocatedKey = 0;</b>
+<b class="fc"><i>76</i>&nbsp;        nextUnallocatedKeyStored = 0;</b>
+<i>77</i>&nbsp;        
+<b class="fc"><i>78</i>&nbsp;        dimension = dimensionInput.get();</b>
+<b class="fc"><i>79</i>&nbsp;        minorDimension = minorDimensionInput.get();</b>
+<i>80</i>&nbsp;        
+<b class="fc"><i>81</i>&nbsp;        for (Parameter&lt;?&gt; param : initialParamsInput.get()) {</b>
+<b class="fc"><i>82</i>&nbsp;            if (param.getDimension() != dimension)</b>
+<b class="nc"><i>83</i>&nbsp;                throw new IllegalArgumentException(&quot;Parameter dimension does not equal&quot;</b>
+<i>84</i>&nbsp;                        + &quot; dimension specified in enclosing ParameterList.&quot;);
+<b class="fc"><i>85</i>&nbsp;            QuietParameter qParam = new QuietParameter(param);</b>
+<b class="fc"><i>86</i>&nbsp;            allocateKey(qParam);</b>
+<b class="fc"><i>87</i>&nbsp;            pList.add(qParam);</b>
+<b class="fc"><i>88</i>&nbsp;        }</b>
+<i>89</i>&nbsp;
+<b class="fc"><i>90</i>&nbsp;        store();</b>
+<b class="fc"><i>91</i>&nbsp;        setSomethingIsDirty(false);</b>
+<b class="fc"><i>92</i>&nbsp;    }</b>
+<i>93</i>&nbsp;   
+<i>94</i>&nbsp;    /**
+<i>95</i>&nbsp;     * Retrieve number of parameters in parameter list.
+<i>96</i>&nbsp;     * 
+<i>97</i>&nbsp;     * @return size of parameter list.
+<i>98</i>&nbsp;     */
+<i>99</i>&nbsp;    public int size() {
+<b class="fc"><i>100</i>&nbsp;        return pList.size();</b>
+<i>101</i>&nbsp;    }
+<i>102</i>&nbsp;    
+<i>103</i>&nbsp;    /**
+<i>104</i>&nbsp;     * Retrieve parameter from list.
+<i>105</i>&nbsp;     * 
+<i>106</i>&nbsp;     * @param index index of parameter to retrieve
+<i>107</i>&nbsp;     * @return parameter
+<i>108</i>&nbsp;     */
+<i>109</i>&nbsp;    public QuietParameter get(int index) {
+<b class="fc"><i>110</i>&nbsp;        return pList.get(index);</b>
+<i>111</i>&nbsp;    }
+<i>112</i>&nbsp;    
+<i>113</i>&nbsp;    /**
+<i>114</i>&nbsp;     * Assign parameter to position in list.
+<i>115</i>&nbsp;     * 
+<i>116</i>&nbsp;     * @param index
+<i>117</i>&nbsp;     * @param param 
+<i>118</i>&nbsp;     */
+<i>119</i>&nbsp;    public void set(int index, QuietParameter param) {
+<b class="nc"><i>120</i>&nbsp;        startEditing(null);</b>
+<b class="nc"><i>121</i>&nbsp;        pList.set(index, param);</b>
+<b class="nc"><i>122</i>&nbsp;    }</b>
+<i>123</i>&nbsp;    
+<i>124</i>&nbsp;    /**
+<i>125</i>&nbsp;     * Append parameter to end of list.
+<i>126</i>&nbsp;     * 
+<i>127</i>&nbsp;     * @param param 
+<i>128</i>&nbsp;     */
+<i>129</i>&nbsp;    public void add(QuietParameter param) {
+<b class="nc"><i>130</i>&nbsp;        startEditing(null);</b>
+<b class="nc"><i>131</i>&nbsp;        pList.add(param);</b>
+<b class="nc"><i>132</i>&nbsp;    }</b>
+<i>133</i>&nbsp;    
+<i>134</i>&nbsp;    /**
+<i>135</i>&nbsp;     * Insert parameter at position index in list, incrementing the index of
+<i>136</i>&nbsp;     * all parameters already at and to the right of that position.
+<i>137</i>&nbsp;     * 
+<i>138</i>&nbsp;     * @param index
+<i>139</i>&nbsp;     * @param param 
+<i>140</i>&nbsp;     */
+<i>141</i>&nbsp;    public void add(int index, QuietParameter param) {
+<b class="nc"><i>142</i>&nbsp;        startEditing(null);</b>
+<b class="nc"><i>143</i>&nbsp;        pList.add(index, param);</b>
+<b class="nc"><i>144</i>&nbsp;    }</b>
+<i>145</i>&nbsp;    
+<i>146</i>&nbsp;    /**
+<i>147</i>&nbsp;     * Remove parameter from list.
+<i>148</i>&nbsp;     * 
+<i>149</i>&nbsp;     * @param param 
+<i>150</i>&nbsp;     */
+<i>151</i>&nbsp;    public void remove(QuietParameter param) {
+<b class="nc"><i>152</i>&nbsp;        startEditing(null);</b>
+<b class="nc"><i>153</i>&nbsp;        deallocatedKeys.add(param.key);</b>
+<b class="nc"><i>154</i>&nbsp;        pList.remove(param);</b>
+<b class="nc"><i>155</i>&nbsp;    }</b>
+<i>156</i>&nbsp;    
+<i>157</i>&nbsp;    /**
+<i>158</i>&nbsp;     * Remove parameter at index from list.
+<i>159</i>&nbsp;     * 
+<i>160</i>&nbsp;     * @param index 
+<i>161</i>&nbsp;     */
+<i>162</i>&nbsp;    public void remove(int index) {
+<b class="fc"><i>163</i>&nbsp;        startEditing(null);</b>
+<b class="fc"><i>164</i>&nbsp;        deallocatedKeys.add(pList.get(index).key);</b>
+<b class="fc"><i>165</i>&nbsp;        pList.remove(index);</b>
+<b class="fc"><i>166</i>&nbsp;    }</b>
+<i>167</i>&nbsp;    
+<i>168</i>&nbsp;    /**
+<i>169</i>&nbsp;     * Create new parameter, without appending it to the list.  This only
+<i>170</i>&nbsp;     * makes sense if the parameter is eventually added to the list.  This
+<i>171</i>&nbsp;     * call does not itself affect the ParameterList&#39;s dirty status (it
+<i>172</i>&nbsp;     * will be marked as dirty when/if add() is called).
+<i>173</i>&nbsp;     * 
+<i>174</i>&nbsp;     * @return New parameter.
+<i>175</i>&nbsp;     */
+<i>176</i>&nbsp;    public QuietParameter createNewParam() {
+<b class="nc"><i>177</i>&nbsp;        QuietParameter param = new QuietParameter();</b>
+<b class="nc"><i>178</i>&nbsp;        allocateKey(param);</b>
+<b class="nc"><i>179</i>&nbsp;        return param;</b>
+<i>180</i>&nbsp;    }
+<i>181</i>&nbsp;    
+<i>182</i>&nbsp;    /**
+<i>183</i>&nbsp;     * Create new parameter from existing Parameter, without appending it to
+<i>184</i>&nbsp;     * the list.  This only makes sense if the parameter is eventually added
+<i>185</i>&nbsp;     * to the list.  This call does not itself affect the ParameterList&#39;s
+<i>186</i>&nbsp;     * dirty status (it will be marked as dirty when/if add() is called).
+<i>187</i>&nbsp;     * 
+<i>188</i>&nbsp;     * @param otherParam
+<i>189</i>&nbsp;     * @return New parameter.
+<i>190</i>&nbsp;     */
+<i>191</i>&nbsp;    public QuietParameter createNewParam(Parameter&lt;?&gt; otherParam) {
+<b class="nc"><i>192</i>&nbsp;        QuietParameter param = new QuietParameter(otherParam);</b>
+<b class="nc"><i>193</i>&nbsp;        allocateKey(param);</b>
+<b class="nc"><i>194</i>&nbsp;        return param;</b>
+<i>195</i>&nbsp;    }
+<i>196</i>&nbsp;
+<i>197</i>&nbsp;    /**
+<i>198</i>&nbsp;     * Create new parameter and append to list.
+<i>199</i>&nbsp;     * 
+<i>200</i>&nbsp;     * @return New parameter.
+<i>201</i>&nbsp;     */
+<i>202</i>&nbsp;    public QuietParameter addNewParam() {
+<b class="fc"><i>203</i>&nbsp;        startEditing(null);</b>
+<b class="fc"><i>204</i>&nbsp;        QuietParameter param = new QuietParameter();</b>
+<b class="fc"><i>205</i>&nbsp;        allocateKey(param);</b>
+<b class="fc"><i>206</i>&nbsp;        pList.add(param);</b>
+<b class="fc"><i>207</i>&nbsp;        return param;</b>
+<i>208</i>&nbsp;    }
+<i>209</i>&nbsp;    
+<i>210</i>&nbsp;    /**
+<i>211</i>&nbsp;     * Create new parameter from existing Parameter and append to list.
+<i>212</i>&nbsp;     * 
+<i>213</i>&nbsp;     * @param otherParam
+<i>214</i>&nbsp;     * @return New parameter.
+<i>215</i>&nbsp;     */
+<i>216</i>&nbsp;    public QuietParameter addNewParam(Parameter&lt;?&gt; otherParam) {
+<b class="fc"><i>217</i>&nbsp;        startEditing(null);</b>
+<b class="fc"><i>218</i>&nbsp;        QuietParameter param = new QuietParameter(otherParam);</b>
+<b class="fc"><i>219</i>&nbsp;        allocateKey(param);</b>
+<b class="fc"><i>220</i>&nbsp;        pList.add(param);</b>
+<b class="fc"><i>221</i>&nbsp;        return param;</b>
+<i>222</i>&nbsp;    }
+<i>223</i>&nbsp;    
+<i>224</i>&nbsp;    /**
+<i>225</i>&nbsp;     * Assign unique ID to this parameter.
+<i>226</i>&nbsp;     * @param param 
+<i>227</i>&nbsp;     */
+<i>228</i>&nbsp;    private void allocateKey(QuietParameter param) {
+<b class="fc"><i>229</i>&nbsp;        if (deallocatedKeys.size()&gt;0) {</b>
+<b class="fc"><i>230</i>&nbsp;            param.key = deallocatedKeys.first();</b>
+<b class="fc"><i>231</i>&nbsp;            deallocatedKeys.remove(param.key);</b>
+<i>232</i>&nbsp;        } else {
+<b class="fc"><i>233</i>&nbsp;            param.key = nextUnallocatedKey;</b>
+<b class="fc"><i>234</i>&nbsp;            nextUnallocatedKey += 1;</b>
+<i>235</i>&nbsp;        }
+<b class="fc"><i>236</i>&nbsp;    }</b>
+<i>237</i>&nbsp;    
+<i>238</i>&nbsp;    @Override
+<i>239</i>&nbsp;    public StateNode copy() {
+<i>240</i>&nbsp;
+<i>241</i>&nbsp;        try {
+<i>242</i>&nbsp;            @SuppressWarnings(&quot;unchecked&quot;)
+<b class="fc"><i>243</i>&nbsp;			GeneralParameterList&lt;T&gt; copy = (GeneralParameterList&lt;T&gt;) this.clone();</b>
+<b class="fc"><i>244</i>&nbsp;            copy.initAndValidate();</b>
+<i>245</i>&nbsp;                    
+<b class="fc"><i>246</i>&nbsp;            copy.pList.clear();</b>
+<b class="fc"><i>247</i>&nbsp;            for (QuietParameter param : pList) {</b>
+<b class="fc"><i>248</i>&nbsp;                QuietParameter paramCopy = param.copy();</b>
+<b class="fc"><i>249</i>&nbsp;                copy.pList.add(paramCopy);</b>
+<b class="fc"><i>250</i>&nbsp;            }</b>
+<i>251</i>&nbsp;        
+<b class="fc"><i>252</i>&nbsp;            copy.dimension = dimension;</b>
+<b class="fc"><i>253</i>&nbsp;            copy.minorDimension = minorDimension;</b>
+<b class="fc"><i>254</i>&nbsp;            copy.lowerBound = lowerBound;</b>
+<b class="fc"><i>255</i>&nbsp;            copy.upperBound = upperBound;</b>
+<b class="fc"><i>256</i>&nbsp;            copy.deallocatedKeys.addAll(deallocatedKeys);</b>
+<b class="fc"><i>257</i>&nbsp;            copy.nextUnallocatedKey = nextUnallocatedKey;</b>
+<i>258</i>&nbsp;            
+<b class="fc"><i>259</i>&nbsp;            return copy;</b>
+<i>260</i>&nbsp;        
+<b class="nc"><i>261</i>&nbsp;        } catch (CloneNotSupportedException ex) {</b>
+<b class="nc"><i>262</i>&nbsp;            Log.err(ex.getMessage());</b>
+<i>263</i>&nbsp;        }
+<i>264</i>&nbsp;        
+<b class="nc"><i>265</i>&nbsp;        return null;</b>
+<i>266</i>&nbsp;    }
+<i>267</i>&nbsp;
+<i>268</i>&nbsp;    @Override
+<i>269</i>&nbsp;    public void assignTo(StateNode other) {
+<b class="nc"><i>270</i>&nbsp;        if (!(other instanceof GeneralParameterList))</b>
+<b class="nc"><i>271</i>&nbsp;            throw new RuntimeException(&quot;Incompatible statenodes in assignTo &quot;</b>
+<i>272</i>&nbsp;                    + &quot;call.&quot;);
+<i>273</i>&nbsp;        
+<i>274</i>&nbsp;        @SuppressWarnings(&quot;unchecked&quot;)
+<b class="nc"><i>275</i>&nbsp;		GeneralParameterList&lt;T&gt; otherParamList = (GeneralParameterList&lt;T&gt;)other;</b>
+<i>276</i>&nbsp;        
+<b class="nc"><i>277</i>&nbsp;        otherParamList.pList.clear();</b>
+<b class="nc"><i>278</i>&nbsp;        for (QuietParameter param : pList)</b>
+<b class="nc"><i>279</i>&nbsp;            otherParamList.pList.add(param.copy());</b>
+<i>280</i>&nbsp;        
+<b class="nc"><i>281</i>&nbsp;        otherParamList.dimension = dimension;</b>
+<b class="nc"><i>282</i>&nbsp;        otherParamList.minorDimension = minorDimension;</b>
+<b class="nc"><i>283</i>&nbsp;        otherParamList.lowerBound = lowerBound;</b>
+<b class="nc"><i>284</i>&nbsp;        otherParamList.upperBound = upperBound;</b>
+<b class="nc"><i>285</i>&nbsp;        otherParamList.deallocatedKeys = new TreeSet&lt;&gt;(deallocatedKeys);</b>
+<b class="nc"><i>286</i>&nbsp;        otherParamList.nextUnallocatedKey = nextUnallocatedKey;</b>
+<b class="nc"><i>287</i>&nbsp;    }</b>
+<i>288</i>&nbsp;
+<i>289</i>&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+<i>290</i>&nbsp;	@Override
+<i>291</i>&nbsp;    public void assignFrom(StateNode other) {
+<b class="nc"><i>292</i>&nbsp;        if (!(other instanceof GeneralParameterList))</b>
+<b class="nc"><i>293</i>&nbsp;            throw new RuntimeException(&quot;Incompatible statenodes in assignFrom &quot;</b>
+<i>294</i>&nbsp;                    + &quot;call.&quot;);
+<i>295</i>&nbsp;        
+<b class="nc"><i>296</i>&nbsp;		GeneralParameterList&lt;T&gt; otherParamList = (GeneralParameterList&lt;T&gt;)other;</b>
+<i>297</i>&nbsp;        
+<b class="nc"><i>298</i>&nbsp;        pList.clear();</b>
+<b class="nc"><i>299</i>&nbsp;        for (Object paramObj : otherParamList.pList)</b>
+<b class="nc"><i>300</i>&nbsp;            pList.add((QuietParameter) paramObj);</b>
+<i>301</i>&nbsp;        
+<b class="nc"><i>302</i>&nbsp;        dimension = otherParamList.dimension;</b>
+<b class="nc"><i>303</i>&nbsp;        minorDimension = otherParamList.minorDimension;</b>
+<b class="nc"><i>304</i>&nbsp;        lowerBound = otherParamList.lowerBound;</b>
+<b class="nc"><i>305</i>&nbsp;        upperBound = otherParamList.upperBound;</b>
+<b class="nc"><i>306</i>&nbsp;        deallocatedKeys = new TreeSet&lt;&gt;(otherParamList.deallocatedKeys);</b>
+<b class="nc"><i>307</i>&nbsp;        nextUnallocatedKey = otherParamList.nextUnallocatedKey;</b>
+<b class="nc"><i>308</i>&nbsp;    }</b>
+<i>309</i>&nbsp;
+<i>310</i>&nbsp;    @Override
+<i>311</i>&nbsp;    public void assignFromFragile(StateNode other) {
+<b class="nc"><i>312</i>&nbsp;        assignFrom(other);</b>
+<b class="nc"><i>313</i>&nbsp;    }</b>
+<i>314</i>&nbsp;
+<i>315</i>&nbsp;    @Override
+<i>316</i>&nbsp;    public String toString() {
+<b class="fc"><i>317</i>&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<i>318</i>&nbsp;        
+<b class="fc"><i>319</i>&nbsp;        sb.append(String.format(&quot;Dimension: [%d, %d], Bounds: [%s,%s], &quot;,</b>
+<b class="fc"><i>320</i>&nbsp;                dimension,</b>
+<b class="fc"><i>321</i>&nbsp;                minorDimension,</b>
+<b class="fc"><i>322</i>&nbsp;                String.valueOf(lowerBound),</b>
+<b class="fc"><i>323</i>&nbsp;                String.valueOf(upperBound)));</b>
+<i>324</i>&nbsp;        
+<b class="fc"><i>325</i>&nbsp;        sb.append(&quot;AvailableKeys: [&quot;);</b>
+<b class="fc"><i>326</i>&nbsp;        boolean first = true;</b>
+<b class="fc"><i>327</i>&nbsp;        for (int key : deallocatedKeys) {</b>
+<b class="nc"><i>328</i>&nbsp;            if (!first)</b>
+<b class="nc"><i>329</i>&nbsp;                sb.append(&quot;,&quot;);</b>
+<i>330</i>&nbsp;            else
+<b class="nc"><i>331</i>&nbsp;                first = false;</b>
+<i>332</i>&nbsp;            
+<b class="nc"><i>333</i>&nbsp;            sb.append(key);</b>
+<b class="nc"><i>334</i>&nbsp;        }</b>
+<b class="fc"><i>335</i>&nbsp;        sb.append(&quot;], &quot;);</b>
+<i>336</i>&nbsp;        
+<b class="fc"><i>337</i>&nbsp;        sb.append(&quot;NextKey: &quot;).append(nextUnallocatedKey).append(&quot;, &quot;);</b>
+<i>338</i>&nbsp;        
+<b class="fc"><i>339</i>&nbsp;        sb.append(&quot;Parameters: [&quot;);</b>
+<b class="fc"><i>340</i>&nbsp;        for (int i=0; i&lt;pList.size(); i++) {</b>
+<b class="fc"><i>341</i>&nbsp;            if (i&gt;0)</b>
+<b class="fc"><i>342</i>&nbsp;                sb.append(&quot;,&quot;);</b>
+<b class="fc"><i>343</i>&nbsp;            sb.append(pList.get(i));</b>
+<i>344</i>&nbsp;        }
+<b class="fc"><i>345</i>&nbsp;        sb.append(&quot;], &quot;);</b>
+<i>346</i>&nbsp;        
+<b class="fc"><i>347</i>&nbsp;        sb.append(&quot;ParameterKeys: [&quot;);</b>
+<b class="fc"><i>348</i>&nbsp;        for (int i=0; i&lt;pList.size(); i++) {</b>
+<b class="fc"><i>349</i>&nbsp;            if (i&gt;0)</b>
+<b class="fc"><i>350</i>&nbsp;                sb.append(&quot;,&quot;);</b>
+<b class="fc"><i>351</i>&nbsp;            sb.append(pList.get(i).key);</b>
+<i>352</i>&nbsp;        }
+<b class="fc"><i>353</i>&nbsp;        sb.append(&quot;]&quot;);</b>
+<i>354</i>&nbsp;        
+<b class="fc"><i>355</i>&nbsp;        return sb.toString();</b>
+<i>356</i>&nbsp;    }
+<i>357</i>&nbsp;    
+<i>358</i>&nbsp;    
+<i>359</i>&nbsp;    @Override
+<i>360</i>&nbsp;    public void fromXML(Node node) {
+<b class="fc"><i>361</i>&nbsp;        String str = node.getTextContent();</b>
+<i>362</i>&nbsp;        
+<b class="fc"><i>363</i>&nbsp;        Pattern pattern = Pattern.compile(&quot;^&quot;</b>
+<i>364</i>&nbsp;                + &quot; *Dimension: *\\[([^]]*)] *,&quot;
+<i>365</i>&nbsp;                + &quot; *Bounds: *\\[([^]]*)] *,&quot;
+<i>366</i>&nbsp;                + &quot; *AvailableKeys: *\\[([^]]*)] *,&quot;
+<i>367</i>&nbsp;                + &quot; *NextKey: *([^, ]*) *,&quot;
+<i>368</i>&nbsp;                + &quot; *Parameters: *\\[(.*)] *,&quot;
+<i>369</i>&nbsp;                + &quot; *ParameterKeys: *\\[(.*)] *$&quot;);
+<b class="fc"><i>370</i>&nbsp;        Matcher matcher = pattern.matcher(str);</b>
+<i>371</i>&nbsp;        
+<b class="fc"><i>372</i>&nbsp;        if (!matcher.find())</b>
+<b class="nc"><i>373</i>&nbsp;            throw new RuntimeException(&quot;Error parsing ParameterList state string.&quot;);</b>
+<i>374</i>&nbsp;        
+<i>375</i>&nbsp;        // Parse dimension strings
+<b class="fc"><i>376</i>&nbsp;        String [] dimStr = matcher.group(1).split(&quot;,&quot;);</b>
+<b class="fc"><i>377</i>&nbsp;        dimension = Integer.parseInt(dimStr[0].trim());</b>
+<b class="fc"><i>378</i>&nbsp;        minorDimension = Integer.parseInt(dimStr[1].trim());</b>
+<i>379</i>&nbsp;        
+<i>380</i>&nbsp;        // Parse dealocated key strings
+<b class="fc"><i>381</i>&nbsp;        deallocatedKeys.clear();</b>
+<b class="fc"><i>382</i>&nbsp;        for (String keyStr : matcher.group(3).trim().split(&quot;,&quot;) ) {</b>
+<b class="fc"><i>383</i>&nbsp;            if (keyStr.trim().length()&gt;0)</b>
+<b class="nc"><i>384</i>&nbsp;                deallocatedKeys.add(Integer.parseInt(keyStr));</b>
+<i>385</i>&nbsp;        }
+<i>386</i>&nbsp;        
+<i>387</i>&nbsp;        // Parse next allocated key string
+<b class="fc"><i>388</i>&nbsp;        nextUnallocatedKey = Integer.parseInt(matcher.group(4));</b>
+<i>389</i>&nbsp;        
+<i>390</i>&nbsp;        // Prepare bounds and parameter value strings for parsing by methods in
+<i>391</i>&nbsp;        // non-abstract classes (where type T is known).
+<b class="fc"><i>392</i>&nbsp;        String [] boundsStr = matcher.group(2).split(&quot;,&quot;);</b>
+<i>393</i>&nbsp;        
+<b class="fc"><i>394</i>&nbsp;        List&lt;String[]&gt; parameterValueStrings = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>395</i>&nbsp;        String parameterListString = matcher.group(5).trim();</b>
+<i>396</i>&nbsp;        
+<b class="fc"><i>397</i>&nbsp;        pattern = Pattern.compile(&quot;\\[([^]]*)]&quot;);</b>
+<b class="fc"><i>398</i>&nbsp;        Matcher parameterMatcher = pattern.matcher(parameterListString);</b>
+<i>399</i>&nbsp;        
+<b class="fc"><i>400</i>&nbsp;        while(parameterMatcher.find())</b>
+<b class="fc"><i>401</i>&nbsp;            parameterValueStrings.add(parameterMatcher.group(1).split(&quot;,&quot;));</b>
+<i>402</i>&nbsp;        
+<i>403</i>&nbsp;        // Parse key strings:
+<b class="fc"><i>404</i>&nbsp;        List&lt;Integer&gt; keys = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>405</i>&nbsp;        for (String keyString : matcher.group(6).split(&quot;,&quot;))</b>
+<b class="fc"><i>406</i>&nbsp;            keys.add(Integer.parseInt(keyString.trim()));</b>
+<i>407</i>&nbsp;        
+<b class="fc"><i>408</i>&nbsp;        readStateFromString(boundsStr, parameterValueStrings, keys);</b>
+<b class="fc"><i>409</i>&nbsp;    }</b>
+<i>410</i>&nbsp;    
+<i>411</i>&nbsp;    /**
+<i>412</i>&nbsp;     * Reads upper and lower parameter element bounds and parameter values from
+<i>413</i>&nbsp;     * strings and uses these to populate the corresponding GeneralParameterList
+<i>414</i>&nbsp;     * fields.
+<i>415</i>&nbsp;     * 
+<i>416</i>&nbsp;     * @param boundsStrings Two-element array containing lower and upper bounds.
+<i>417</i>&nbsp;     * @param parameterValueStrings List of arrays of reps of parameter values
+<i>418</i>&nbsp;     * @param keys List of keys to assign to parameters
+<i>419</i>&nbsp;     */
+<i>420</i>&nbsp;    protected abstract void readStateFromString(String [] boundsStrings,
+<i>421</i>&nbsp;            List&lt;String[]&gt; parameterValueStrings,
+<i>422</i>&nbsp;            List&lt;Integer&gt; keys);
+<i>423</i>&nbsp;
+<i>424</i>&nbsp;    @Override
+<i>425</i>&nbsp;    public int scale(double scale) {
+<b class="nc"><i>426</i>&nbsp;        throw new UnsupportedOperationException(&quot;Not supported yet.&quot;); //To change body of generated methods, choose Tools | Templates.</b>
+<i>427</i>&nbsp;    }
+<i>428</i>&nbsp;
+<i>429</i>&nbsp;    @Override
+<i>430</i>&nbsp;    protected void store() {
+<b class="fc"><i>431</i>&nbsp;        pListStored.clear();</b>
+<b class="fc"><i>432</i>&nbsp;        for (QuietParameter param : pList)</b>
+<b class="fc"><i>433</i>&nbsp;            pListStored.add(param.copy());</b>
+<i>434</i>&nbsp;
+<b class="fc"><i>435</i>&nbsp;        deallocatedKeysStored.clear();</b>
+<b class="fc"><i>436</i>&nbsp;        deallocatedKeysStored.addAll(deallocatedKeys);</b>
+<b class="fc"><i>437</i>&nbsp;        nextUnallocatedKeyStored = nextUnallocatedKey;</b>
+<b class="fc"><i>438</i>&nbsp;    }</b>
+<i>439</i>&nbsp;
+<i>440</i>&nbsp;    @Override
+<i>441</i>&nbsp;    public void restore() {
+<b class="fc"><i>442</i>&nbsp;        pList.clear();</b>
+<b class="fc"><i>443</i>&nbsp;        for (QuietParameter param: pListStored)</b>
+<b class="fc"><i>444</i>&nbsp;            pList.add(param.copy());</b>
+<i>445</i>&nbsp;        
+<b class="fc"><i>446</i>&nbsp;        deallocatedKeys.clear();</b>
+<b class="fc"><i>447</i>&nbsp;        deallocatedKeys.addAll(deallocatedKeysStored);</b>
+<b class="fc"><i>448</i>&nbsp;        nextUnallocatedKey = nextUnallocatedKeyStored;</b>
+<i>449</i>&nbsp;        
+<b class="fc"><i>450</i>&nbsp;        hasStartedEditing = false;</b>
+<b class="fc"><i>451</i>&nbsp;    }</b>
+<i>452</i>&nbsp;    
+<i>453</i>&nbsp;    
+<i>454</i>&nbsp;    @Override
+<i>455</i>&nbsp;    public void setEverythingDirty(boolean isDirty) {
+<b class="nc"><i>456</i>&nbsp;        setSomethingIsDirty(isDirty);</b>
+<b class="nc"><i>457</i>&nbsp;    }</b>
+<i>458</i>&nbsp;
+<i>459</i>&nbsp;    /*
+<i>460</i>&nbsp;    * The following methods are here because Functions are Loggable.  This
+<i>461</i>&nbsp;    * doesn&#39;t seem to make sense for ParameterLists though, so at the moment
+<i>462</i>&nbsp;    * these methods just log the ParameterLists&#39;s size.
+<i>463</i>&nbsp;    */
+<i>464</i>&nbsp;    
+<i>465</i>&nbsp;    @Override
+<i>466</i>&nbsp;    public void init(PrintStream out) {
+<b class="nc"><i>467</i>&nbsp;        out.print(getID() + &quot;.size\t&quot;);</b>
+<b class="nc"><i>468</i>&nbsp;    }</b>
+<i>469</i>&nbsp;
+<i>470</i>&nbsp;    @Override
+<i>471</i>&nbsp;    public void log(int sample, PrintStream out) {
+<b class="nc"><i>472</i>&nbsp;        out.print(pList.size() + &quot;\t&quot;);</b>
+<b class="nc"><i>473</i>&nbsp;    }</b>
+<i>474</i>&nbsp;
+<i>475</i>&nbsp;    @Override
+<b class="nc"><i>476</i>&nbsp;    public void close(PrintStream out) { }</b>
+<i>477</i>&nbsp;
+<i>478</i>&nbsp;    /*
+<i>479</i>&nbsp;     * The following methods are here because all StateNodes are Functions.
+<i>480</i>&nbsp;     * They don&#39;t seem to make sense for ParameterLists though, so at the
+<i>481</i>&nbsp;     * moment these methods just probe the ParameterList&#39;s size.
+<i>482</i>&nbsp;     */
+<i>483</i>&nbsp;    
+<i>484</i>&nbsp;    @Override
+<i>485</i>&nbsp;    public int getDimension() {
+<b class="nc"><i>486</i>&nbsp;        return 1;</b>
+<i>487</i>&nbsp;    }
+<i>488</i>&nbsp;
+<i>489</i>&nbsp;    @Override
+<i>490</i>&nbsp;    public double getArrayValue() {
+<b class="nc"><i>491</i>&nbsp;        return pList.size();</b>
+<i>492</i>&nbsp;    }
+<i>493</i>&nbsp;
+<i>494</i>&nbsp;    @Override
+<i>495</i>&nbsp;    public double getArrayValue(int i) {
+<b class="nc"><i>496</i>&nbsp;        if (i==0)</b>
+<b class="nc"><i>497</i>&nbsp;            return pList.size();</b>
+<i>498</i>&nbsp;        else
+<b class="nc"><i>499</i>&nbsp;            return Double.NaN;</b>
+<i>500</i>&nbsp;    }
+<i>501</i>&nbsp;
+<i>502</i>&nbsp;    
+<i>503</i>&nbsp;
+<i>504</i>&nbsp;    /**
+<i>505</i>&nbsp;     * Jessie&#39;s QuietParameter.  Objects of this class make sense
+<i>506</i>&nbsp;     * only in the context of ParameterLists.  They behave very much like
+<i>507</i>&nbsp;     * Parameter&lt;T&gt;.Base objects, but are not StateNodes.
+<i>508</i>&nbsp;     */
+<i>509</i>&nbsp;    public class QuietParameter implements Parameter&lt;T&gt; {
+<i>510</i>&nbsp;
+<i>511</i>&nbsp;        Object[] values;
+<b class="fc"><i>512</i>&nbsp;        int key = -1;</b>
+<i>513</i>&nbsp;        
+<i>514</i>&nbsp;        /**
+<i>515</i>&nbsp;         * Construct a new QuietParameter.
+<i>516</i>&nbsp;         */
+<b class="fc"><i>517</i>&nbsp;        QuietParameter() {</b>
+<b class="fc"><i>518</i>&nbsp;            values = new Object[dimension];</b>
+<b class="fc"><i>519</i>&nbsp;        }</b>
+<i>520</i>&nbsp;
+<i>521</i>&nbsp;        /**
+<i>522</i>&nbsp;         * Create new QuietParameter from existing parameter.
+<i>523</i>&nbsp;         * 
+<i>524</i>&nbsp;         * @param param 
+<i>525</i>&nbsp;         */
+<b class="fc"><i>526</i>&nbsp;        QuietParameter(Parameter&lt;?&gt; param) {</b>
+<b class="fc"><i>527</i>&nbsp;            if (param.getDimension() != dimension)</b>
+<b class="nc"><i>528</i>&nbsp;                throw new IllegalArgumentException(&quot;Cannot construct &quot;</b>
+<i>529</i>&nbsp;                        + &quot;ParameterList parameter with a dimension not equal &quot;
+<i>530</i>&nbsp;                        + &quot;to that specified in the enclosing list.&quot;);
+<i>531</i>&nbsp;            
+<b class="fc"><i>532</i>&nbsp;            values = new Object[dimension];</b>
+<b class="fc"><i>533</i>&nbsp;            for (int i=0; i&lt;param.getValues().length; i++) {</b>
+<b class="fc"><i>534</i>&nbsp;                values[i] = param.getValue(i);</b>
+<i>535</i>&nbsp;            }
+<i>536</i>&nbsp;            
+<b class="fc"><i>537</i>&nbsp;        }</b>
+<i>538</i>&nbsp;        
+<i>539</i>&nbsp;        public int getKey() {
+<b class="fc"><i>540</i>&nbsp;            return key;</b>
+<i>541</i>&nbsp;        }
+<i>542</i>&nbsp;        
+<i>543</i>&nbsp;        @SuppressWarnings(&quot;unchecked&quot;)
+<i>544</i>&nbsp;		@Override
+<i>545</i>&nbsp;        public T getValue(int i) {
+<b class="fc"><i>546</i>&nbsp;            return (T)values[i];</b>
+<i>547</i>&nbsp;        }
+<i>548</i>&nbsp;
+<i>549</i>&nbsp;        @SuppressWarnings(&quot;unchecked&quot;)
+<i>550</i>&nbsp;		@Override
+<i>551</i>&nbsp;        public T getValue() {
+<b class="fc"><i>552</i>&nbsp;            return (T)values[0];</b>
+<i>553</i>&nbsp;        }
+<i>554</i>&nbsp;
+<i>555</i>&nbsp;        @Override
+<i>556</i>&nbsp;        public void setValue(int i, T value) {
+<b class="fc"><i>557</i>&nbsp;            startEditing(null); // ParameterList&#39;s startEditing()</b>
+<b class="fc"><i>558</i>&nbsp;            values[i] = value;</b>
+<b class="fc"><i>559</i>&nbsp;        }</b>
+<i>560</i>&nbsp;        
+<i>561</i>&nbsp;        @Override
+<i>562</i>&nbsp;        public void setValue(T value) {
+<b class="fc"><i>563</i>&nbsp;            startEditing(null); // ParameterList&#39;s startEditing()</b>
+<b class="fc"><i>564</i>&nbsp;            values[0] = value;</b>
+<b class="fc"><i>565</i>&nbsp;        }</b>
+<i>566</i>&nbsp;
+<i>567</i>&nbsp;        @Override
+<i>568</i>&nbsp;        public T getLower() {
+<b class="nc"><i>569</i>&nbsp;            return lowerBound;</b>
+<i>570</i>&nbsp;        }
+<i>571</i>&nbsp;
+<i>572</i>&nbsp;        @Override
+<i>573</i>&nbsp;        public void setLower(T lower) {
+<b class="nc"><i>574</i>&nbsp;            lowerBound = lower;</b>
+<b class="nc"><i>575</i>&nbsp;        }</b>
+<i>576</i>&nbsp;
+<i>577</i>&nbsp;        @Override
+<i>578</i>&nbsp;        public T getUpper() {
+<b class="nc"><i>579</i>&nbsp;            return upperBound;</b>
+<i>580</i>&nbsp;        }
+<i>581</i>&nbsp;
+<i>582</i>&nbsp;        @Override
+<i>583</i>&nbsp;        public void setUpper(T upper) {
+<b class="nc"><i>584</i>&nbsp;            upperBound = upper;</b>
+<b class="nc"><i>585</i>&nbsp;        }</b>
+<i>586</i>&nbsp;
+<i>587</i>&nbsp;        @SuppressWarnings(&quot;unchecked&quot;)
+<i>588</i>&nbsp;		@Override
+<i>589</i>&nbsp;        public T[] getValues() {
+<b class="fc"><i>590</i>&nbsp;            return (T[])values;</b>
+<i>591</i>&nbsp;        }
+<i>592</i>&nbsp;
+<i>593</i>&nbsp;        @Override
+<i>594</i>&nbsp;        public String getID() {
+<b class="nc"><i>595</i>&nbsp;            throw new UnsupportedOperationException(&quot;Not supported yet.&quot;);</b>
+<i>596</i>&nbsp;        }
+<i>597</i>&nbsp;
+<i>598</i>&nbsp;        @Override
+<i>599</i>&nbsp;        public int getMinorDimension1() {
+<b class="nc"><i>600</i>&nbsp;            return minorDimension;</b>
+<i>601</i>&nbsp;        }
+<i>602</i>&nbsp;        
+<i>603</i>&nbsp;        @Override
+<i>604</i>&nbsp;        public int getMinorDimension2() {
+<b class="nc"><i>605</i>&nbsp;            return dimension/minorDimension;</b>
+<i>606</i>&nbsp;        }
+<i>607</i>&nbsp;        
+<i>608</i>&nbsp;        
+<i>609</i>&nbsp;        @SuppressWarnings(&quot;unchecked&quot;)
+<i>610</i>&nbsp;		@Override
+<i>611</i>&nbsp;        public T getMatrixValue(int i, int j) {
+<b class="nc"><i>612</i>&nbsp;            return (T)values[i*minorDimension+j];</b>
+<i>613</i>&nbsp;        }
+<i>614</i>&nbsp;
+<i>615</i>&nbsp;        @Override
+<i>616</i>&nbsp;        public void swap(int i, int j) {
+<b class="nc"><i>617</i>&nbsp;            startEditing(null);</b>
+<b class="nc"><i>618</i>&nbsp;            Object tmp = values[i];</b>
+<b class="nc"><i>619</i>&nbsp;            values[i] = values[j];</b>
+<b class="nc"><i>620</i>&nbsp;            values[j] = tmp;</b>
+<b class="nc"><i>621</i>&nbsp;        }</b>
+<i>622</i>&nbsp;
+<i>623</i>&nbsp;        @Override
+<i>624</i>&nbsp;        public int getDimension() {
+<b class="fc"><i>625</i>&nbsp;            return values.length;</b>
+<i>626</i>&nbsp;        }
+<i>627</i>&nbsp;
+<i>628</i>&nbsp;        @Override
+<i>629</i>&nbsp;        public double getArrayValue() {
+<b class="nc"><i>630</i>&nbsp;            return (Double)values[0];</b>
+<i>631</i>&nbsp;        }
+<i>632</i>&nbsp;
+<i>633</i>&nbsp;        @Override
+<i>634</i>&nbsp;        public double getArrayValue(int i) {
+<b class="nc"><i>635</i>&nbsp;            return (Double)values[0];</b>
+<i>636</i>&nbsp;        }
+<i>637</i>&nbsp;
+<i>638</i>&nbsp;        @Override
+<i>639</i>&nbsp;        public String toString() {
+<b class="fc"><i>640</i>&nbsp;            StringBuilder sb = new StringBuilder(&quot;[&quot;);</b>
+<b class="fc"><i>641</i>&nbsp;            for (int i=0; i&lt;values.length; i++) {</b>
+<b class="fc"><i>642</i>&nbsp;                if (i&gt;0)</b>
+<b class="fc"><i>643</i>&nbsp;                    sb.append(&quot;,&quot;);</b>
+<b class="fc"><i>644</i>&nbsp;                sb.append(values[i]);</b>
+<i>645</i>&nbsp;            }            
+<b class="fc"><i>646</i>&nbsp;            sb.append(&quot;]&quot;);</b>
+<i>647</i>&nbsp;            
+<b class="fc"><i>648</i>&nbsp;            return sb.toString();</b>
+<i>649</i>&nbsp;        }
+<i>650</i>&nbsp;        
+<i>651</i>&nbsp;        /**
+<i>652</i>&nbsp;         * @return deep copy of parameter.
+<i>653</i>&nbsp;         */
+<i>654</i>&nbsp;        public QuietParameter copy() {
+<b class="fc"><i>655</i>&nbsp;            QuietParameter copy = new QuietParameter(this);</b>
+<b class="fc"><i>656</i>&nbsp;            copy.key = this.key;</b>
+<b class="fc"><i>657</i>&nbsp;            return copy;</b>
+<i>658</i>&nbsp;        }
+<i>659</i>&nbsp;
+<i>660</i>&nbsp;    }
+<i>661</i>&nbsp;    
+<i>662</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

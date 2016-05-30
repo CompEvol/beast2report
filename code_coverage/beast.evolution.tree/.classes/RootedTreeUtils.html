@@ -1,0 +1,391 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: RootedTreeUtils</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.tree</a> ]
+</div>
+
+<h1>Coverage Summary for Class: RootedTreeUtils (beast.evolution.tree)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RootedTreeUtils</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 113)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.tree;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import beast.evolution.taxonomy.Taxon;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;import java.util.*;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;/**
+<i>9</i>&nbsp; * Static utility functions for rooted trees.
+<i>10</i>&nbsp; *
+<i>11</i>&nbsp; * @author Andrew Rambaut
+<i>12</i>&nbsp; * @author Alexei Drummond
+<i>13</i>&nbsp; *
+<i>14</i>&nbsp; * @version $Id: RootedTreeUtils.java 889 2008-02-27 01:13:21Z matt_kearse $
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;public class RootedTreeUtils {
+<b class="nc"><i>18</i>&nbsp;    private RootedTreeUtils() { }  // make class uninstantiable</b>
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;    /**
+<i>21</i>&nbsp;	 * Return the number of leaves under this node.
+<i>22</i>&nbsp;	 * @param tree
+<i>23</i>&nbsp;	 * @param node
+<i>24</i>&nbsp;	 * @return the number of leaves under this node.
+<i>25</i>&nbsp;	 */
+<i>26</i>&nbsp;	public static final int getTipCount(RootedTree tree, Node node) {
+<b class="nc"><i>27</i>&nbsp;		int tipCount = 0;</b>
+<b class="nc"><i>28</i>&nbsp;		for (Node child : tree.getChildren(node)) {</b>
+<b class="nc"><i>29</i>&nbsp;			tipCount += getTipCount(tree, child);</b>
+<b class="nc"><i>30</i>&nbsp;		}</b>
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;		// is external
+<b class="nc"><i>33</i>&nbsp;		if (tipCount == 0) return 1;</b>
+<i>34</i>&nbsp;
+<b class="nc"><i>35</i>&nbsp;		return tipCount;</b>
+<i>36</i>&nbsp;	}
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;    public static double getMinTipHeight(RootedTree tree, Node node) {
+<b class="nc"><i>39</i>&nbsp;        if (tree.isExternal(node)) {</b>
+<b class="nc"><i>40</i>&nbsp;            return tree.getHeight(node);</b>
+<i>41</i>&nbsp;        }
+<i>42</i>&nbsp;
+<b class="nc"><i>43</i>&nbsp;        double minTipHeight = Double.MAX_VALUE;</b>
+<b class="nc"><i>44</i>&nbsp;        for (Node child : tree.getChildren(node)) {</b>
+<b class="nc"><i>45</i>&nbsp;           double h = getMinTipHeight(tree, child);</b>
+<b class="nc"><i>46</i>&nbsp;            if (h &lt; minTipHeight) {</b>
+<b class="nc"><i>47</i>&nbsp;                minTipHeight = h;</b>
+<i>48</i>&nbsp;            }
+<b class="nc"><i>49</i>&nbsp;        }</b>
+<i>50</i>&nbsp;
+<b class="nc"><i>51</i>&nbsp;        return minTipHeight;</b>
+<i>52</i>&nbsp;    }
+<i>53</i>&nbsp;
+<i>54</i>&nbsp;    public static double getMaxTipHeight(RootedTree tree, Node node) {
+<b class="nc"><i>55</i>&nbsp;        if (tree.isExternal(node)) {</b>
+<b class="nc"><i>56</i>&nbsp;            return tree.getHeight(node);</b>
+<i>57</i>&nbsp;        }
+<i>58</i>&nbsp;
+<b class="nc"><i>59</i>&nbsp;        double maxTipHeight = -Double.MAX_VALUE;</b>
+<b class="nc"><i>60</i>&nbsp;        for (Node child : tree.getChildren(node)) {</b>
+<b class="nc"><i>61</i>&nbsp;           double h = getMaxTipHeight(tree, child);</b>
+<b class="nc"><i>62</i>&nbsp;            if (h &gt; maxTipHeight) {</b>
+<b class="nc"><i>63</i>&nbsp;                maxTipHeight = h;</b>
+<i>64</i>&nbsp;            }
+<b class="nc"><i>65</i>&nbsp;        }</b>
+<i>66</i>&nbsp;
+<b class="nc"><i>67</i>&nbsp;        return maxTipHeight;</b>
+<i>68</i>&nbsp;    }
+<i>69</i>&nbsp;
+<i>70</i>&nbsp;    /**
+<i>71</i>&nbsp;	 * @return true only if all tips have height 0.0
+<i>72</i>&nbsp;	 */
+<i>73</i>&nbsp;	public static boolean isUltrametric(RootedTree tree, double tolerance) {
+<b class="nc"><i>74</i>&nbsp;		for (Node node : tree.getExternalNodesSet()) {</b>
+<b class="nc"><i>75</i>&nbsp;			if (Math.abs(tree.getHeight(node)) &gt; tolerance) return false;</b>
+<b class="nc"><i>76</i>&nbsp;		}</b>
+<b class="nc"><i>77</i>&nbsp;		return true;</b>
+<i>78</i>&nbsp;	}
+<i>79</i>&nbsp;
+<i>80</i>&nbsp;	/**
+<i>81</i>&nbsp;	 * @return true only if internal nodes have 2 children
+<i>82</i>&nbsp;	 */
+<i>83</i>&nbsp;	public static boolean isBinary(RootedTree tree) {
+<b class="nc"><i>84</i>&nbsp;		for (Node node : tree.getInternalNodesSet()) {</b>
+<b class="nc"><i>85</i>&nbsp;			if (tree.getChildren(node).size() &gt; 2) return false;</b>
+<b class="nc"><i>86</i>&nbsp;		}</b>
+<b class="nc"><i>87</i>&nbsp;		return true;</b>
+<i>88</i>&nbsp;	}
+<i>89</i>&nbsp;
+<i>90</i>&nbsp;	/**
+<i>91</i>&nbsp;	 * Gets a set of external nodes that correspond to the given taxa.
+<i>92</i>&nbsp;	 */
+<i>93</i>&nbsp;	public static Set&lt;Node&gt; getTipsForTaxa(RootedTree tree, Collection&lt;Taxon&gt; taxa) {
+<i>94</i>&nbsp;
+<b class="nc"><i>95</i>&nbsp;		Set&lt;Node&gt; tipNodes = new LinkedHashSet&lt;Node&gt;();</b>
+<i>96</i>&nbsp;
+<b class="nc"><i>97</i>&nbsp;		for (Taxon taxon : taxa) {</b>
+<i>98</i>&nbsp;
+<b class="nc"><i>99</i>&nbsp;			Node node = tree.getNode(taxon);</b>
+<i>100</i>&nbsp;
+<b class="nc"><i>101</i>&nbsp;			if (node == null) {</b>
+<b class="nc"><i>102</i>&nbsp;				throw new IllegalArgumentException(taxon.toString());</b>
+<i>103</i>&nbsp;			}
+<i>104</i>&nbsp;
+<b class="nc"><i>105</i>&nbsp;			tipNodes.add(node);</b>
+<b class="nc"><i>106</i>&nbsp;		}</b>
+<i>107</i>&nbsp;
+<b class="nc"><i>108</i>&nbsp;		return tipNodes;</b>
+<i>109</i>&nbsp;	}
+<i>110</i>&nbsp;
+<i>111</i>&nbsp;	/**
+<i>112</i>&nbsp;	 * Gets a set of tip nodes descended from the given node.
+<i>113</i>&nbsp;	 */
+<i>114</i>&nbsp;	public static Set&lt;Node&gt; getDescendantTips(RootedTree tree, Node node) {
+<i>115</i>&nbsp;
+<b class="nc"><i>116</i>&nbsp;		Set&lt;Node&gt; tipNodes = new LinkedHashSet&lt;Node&gt;();</b>
+<b class="nc"><i>117</i>&nbsp;		getDescendantTips(tree, node, tipNodes);</b>
+<b class="nc"><i>118</i>&nbsp;		return tipNodes;</b>
+<i>119</i>&nbsp;	}
+<i>120</i>&nbsp;
+<i>121</i>&nbsp;	/**
+<i>122</i>&nbsp;	 * Private recursive function used by getDescendantTips.
+<i>123</i>&nbsp;	 */
+<i>124</i>&nbsp;	private static void getDescendantTips(RootedTree tree, Node node, Set&lt;Node&gt; tipNodes) {
+<i>125</i>&nbsp;
+<b class="nc"><i>126</i>&nbsp;		for (Node child : tree.getChildren(node)) {</b>
+<b class="nc"><i>127</i>&nbsp;			if (tree.isExternal(child)) {</b>
+<b class="nc"><i>128</i>&nbsp;				tipNodes.add(child);</b>
+<i>129</i>&nbsp;			} else {
+<b class="nc"><i>130</i>&nbsp;				getDescendantTips(tree, child, tipNodes);</b>
+<i>131</i>&nbsp;			}
+<b class="nc"><i>132</i>&nbsp;		}</b>
+<i>133</i>&nbsp;	}
+<i>134</i>&nbsp;
+<i>135</i>&nbsp;	/**
+<i>136</i>&nbsp;	 * Gets the most recent common ancestor (MRCA) node of a set of tip nodes.
+<i>137</i>&nbsp;	 * @param tree the JEBLTree
+<i>138</i>&nbsp;	 * @param tipNodes a set of tip nodes
+<i>139</i>&nbsp;	 * @return the Node of the MRCA
+<i>140</i>&nbsp;	 */
+<i>141</i>&nbsp;	public static Node getCommonAncestorNode(RootedTree tree, Set&lt;Node&gt; tipNodes) {
+<i>142</i>&nbsp;
+<b class="nc"><i>143</i>&nbsp;		if (tipNodes.size() == 0) {</b>
+<b class="nc"><i>144</i>&nbsp;			throw new IllegalArgumentException(&quot;No leaf nodes selected&quot;);</b>
+<i>145</i>&nbsp;		}
+<i>146</i>&nbsp;
+<b class="nc"><i>147</i>&nbsp;		if (tipNodes.size() == 1) return tipNodes.iterator().next();</b>
+<i>148</i>&nbsp;
+<b class="nc"><i>149</i>&nbsp;		Node[] mrca = new Node[] { null };</b>
+<b class="nc"><i>150</i>&nbsp;		getCommonAncestorNode(tree, tree.getRootNode(), tipNodes, mrca);</b>
+<i>151</i>&nbsp;
+<b class="nc"><i>152</i>&nbsp;		return mrca[0];</b>
+<i>153</i>&nbsp;	}
+<i>154</i>&nbsp;
+<i>155</i>&nbsp;	/**
+<i>156</i>&nbsp;	 * Private recursive function used by getCommonAncestorNode.
+<i>157</i>&nbsp;	 */
+<i>158</i>&nbsp;	private static int getCommonAncestorNode(RootedTree tree, Node node,
+<i>159</i>&nbsp;	                                         Set&lt;Node&gt; tipNodes,
+<i>160</i>&nbsp;	                                         Node[] mrca) {
+<i>161</i>&nbsp;
+<i>162</i>&nbsp;
+<b class="nc"><i>163</i>&nbsp;		int matches = 0;</b>
+<i>164</i>&nbsp;
+<b class="nc"><i>165</i>&nbsp;		for (Node child : tree.getChildren(node)) {</b>
+<b class="nc"><i>166</i>&nbsp;			if (tree.isExternal(child)) {</b>
+<b class="nc"><i>167</i>&nbsp;				if (tipNodes.contains(child)) {</b>
+<b class="nc"><i>168</i>&nbsp;					matches ++;</b>
+<i>169</i>&nbsp;				}
+<i>170</i>&nbsp;			} else {
+<i>171</i>&nbsp;
+<b class="nc"><i>172</i>&nbsp;				matches += getCommonAncestorNode(tree, child, tipNodes, mrca);</b>
+<i>173</i>&nbsp;
+<b class="nc"><i>174</i>&nbsp;				if (mrca[0] != null) {</b>
+<b class="nc"><i>175</i>&nbsp;					return matches;</b>
+<i>176</i>&nbsp;				}
+<i>177</i>&nbsp;			}
+<b class="nc"><i>178</i>&nbsp;		}</b>
+<i>179</i>&nbsp;
+<i>180</i>&nbsp;		// If we haven&#39;t already found the MRCA, test this node
+<b class="nc"><i>181</i>&nbsp;		if (matches == tipNodes.size()) {</b>
+<b class="nc"><i>182</i>&nbsp;			mrca[0] = node;</b>
+<i>183</i>&nbsp;		}
+<i>184</i>&nbsp;
+<b class="nc"><i>185</i>&nbsp;		return matches;</b>
+<i>186</i>&nbsp;	}
+<i>187</i>&nbsp;
+<i>188</i>&nbsp;	/**
+<i>189</i>&nbsp;	 * Performs the a monophyly test on a set of tip nodes. The nodes are monophyletic
+<i>190</i>&nbsp;	 * if there is a node in the tree which subtends all the tips in the set (and
+<i>191</i>&nbsp;	 * only those tips).
+<i>192</i>&nbsp;	 * @param tree a tree object to perform test on
+<i>193</i>&nbsp;	 * @param tipNodes a set containing the tip node.
+<i>194</i>&nbsp;	 * @return boolean is monophyletic?
+<i>195</i>&nbsp;	 */
+<i>196</i>&nbsp;	public static boolean isMonophyletic(RootedTree tree, Set&lt;Node&gt; tipNodes) {
+<i>197</i>&nbsp;
+<b class="nc"><i>198</i>&nbsp;		if (tipNodes.size() == 0) {</b>
+<b class="nc"><i>199</i>&nbsp;			throw new IllegalArgumentException(&quot;No tip nodes selected&quot;);</b>
+<i>200</i>&nbsp;		}
+<i>201</i>&nbsp;
+<b class="nc"><i>202</i>&nbsp;		if (tipNodes.size() == 1) {</b>
+<i>203</i>&nbsp;			// A single selected leaf is always monophyletic
+<b class="nc"><i>204</i>&nbsp;			return true;</b>
+<i>205</i>&nbsp;		}
+<i>206</i>&nbsp;
+<b class="nc"><i>207</i>&nbsp;		if (tipNodes.size() == tree.getExternalNodesSet().size()) {</b>
+<i>208</i>&nbsp;			// All leaf nodes are selected
+<b class="nc"><i>209</i>&nbsp;			return true;</b>
+<i>210</i>&nbsp;		}
+<i>211</i>&nbsp;
+<b class="nc"><i>212</i>&nbsp;		int[] matchCount = new int[] { 0 };</b>
+<b class="nc"><i>213</i>&nbsp;		int[] tipCount = new int[] { 0 };</b>
+<i>214</i>&nbsp;
+<b class="nc"><i>215</i>&nbsp;		Boolean result = isMonophyletic(tree, tree.getRootNode(), tipNodes, matchCount, tipCount);</b>
+<i>216</i>&nbsp;
+<b class="nc"><i>217</i>&nbsp;		if (result != null) return result;</b>
+<i>218</i>&nbsp;
+<b class="nc"><i>219</i>&nbsp;		return false;</b>
+<i>220</i>&nbsp;	}
+<i>221</i>&nbsp;
+<i>222</i>&nbsp;	/**
+<i>223</i>&nbsp;	 * Private recursive function used by isMonophyletic.
+<i>224</i>&nbsp;	 */
+<i>225</i>&nbsp;	private static Boolean isMonophyletic(RootedTree tree, Node node,
+<i>226</i>&nbsp;	                                      Set&lt;Node&gt; tipNodes,
+<i>227</i>&nbsp;	                                      int[] matchCount, int[] tipCount) {
+<i>228</i>&nbsp;
+<b class="nc"><i>229</i>&nbsp;		int mc = 0;</b>
+<b class="nc"><i>230</i>&nbsp;		int tc = 0;</b>
+<i>231</i>&nbsp;
+<b class="nc"><i>232</i>&nbsp;		for (Node child : tree.getChildren(node)) {</b>
+<b class="nc"><i>233</i>&nbsp;			if (tree.isExternal(child)) {</b>
+<b class="nc"><i>234</i>&nbsp;				if (tipNodes.contains(child)) {</b>
+<b class="nc"><i>235</i>&nbsp;					mc ++;</b>
+<i>236</i>&nbsp;				}
+<b class="nc"><i>237</i>&nbsp;				tc ++;</b>
+<i>238</i>&nbsp;			} else {
+<i>239</i>&nbsp;
+<b class="nc"><i>240</i>&nbsp;				Boolean result = isMonophyletic(tree, child, tipNodes, matchCount, tipCount);</b>
+<i>241</i>&nbsp;
+<b class="nc"><i>242</i>&nbsp;				if (result != null) {</b>
+<b class="nc"><i>243</i>&nbsp;					return result;</b>
+<i>244</i>&nbsp;				}
+<i>245</i>&nbsp;
+<b class="nc"><i>246</i>&nbsp;				mc += matchCount[0];</b>
+<b class="nc"><i>247</i>&nbsp;				tc += tipCount[0];</b>
+<i>248</i>&nbsp;			}
+<b class="nc"><i>249</i>&nbsp;		}</b>
+<i>250</i>&nbsp;
+<i>251</i>&nbsp;
+<b class="nc"><i>252</i>&nbsp;		matchCount[0] = mc;</b>
+<b class="nc"><i>253</i>&nbsp;		tipCount[0] = tc;</b>
+<i>254</i>&nbsp;
+<i>255</i>&nbsp;		// If we haven&#39;t already found the MRCA, test this node
+<b class="nc"><i>256</i>&nbsp;		if (mc == tc &amp;&amp; tc == tipNodes.size()) {</b>
+<i>257</i>&nbsp;			// monophyletic
+<b class="nc"><i>258</i>&nbsp;			return Boolean.TRUE;</b>
+<i>259</i>&nbsp;		}
+<i>260</i>&nbsp;
+<b class="nc"><i>261</i>&nbsp;		if (mc != 0 &amp;&amp; mc != tc) {</b>
+<i>262</i>&nbsp;			// not monophyletic
+<b class="nc"><i>263</i>&nbsp;			return Boolean.FALSE;</b>
+<i>264</i>&nbsp;		}
+<i>265</i>&nbsp;
+<i>266</i>&nbsp;		// no result yet
+<b class="nc"><i>267</i>&nbsp;		return null;</b>
+<i>268</i>&nbsp;	}
+<i>269</i>&nbsp;
+<i>270</i>&nbsp;	/**
+<i>271</i>&nbsp;	 * Recursive function for constructing a newick tree representation in the given buffer.
+<i>272</i>&nbsp;	 */
+<i>273</i>&nbsp;	public static String uniqueNewick(RootedTree tree, Node node) {
+<b class="nc"><i>274</i>&nbsp;		if (tree.isExternal(node)) {</b>
+<b class="nc"><i>275</i>&nbsp;			return tree.getTaxon(node).toString();</b>
+<i>276</i>&nbsp;		} else {
+<b class="nc"><i>277</i>&nbsp;			StringBuffer buffer = new StringBuffer(&quot;(&quot;);</b>
+<i>278</i>&nbsp;
+<b class="nc"><i>279</i>&nbsp;			List&lt;String&gt; subtrees = new ArrayList&lt;String&gt;();</b>
+<i>280</i>&nbsp;
+<b class="nc"><i>281</i>&nbsp;			for (Node child : tree.getChildren(node)) {</b>
+<b class="nc"><i>282</i>&nbsp;				subtrees.add(uniqueNewick(tree, child));</b>
+<b class="nc"><i>283</i>&nbsp;			}</b>
+<b class="nc"><i>284</i>&nbsp;			Collections.sort(subtrees);</b>
+<i>285</i>&nbsp;
+<b class="nc"><i>286</i>&nbsp;			for (int i = 0; i &lt; subtrees.size(); i++) {</b>
+<b class="nc"><i>287</i>&nbsp;				buffer.append(subtrees.get(i));</b>
+<b class="nc"><i>288</i>&nbsp;				if (i &lt; subtrees.size() - 1) {</b>
+<b class="nc"><i>289</i>&nbsp;					buffer.append(&quot;,&quot;);</b>
+<i>290</i>&nbsp;				}
+<i>291</i>&nbsp;			}
+<b class="nc"><i>292</i>&nbsp;			buffer.append(&quot;)&quot;);</b>
+<i>293</i>&nbsp;
+<b class="nc"><i>294</i>&nbsp;			return buffer.toString();</b>
+<i>295</i>&nbsp;		}
+<i>296</i>&nbsp;	}
+<i>297</i>&nbsp;
+<i>298</i>&nbsp;	/**
+<i>299</i>&nbsp;	 * Compares 2 trees and returns true if they have the same topology.
+<i>300</i>&nbsp;	 */
+<i>301</i>&nbsp;	public static boolean equal(RootedTree tree1, RootedTree tree2) {
+<i>302</i>&nbsp;
+<b class="nc"><i>303</i>&nbsp;		return uniqueNewick(tree1, tree1.getRootNode()).equals(uniqueNewick(tree2, tree2.getRootNode()));</b>
+<i>304</i>&nbsp;	}
+<i>305</i>&nbsp;
+<i>306</i>&nbsp;
+<i>307</i>&nbsp;}
+<i>308</i>&nbsp;
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

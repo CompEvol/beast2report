@@ -1,0 +1,117 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Version</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.util</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Version (beast.app.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Version</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    11.1%
+  </span>
+  <span class="absValue">
+    (1/ 9)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.util;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;/**
+<i>4</i>&nbsp; * Version last changed 2004/05/07 by AER
+<i>5</i>&nbsp; *
+<i>6</i>&nbsp; * @author Alexei Drummond
+<i>7</i>&nbsp; * @author Andrew Rambaut
+<i>8</i>&nbsp; * @version $Id: Version.java,v 1.13 2005/07/11 14:06:25 rambaut Exp $
+<i>9</i>&nbsp; */
+<b class="fc"><i>10</i>&nbsp;public abstract class Version {</b>
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;    public abstract String getVersion();
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;    public abstract String getVersionString();
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;    public abstract String getDateString();
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;    public abstract String[] getCredits();
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;    public String getHTMLCredits() {
+<b class="nc"><i>21</i>&nbsp;        String str = &quot;&quot;;</b>
+<b class="nc"><i>22</i>&nbsp;        for (String s : getCredits()) {</b>
+<b class="nc"><i>23</i>&nbsp;            if (s.contains(&quot;@&quot;)) {</b>
+<b class="nc"><i>24</i>&nbsp;                str += &quot;&lt;a href=\&quot;mailto:&quot; + s + &quot;\&quot;&gt;&quot; + s + &quot;&lt;/a&gt;&lt;br&gt;&quot;;</b>
+<i>25</i>&nbsp;            }
+<b class="nc"><i>26</i>&nbsp;            if (s.contains(&quot;http&quot;)) {</b>
+<b class="nc"><i>27</i>&nbsp;                str += &quot;&lt;a href=\&quot;&quot; + s + &quot;\&quot;&gt;&quot; + s + &quot;&lt;/a&gt;&lt;br&gt;&quot;;</b>
+<i>28</i>&nbsp;            } else {
+<b class="nc"><i>29</i>&nbsp;                str += &quot;&lt;p&gt;&quot; + s + &quot;&lt;/p&gt;&quot;;</b>
+<i>30</i>&nbsp;            }
+<i>31</i>&nbsp;        }
+<b class="nc"><i>32</i>&nbsp;        return str;</b>
+<i>33</i>&nbsp;    }
+<i>34</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

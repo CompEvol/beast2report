@@ -1,0 +1,461 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: OperatorSchedule</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.core</a> ]
+</div>
+
+<h1>Coverage Summary for Class: OperatorSchedule (beast.core)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OperatorSchedule</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 165)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">OperatorSchedule$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">OperatorSchedule$OptimisationTransform</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 167)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.core;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.io.BufferedReader;
+<i>4</i>&nbsp;import java.io.File;
+<i>5</i>&nbsp;import java.io.FileReader;
+<i>6</i>&nbsp;import java.io.FileWriter;
+<i>7</i>&nbsp;import java.io.IOException;
+<i>8</i>&nbsp;import java.io.PrintStream;
+<i>9</i>&nbsp;import java.io.PrintWriter;
+<i>10</i>&nbsp;import java.util.ArrayList;
+<i>11</i>&nbsp;import java.util.Arrays;
+<i>12</i>&nbsp;import java.util.Formatter;
+<i>13</i>&nbsp;import java.util.List;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;import org.json.JSONArray;
+<i>16</i>&nbsp;import org.json.JSONException;
+<i>17</i>&nbsp;import org.json.JSONObject;
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;import beast.core.util.Log;
+<i>20</i>&nbsp;import beast.util.Randomizer;
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;@Description(&quot;Specify operator selection and optimisation schedule&quot;)
+<b class="nc"><i>23</i>&nbsp;public class OperatorSchedule extends BEASTObject {</b>
+<i>24</i>&nbsp;
+<b class="nc"><i>25</i>&nbsp;    enum OptimisationTransform {none, log, sqrt}</b>
+<i>26</i>&nbsp;
+<b class="nc"><i>27</i>&nbsp;    final public Input&lt;OptimisationTransform&gt; transformInput = new Input&lt;&gt;(&quot;transform&quot;,</b>
+<i>28</i>&nbsp;            &quot;transform optimisation schedule (default none) This can be &quot;
+<b class="nc"><i>29</i>&nbsp;                    + Arrays.toString(OptimisationTransform.values()) + &quot; (default &#39;none&#39;)&quot;,</b>
+<b class="nc"><i>30</i>&nbsp;            OptimisationTransform.none, OptimisationTransform.values());</b>
+<b class="nc"><i>31</i>&nbsp;    final public Input&lt;Boolean&gt; autoOptimiseInput = new Input&lt;&gt;(&quot;autoOptimize&quot;, &quot;whether to automatically optimise operator settings&quot;, true);</b>
+<i>32</i>&nbsp;
+<b class="nc"><i>33</i>&nbsp;    final public Input&lt;Boolean&gt; detailedRejectionInput = new Input&lt;&gt;(&quot;detailedRejection&quot;, &quot;true if detailed rejection statistics should be included. (default=false)&quot;, false);</b>
+<i>34</i>&nbsp;
+<b class="nc"><i>35</i>&nbsp;    final public Input&lt;Integer&gt; autoOptimizeDelayInput = new Input&lt;&gt;(&quot;autoOptimizeDelay&quot;, &quot;number of samples to skip before auto optimisation kicks in (default=10000)&quot;, 10000);</b>
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;    /**
+<i>38</i>&nbsp;     * list of operators in the schedule *
+<i>39</i>&nbsp;     */
+<i>40</i>&nbsp;    // temporary for play
+<b class="nc"><i>41</i>&nbsp;    public List&lt;Operator&gt; operators = new ArrayList&lt;&gt;();</b>
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;    /**
+<i>44</i>&nbsp;     * sum of weight of operators *
+<i>45</i>&nbsp;     */
+<b class="nc"><i>46</i>&nbsp;    double totalWeight = 0;</b>
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;    /**
+<i>49</i>&nbsp;     * cumulative weights, with unity as max value *
+<i>50</i>&nbsp;     */
+<i>51</i>&nbsp;    double[] cumulativeProbs;
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;    /**
+<i>54</i>&nbsp;     * name of the file to store operator related info *
+<i>55</i>&nbsp;     */
+<i>56</i>&nbsp;    String stateFileName;
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;    /**
+<i>59</i>&nbsp;     * Don&#39;t start optimisation at the start of the chain, but wait till
+<i>60</i>&nbsp;     * autoOptimizeDelay has been reached.
+<i>61</i>&nbsp;     */
+<b class="nc"><i>62</i>&nbsp;    protected int autoOptimizeDelay = 10000;</b>
+<b class="nc"><i>63</i>&nbsp;    protected int autoOptimizeDelayCount = 0;</b>
+<b class="nc"><i>64</i>&nbsp;    OptimisationTransform transform = OptimisationTransform.none;</b>
+<b class="nc"><i>65</i>&nbsp;    boolean autoOptimise = true;</b>
+<b class="nc"><i>66</i>&nbsp;    boolean detailedRejection = false;</b>
+<i>67</i>&nbsp;
+<i>68</i>&nbsp;    @Override
+<i>69</i>&nbsp;    public void initAndValidate() {
+<b class="nc"><i>70</i>&nbsp;        transform = transformInput.get();</b>
+<b class="nc"><i>71</i>&nbsp;        autoOptimise = autoOptimiseInput.get();</b>
+<b class="nc"><i>72</i>&nbsp;        autoOptimizeDelay = autoOptimizeDelayInput.get();</b>
+<b class="nc"><i>73</i>&nbsp;        detailedRejection = detailedRejectionInput.get();</b>
+<b class="nc"><i>74</i>&nbsp;    }</b>
+<i>75</i>&nbsp;
+<i>76</i>&nbsp;    public void setStateFileName(final String name) {
+<b class="nc"><i>77</i>&nbsp;        this.stateFileName = name;</b>
+<b class="nc"><i>78</i>&nbsp;    }</b>
+<i>79</i>&nbsp;
+<i>80</i>&nbsp;    /**
+<i>81</i>&nbsp;     * add operator to the schedule *
+<i>82</i>&nbsp;     * @param p
+<i>83</i>&nbsp;     */
+<i>84</i>&nbsp;    public void addOperator(final Operator p) {
+<b class="nc"><i>85</i>&nbsp;        operators.add(p);</b>
+<b class="nc"><i>86</i>&nbsp;        p.setOperatorSchedule(this);</b>
+<b class="nc"><i>87</i>&nbsp;        totalWeight += p.getWeight();</b>
+<b class="nc"><i>88</i>&nbsp;        cumulativeProbs = new double[operators.size()];</b>
+<b class="nc"><i>89</i>&nbsp;        cumulativeProbs[0] = operators.get(0).getWeight() / totalWeight;</b>
+<b class="nc"><i>90</i>&nbsp;        for (int i = 1; i &lt; operators.size(); i++) {</b>
+<b class="nc"><i>91</i>&nbsp;            cumulativeProbs[i] = operators.get(i).getWeight() / totalWeight + cumulativeProbs[i - 1];</b>
+<i>92</i>&nbsp;        }
+<b class="nc"><i>93</i>&nbsp;    }</b>
+<i>94</i>&nbsp;
+<i>95</i>&nbsp;    /**
+<i>96</i>&nbsp;     * randomly select an operator with probability proportional to the weight
+<i>97</i>&nbsp;     * of the operator
+<i>98</i>&nbsp;     * @return
+<i>99</i>&nbsp;     */
+<i>100</i>&nbsp;    public Operator selectOperator() {
+<b class="nc"><i>101</i>&nbsp;        final int operatorIndex = Randomizer.randomChoice(cumulativeProbs);</b>
+<b class="nc"><i>102</i>&nbsp;        return operators.get(operatorIndex);</b>
+<i>103</i>&nbsp;    }
+<i>104</i>&nbsp;
+<i>105</i>&nbsp;    private static final String TUNING = &quot;Tuning&quot;;
+<i>106</i>&nbsp;    private static final String NUM_ACCEPT = &quot;#accept&quot;;
+<i>107</i>&nbsp;    private static final String NUM_REJECT = &quot;#reject&quot;;
+<i>108</i>&nbsp;    private static final String PR_M = &quot;Pr(m)&quot;;
+<i>109</i>&nbsp;    private static final String PR_ACCEPT = &quot;Pr(acc|m)&quot;;
+<i>110</i>&nbsp;
+<i>111</i>&nbsp;    /**
+<i>112</i>&nbsp;     * report operator statistics *
+<i>113</i>&nbsp;     * @param out
+<i>114</i>&nbsp;     */
+<i>115</i>&nbsp;    public void showOperatorRates(final PrintStream out) {
+<i>116</i>&nbsp;
+<b class="nc"><i>117</i>&nbsp;        Formatter formatter = new Formatter(out);</b>
+<i>118</i>&nbsp;
+<b class="nc"><i>119</i>&nbsp;        int longestName = 0;</b>
+<b class="nc"><i>120</i>&nbsp;        for (final Operator operator : operators) {</b>
+<b class="nc"><i>121</i>&nbsp;            if (operator.getName().length() &gt; longestName) {</b>
+<b class="nc"><i>122</i>&nbsp;                longestName = operator.getName().length();</b>
+<i>123</i>&nbsp;            }
+<b class="nc"><i>124</i>&nbsp;        }</b>
+<i>125</i>&nbsp;
+<b class="nc"><i>126</i>&nbsp;        formatter.format(&quot;%-&quot; + longestName + &quot;s&quot;, &quot;Operator&quot;);</b>
+<i>127</i>&nbsp;
+<b class="nc"><i>128</i>&nbsp;        int colWidth = 10;</b>
+<b class="nc"><i>129</i>&nbsp;        String headerFormat = &quot; %&quot; + colWidth + &quot;s&quot;;</b>
+<i>130</i>&nbsp;
+<b class="nc"><i>131</i>&nbsp;        formatter.format(headerFormat, TUNING);</b>
+<b class="nc"><i>132</i>&nbsp;        formatter.format(headerFormat, NUM_ACCEPT);</b>
+<b class="nc"><i>133</i>&nbsp;        formatter.format(headerFormat, NUM_REJECT);</b>
+<b class="nc"><i>134</i>&nbsp;        if (detailedRejection) {</b>
+<b class="nc"><i>135</i>&nbsp;            formatter.format(headerFormat, &quot;rej.inv&quot;);</b>
+<b class="nc"><i>136</i>&nbsp;            formatter.format(headerFormat, &quot;rej.op&quot;);</b>
+<i>137</i>&nbsp;        }
+<b class="nc"><i>138</i>&nbsp;        formatter.format(headerFormat, PR_M);</b>
+<b class="nc"><i>139</i>&nbsp;        formatter.format(headerFormat, PR_ACCEPT);</b>
+<b class="nc"><i>140</i>&nbsp;        out.println();</b>
+<b class="nc"><i>141</i>&nbsp;        for (final Operator operator : operators) {</b>
+<b class="nc"><i>142</i>&nbsp;            out.println(prettyPrintOperator(operator, longestName, colWidth, 4, totalWeight, detailedRejection));</b>
+<b class="nc"><i>143</i>&nbsp;        }</b>
+<b class="nc"><i>144</i>&nbsp;        out.println();</b>
+<i>145</i>&nbsp;
+<b class="nc"><i>146</i>&nbsp;        formatter.format(headerFormat,TUNING);</b>
+<b class="nc"><i>147</i>&nbsp;        out.println(&quot;: The value of the operator&#39;s tuning parameter, or &#39;-&#39; if the operator can&#39;t be optimized.&quot;);</b>
+<b class="nc"><i>148</i>&nbsp;        formatter.format(headerFormat, NUM_ACCEPT);</b>
+<b class="nc"><i>149</i>&nbsp;        out.println(&quot;: The total number of times a proposal by this operator has been accepted.&quot;);</b>
+<b class="nc"><i>150</i>&nbsp;        formatter.format(headerFormat, NUM_REJECT);</b>
+<b class="nc"><i>151</i>&nbsp;        out.println(&quot;: The total number of times a proposal by this operator has been rejected.&quot;);</b>
+<b class="nc"><i>152</i>&nbsp;        formatter.format(headerFormat, PR_M);</b>
+<b class="nc"><i>153</i>&nbsp;        out.println(&quot;: The probability this operator is chosen in a step of the MCMC (i.e. the normalized weight).&quot;);</b>
+<b class="nc"><i>154</i>&nbsp;        formatter.format(headerFormat, PR_ACCEPT);</b>
+<b class="nc"><i>155</i>&nbsp;        out.println(&quot;: The acceptance probability (&quot; + NUM_ACCEPT + &quot; as a fraction of the total proposals for this operator).&quot;);</b>
+<b class="nc"><i>156</i>&nbsp;        out.println();</b>
+<b class="nc"><i>157</i>&nbsp;    }</b>
+<i>158</i>&nbsp;
+<i>159</i>&nbsp;    protected static String prettyPrintOperator(
+<i>160</i>&nbsp;            Operator op,
+<i>161</i>&nbsp;            int nameColWidth,
+<i>162</i>&nbsp;            int colWidth,
+<i>163</i>&nbsp;            int dp,
+<i>164</i>&nbsp;            double totalWeight,
+<i>165</i>&nbsp;            boolean detailedRejection) {
+<i>166</i>&nbsp;
+<b class="nc"><i>167</i>&nbsp;        double tuning = op.getCoercableParameterValue();</b>
+<b class="nc"><i>168</i>&nbsp;        double accRate = (double) op.m_nNrAccepted / (double) (op.m_nNrAccepted + op.m_nNrRejected);</b>
+<i>169</i>&nbsp;
+<b class="nc"><i>170</i>&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<b class="nc"><i>171</i>&nbsp;        Formatter formatter = new Formatter(sb);</b>
+<i>172</i>&nbsp;
+<b class="nc"><i>173</i>&nbsp;        String intFormat = &quot; %&quot; + colWidth + &quot;d&quot;;</b>
+<b class="nc"><i>174</i>&nbsp;        String doubleFormat = &quot; %&quot; + colWidth + &quot;.&quot; + dp + &quot;f&quot;;</b>
+<i>175</i>&nbsp;
+<b class="nc"><i>176</i>&nbsp;        formatter.format(&quot;%-&quot; + nameColWidth + &quot;s&quot;, op.getName());</b>
+<b class="nc"><i>177</i>&nbsp;        if (!Double.isNaN(tuning)) {</b>
+<b class="nc"><i>178</i>&nbsp;            formatter.format(doubleFormat, tuning);</b>
+<i>179</i>&nbsp;        } else {
+<b class="nc"><i>180</i>&nbsp;            formatter.format(&quot; %&quot; + colWidth + &quot;s&quot;, &quot;-&quot;);</b>
+<i>181</i>&nbsp;        }
+<i>182</i>&nbsp;
+<b class="nc"><i>183</i>&nbsp;        formatter.format(intFormat, op.m_nNrAccepted);</b>
+<b class="nc"><i>184</i>&nbsp;        formatter.format(intFormat, op.m_nNrRejected);</b>
+<b class="nc"><i>185</i>&nbsp;        if (detailedRejection) {</b>
+<b class="nc"><i>186</i>&nbsp;            formatter.format(doubleFormat, (double) op.m_nNrRejectedInvalid / (double) op.m_nNrRejected);</b>
+<b class="nc"><i>187</i>&nbsp;            formatter.format(doubleFormat, (double) op.m_nNrRejectedOperator / (double) op.m_nNrRejected);</b>
+<i>188</i>&nbsp;        }
+<b class="nc"><i>189</i>&nbsp;        if (totalWeight &gt; 0.0) {</b>
+<b class="nc"><i>190</i>&nbsp;            formatter.format(doubleFormat, op.getWeight() / totalWeight);</b>
+<i>191</i>&nbsp;        }
+<b class="nc"><i>192</i>&nbsp;        formatter.format(doubleFormat, accRate);</b>
+<i>193</i>&nbsp;
+<b class="nc"><i>194</i>&nbsp;        sb.append(&quot; &quot; + op.getPerformanceSuggestion());</b>
+<i>195</i>&nbsp;
+<b class="nc"><i>196</i>&nbsp;        formatter.close();</b>
+<i>197</i>&nbsp;   
+<b class="nc"><i>198</i>&nbsp;        return sb.toString();</b>
+<i>199</i>&nbsp;    }
+<i>200</i>&nbsp;
+<i>201</i>&nbsp;    /**
+<i>202</i>&nbsp;     * store operator optimisation specific information to file *
+<i>203</i>&nbsp;     * @throws IOException
+<i>204</i>&nbsp;     */
+<i>205</i>&nbsp;    public void storeToFile() throws IOException {
+<i>206</i>&nbsp;        // appends state of operator set to state file
+<b class="nc"><i>207</i>&nbsp;        File file = new File(stateFileName);</b>
+<b class="nc"><i>208</i>&nbsp;        PrintWriter out = new PrintWriter(new FileWriter(file, true));</b>
+<i>209</i>&nbsp;
+<b class="nc"><i>210</i>&nbsp;        out.println(&quot;&lt;!--&quot;);</b>
+<b class="nc"><i>211</i>&nbsp;        out.println(&quot;{\&quot;operators\&quot;:[&quot;);</b>
+<b class="nc"><i>212</i>&nbsp;        int k = 0;</b>
+<b class="nc"><i>213</i>&nbsp;        for (Operator operator: operators) {</b>
+<b class="nc"><i>214</i>&nbsp;            operator.storeToFile(out);</b>
+<b class="nc"><i>215</i>&nbsp;            if (k++ &lt; operators.size() - 1) {</b>
+<b class="nc"><i>216</i>&nbsp;            	out.println(&quot;,&quot;);</b>
+<i>217</i>&nbsp;            }
+<b class="nc"><i>218</i>&nbsp;        }</b>
+<b class="nc"><i>219</i>&nbsp;        out.println(&quot;\n]}&quot;);</b>
+<b class="nc"><i>220</i>&nbsp;        out.println(&quot;--&gt;&quot;);</b>
+<b class="nc"><i>221</i>&nbsp;        out.flush();</b>
+<b class="nc"><i>222</i>&nbsp;        out.close();</b>
+<b class="nc"><i>223</i>&nbsp;    }</b>
+<i>224</i>&nbsp;
+<i>225</i>&nbsp;    /**
+<i>226</i>&nbsp;     * restore operator optimisation specific information from file *
+<i>227</i>&nbsp;     * @throws IOException
+<i>228</i>&nbsp;     */
+<i>229</i>&nbsp;    public void restoreFromFile() throws IOException {
+<i>230</i>&nbsp;        // reads state of operator set from state file
+<b class="nc"><i>231</i>&nbsp;        String xml = &quot;&quot;;</b>
+<b class="nc"><i>232</i>&nbsp;        final BufferedReader fin = new BufferedReader(new FileReader(stateFileName));</b>
+<b class="nc"><i>233</i>&nbsp;        while (fin.ready()) {</b>
+<b class="nc"><i>234</i>&nbsp;            xml += fin.readLine() + &quot;\n&quot;;</b>
+<i>235</i>&nbsp;        }
+<b class="nc"><i>236</i>&nbsp;        fin.close();</b>
+<b class="nc"><i>237</i>&nbsp;        int start = xml.indexOf(&quot;&lt;/itsabeastystatewerein&gt;&quot;) + 25 + 5;</b>
+<b class="nc"><i>238</i>&nbsp;        if (start &gt;= xml.length() - 4) {</b>
+<b class="nc"><i>239</i>&nbsp;        	return;</b>
+<i>240</i>&nbsp;        }
+<b class="nc"><i>241</i>&nbsp;        xml = xml.substring(xml.indexOf(&quot;&lt;/itsabeastystatewerein&gt;&quot;) + 25 + 5, xml.length() - 4);</b>
+<i>242</i>&nbsp;        try {
+<b class="nc"><i>243</i>&nbsp;	        JSONObject o = new JSONObject(xml);</b>
+<b class="nc"><i>244</i>&nbsp;	        JSONArray operatorlist = o.getJSONArray(&quot;operators&quot;);</b>
+<b class="nc"><i>245</i>&nbsp;	        autoOptimizeDelayCount = 0;</b>
+<b class="nc"><i>246</i>&nbsp;	        for (int i = 0; i &lt; operatorlist.length(); i++) {</b>
+<b class="nc"><i>247</i>&nbsp;	            JSONObject item = operatorlist.getJSONObject(i);</b>
+<b class="nc"><i>248</i>&nbsp;	            String id = item.getString(&quot;id&quot;);</b>
+<b class="nc"><i>249</i>&nbsp;	    		boolean found = false;</b>
+<b class="nc"><i>250</i>&nbsp;	            if (!id.equals(&quot;null&quot;)) {</b>
+<b class="nc"><i>251</i>&nbsp;	            	for (Operator operator: operators) {</b>
+<b class="nc"><i>252</i>&nbsp;	            		if (id.equals(operator.getID())) {</b>
+<b class="nc"><i>253</i>&nbsp;	                    	operator.restoreFromFile(item);</b>
+<b class="nc"><i>254</i>&nbsp;	                        autoOptimizeDelayCount += operator.m_nNrAccepted + operator.m_nNrRejected;</b>
+<b class="nc"><i>255</i>&nbsp;	                        found = true;</b>
+<b class="nc"><i>256</i>&nbsp;	            			break;</b>
+<i>257</i>&nbsp;	            		}
+<b class="nc"><i>258</i>&nbsp;	            	}</b>
+<i>259</i>&nbsp;	            }
+<b class="nc"><i>260</i>&nbsp;	        	if (!found) {</b>
+<b class="nc"><i>261</i>&nbsp;	        		Log.warning.println(&quot;Operator (&quot; + id + &quot;) found in state file that is not in operator list any more&quot;);</b>
+<i>262</i>&nbsp;	        	}
+<i>263</i>&nbsp;	        }
+<b class="nc"><i>264</i>&nbsp;	    	for (Operator operator: operators) {</b>
+<b class="nc"><i>265</i>&nbsp;	    		if (operator.getID() == null) {</b>
+<b class="nc"><i>266</i>&nbsp;	        		Log.warning.println(&quot;Operator (&quot; + operator.getClass() + &quot;) found in BEAST file that could not be restored because it has not ID&quot;);</b>
+<i>267</i>&nbsp;	    		}
+<b class="nc"><i>268</i>&nbsp;	    	}    </b>
+<b class="nc"><i>269</i>&nbsp;        } catch (JSONException e) {</b>
+<i>270</i>&nbsp;        	// it is not a JSON file -- probably a version 2.0.X state file
+<b class="nc"><i>271</i>&nbsp;	        String[] strs = xml.split(&quot;\n&quot;);</b>
+<b class="nc"><i>272</i>&nbsp;            autoOptimizeDelayCount = 0;</b>
+<b class="nc"><i>273</i>&nbsp;	        for (int i = 0; i &lt; operators.size() &amp;&amp; i + 2 &lt; strs.length; i++) {</b>
+<b class="nc"><i>274</i>&nbsp;	            String[] strs2 = strs[i + 1].split(&quot; &quot;);</b>
+<b class="nc"><i>275</i>&nbsp;	            Operator operator = operators.get(i);</b>
+<b class="nc"><i>276</i>&nbsp;	            if ((operator.getID() == null &amp;&amp; strs2[0].equals(&quot;null&quot;)) || operator.getID().equals(strs2[0])) {</b>
+<b class="nc"><i>277</i>&nbsp;	                cumulativeProbs[i] = Double.parseDouble(strs2[1]);</b>
+<b class="nc"><i>278</i>&nbsp;	                if (!strs2[2].equals(&quot;NaN&quot;)) {</b>
+<b class="nc"><i>279</i>&nbsp;	                    operator.setCoercableParameterValue(Double.parseDouble(strs2[2]));</b>
+<i>280</i>&nbsp;	                }
+<b class="nc"><i>281</i>&nbsp;	                operator.m_nNrAccepted = Integer.parseInt(strs2[3]);</b>
+<b class="nc"><i>282</i>&nbsp;	                operator.m_nNrRejected = Integer.parseInt(strs2[4]);</b>
+<b class="nc"><i>283</i>&nbsp;	                autoOptimizeDelayCount += operator.m_nNrAccepted + operator.m_nNrRejected;</b>
+<b class="nc"><i>284</i>&nbsp;	                operator.m_nNrAcceptedForCorrection = Integer.parseInt(strs2[5]);</b>
+<b class="nc"><i>285</i>&nbsp;	                operator.m_nNrRejectedForCorrection = Integer.parseInt(strs2[6]);</b>
+<i>286</i>&nbsp;	            } else {
+<b class="nc"><i>287</i>&nbsp;	                throw new RuntimeException(&quot;Cannot resume: operator order or set changed from previous run&quot;);</b>
+<i>288</i>&nbsp;	            }
+<i>289</i>&nbsp;	        }
+<b class="nc"><i>290</i>&nbsp;	    }</b>
+<b class="nc"><i>291</i>&nbsp;        showOperatorRates(System.err);</b>
+<b class="nc"><i>292</i>&nbsp;    }</b>
+<i>293</i>&nbsp;
+<i>294</i>&nbsp;    /**
+<i>295</i>&nbsp;     * Calculate change of coerceable parameter for operators that allow
+<i>296</i>&nbsp;     * optimisation
+<i>297</i>&nbsp;     *
+<i>298</i>&nbsp;     * @param operator
+<i>299</i>&nbsp;     * @param logAlpha difference in posterior between previous state &amp; proposed
+<i>300</i>&nbsp;     *                 state + hasting ratio
+<i>301</i>&nbsp;     * @return change of value of a parameter for MCMC chain optimisation
+<i>302</i>&nbsp;     */
+<i>303</i>&nbsp;    public double calcDelta(final Operator operator, final double logAlpha) {
+<i>304</i>&nbsp;        // do no optimisation for the first N optimisable operations
+<b class="nc"><i>305</i>&nbsp;        if (autoOptimizeDelayCount &lt; autoOptimizeDelay || !autoOptimise) {</b>
+<b class="nc"><i>306</i>&nbsp;            autoOptimizeDelayCount++;</b>
+<b class="nc"><i>307</i>&nbsp;            return 0;</b>
+<i>308</i>&nbsp;        }
+<b class="nc"><i>309</i>&nbsp;        final double target = operator.getTargetAcceptanceProbability();</b>
+<i>310</i>&nbsp;
+<b class="nc"><i>311</i>&nbsp;        double count = (operator.m_nNrRejectedForCorrection + operator.m_nNrAcceptedForCorrection + 1.0);</b>
+<b class="nc"><i>312</i>&nbsp;        switch (transform) {</b>
+<i>313</i>&nbsp;            case log:
+<b class="nc"><i>314</i>&nbsp;                count = Math.log(count + 1.0);</b>
+<b class="nc"><i>315</i>&nbsp;                break;</b>
+<i>316</i>&nbsp;            case sqrt:
+<b class="nc"><i>317</i>&nbsp;                count = Math.sqrt(count);</b>
+<b class="nc"><i>318</i>&nbsp;                break;</b>
+<i>319</i>&nbsp;            case none:
+<b class="nc"><i>320</i>&nbsp;            	break;</b>
+<i>321</i>&nbsp;            default:
+<i>322</i>&nbsp;            	break;
+<i>323</i>&nbsp;        }
+<i>324</i>&nbsp;
+<b class="nc"><i>325</i>&nbsp;        final double deltaP = ((1.0 / count) * (Math.exp(Math.min(logAlpha, 0)) - target));</b>
+<i>326</i>&nbsp;
+<b class="nc"><i>327</i>&nbsp;        if (deltaP &gt; -Double.MAX_VALUE &amp;&amp; deltaP &lt; Double.MAX_VALUE) {</b>
+<b class="nc"><i>328</i>&nbsp;            return deltaP;</b>
+<i>329</i>&nbsp;        }
+<b class="nc"><i>330</i>&nbsp;        return 0;</b>
+<i>331</i>&nbsp;    }
+<i>332</i>&nbsp;
+<i>333</i>&nbsp;} // class OperatorSchedule
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,107 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Citation</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.core</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Citation (beast.core)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">Citation</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;* File Description.java
+<i>3</i>&nbsp;*
+<i>4</i>&nbsp;* Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>5</i>&nbsp;*
+<i>6</i>&nbsp;* This file is part of BEAST2.
+<i>7</i>&nbsp;* See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp;* information regarding copyright ownership and licensing.
+<i>9</i>&nbsp;*
+<i>10</i>&nbsp;* BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp;* it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp;* published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp;* of the License, or (at your option) any later version.
+<i>14</i>&nbsp;*
+<i>15</i>&nbsp;*  BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp;*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp;*  GNU Lesser General Public License for more details.
+<i>19</i>&nbsp;*
+<i>20</i>&nbsp;* You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp;* License along with BEAST; if not, write to the
+<i>22</i>&nbsp;* Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp;* Boston, MA  02110-1301  USA
+<i>24</i>&nbsp;*/
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;package beast.core;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;import java.lang.annotation.ElementType;
+<i>29</i>&nbsp;import java.lang.annotation.Inherited;
+<i>30</i>&nbsp;import java.lang.annotation.Retention;
+<i>31</i>&nbsp;import java.lang.annotation.RetentionPolicy;
+<i>32</i>&nbsp;import java.lang.annotation.Target;
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;/**
+<i>35</i>&nbsp; * This is an annotation that can be used to add a reference
+<i>36</i>&nbsp; * to a class.
+<i>37</i>&nbsp; * &lt;p/&gt;
+<i>38</i>&nbsp; * Example: @Citation(&quot;Darwin &amp; Wallace (1858) &#39;On the Tendency
+<i>39</i>&nbsp; * of Species to form Varieties and on the Perpetuation of Varieties
+<i>40</i>&nbsp; * and Species by Natural Means of Selection.&#39; Linnean Society&quot;)
+<i>41</i>&nbsp; * just before class declarations of plug-ins. Applications
+<i>42</i>&nbsp; * like DocMaker then can pick it up through introspection.
+<i>43</i>&nbsp; * &lt;p/&gt;
+<i>44</i>&nbsp; */
+<i>45</i>&nbsp;@Target({ElementType.TYPE})
+<i>46</i>&nbsp;@Retention(RetentionPolicy.RUNTIME)
+<i>47</i>&nbsp;@Inherited
+<i>48</i>&nbsp;public @interface Citation {
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;    /**
+<i>51</i>&nbsp;     * @return the citation for the class
+<i>52</i>&nbsp;     */
+<i>53</i>&nbsp;    String value();
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;    String DOI() default &quot;&quot;;
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;    int year() default 0;
+<i>58</i>&nbsp;    
+<i>59</i>&nbsp;    String firstAuthorSurname() default &quot;&quot;;
+<i>60</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

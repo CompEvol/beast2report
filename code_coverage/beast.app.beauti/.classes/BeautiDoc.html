@@ -1,0 +1,2677 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: BeautiDoc</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.beauti</a> ]
+</div>
+
+<h1>Coverage Summary for Class: BeautiDoc (beast.app.beauti)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BeautiDoc</td>
+<td class="coverageStat">
+  <span class="percent">
+    73.5%
+  </span>
+  <span class="absValue">
+    (61/ 83)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    68.9%
+  </span>
+  <span class="absValue">
+    (928/ 1347)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BeautiDoc$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BeautiDoc$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BeautiDoc$ActionOnExit</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BeautiDoc$DOC_STATUS</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    73.3%
+  </span>
+  <span class="absValue">
+    (66/ 90)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    68.9%
+  </span>
+  <span class="absValue">
+    (933/ 1354)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.beauti;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import java.io.BufferedReader;
+<i>5</i>&nbsp;import java.io.ByteArrayOutputStream;
+<i>6</i>&nbsp;import java.io.File;
+<i>7</i>&nbsp;import java.io.FileNotFoundException;
+<i>8</i>&nbsp;import java.io.FileOutputStream;
+<i>9</i>&nbsp;import java.io.FileReader;
+<i>10</i>&nbsp;import java.io.FileWriter;
+<i>11</i>&nbsp;import java.io.IOException;
+<i>12</i>&nbsp;import java.io.OutputStream;
+<i>13</i>&nbsp;import java.io.OutputStreamWriter;
+<i>14</i>&nbsp;import java.io.PrintStream;
+<i>15</i>&nbsp;import java.io.StringReader;
+<i>16</i>&nbsp;import java.io.StringWriter;
+<i>17</i>&nbsp;import java.io.Writer;
+<i>18</i>&nbsp;import java.util.ArrayList;
+<i>19</i>&nbsp;import java.util.Arrays;
+<i>20</i>&nbsp;import java.util.Collection;
+<i>21</i>&nbsp;import java.util.HashMap;
+<i>22</i>&nbsp;import java.util.HashSet;
+<i>23</i>&nbsp;import java.util.List;
+<i>24</i>&nbsp;import java.util.Map;
+<i>25</i>&nbsp;import java.util.Set;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;import javax.swing.JFrame;
+<i>28</i>&nbsp;import javax.swing.JOptionPane;
+<i>29</i>&nbsp;import javax.xml.parsers.DocumentBuilderFactory;
+<i>30</i>&nbsp;import javax.xml.parsers.ParserConfigurationException;
+<i>31</i>&nbsp;import javax.xml.transform.OutputKeys;
+<i>32</i>&nbsp;import javax.xml.transform.Transformer;
+<i>33</i>&nbsp;import javax.xml.transform.TransformerException;
+<i>34</i>&nbsp;import javax.xml.transform.TransformerFactory;
+<i>35</i>&nbsp;import javax.xml.transform.dom.DOMSource;
+<i>36</i>&nbsp;import javax.xml.transform.stream.StreamResult;
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;import org.w3c.dom.Document;
+<i>39</i>&nbsp;import org.w3c.dom.Node;
+<i>40</i>&nbsp;import org.w3c.dom.NodeList;
+<i>41</i>&nbsp;import org.xml.sax.InputSource;
+<i>42</i>&nbsp;import org.xml.sax.SAXException;
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;import beast.app.draw.BEASTObjectPanel;
+<i>45</i>&nbsp;import beast.app.draw.InputEditor;
+<i>46</i>&nbsp;import beast.app.draw.InputEditorFactory;
+<i>47</i>&nbsp;import beast.core.BEASTInterface;
+<i>48</i>&nbsp;import beast.core.BEASTObject;
+<i>49</i>&nbsp;import beast.core.Description;
+<i>50</i>&nbsp;import beast.core.Distribution;
+<i>51</i>&nbsp;import beast.core.Input;
+<i>52</i>&nbsp;import beast.core.Input.Validate;
+<i>53</i>&nbsp;import beast.core.MCMC;
+<i>54</i>&nbsp;import beast.core.Operator;
+<i>55</i>&nbsp;import beast.core.StateNode;
+<i>56</i>&nbsp;import beast.core.parameter.Parameter;
+<i>57</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>58</i>&nbsp;import beast.core.util.CompoundDistribution;
+<i>59</i>&nbsp;import beast.core.util.Log;
+<i>60</i>&nbsp;import beast.evolution.alignment.Alignment;
+<i>61</i>&nbsp;import beast.evolution.alignment.FilteredAlignment;
+<i>62</i>&nbsp;import beast.evolution.alignment.Taxon;
+<i>63</i>&nbsp;import beast.evolution.alignment.TaxonSet;
+<i>64</i>&nbsp;import beast.evolution.branchratemodel.BranchRateModel;
+<i>65</i>&nbsp;import beast.evolution.branchratemodel.StrictClockModel;
+<i>66</i>&nbsp;import beast.evolution.likelihood.GenericTreeLikelihood;
+<i>67</i>&nbsp;import beast.evolution.operators.TipDatesRandomWalker;
+<i>68</i>&nbsp;import beast.evolution.substitutionmodel.SubstitutionModel;
+<i>69</i>&nbsp;import beast.evolution.tree.TraitSet;
+<i>70</i>&nbsp;import beast.evolution.tree.Tree;
+<i>71</i>&nbsp;import beast.math.distributions.MRCAPrior;
+<i>72</i>&nbsp;import beast.math.distributions.ParametricDistribution;
+<i>73</i>&nbsp;import beast.math.distributions.Uniform;
+<i>74</i>&nbsp;import beast.util.JSONProducer;
+<i>75</i>&nbsp;import beast.util.NexusParser;
+<i>76</i>&nbsp;import beast.util.XMLParser;
+<i>77</i>&nbsp;import beast.util.XMLParser.RequiredInputProvider;
+<i>78</i>&nbsp;import beast.util.XMLParserException;
+<i>79</i>&nbsp;import beast.util.XMLProducer;
+<i>80</i>&nbsp;
+<i>81</i>&nbsp;
+<i>82</i>&nbsp;@Description(&quot;Beauti document in doc-view pattern, not useful in models&quot;)
+<i>83</i>&nbsp;public class BeautiDoc extends BEASTObject implements RequiredInputProvider {
+<i>84</i>&nbsp;    final static String STANDARD_TEMPLATE = &quot;templates/Standard.xml&quot;;
+<i>85</i>&nbsp;
+<i>86</i>&nbsp;    final static int ALIGNMENT_PARTITION = 3;
+<i>87</i>&nbsp;    final static int SITEMODEL_PARTITION = 0;
+<i>88</i>&nbsp;    final static int CLOCKMODEL_PARTITION = 1;
+<i>89</i>&nbsp;    final static int TREEMODEL_PARTITION = 2;
+<i>90</i>&nbsp;
+<b class="fc"><i>91</i>&nbsp;    public enum ActionOnExit {</b>
+<b class="fc"><i>92</i>&nbsp;        UNKNOWN, SHOW_DETAILS_USE_TEMPLATE, SHOW_DETAILS_USE_XML_SPEC, WRITE_XML, MERGE_AND_WRITE_XML</b>
+<i>93</i>&nbsp;    }
+<i>94</i>&nbsp;
+<b class="fc"><i>95</i>&nbsp;    public List&lt;Alignment&gt; alignments = new ArrayList&lt;&gt;();</b>
+<i>96</i>&nbsp;
+<b class="fc"><i>97</i>&nbsp;    final public Input&lt;beast.core.Runnable&gt; mcmc = new Input&lt;&gt;(&quot;runnable&quot;, &quot;main entry of analysis&quot;,</b>
+<i>98</i>&nbsp;            Validate.REQUIRED);
+<i>99</i>&nbsp;
+<i>100</i>&nbsp;    protected List&lt;BranchRateModel&gt; clockModels;
+<i>101</i>&nbsp;    // protected List&lt;TreeDistribution&gt; treePriors;
+<i>102</i>&nbsp;    /**
+<i>103</i>&nbsp;     * contains all loggers from the template *
+<i>104</i>&nbsp;     */
+<i>105</i>&nbsp;
+<b class="fc"><i>106</i>&nbsp;    public boolean autoSetClockRate = true;</b>
+<i>107</i>&nbsp;
+<b class="fc"><i>108</i>&nbsp;    public boolean autoUpdateOperatorWeights = true;</b>
+<i>109</i>&nbsp;
+<b class="fc"><i>110</i>&nbsp;    public boolean autoUpdateFixMeanSubstRate = true;</b>
+<i>111</i>&nbsp;    /**
+<i>112</i>&nbsp;     * flags for whether parameters can be linked.
+<i>113</i>&nbsp;     * Once a parameter is linked, (un)linking in the alignment editor should be disabled
+<i>114</i>&nbsp;     */
+<b class="fc"><i>115</i>&nbsp;    public boolean allowLinking = false;</b>
+<b class="fc"><i>116</i>&nbsp;    public boolean hasLinkedAtLeastOnce = false;</b>
+<i>117</i>&nbsp;
+<i>118</i>&nbsp;    /**
+<i>119</i>&nbsp;     * [0] = sitemodel [1] = clock model [2] = tree *
+<i>120</i>&nbsp;     */
+<i>121</i>&nbsp;    List&lt;BEASTInterface&gt;[] pPartitionByAlignments;
+<i>122</i>&nbsp;    List&lt;BEASTInterface&gt;[] pPartition;
+<i>123</i>&nbsp;    private List&lt;Integer&gt;[] currentPartitions;
+<i>124</i>&nbsp;    // partition names
+<b class="fc"><i>125</i>&nbsp;    List&lt;PartitionContext&gt; partitionNames = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>126</i>&nbsp;    Set&lt;PartitionContext&gt; possibleContexts = new HashSet&lt;&gt;();</b>
+<i>127</i>&nbsp;
+<i>128</i>&nbsp;    public BeautiConfig beautiConfig;
+<i>129</i>&nbsp;    Beauti beauti;
+<i>130</i>&nbsp;
+<b class="fc"><i>131</i>&nbsp;    private String templateName = null;</b>
+<b class="fc"><i>132</i>&nbsp;    private String templateFileName = STANDARD_TEMPLATE;</b>
+<i>133</i>&nbsp;
+<b class="fc"><i>134</i>&nbsp;    Map&lt;String, String&gt; tipTextMap = new HashMap&lt;&gt;();</b>
+<i>135</i>&nbsp;
+<i>136</i>&nbsp;    /**
+<i>137</i>&nbsp;     * list of all beastObjects in the model, mapped by its ID *
+<i>138</i>&nbsp;     */
+<b class="fc"><i>139</i>&nbsp;    public HashMap&lt;String, BEASTInterface&gt; pluginmap = null;</b>
+<i>140</i>&nbsp;    private Map&lt;BEASTInterface, String&gt; reversePluginmap;
+<i>141</i>&nbsp;    /**
+<i>142</i>&nbsp;     * list of all beastObjects in the model that have an impact on the posterior
+<i>143</i>&nbsp;     */
+<b class="fc"><i>144</i>&nbsp;    List&lt;BEASTInterface&gt; posteriorPredecessors = null;</b>
+<b class="fc"><i>145</i>&nbsp;    List&lt;BEASTInterface&gt; likelihoodPredecessors = null;</b>
+<i>146</i>&nbsp;
+<i>147</i>&nbsp;    /**
+<i>148</i>&nbsp;     * set of all taxa in the model *
+<i>149</i>&nbsp;     */
+<b class="fc"><i>150</i>&nbsp;    public Map&lt;String,Taxon&gt; taxaset = null;</b>
+<i>151</i>&nbsp;
+<b class="fc"><i>152</i>&nbsp;    private boolean isExpertMode = false;</b>
+<i>153</i>&nbsp;
+<b class="fc"><i>154</i>&nbsp;    public Set&lt;InputEditor&gt; currentInputEditors = new HashSet&lt;&gt;();</b>
+<i>155</i>&nbsp;
+<i>156</i>&nbsp;    /**
+<i>157</i>&nbsp;     * name of current file, used for saving (as opposed to saveAs) *
+<i>158</i>&nbsp;     */
+<b class="fc"><i>159</i>&nbsp;    private String fileName = &quot;&quot;;</b>
+<i>160</i>&nbsp;
+<i>161</i>&nbsp;
+<i>162</i>&nbsp;    public Set&lt;Input&lt;?&gt;&gt; linked;
+<i>163</i>&nbsp;
+<i>164</i>&nbsp;    InputEditorFactory inputEditorFactory;
+<i>165</i>&nbsp;
+<i>166</i>&nbsp;    /** used to capture Stdout and Stderr **/
+<b class="fc"><i>167</i>&nbsp;    static ByteArrayOutputStream baos = null;</b>
+<i>168</i>&nbsp;
+<i>169</i>&nbsp;
+<i>170</i>&nbsp;    public InputEditorFactory getInputEditorFactory() {
+<b class="fc"><i>171</i>&nbsp;        return inputEditorFactory;</b>
+<i>172</i>&nbsp;    }
+<i>173</i>&nbsp;
+<b class="fc"><i>174</i>&nbsp;    public BeautiDoc() {</b>
+<i>175</i>&nbsp;        // g_doc = this;
+<b class="fc"><i>176</i>&nbsp;        setID(&quot;BeautiDoc&quot;);</b>
+<b class="fc"><i>177</i>&nbsp;        clear();</b>
+<b class="fc"><i>178</i>&nbsp;        inputEditorFactory = new InputEditorFactory(this);</b>
+<b class="fc"><i>179</i>&nbsp;    }</b>
+<i>180</i>&nbsp;
+<i>181</i>&nbsp;    public void setFileName(String fileName) {
+<b class="nc"><i>182</i>&nbsp;        this.fileName = fileName;</b>
+<b class="nc"><i>183</i>&nbsp;    }</b>
+<i>184</i>&nbsp;
+<i>185</i>&nbsp;    public String getFileName() {
+<b class="fc"><i>186</i>&nbsp;        return fileName;</b>
+<i>187</i>&nbsp;    }
+<i>188</i>&nbsp;
+<i>189</i>&nbsp;    public String getTemplateName() {
+<b class="fc"><i>190</i>&nbsp;        return templateName;</b>
+<i>191</i>&nbsp;    }
+<i>192</i>&nbsp;
+<i>193</i>&nbsp;    public ActionOnExit parseArgs(String[] args) throws XMLParserException, SAXException, IOException, ParserConfigurationException  {
+<b class="fc"><i>194</i>&nbsp;        ActionOnExit endState = ActionOnExit.UNKNOWN;</b>
+<b class="fc"><i>195</i>&nbsp;        String outputFileName = &quot;beast.xml&quot;;</b>
+<b class="fc"><i>196</i>&nbsp;        String xml = null;</b>
+<b class="fc"><i>197</i>&nbsp;        String templateXML = null;</b>
+<b class="fc"><i>198</i>&nbsp;        TraitSet traitset = null;</b>
+<i>199</i>&nbsp;
+<b class="fc"><i>200</i>&nbsp;        int i = 0;</b>
+<i>201</i>&nbsp;        try {
+<b class="fc"><i>202</i>&nbsp;            while (i &lt; args.length) {</b>
+<b class="fc"><i>203</i>&nbsp;                int old = i;</b>
+<b class="fc"><i>204</i>&nbsp;                if (args[i].equals(&quot;&quot;)) {</b>
+<b class="nc"><i>205</i>&nbsp;                    i += 1;</b>
+<b class="fc"><i>206</i>&nbsp;                } else if (args[i].equals(&quot;-capture&quot;)) {</b>
+<i>207</i>&nbsp;                	// capture stderr and stdout
+<i>208</i>&nbsp;                	// already done in beast.app.beauti.Beauti
+<b class="nc"><i>209</i>&nbsp;                	i += 1;</b>
+<b class="fc"><i>210</i>&nbsp;                } else if (args[i].equals(&quot;-xml&quot;)) {</b>
+<b class="nc"><i>211</i>&nbsp;                    String fileName = args[i + 1];</b>
+<b class="nc"><i>212</i>&nbsp;                    xml = load(fileName);</b>
+<i>213</i>&nbsp;                    // XMLParser parser = new XMLParser();
+<i>214</i>&nbsp;                    // m_doc.m_mcmc.setValue(parser.parseFile(fileName),
+<i>215</i>&nbsp;                    // m_doc);
+<b class="nc"><i>216</i>&nbsp;                    this.fileName = nameFromFile(fileName);</b>
+<b class="nc"><i>217</i>&nbsp;                    i += 2;</b>
+<b class="nc"><i>218</i>&nbsp;                } else if (args[i].equals(&quot;-template&quot;)) {</b>
+<b class="fc"><i>219</i>&nbsp;                    String fileName = args[i + 1];</b>
+<b class="fc"><i>220</i>&nbsp;                    templateXML = processTemplate(fileName);</b>
+<b class="fc"><i>221</i>&nbsp;                    templateFileName = fileName;</b>
+<b class="fc"><i>222</i>&nbsp;                    templateName = nameFromFile(fileName);</b>
+<b class="fc"><i>223</i>&nbsp;                    i += 2;</b>
+<b class="fc"><i>224</i>&nbsp;                } else if (args[i].equals(&quot;-nex&quot;)) {</b>
+<i>225</i>&nbsp;                    // NB: multiple -nex/-xmldata commands can be processed!
+<b class="fc"><i>226</i>&nbsp;                    String fileName = args[i + 1];</b>
+<b class="fc"><i>227</i>&nbsp;                    NexusParser parser = new NexusParser();</b>
+<b class="fc"><i>228</i>&nbsp;                    parser.parseFile(new File(fileName));</b>
+<b class="fc"><i>229</i>&nbsp;                    if (parser.filteredAlignments.size() &gt; 0) {</b>
+<b class="nc"><i>230</i>&nbsp;                        for (Alignment data : parser.filteredAlignments) {</b>
+<b class="nc"><i>231</i>&nbsp;                            alignments.add(data);</b>
+<b class="nc"><i>232</i>&nbsp;                        }</b>
+<i>233</i>&nbsp;                    } else {
+<b class="fc"><i>234</i>&nbsp;                        alignments.add(parser.m_alignment);</b>
+<i>235</i>&nbsp;                    }
+<b class="fc"><i>236</i>&nbsp;                    i += 2;</b>
+<b class="fc"><i>237</i>&nbsp;                    traitset = parser.traitSet;</b>
+<b class="fc"><i>238</i>&nbsp;                } else if (args[i].equals(&quot;-xmldata&quot;)) {</b>
+<i>239</i>&nbsp;                    // NB: multiple -xmldata/-nex commands can be processed!
+<b class="nc"><i>240</i>&nbsp;                    String fileName = args[i + 1];</b>
+<b class="nc"><i>241</i>&nbsp;                    Alignment alignment = (Alignment) BeautiAlignmentProvider.getXMLData(new File(fileName));</b>
+<b class="nc"><i>242</i>&nbsp;                    alignments.add(alignment);</b>
+<b class="nc"><i>243</i>&nbsp;                    i += 2;</b>
+<b class="nc"><i>244</i>&nbsp;                } else if (args[i].equals(&quot;-exitaction&quot;)) {</b>
+<b class="fc"><i>245</i>&nbsp;                    if (args[i + 1].equals(&quot;writexml&quot;)) {</b>
+<b class="fc"><i>246</i>&nbsp;                        endState = ActionOnExit.WRITE_XML;</b>
+<b class="nc"><i>247</i>&nbsp;                    } else if (args[i + 1].equals(&quot;usetemplate&quot;)) {</b>
+<b class="nc"><i>248</i>&nbsp;                        endState = ActionOnExit.SHOW_DETAILS_USE_TEMPLATE;</b>
+<b class="nc"><i>249</i>&nbsp;                    } else if (args[i + 1].equals(&quot;usexml&quot;)) {</b>
+<b class="nc"><i>250</i>&nbsp;                        endState = ActionOnExit.SHOW_DETAILS_USE_XML_SPEC;</b>
+<b class="nc"><i>251</i>&nbsp;                    } else if (args[i + 1].equals(&quot;merge&quot;)) {</b>
+<b class="nc"><i>252</i>&nbsp;                        endState = ActionOnExit.MERGE_AND_WRITE_XML;</b>
+<i>253</i>&nbsp;                    } else {
+<b class="nc"><i>254</i>&nbsp;                        throw new IllegalArgumentException(&quot;Expected one of &#39;writexml&#39;,&#39;usetemplate&#39; or &#39;usexml&#39;, not &quot; + args[i + 1]);</b>
+<i>255</i>&nbsp;                    }
+<b class="fc"><i>256</i>&nbsp;                    i += 2;</b>
+<b class="fc"><i>257</i>&nbsp;                } else if (args[i].equals(&quot;-out&quot;)) {</b>
+<b class="fc"><i>258</i>&nbsp;                    outputFileName = args[i + 1];</b>
+<b class="fc"><i>259</i>&nbsp;                    i += 2;</b>
+<b class="nc"><i>260</i>&nbsp;                } else if (args[i].equals(&quot;-noerr&quot;)) {</b>
+<b class="nc"><i>261</i>&nbsp;                    System.setErr(new PrintStream(new OutputStream() {</b>
+<i>262</i>&nbsp;                        @Override
+<i>263</i>&nbsp;						public void write(int b) {
+<b class="nc"><i>264</i>&nbsp;                        }</b>
+<i>265</i>&nbsp;                    }));
+<b class="nc"><i>266</i>&nbsp;                    i += 1;</b>
+<i>267</i>&nbsp;                }
+<i>268</i>&nbsp;
+<b class="fc"><i>269</i>&nbsp;                if (i == old) {</b>
+<b class="nc"><i>270</i>&nbsp;                    throw new IllegalArgumentException(&quot;Wrong argument: &quot; + args[i]);</b>
+<i>271</i>&nbsp;                }
+<b class="fc"><i>272</i>&nbsp;            }</b>
+<b class="nc"><i>273</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>274</i>&nbsp;            JOptionPane.showMessageDialog(null, e.getMessage());</b>
+<b class="nc"><i>275</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>276</i>&nbsp;            System.exit(1);</b>
+<b class="fc"><i>277</i>&nbsp;        }</b>
+<i>278</i>&nbsp;
+<b class="fc"><i>279</i>&nbsp;        initialize(endState, xml, templateXML, outputFileName);</b>
+<b class="fc"><i>280</i>&nbsp;        addTraitSet(traitset);</b>
+<b class="fc"><i>281</i>&nbsp;        return endState;</b>
+<i>282</i>&nbsp;    } // parseArgs
+<i>283</i>&nbsp;
+<i>284</i>&nbsp;    String nameFromFile(String fileName) {
+<b class="fc"><i>285</i>&nbsp;        if (fileName.contains(&quot;/&quot;)) {</b>
+<b class="fc"><i>286</i>&nbsp;            return fileName.substring(fileName.lastIndexOf(&quot;/&quot;) + 1, fileName.length() - 4);</b>
+<b class="nc"><i>287</i>&nbsp;        } else if (fileName.contains(&quot;\\&quot;)) {</b>
+<b class="nc"><i>288</i>&nbsp;            return fileName.substring(fileName.lastIndexOf(&quot;\\&quot;) + 1, fileName.length() - 4);</b>
+<i>289</i>&nbsp;        }
+<b class="nc"><i>290</i>&nbsp;        return fileName.substring(0, fileName.length() - 4);</b>
+<i>291</i>&nbsp;    }
+<i>292</i>&nbsp;
+<i>293</i>&nbsp;
+<i>294</i>&nbsp;
+<b class="fc"><i>295</i>&nbsp;    private Set&lt;BeautiDocListener&gt; listeners = new HashSet&lt;&gt;();</b>
+<i>296</i>&nbsp;
+<i>297</i>&nbsp;    public void addBeautiDocListener(BeautiDocListener listener) {
+<b class="fc"><i>298</i>&nbsp;        listeners.add(listener);</b>
+<b class="fc"><i>299</i>&nbsp;    }</b>
+<i>300</i>&nbsp;
+<i>301</i>&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+<i>302</i>&nbsp;    void clear() {
+<b class="fc"><i>303</i>&nbsp;        clockModels = new ArrayList&lt;&gt;();</b>
+<i>304</i>&nbsp;        // treePriors = new ArrayList&lt;&gt;();
+<b class="fc"><i>305</i>&nbsp;        alignments = new ArrayList&lt;&gt;();</b>
+<i>306</i>&nbsp;
+<b class="fc"><i>307</i>&nbsp;        pPartitionByAlignments = new List[3];</b>
+<b class="fc"><i>308</i>&nbsp;        pPartition = new List[3];</b>
+<b class="fc"><i>309</i>&nbsp;        currentPartitions = new List[3];</b>
+<b class="fc"><i>310</i>&nbsp;        partitionNames = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>311</i>&nbsp;        for (int i = 0; i &lt; 3; i++) {</b>
+<b class="fc"><i>312</i>&nbsp;            pPartitionByAlignments[i] = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>313</i>&nbsp;            pPartition[i] = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>314</i>&nbsp;            currentPartitions[i] = new ArrayList&lt;&gt;();</b>
+<i>315</i>&nbsp;        }
+<b class="fc"><i>316</i>&nbsp;        tipTextMap = new HashMap&lt;&gt;();</b>
+<i>317</i>&nbsp;
+<b class="fc"><i>318</i>&nbsp;        pluginmap = new HashMap&lt;&gt;();</b>
+<b class="fc"><i>319</i>&nbsp;        reversePluginmap = new HashMap&lt;&gt;();</b>
+<b class="fc"><i>320</i>&nbsp;        taxaset = new HashMap&lt;&gt;();</b>
+<b class="fc"><i>321</i>&nbsp;        fileName = &quot;&quot;;</b>
+<b class="fc"><i>322</i>&nbsp;        linked = new HashSet&lt;&gt;();</b>
+<b class="fc"><i>323</i>&nbsp;    }</b>
+<i>324</i>&nbsp;
+<i>325</i>&nbsp;    public void registerPlugin(BEASTInterface beastObject) {
+<i>326</i>&nbsp;        // first make sure to remove plug-ins when the id of a beastObject changed
+<b class="fc"><i>327</i>&nbsp;        unregisterPlugin(beastObject);</b>
+<i>328</i>&nbsp;
+<b class="fc"><i>329</i>&nbsp;        pluginmap.put(beastObject.getID(), beastObject);</b>
+<b class="fc"><i>330</i>&nbsp;        reversePluginmap.put(beastObject, beastObject.getID());</b>
+<b class="fc"><i>331</i>&nbsp;        if (beastObject instanceof Taxon) {</b>
+<b class="fc"><i>332</i>&nbsp;        	Taxon taxon = (Taxon) beastObject;</b>
+<b class="fc"><i>333</i>&nbsp;            taxaset.put(taxon.getID(), taxon);</b>
+<i>334</i>&nbsp;        }
+<b class="fc"><i>335</i>&nbsp;    }</b>
+<i>336</i>&nbsp;
+<i>337</i>&nbsp;    public void unregisterPlugin(BEASTInterface beastObject) {
+<b class="fc"><i>338</i>&nbsp;        taxaset.remove(beastObject.getID());</b>
+<i>339</i>&nbsp;        // directly remove beast object from HashMap
+<i>340</i>&nbsp;        // relies on hashes of String being unique (which they should be).
+<i>341</i>&nbsp;        // is much more efficient (O(1)) than lookup in keySet (O(n)),
+<i>342</i>&nbsp;        // which matter when a lot of partitions are loaded
+<i>343</i>&nbsp;        // but less reliable since ID may have changed.
+<b class="fc"><i>344</i>&nbsp;        String id = reversePluginmap.get(beastObject);</b>
+<b class="fc"><i>345</i>&nbsp;        if (id != null &amp;&amp; pluginmap.containsKey(id)) {</b>
+<b class="fc"><i>346</i>&nbsp;            pluginmap.remove(id);</b>
+<i>347</i>&nbsp;        }
+<i>348</i>&nbsp;
+<i>349</i>&nbsp;//        String oldID = null;
+<i>350</i>&nbsp;//        for (String id : pluginmap.keySet()) {
+<i>351</i>&nbsp;//            if (pluginmap.get(id).equals(beastObject)) {
+<i>352</i>&nbsp;//                oldID = id;
+<i>353</i>&nbsp;//                break;
+<i>354</i>&nbsp;//            }
+<i>355</i>&nbsp;//        }
+<i>356</i>&nbsp;//        if (oldID != null) {
+<i>357</i>&nbsp;//            pluginmap.remove(oldID);
+<i>358</i>&nbsp;//        }
+<b class="fc"><i>359</i>&nbsp;    }</b>
+<i>360</i>&nbsp;
+<i>361</i>&nbsp;    /**
+<i>362</i>&nbsp;     * remove all alignment data and model, and reload Standard template *
+<i>363</i>&nbsp;     */
+<i>364</i>&nbsp;    public void newAnalysis() {
+<i>365</i>&nbsp;        try {
+<b class="nc"><i>366</i>&nbsp;            clear();</b>
+<b class="nc"><i>367</i>&nbsp;            BEASTObjectPanel.init();</b>
+<b class="nc"><i>368</i>&nbsp;            beautiConfig.clear();</b>
+<b class="nc"><i>369</i>&nbsp;            String xml = processTemplate(templateFileName);</b>
+<b class="nc"><i>370</i>&nbsp;            loadTemplate(xml);</b>
+<i>371</i>&nbsp;
+<b class="nc"><i>372</i>&nbsp;            for (BeautiDocListener listener : listeners) {</b>
+<b class="nc"><i>373</i>&nbsp;                listener.docHasChanged();</b>
+<b class="nc"><i>374</i>&nbsp;            }</b>
+<b class="nc"><i>375</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>376</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>377</i>&nbsp;        }</b>
+<b class="nc"><i>378</i>&nbsp;    }</b>
+<i>379</i>&nbsp;
+<i>380</i>&nbsp;    public void loadXML(File file) throws IOException, XMLParserException, SAXException, ParserConfigurationException  {
+<b class="nc"><i>381</i>&nbsp;        String xml = load(file);</b>
+<b class="nc"><i>382</i>&nbsp;        extractSequences(xml);</b>
+<b class="nc"><i>383</i>&nbsp;        scrubAll(true, false);</b>
+<b class="nc"><i>384</i>&nbsp;        fireDocHasChanged();</b>
+<b class="nc"><i>385</i>&nbsp;    }</b>
+<i>386</i>&nbsp;
+<i>387</i>&nbsp;    public void loadNewTemplate(String fileName)  {
+<b class="nc"><i>388</i>&nbsp;        templateFileName = fileName;</b>
+<b class="nc"><i>389</i>&nbsp;        newAnalysis();</b>
+<b class="nc"><i>390</i>&nbsp;    }</b>
+<i>391</i>&nbsp;
+<i>392</i>&nbsp;    public void importNexus(File file) throws IOException  {
+<b class="fc"><i>393</i>&nbsp;        NexusParser parser = new NexusParser();</b>
+<b class="fc"><i>394</i>&nbsp;        parser.parseFile(file);</b>
+<b class="fc"><i>395</i>&nbsp;        if (parser.filteredAlignments.size() &gt; 0) {</b>
+<b class="fc"><i>396</i>&nbsp;            for (Alignment data : parser.filteredAlignments) {</b>
+<b class="fc"><i>397</i>&nbsp;                addAlignmentWithSubnet(data, beautiConfig.partitionTemplate.get());</b>
+<b class="fc"><i>398</i>&nbsp;            }</b>
+<i>399</i>&nbsp;        } else {
+<b class="fc"><i>400</i>&nbsp;            addAlignmentWithSubnet(parser.m_alignment, beautiConfig.partitionTemplate.get());</b>
+<i>401</i>&nbsp;        }
+<i>402</i>&nbsp;//      connectModel();
+<b class="fc"><i>403</i>&nbsp;        addTraitSet(parser.traitSet);</b>
+<i>404</i>&nbsp;//      fireDocHasChanged();
+<b class="fc"><i>405</i>&nbsp;    }</b>
+<i>406</i>&nbsp;
+<i>407</i>&nbsp;    public void importXMLAlignment(File file)  {
+<b class="nc"><i>408</i>&nbsp;        Alignment data = (Alignment) BeautiAlignmentProvider.getXMLData(file);</b>
+<b class="nc"><i>409</i>&nbsp;        data.initAndValidate();</b>
+<b class="nc"><i>410</i>&nbsp;        addAlignmentWithSubnet(data, beautiConfig.partitionTemplate.get());</b>
+<i>411</i>&nbsp;//      connectModel();
+<i>412</i>&nbsp;//      fireDocHasChanged();
+<b class="nc"><i>413</i>&nbsp;    }</b>
+<i>414</i>&nbsp;
+<i>415</i>&nbsp;    void fireDocHasChanged()  {
+<b class="nc"><i>416</i>&nbsp;        for (BeautiDocListener listener : listeners) {</b>
+<i>417</i>&nbsp;            try {
+<b class="nc"><i>418</i>&nbsp;				listener.docHasChanged();</b>
+<b class="nc"><i>419</i>&nbsp;			} catch (Exception e) {</b>
+<b class="nc"><i>420</i>&nbsp;				e.printStackTrace();</b>
+<b class="nc"><i>421</i>&nbsp;			}</b>
+<b class="nc"><i>422</i>&nbsp;        }</b>
+<b class="nc"><i>423</i>&nbsp;    }</b>
+<i>424</i>&nbsp;
+<i>425</i>&nbsp;    void initialize(ActionOnExit endState, String xml, String template, String fileName) throws XMLParserException, SAXException, IOException, ParserConfigurationException {
+<i>426</i>&nbsp;        // beautiConfig.clear();
+<b class="fc"><i>427</i>&nbsp;        switch (endState) {</b>
+<i>428</i>&nbsp;            case UNKNOWN:
+<i>429</i>&nbsp;            case SHOW_DETAILS_USE_TEMPLATE: {
+<b class="fc"><i>430</i>&nbsp;                mergeSequences(template);</b>
+<i>431</i>&nbsp;                // scrubAll(true, );
+<b class="fc"><i>432</i>&nbsp;                connectModel();</b>
+<b class="fc"><i>433</i>&nbsp;                break;</b>
+<i>434</i>&nbsp;            }
+<i>435</i>&nbsp;            case SHOW_DETAILS_USE_XML_SPEC: {
+<b class="nc"><i>436</i>&nbsp;                if (template == null) {</b>
+<b class="nc"><i>437</i>&nbsp;                    template = processTemplate(STANDARD_TEMPLATE);</b>
+<i>438</i>&nbsp;                }
+<b class="nc"><i>439</i>&nbsp;                loadTemplate(template);</b>
+<b class="nc"><i>440</i>&nbsp;                extractSequences(xml);</b>
+<b class="nc"><i>441</i>&nbsp;                connectModel();</b>
+<b class="nc"><i>442</i>&nbsp;                break;</b>
+<i>443</i>&nbsp;            }
+<i>444</i>&nbsp;            case WRITE_XML: {
+<b class="fc"><i>445</i>&nbsp;                mergeSequences(template);</b>
+<b class="fc"><i>446</i>&nbsp;                connectModel();</b>
+<b class="fc"><i>447</i>&nbsp;                save(fileName);</b>
+<b class="fc"><i>448</i>&nbsp;                break;</b>
+<i>449</i>&nbsp;            }
+<i>450</i>&nbsp;            case MERGE_AND_WRITE_XML: {
+<i>451</i>&nbsp;                // merge alignment with XML
+<i>452</i>&nbsp;//	        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+<i>453</i>&nbsp;//	        Document doc = factory.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));
+<i>454</i>&nbsp;//	        doc.normalize();
+<i>455</i>&nbsp;//	        NodeList nodes = doc.getElementsByTagName(&quot;data&quot;);
+<i>456</i>&nbsp;//
+<i>457</i>&nbsp;//			XMLProducer producer = new XMLProducer();
+<i>458</i>&nbsp;//			producer.toRawXML(alignments.get(0));
+<i>459</i>&nbsp;//
+<i>460</i>&nbsp;//			Pplugin beastObject =  parser.parseFragment(xml, false);
+<i>461</i>&nbsp;//			int i = xml.indexOf(&quot;&lt;data&quot;);
+<i>462</i>&nbsp;//			for (BEASTObject beastObject : pluginmap.values()) {
+<i>463</i>&nbsp;//				if (beastObject instanceof Alignment) {
+<i>464</i>&nbsp;//
+<i>465</i>&nbsp;//				}
+<i>466</i>&nbsp;//			}
+<i>467</i>&nbsp;//			save(fileName);
+<b class="nc"><i>468</i>&nbsp;                System.exit(1);</b>
+<i>469</i>&nbsp;                break;
+<i>470</i>&nbsp;            }
+<i>471</i>&nbsp;            // // load standard template
+<i>472</i>&nbsp;            // String templateXML =
+<i>473</i>&nbsp;            // BeautiInitDlg.processTemplate(STANDARD_TEMPLATE);
+<i>474</i>&nbsp;            // loadTemplate(templateXML);
+<i>475</i>&nbsp;            // connectModel();
+<i>476</i>&nbsp;        }
+<b class="fc"><i>477</i>&nbsp;    }</b>
+<i>478</i>&nbsp;
+<i>479</i>&nbsp;    /**
+<i>480</i>&nbsp;     * public to allow access for unit test
+<i>481</i>&nbsp;     * @throws IOException *
+<i>482</i>&nbsp;     */
+<i>483</i>&nbsp;    public String processTemplate(String fileName) throws IOException {
+<b class="fc"><i>484</i>&nbsp;        final String MERGE_ELEMENT = &quot;mergepoint&quot;;</b>
+<i>485</i>&nbsp;        // first gather the set of potential directories with templates
+<b class="fc"><i>486</i>&nbsp;        Set&lt;String&gt; dirs = new HashSet&lt;&gt;();// AddOnManager.getBeastDirectories();</b>
+<b class="fc"><i>487</i>&nbsp;        String pathSep = System.getProperty(&quot;path.separator&quot;);</b>
+<b class="fc"><i>488</i>&nbsp;        String classpath = System.getProperty(&quot;java.class.path&quot;);</b>
+<b class="fc"><i>489</i>&nbsp;        String fileSep = System.getProperty(&quot;file.separator&quot;);</b>
+<b class="fc"><i>490</i>&nbsp;        if (fileSep.equals(&quot;\\&quot;)) {</b>
+<b class="nc"><i>491</i>&nbsp;            fileSep = &quot;\\\\&quot;;</b>
+<i>492</i>&nbsp;        }
+<b class="fc"><i>493</i>&nbsp;        dirs.add(&quot;.&quot;);</b>
+<b class="fc"><i>494</i>&nbsp;        for (String path : classpath.split(pathSep)) {</b>
+<b class="fc"><i>495</i>&nbsp;            path = path.replaceAll(fileSep, &quot;/&quot;);</b>
+<b class="fc"><i>496</i>&nbsp;            if (path.endsWith(&quot;.jar&quot;)) {</b>
+<b class="fc"><i>497</i>&nbsp;                path = path.substring(0, path.lastIndexOf(&quot;/&quot;));</b>
+<i>498</i>&nbsp;            }
+<b class="fc"><i>499</i>&nbsp;            if (path.indexOf(&quot;/&quot;) &gt;= 0) {</b>
+<b class="fc"><i>500</i>&nbsp;                path = path.substring(0, path.lastIndexOf(&quot;/&quot;));</b>
+<i>501</i>&nbsp;            }
+<b class="fc"><i>502</i>&nbsp;            if (!dirs.contains(path)) {</b>
+<b class="fc"><i>503</i>&nbsp;                dirs.add(path);</b>
+<i>504</i>&nbsp;            }
+<i>505</i>&nbsp;        }
+<i>506</i>&nbsp;
+<i>507</i>&nbsp;        // read main template, try all template directories if necessary
+<b class="fc"><i>508</i>&nbsp;        File mainTemplate = new File(fileName);</b>
+<b class="fc"><i>509</i>&nbsp;        for (String dirName : dirs) {</b>
+<b class="fc"><i>510</i>&nbsp;            if (!mainTemplate.exists()) {</b>
+<b class="nc"><i>511</i>&nbsp;                mainTemplate = new File(dirName + fileSep + fileName);</b>
+<i>512</i>&nbsp;            }
+<b class="fc"><i>513</i>&nbsp;            if (!mainTemplate.exists()) {</b>
+<b class="nc"><i>514</i>&nbsp;                mainTemplate = new File(dirName + fileSep + &quot;templates&quot; + fileSep + fileName);</b>
+<i>515</i>&nbsp;            }
+<b class="fc"><i>516</i>&nbsp;        }</b>
+<b class="fc"><i>517</i>&nbsp;        Log.warning.println(&quot;Loading template &quot; + mainTemplate.getAbsolutePath());</b>
+<b class="fc"><i>518</i>&nbsp;        String templateXML = load(mainTemplate.getAbsolutePath());</b>
+<i>519</i>&nbsp;
+<i>520</i>&nbsp;        // find merge points
+<b class="fc"><i>521</i>&nbsp;        int i = 0;</b>
+<b class="fc"><i>522</i>&nbsp;        HashMap&lt;String, String&gt; mergePoints = new HashMap&lt;&gt;();</b>
+<b class="fc"><i>523</i>&nbsp;        while (i &gt;= 0) {</b>
+<b class="fc"><i>524</i>&nbsp;            i = templateXML.indexOf(&quot;&lt;&quot; + MERGE_ELEMENT, i + 1);</b>
+<b class="fc"><i>525</i>&nbsp;            if (i &gt; 0) {</b>
+<b class="fc"><i>526</i>&nbsp;                int j = templateXML.indexOf(&#39;&gt;&#39;, i);</b>
+<b class="fc"><i>527</i>&nbsp;                String str = templateXML.substring(i, j);</b>
+<b class="fc"><i>528</i>&nbsp;                str = str.replaceAll(&quot;.*id=&quot;, &quot;&quot;);</b>
+<b class="fc"><i>529</i>&nbsp;                char c = str.charAt(0);</b>
+<b class="fc"><i>530</i>&nbsp;                str = str.replaceAll(c + &quot;[^&quot; + c + &quot;]*$&quot;, &quot;&quot;);</b>
+<b class="fc"><i>531</i>&nbsp;                str = str.substring(1);</b>
+<b class="fc"><i>532</i>&nbsp;                mergePoints.put(str, &quot;&quot;);</b>
+<b class="fc"><i>533</i>&nbsp;            }</b>
+<i>534</i>&nbsp;        }
+<i>535</i>&nbsp;
+<i>536</i>&nbsp;        // find XML to merge
+<i>537</i>&nbsp;        // ensure processed templates are unique in name.
+<i>538</i>&nbsp;        // This prevents loading templates twice, once from the development area
+<i>539</i>&nbsp;        // and once from .beast2-addon area
+<b class="fc"><i>540</i>&nbsp;        Set&lt;String&gt; loadedTemplates = new HashSet&lt;&gt;();</b>
+<b class="fc"><i>541</i>&nbsp;        for (String dirName : dirs) {</b>
+<b class="fc"><i>542</i>&nbsp;            Log.info.println(&quot;Investigating &quot; + dirName);</b>
+<b class="fc"><i>543</i>&nbsp;            File templates = new File(dirName + fileSep + &quot;templates&quot;);</b>
+<b class="fc"><i>544</i>&nbsp;            File[] files = templates.listFiles();</b>
+<b class="fc"><i>545</i>&nbsp;            if (files != null) {</b>
+<b class="fc"><i>546</i>&nbsp;                for (File template : files) {</b>
+<b class="fc"><i>547</i>&nbsp;                    if (!template.getAbsolutePath().equals(mainTemplate.getAbsolutePath())</b>
+<b class="fc"><i>548</i>&nbsp;                            &amp;&amp; template.getName().toLowerCase().endsWith(&quot;.xml&quot;)) {</b>
+<b class="fc"><i>549</i>&nbsp;                        if (!loadedTemplates.contains(template.getName())) {</b>
+<b class="fc"><i>550</i>&nbsp;                        	Log.warning.println(&quot;Processing &quot; + template.getAbsolutePath());</b>
+<b class="fc"><i>551</i>&nbsp;                            loadedTemplates.add(template.getName());</b>
+<b class="fc"><i>552</i>&nbsp;                            String xml2 = load(template.getAbsolutePath());</b>
+<b class="fc"><i>553</i>&nbsp;                            if (!xml2.contains(&quot;&lt;mergepoint &quot;)) {</b>
+<i>554</i>&nbsp;                                try {
+<i>555</i>&nbsp;
+<b class="fc"><i>556</i>&nbsp;                                    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();</b>
+<i>557</i>&nbsp;                                    // factory.setValidating(true);
+<b class="fc"><i>558</i>&nbsp;                                    Document doc = factory.newDocumentBuilder().parse(template);</b>
+<b class="fc"><i>559</i>&nbsp;                                    doc.normalize();</b>
+<i>560</i>&nbsp;
+<b class="fc"><i>561</i>&nbsp;                                    processBeautiConfig(doc);</b>
+<i>562</i>&nbsp;
+<i>563</i>&nbsp;                                    // find mergewith elements
+<b class="fc"><i>564</i>&nbsp;                                    NodeList nodes = doc.getElementsByTagName(&quot;mergewith&quot;);</b>
+<b class="fc"><i>565</i>&nbsp;                                    for (int mergeElementIndex = 0; mergeElementIndex &lt; nodes.getLength(); mergeElementIndex++) {</b>
+<b class="fc"><i>566</i>&nbsp;                                        Node mergeElement = nodes.item(mergeElementIndex);</b>
+<b class="fc"><i>567</i>&nbsp;                                        String mergePoint = mergeElement.getAttributes().getNamedItem(&quot;point&quot;)</b>
+<b class="fc"><i>568</i>&nbsp;                                                .getNodeValue();</b>
+<b class="fc"><i>569</i>&nbsp;                                        if (!mergePoints.containsKey(mergePoint)) {</b>
+<b class="fc"><i>570</i>&nbsp;                                        	Log.warning.println(&quot;Cannot find merge point named &quot; + mergePoint</b>
+<b class="fc"><i>571</i>&nbsp;                                                    + &quot; from &quot; + template.getName()</b>
+<i>572</i>&nbsp;                                                    + &quot; in template. MergeWith ignored.&quot;);
+<i>573</i>&nbsp;                                        } else {
+<b class="fc"><i>574</i>&nbsp;                                            String xml = &quot;&quot;;</b>
+<b class="fc"><i>575</i>&nbsp;                                            NodeList children = mergeElement.getChildNodes();</b>
+<b class="fc"><i>576</i>&nbsp;                                            for (int childIndex = 0; childIndex &lt; children.getLength(); childIndex++) {</b>
+<b class="fc"><i>577</i>&nbsp;                                                xml += nodeToString(children.item(childIndex));</b>
+<i>578</i>&nbsp;                                            }
+<b class="fc"><i>579</i>&nbsp;                                            String str = mergePoints.get(mergePoint);</b>
+<b class="fc"><i>580</i>&nbsp;                                            str += xml;</b>
+<b class="fc"><i>581</i>&nbsp;                                            mergePoints.put(mergePoint, str);</b>
+<i>582</i>&nbsp;                                        }
+<i>583</i>&nbsp;
+<i>584</i>&nbsp;                                    }
+<b class="nc"><i>585</i>&nbsp;                                } catch (Exception e) {</b>
+<b class="nc"><i>586</i>&nbsp;                                    if (!e.getMessage().contains(&quot;beast.app.beauti.InputConstraint&quot;)) {</b>
+<b class="nc"><i>587</i>&nbsp;                                    	Log.warning.println(e.getMessage());</b>
+<i>588</i>&nbsp;                                    }
+<b class="fc"><i>589</i>&nbsp;                                }</b>
+<i>590</i>&nbsp;                            }
+<b class="fc"><i>591</i>&nbsp;                        } else {</b>
+<b class="fc"><i>592</i>&nbsp;                        	Log.warning.println(&quot;Skipping &quot; + template.getAbsolutePath() + &quot; since &quot;</b>
+<b class="fc"><i>593</i>&nbsp;                                    + template.getName() + &quot; is already processed&quot;);</b>
+<i>594</i>&nbsp;                        }
+<i>595</i>&nbsp;
+<i>596</i>&nbsp;                    }
+<i>597</i>&nbsp;                }
+<i>598</i>&nbsp;            }
+<b class="fc"><i>599</i>&nbsp;        }</b>
+<i>600</i>&nbsp;
+<i>601</i>&nbsp;        // merge XML
+<b class="fc"><i>602</i>&nbsp;        i = 0;</b>
+<b class="fc"><i>603</i>&nbsp;        while (i &gt;= 0) {</b>
+<b class="fc"><i>604</i>&nbsp;            i = templateXML.indexOf(&quot;&lt;&quot; + MERGE_ELEMENT, i + 1);</b>
+<b class="fc"><i>605</i>&nbsp;            if (i &gt; 0) {</b>
+<b class="fc"><i>606</i>&nbsp;                int j = templateXML.indexOf(&#39;&gt;&#39;, i);</b>
+<b class="fc"><i>607</i>&nbsp;                String str = templateXML.substring(i, j);</b>
+<b class="fc"><i>608</i>&nbsp;                str = str.replaceAll(&quot;.*id=&quot;, &quot;&quot;);</b>
+<b class="fc"><i>609</i>&nbsp;                char c = str.charAt(0);</b>
+<b class="fc"><i>610</i>&nbsp;                str = str.replaceAll(c + &quot;[^&quot; + c + &quot;]*$&quot;, &quot;&quot;);</b>
+<b class="fc"><i>611</i>&nbsp;                str = str.substring(1);</b>
+<b class="fc"><i>612</i>&nbsp;                String xml = mergePoints.get(str);</b>
+<b class="fc"><i>613</i>&nbsp;                templateXML = templateXML.substring(0, i) + xml + templateXML.substring(j + 1);</b>
+<b class="fc"><i>614</i>&nbsp;            }</b>
+<i>615</i>&nbsp;        }
+<b class="fc"><i>616</i>&nbsp;        templateName = nameFromFile(fileName);</b>
+<i>617</i>&nbsp;
+<b class="fc"><i>618</i>&nbsp;        if (Boolean.valueOf(System.getProperty(&quot;beast.debug&quot;))) {</b>
+<b class="nc"><i>619</i>&nbsp;            Writer out = new OutputStreamWriter(new FileOutputStream(&quot;/tmp/beast.xml&quot;));</b>
+<i>620</i>&nbsp;            try {
+<b class="nc"><i>621</i>&nbsp;                out.write(templateXML);</b>
+<i>622</i>&nbsp;            } finally {
+<b class="nc"><i>623</i>&nbsp;                out.close();</b>
+<b class="nc"><i>624</i>&nbsp;            }</b>
+<i>625</i>&nbsp;        }
+<i>626</i>&nbsp;
+<b class="fc"><i>627</i>&nbsp;        return templateXML;</b>
+<i>628</i>&nbsp;    }
+<i>629</i>&nbsp;
+<i>630</i>&nbsp;    void processBeautiConfig(Document doc) throws XMLParserException, TransformerException  {
+<i>631</i>&nbsp;        // find configuration elements, process and remove
+<b class="fc"><i>632</i>&nbsp;        NodeList nodes = doc.getElementsByTagName(&quot;beauticonfig&quot;);</b>
+<b class="fc"><i>633</i>&nbsp;        Node topNode = doc.getElementsByTagName(&quot;*&quot;).item(0);</b>
+<b class="fc"><i>634</i>&nbsp;        String nameSpaceStr = XMLParser.getAttribute(topNode, &quot;namespace&quot;);</b>
+<b class="fc"><i>635</i>&nbsp;        for (int configElementIndex = 0; configElementIndex &lt; nodes.getLength(); configElementIndex++) {</b>
+<b class="nc"><i>636</i>&nbsp;            Node configElement = nodes.item(configElementIndex);</b>
+<b class="nc"><i>637</i>&nbsp;            String xml = nodeToString(configElement);</b>
+<b class="nc"><i>638</i>&nbsp;            XMLParser parser = new XMLParser();</b>
+<b class="nc"><i>639</i>&nbsp;            parser.setNameSpace(nameSpaceStr);</b>
+<b class="nc"><i>640</i>&nbsp;            parser.parseBareFragment(xml, true);</b>
+<b class="nc"><i>641</i>&nbsp;            configElement.getParentNode().removeChild(configElement);</b>
+<i>642</i>&nbsp;        }
+<b class="fc"><i>643</i>&nbsp;    }</b>
+<i>644</i>&nbsp;
+<i>645</i>&nbsp;    String nodeToString(Node node) throws TransformerException {
+<b class="fc"><i>646</i>&nbsp;        TransformerFactory transFactory = TransformerFactory.newInstance();</b>
+<b class="fc"><i>647</i>&nbsp;        Transformer transformer = transFactory.newTransformer();</b>
+<b class="fc"><i>648</i>&nbsp;        StringWriter buffer = new StringWriter();</b>
+<b class="fc"><i>649</i>&nbsp;        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, &quot;yes&quot;);</b>
+<b class="fc"><i>650</i>&nbsp;        transformer.transform(new DOMSource(node), new StreamResult(buffer));</b>
+<b class="fc"><i>651</i>&nbsp;        return buffer.toString();</b>
+<i>652</i>&nbsp;    }
+<i>653</i>&nbsp;
+<i>654</i>&nbsp;    static public String load(String fileName) throws IOException {
+<b class="fc"><i>655</i>&nbsp;        return load(new File(fileName));</b>
+<i>656</i>&nbsp;    }
+<i>657</i>&nbsp;
+<i>658</i>&nbsp;    static public String load(File file) throws IOException {
+<b class="fc"><i>659</i>&nbsp;        BufferedReader fin = new BufferedReader(new FileReader(file));</b>
+<b class="fc"><i>660</i>&nbsp;        StringBuffer buf = new StringBuffer();</b>
+<b class="fc"><i>661</i>&nbsp;        String str = null;</b>
+<b class="fc"><i>662</i>&nbsp;        while (fin.ready()) {</b>
+<b class="fc"><i>663</i>&nbsp;            str = fin.readLine();</b>
+<b class="fc"><i>664</i>&nbsp;            buf.append(str);</b>
+<b class="fc"><i>665</i>&nbsp;            buf.append(&#39;\n&#39;);</b>
+<i>666</i>&nbsp;        }
+<b class="fc"><i>667</i>&nbsp;        fin.close();</b>
+<b class="fc"><i>668</i>&nbsp;        return buf.toString();</b>
+<i>669</i>&nbsp;    }
+<i>670</i>&nbsp;
+<i>671</i>&nbsp;    Alignment getPartition(BEASTInterface beastObject) {
+<b class="nc"><i>672</i>&nbsp;        String partition = beastObject.getID();</b>
+<b class="nc"><i>673</i>&nbsp;        partition = parsePartition(partition);</b>
+<b class="nc"><i>674</i>&nbsp;        for (Alignment data : alignments) {</b>
+<b class="nc"><i>675</i>&nbsp;            if (data.getID().equals(partition)) {</b>
+<b class="nc"><i>676</i>&nbsp;                return data;</b>
+<i>677</i>&nbsp;            }
+<b class="nc"><i>678</i>&nbsp;        }</b>
+<b class="nc"><i>679</i>&nbsp;        return null;</b>
+<i>680</i>&nbsp;    }
+<i>681</i>&nbsp;
+<i>682</i>&nbsp;    /**
+<i>683</i>&nbsp;     * see whether we have a valid model that can be saved at this point in time
+<i>684</i>&nbsp;     */
+<b class="fc"><i>685</i>&nbsp;    public enum DOC_STATUS {</b>
+<b class="fc"><i>686</i>&nbsp;        NO_DOCUMENT, SAVED, DIRTY</b>
+<i>687</i>&nbsp;    }
+<i>688</i>&nbsp;
+<i>689</i>&nbsp;    public DOC_STATUS validateModel() {
+<b class="nc"><i>690</i>&nbsp;        if (mcmc == null || (mcmc.get().hasPartitions() &amp;&amp; partitionNames.size() == 0)) {</b>
+<b class="nc"><i>691</i>&nbsp;            return DOC_STATUS.NO_DOCUMENT;</b>
+<i>692</i>&nbsp;        }
+<i>693</i>&nbsp;        try {
+<i>694</i>&nbsp;            // check if file is already saved and not changed wrt file on disk
+<b class="nc"><i>695</i>&nbsp;            if (fileName != null &amp;&amp; fileName.length() &gt; 0) {</b>
+<b class="nc"><i>696</i>&nbsp;                String fileXML = load(fileName);</b>
+<b class="nc"><i>697</i>&nbsp;                String xml = toXML();</b>
+<b class="nc"><i>698</i>&nbsp;                if (fileXML.equals(xml)) {</b>
+<b class="nc"><i>699</i>&nbsp;                    return DOC_STATUS.SAVED;</b>
+<i>700</i>&nbsp;                }
+<i>701</i>&nbsp;            }
+<b class="nc"><i>702</i>&nbsp;        } catch (Exception e) {</b>
+<i>703</i>&nbsp;            // ignore
+<b class="nc"><i>704</i>&nbsp;        }</b>
+<b class="nc"><i>705</i>&nbsp;        return DOC_STATUS.DIRTY;</b>
+<i>706</i>&nbsp;    } // validateModel
+<i>707</i>&nbsp;
+<i>708</i>&nbsp;    /**
+<i>709</i>&nbsp;     * save specification in file
+<i>710</i>&nbsp;     * @throws IOException *
+<i>711</i>&nbsp;     */
+<i>712</i>&nbsp;    public void save(String fileName) throws IOException  {
+<b class="fc"><i>713</i>&nbsp;        save(new File(fileName));</b>
+<b class="fc"><i>714</i>&nbsp;    } // save</b>
+<i>715</i>&nbsp;
+<i>716</i>&nbsp;    /**
+<i>717</i>&nbsp;     * save specification in file
+<i>718</i>&nbsp;     * @throws IOException *
+<i>719</i>&nbsp;     */
+<i>720</i>&nbsp;    public void save(File file) throws IOException  {
+<b class="fc"><i>721</i>&nbsp;        determinePartitions();</b>
+<b class="fc"><i>722</i>&nbsp;        scrubAll(false, false);</b>
+<i>723</i>&nbsp;        // String xml = new XMLProducer().toXML(mcmc.get(), );
+<b class="fc"><i>724</i>&nbsp;        String spec = null;</b>
+<b class="fc"><i>725</i>&nbsp;        if (file.getPath().toLowerCase().endsWith(&quot;.json&quot;)) {</b>
+<b class="nc"><i>726</i>&nbsp;            spec = toJSON();</b>
+<i>727</i>&nbsp;        } else {
+<b class="fc"><i>728</i>&nbsp;            spec = toXML();</b>
+<i>729</i>&nbsp;        }
+<b class="fc"><i>730</i>&nbsp;        FileWriter outfile = new FileWriter(file);</b>
+<b class="fc"><i>731</i>&nbsp;        outfile.write(spec);</b>
+<b class="fc"><i>732</i>&nbsp;        outfile.close();</b>
+<b class="fc"><i>733</i>&nbsp;    } // save</b>
+<i>734</i>&nbsp;
+<i>735</i>&nbsp;    private String toJSON() {
+<b class="nc"><i>736</i>&nbsp;        Set&lt;BEASTInterface&gt; beastObjects = new HashSet&lt;&gt;();</b>
+<b class="nc"><i>737</i>&nbsp;        String json = new JSONProducer().toJSON(mcmc.get(), beastObjects);</b>
+<i>738</i>&nbsp;
+<b class="nc"><i>739</i>&nbsp;        json = json.replaceFirst(&quot;\\{&quot;, &quot;{ beautitemplate:\&quot;&quot; + templateName + &quot;\&quot;, beautistatus:\&quot;&quot; + getBeautiStatus() + &quot;\&quot;, &quot;);</b>
+<b class="nc"><i>740</i>&nbsp;        return json + &quot;\n&quot;;</b>
+<i>741</i>&nbsp;    }
+<i>742</i>&nbsp;
+<i>743</i>&nbsp;    public String toXML() {
+<b class="fc"><i>744</i>&nbsp;        Set&lt;BEASTInterface&gt; beastObjects = new HashSet&lt;&gt;();</b>
+<i>745</i>&nbsp;//		for (BEASTObject beastObject : pluginmap.values()) {
+<i>746</i>&nbsp;//			String name = beastObject.getClass().getName();
+<i>747</i>&nbsp;//			if (!name.startsWith(&quot;beast.app.beauti&quot;)) {
+<i>748</i>&nbsp;//				beastObjects.add(beastObject);
+<i>749</i>&nbsp;//			}
+<i>750</i>&nbsp;//		}
+<b class="fc"><i>751</i>&nbsp;        String xml = new XMLProducer().toXML(mcmc.get(), beastObjects);</b>
+<i>752</i>&nbsp;
+<b class="fc"><i>753</i>&nbsp;        xml = xml.replaceFirst(&quot;&lt;beast &quot;, &quot;&lt;beast beautitemplate=&#39;&quot; + templateName + &quot;&#39; beautistatus=&#39;&quot; + getBeautiStatus() + &quot;&#39; &quot;);</b>
+<b class="fc"><i>754</i>&nbsp;        return xml + &quot;\n&quot;;</b>
+<i>755</i>&nbsp;    }
+<i>756</i>&nbsp;
+<i>757</i>&nbsp;    /** get status of mode-flags in BEAUti, so these can be restored when reloading an XML file **/
+<i>758</i>&nbsp;    String getBeautiStatus() {
+<b class="fc"><i>759</i>&nbsp;	    String beautiStatus = &quot;&quot;;</b>
+<b class="fc"><i>760</i>&nbsp;	    if (!autoSetClockRate) {</b>
+<b class="nc"><i>761</i>&nbsp;	        beautiStatus = &quot;noAutoSetClockRate&quot;;</b>
+<i>762</i>&nbsp;	    }
+<b class="fc"><i>763</i>&nbsp;	    if (allowLinking) {</b>
+<b class="nc"><i>764</i>&nbsp;	        beautiStatus += (beautiStatus.length() &gt; 0 ? &quot;|&quot; : &quot;&quot;) + &quot;allowLinking&quot;;</b>
+<i>765</i>&nbsp;	    }
+<b class="fc"><i>766</i>&nbsp;	    if (!autoUpdateOperatorWeights) {</b>
+<b class="nc"><i>767</i>&nbsp;	        beautiStatus += (beautiStatus.length() &gt; 0 ? &quot;|&quot; : &quot;&quot;) + &quot;noAutoUpdateOperatorWeights&quot;;</b>
+<i>768</i>&nbsp;	    }
+<b class="fc"><i>769</i>&nbsp;	    if (!autoUpdateFixMeanSubstRate) {</b>
+<b class="nc"><i>770</i>&nbsp;	        beautiStatus += (beautiStatus.length() &gt; 0 ? &quot;|&quot; : &quot;&quot;) + &quot;noAutoUpdateFixMeanSubstRate&quot;;</b>
+<i>771</i>&nbsp;	    }
+<b class="fc"><i>772</i>&nbsp;	    return beautiStatus;</b>
+<i>773</i>&nbsp;    }
+<i>774</i>&nbsp;
+<i>775</i>&nbsp;    void extractSequences(String xml) throws XMLParserException, SAXException, IOException, ParserConfigurationException  {
+<i>776</i>&nbsp;
+<i>777</i>&nbsp;        // parse the XML fragment into a DOM document
+<b class="nc"><i>778</i>&nbsp;        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();</b>
+<b class="nc"><i>779</i>&nbsp;        Document doc = factory.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));</b>
+<b class="nc"><i>780</i>&nbsp;        doc.normalize();</b>
+<i>781</i>&nbsp;        // find top level beast element
+<b class="nc"><i>782</i>&nbsp;        NodeList nodes = doc.getElementsByTagName(&quot;*&quot;);</b>
+<b class="nc"><i>783</i>&nbsp;        Node topNode = nodes.item(0);</b>
+<b class="nc"><i>784</i>&nbsp;        String beautiTemplate = XMLParser.getAttribute(topNode, &quot;beautitemplate&quot;);</b>
+<b class="nc"><i>785</i>&nbsp;        if (beautiTemplate == null) {</b>
+<b class="nc"><i>786</i>&nbsp;            int choice = JOptionPane.showConfirmDialog(getFrame(), &quot;This file does not appear to be generated by BEAUti. If you load it, unexpected behaviour may follow&quot;);</b>
+<b class="nc"><i>787</i>&nbsp;            if (choice != JOptionPane.OK_OPTION) {</b>
+<b class="nc"><i>788</i>&nbsp;                return;</b>
+<i>789</i>&nbsp;            }
+<i>790</i>&nbsp;            // load standard template
+<b class="nc"><i>791</i>&nbsp;            if (beautiConfig == null) {</b>
+<b class="nc"><i>792</i>&nbsp;                String templateXML = processTemplate(STANDARD_TEMPLATE);</b>
+<b class="nc"><i>793</i>&nbsp;                loadTemplate(templateXML);</b>
+<i>794</i>&nbsp;            }
+<b class="nc"><i>795</i>&nbsp;        } else {</b>
+<b class="nc"><i>796</i>&nbsp;            String templateXML = processTemplate(beautiTemplate + &quot;.xml&quot;);</b>
+<b class="nc"><i>797</i>&nbsp;            loadTemplate(templateXML);</b>
+<i>798</i>&nbsp;        }
+<i>799</i>&nbsp;
+<b class="nc"><i>800</i>&nbsp;        String beautiStatus = XMLParser.getAttribute(topNode, &quot;beautistatus&quot;);</b>
+<b class="nc"><i>801</i>&nbsp;        if (beautiStatus == null) {</b>
+<b class="nc"><i>802</i>&nbsp;            beautiStatus = &quot;&quot;;</b>
+<i>803</i>&nbsp;        }
+<b class="nc"><i>804</i>&nbsp;        autoSetClockRate = !beautiStatus.contains(&quot;noAutoSetClockRate&quot;);</b>
+<b class="nc"><i>805</i>&nbsp;        beauti.autoSetClockRate.setSelected(autoSetClockRate);</b>
+<b class="nc"><i>806</i>&nbsp;        allowLinking = beautiStatus.contains(&quot;allowLinking&quot;);</b>
+<b class="nc"><i>807</i>&nbsp;        beauti.allowLinking.setSelected(allowLinking);</b>
+<b class="nc"><i>808</i>&nbsp;        autoUpdateOperatorWeights = !beautiStatus.contains(&quot;noAutoUpdateOperatorWeights&quot;);</b>
+<b class="nc"><i>809</i>&nbsp;        beauti.autoUpdateOperatorWeights.setSelected(autoUpdateOperatorWeights);</b>
+<b class="nc"><i>810</i>&nbsp;        autoUpdateFixMeanSubstRate = !beautiStatus.contains(&quot;noAutoUpdateFixMeanSubstRate&quot;);</b>
+<b class="nc"><i>811</i>&nbsp;        beauti.autoUpdateFixMeanSubstRate.setSelected(autoUpdateFixMeanSubstRate);</b>
+<i>812</i>&nbsp;
+<i>813</i>&nbsp;        // parse file
+<b class="nc"><i>814</i>&nbsp;        XMLParser parser = new XMLParser();</b>
+<b class="nc"><i>815</i>&nbsp;        BEASTInterface MCMC = parser.parseFragment(xml, true);</b>
+<b class="nc"><i>816</i>&nbsp;        mcmc.setValue(MCMC, this);</b>
+<b class="nc"><i>817</i>&nbsp;        BEASTObjectPanel.addPluginToMap(MCMC, this);</b>
+<i>818</i>&nbsp;
+<i>819</i>&nbsp;        // reconstruct all objects from templates
+<i>820</i>&nbsp;        try {
+<b class="nc"><i>821</i>&nbsp;            CompoundDistribution posterior = (CompoundDistribution) ((beast.core.MCMC) mcmc.get()).posteriorInput.get();</b>
+<b class="nc"><i>822</i>&nbsp;            for (Distribution distr : posterior.pDistributions.get()) {</b>
+<b class="nc"><i>823</i>&nbsp;                if (distr.getID().equals(&quot;likelihood&quot;)) {</b>
+<b class="nc"><i>824</i>&nbsp;                    for (Distribution likelihood : ((CompoundDistribution) distr).pDistributions.get()) {</b>
+<b class="nc"><i>825</i>&nbsp;                        if (likelihood instanceof GenericTreeLikelihood) {</b>
+<b class="nc"><i>826</i>&nbsp;                            GenericTreeLikelihood treeLikelihood = (GenericTreeLikelihood) likelihood;</b>
+<b class="nc"><i>827</i>&nbsp;                            PartitionContext context = new PartitionContext(treeLikelihood);</b>
+<i>828</i>&nbsp;                            try {
+<b class="nc"><i>829</i>&nbsp;                                beautiConfig.partitionTemplate.get().createSubNet(context, false);</b>
+<b class="nc"><i>830</i>&nbsp;                            } catch (Exception e) {</b>
+<i>831</i>&nbsp;                                //e.printStackTrace();
+<b class="nc"><i>832</i>&nbsp;                            }</b>
+<b class="nc"><i>833</i>&nbsp;                            for (BeautiSubTemplate subTemplate : beautiConfig.subTemplates) {</b>
+<i>834</i>&nbsp;                                try {
+<b class="nc"><i>835</i>&nbsp;                                    subTemplate.createSubNet(context, false);</b>
+<b class="nc"><i>836</i>&nbsp;                                } catch (Exception e) {</b>
+<i>837</i>&nbsp;                                    //e.printStackTrace();
+<b class="nc"><i>838</i>&nbsp;                                }</b>
+<b class="nc"><i>839</i>&nbsp;                            }</b>
+<i>840</i>&nbsp;                        }
+<b class="nc"><i>841</i>&nbsp;                    }</b>
+<i>842</i>&nbsp;                }
+<b class="nc"><i>843</i>&nbsp;            }</b>
+<b class="nc"><i>844</i>&nbsp;        } catch (Exception e) {</b>
+<i>845</i>&nbsp;            //e.printStackTrace();
+<b class="nc"><i>846</i>&nbsp;        }</b>
+<i>847</i>&nbsp;
+<i>848</i>&nbsp;//		MCMC = parser.parseFragment(xml, true);
+<i>849</i>&nbsp;//		mcmc.setValue(MCMC, this);
+<i>850</i>&nbsp;//		PluginPanel.addPluginToMap(MCMC, this);
+<i>851</i>&nbsp;
+<i>852</i>&nbsp;//		if (xml.indexOf(XMLProducer.DO_NOT_EDIT_WARNING) &gt; 0) {
+<i>853</i>&nbsp;//			int start = xml.indexOf(XMLProducer.DO_NOT_EDIT_WARNING);
+<i>854</i>&nbsp;//			int end = xml.lastIndexOf(&quot;--&gt;&quot;);
+<i>855</i>&nbsp;//			xml = xml.substring(start, end);
+<i>856</i>&nbsp;//			xml = xml.replaceAll(XMLProducer.DO_NOT_EDIT_WARNING, &quot;&quot;);
+<i>857</i>&nbsp;//			xml = &quot;&lt;beast namespace=&#39;&quot; + XMLProducer.DEFAULT_NAMESPACE + &quot;&#39;&gt;&quot; + xml + &quot;&lt;/beast&gt;&quot;;
+<i>858</i>&nbsp;//			List&lt;BEASTObject&gt; beastObjects = parser.parseBareFragments(xml, true);
+<i>859</i>&nbsp;//			for (BEASTObject beastObject : beastObjects) {
+<i>860</i>&nbsp;//				PluginPanel.addPluginToMap(beastObject, this);
+<i>861</i>&nbsp;//			}
+<i>862</i>&nbsp;//		}
+<i>863</i>&nbsp;
+<i>864</i>&nbsp;        // extract alignments
+<b class="nc"><i>865</i>&nbsp;        determinePartitions();</b>
+<b class="nc"><i>866</i>&nbsp;    }</b>
+<i>867</i>&nbsp;
+<i>868</i>&nbsp;    /**
+<i>869</i>&nbsp;     * Merge sequence data with xml specification.
+<i>870</i>&nbsp;     * @throws ParserConfigurationException
+<i>871</i>&nbsp;     * @throws IOException
+<i>872</i>&nbsp;     * @throws SAXException
+<i>873</i>&nbsp;     * @throws XMLParserException
+<i>874</i>&nbsp;     */
+<i>875</i>&nbsp;    void mergeSequences(String xml) throws XMLParserException, SAXException, IOException, ParserConfigurationException {
+<b class="fc"><i>876</i>&nbsp;        if (xml == null) {</b>
+<b class="fc"><i>877</i>&nbsp;            xml = processTemplate(STANDARD_TEMPLATE);</b>
+<i>878</i>&nbsp;        }
+<b class="fc"><i>879</i>&nbsp;        loadTemplate(xml);</b>
+<i>880</i>&nbsp;        // create XML for alignments
+<b class="fc"><i>881</i>&nbsp;        if (beautiConfig != null) {</b>
+<b class="fc"><i>882</i>&nbsp;            for (Alignment alignment : alignments) {</b>
+<b class="fc"><i>883</i>&nbsp;                beautiConfig.partitionTemplate.get().createSubNet(alignment, this, true);</b>
+<b class="fc"><i>884</i>&nbsp;            }</b>
+<i>885</i>&nbsp;        } else {
+<i>886</i>&nbsp;            // replace alignment
+<b class="fc"><i>887</i>&nbsp;            for (BEASTInterface beastObject : pluginmap.values()) {</b>
+<b class="fc"><i>888</i>&nbsp;                if (beastObject instanceof Alignment) {</b>
+<i>889</i>&nbsp;                	// use toArray to prevent ConcurrentModificationException
+<b class="fc"><i>890</i>&nbsp;                    for (Object output : beastObject.getOutputs().toArray()) {</b>
+<b class="fc"><i>891</i>&nbsp;                        replaceInputs((BEASTInterface) output, beastObject, alignments.get(0));</b>
+<i>892</i>&nbsp;                    }
+<i>893</i>&nbsp;                }
+<b class="fc"><i>894</i>&nbsp;            }</b>
+<b class="fc"><i>895</i>&nbsp;            return;</b>
+<i>896</i>&nbsp;        }
+<b class="fc"><i>897</i>&nbsp;        determinePartitions();</b>
+<i>898</i>&nbsp;
+<b class="fc"><i>899</i>&nbsp;    } // mergeSequences</b>
+<i>900</i>&nbsp;
+<i>901</i>&nbsp;    private void replaceInputs(BEASTInterface beastObject, BEASTInterface original, BEASTInterface replacement) {
+<i>902</i>&nbsp;        try {
+<b class="fc"><i>903</i>&nbsp;            for (Input&lt;?&gt; input : beastObject.listInputs()) {</b>
+<b class="fc"><i>904</i>&nbsp;                if (input.get() != null) {</b>
+<b class="fc"><i>905</i>&nbsp;                    if (input.get() instanceof List) {</b>
+<i>906</i>&nbsp;                        @SuppressWarnings(&quot;unchecked&quot;)
+<b class="fc"><i>907</i>&nbsp;						List&lt;BEASTInterface&gt; list = (List&lt;BEASTInterface&gt;) input.get();</b>
+<b class="fc"><i>908</i>&nbsp;                        if (list.contains(original)) {</b>
+<b class="nc"><i>909</i>&nbsp;                            list.remove(original);</b>
+<b class="nc"><i>910</i>&nbsp;                            list.add(replacement);</b>
+<i>911</i>&nbsp;                        }
+<b class="fc"><i>912</i>&nbsp;                    } else {</b>
+<b class="fc"><i>913</i>&nbsp;                        if (input.get().equals(original)) {</b>
+<b class="fc"><i>914</i>&nbsp;                            input.setValue(replacement, beastObject);</b>
+<i>915</i>&nbsp;                        }
+<i>916</i>&nbsp;                    }
+<i>917</i>&nbsp;                }
+<b class="fc"><i>918</i>&nbsp;            }</b>
+<b class="nc"><i>919</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>920</i>&nbsp;            e.printStackTrace();</b>
+<b class="fc"><i>921</i>&nbsp;        }</b>
+<b class="fc"><i>922</i>&nbsp;    }</b>
+<i>923</i>&nbsp;
+<i>924</i>&nbsp;    void loadTemplate(String xml) throws XMLParserException, SAXException, IOException, ParserConfigurationException  {
+<i>925</i>&nbsp;        // load the template and its beauti configuration parts
+<b class="fc"><i>926</i>&nbsp;        XMLParser parser = new XMLParser();</b>
+<b class="fc"><i>927</i>&nbsp;        BEASTObjectPanel.init();</b>
+<b class="fc"><i>928</i>&nbsp;        List&lt;BEASTInterface&gt; beastObjects = parser.parseTemplate(xml, new HashMap&lt;&gt;(), true);</b>
+<b class="fc"><i>929</i>&nbsp;        for (BEASTInterface beastObject : beastObjects) {</b>
+<b class="fc"><i>930</i>&nbsp;            if (beastObject instanceof beast.core.Runnable) {</b>
+<b class="fc"><i>931</i>&nbsp;                mcmc.setValue(beastObject, this);</b>
+<b class="fc"><i>932</i>&nbsp;            } else if (beastObject instanceof BeautiConfig) {</b>
+<b class="fc"><i>933</i>&nbsp;                beautiConfig = (BeautiConfig) beastObject;</b>
+<b class="fc"><i>934</i>&nbsp;                beautiConfig.setDoc(this);</b>
+<i>935</i>&nbsp;            } else {
+<b class="fc"><i>936</i>&nbsp;            	Log.warning.println(&quot;template item &quot; + beastObject.getID() + &quot; is ignored&quot;);</b>
+<i>937</i>&nbsp;            }
+<b class="fc"><i>938</i>&nbsp;            BEASTObjectPanel.addPluginToMap(beastObject, this);</b>
+<b class="fc"><i>939</i>&nbsp;        }</b>
+<b class="fc"><i>940</i>&nbsp;    }</b>
+<i>941</i>&nbsp;
+<i>942</i>&nbsp;    /**
+<i>943</i>&nbsp;     * assigns trait to first available tree *
+<i>944</i>&nbsp;     */
+<i>945</i>&nbsp;    void addTraitSet(TraitSet trait) {
+<b class="fc"><i>946</i>&nbsp;        if (trait != null) {</b>
+<b class="nc"><i>947</i>&nbsp;            CompoundDistribution likelihood = (CompoundDistribution) pluginmap.get(&quot;likelihood&quot;);</b>
+<b class="nc"><i>948</i>&nbsp;            for (Distribution d : likelihood.pDistributions.get()) {</b>
+<b class="nc"><i>949</i>&nbsp;                if (d instanceof GenericTreeLikelihood) {</b>
+<i>950</i>&nbsp;                    try {
+<i>951</i>&nbsp;                        // TODO: this might not be a valid type conversion from TreeInterface to Tree
+<b class="nc"><i>952</i>&nbsp;                        Tree tree = (Tree) ((GenericTreeLikelihood) d).treeInput.get();</b>
+<b class="nc"><i>953</i>&nbsp;                        tree.m_traitList.setValue(trait, tree);</b>
+<b class="nc"><i>954</i>&nbsp;                    } catch (Exception e) {</b>
+<b class="nc"><i>955</i>&nbsp;                        e.printStackTrace();</b>
+<b class="nc"><i>956</i>&nbsp;                    }</b>
+<b class="nc"><i>957</i>&nbsp;                    scrubAll(true, false);</b>
+<b class="nc"><i>958</i>&nbsp;                    return;</b>
+<i>959</i>&nbsp;                }
+<b class="nc"><i>960</i>&nbsp;            }</b>
+<i>961</i>&nbsp;        }
+<b class="fc"><i>962</i>&nbsp;    }</b>
+<i>963</i>&nbsp;
+<i>964</i>&nbsp;    /**
+<i>965</i>&nbsp;     * Connect all inputs to the relevant ancestors of m_runnable.
+<i>966</i>&nbsp;     *
+<i>967</i>&nbsp;     * @ *
+<i>968</i>&nbsp;     */
+<i>969</i>&nbsp;    void connectModel()  {
+<b class="fc"><i>970</i>&nbsp;        scrubAll(true, true);</b>
+<b class="fc"><i>971</i>&nbsp;    }</b>
+<i>972</i>&nbsp;
+<i>973</i>&nbsp;    private void collectClockModels() {
+<i>974</i>&nbsp;        // collect branch rate models from model
+<b class="fc"><i>975</i>&nbsp;        CompoundDistribution likelihood = (CompoundDistribution) pluginmap.get(&quot;likelihood&quot;);</b>
+<b class="fc"><i>976</i>&nbsp;        while (clockModels.size() &lt; partitionNames.size()) {</b>
+<i>977</i>&nbsp;            try {
+<b class="fc"><i>978</i>&nbsp;                GenericTreeLikelihood treelikelihood = new GenericTreeLikelihood();</b>
+<b class="fc"><i>979</i>&nbsp;                treelikelihood.branchRateModelInput.setValue(new StrictClockModel(), treelikelihood);</b>
+<b class="fc"><i>980</i>&nbsp;                List&lt;BeautiSubTemplate&gt; availableBEASTObjects = inputEditorFactory.getAvailableTemplates(</b>
+<i>981</i>&nbsp;                        treelikelihood.branchRateModelInput, treelikelihood, null, this);
+<b class="fc"><i>982</i>&nbsp;                BEASTInterface beastObject = availableBEASTObjects.get(0).createSubNet(partitionNames.get(clockModels.size()), true);</b>
+<b class="fc"><i>983</i>&nbsp;                clockModels.add((BranchRateModel.Base) beastObject);</b>
+<b class="nc"><i>984</i>&nbsp;            } catch (Exception e) {</b>
+<i>985</i>&nbsp;                // TODO Auto-generated catch block
+<b class="nc"><i>986</i>&nbsp;                e.printStackTrace();</b>
+<b class="fc"><i>987</i>&nbsp;            }</b>
+<i>988</i>&nbsp;        }
+<b class="fc"><i>989</i>&nbsp;        int k = 0;</b>
+<b class="fc"><i>990</i>&nbsp;        for (Distribution d : likelihood.pDistributions.get()) {</b>
+<b class="fc"><i>991</i>&nbsp;            BranchRateModel clockModel = ((GenericTreeLikelihood) d).branchRateModelInput.get();</b>
+<i>992</i>&nbsp;            // sanity check
+<b class="fc"><i>993</i>&nbsp;            Tree tree = null;</b>
+<i>994</i>&nbsp;            try {
+<b class="fc"><i>995</i>&nbsp;                for (Input&lt;?&gt; input : ((BEASTInterface) clockModel).listInputs()) {</b>
+<b class="fc"><i>996</i>&nbsp;                    if (input.getName().equals(&quot;tree&quot;)) {</b>
+<b class="fc"><i>997</i>&nbsp;                        tree = (Tree) input.get();</b>
+<i>998</i>&nbsp;                    }
+<i>999</i>&nbsp;
+<b class="fc"><i>1000</i>&nbsp;                }</b>
+<b class="fc"><i>1001</i>&nbsp;                if (tree != null &amp;&amp; tree != ((GenericTreeLikelihood) d).treeInput.get()) {</b>
+<b class="nc"><i>1002</i>&nbsp;                    clockModel = clockModels.get(k);</b>
+<b class="nc"><i>1003</i>&nbsp;                    Log.warning.println(&quot;WARNING: unlinking clock model for &quot; + d.getID());</b>
+<i>1004</i>&nbsp;                    // TODO #557: this should move to the event of clock model drop box
+<i>1005</i>&nbsp;//                    JOptionPane.showMessageDialog(beauti.getSelectedComponent(),
+<i>1006</i>&nbsp;//                            &quot;Cannot link all clock model(s) except strict clock with different trees !&quot;);
+<b class="nc"><i>1007</i>&nbsp;                    ((GenericTreeLikelihood) d).branchRateModelInput.setValue(clockModel, d);</b>
+<i>1008</i>&nbsp;                }
+<b class="nc"><i>1009</i>&nbsp;            } catch (Exception e) {</b>
+<i>1010</i>&nbsp;                // ignore
+<b class="fc"><i>1011</i>&nbsp;            }</b>
+<i>1012</i>&nbsp;
+<b class="fc"><i>1013</i>&nbsp;            if (clockModel != null) {</b>
+<b class="fc"><i>1014</i>&nbsp;                String id = ((BEASTInterface) clockModel).getID();</b>
+<b class="fc"><i>1015</i>&nbsp;                id = parsePartition(id);</b>
+<b class="fc"><i>1016</i>&nbsp;                String partition = alignments.get(k).getID();</b>
+<b class="fc"><i>1017</i>&nbsp;                if (id.equals(partition)) {</b>
+<b class="fc"><i>1018</i>&nbsp;                    clockModels.set(k, clockModel);</b>
+<i>1019</i>&nbsp;                }
+<b class="fc"><i>1020</i>&nbsp;                k++;</b>
+<i>1021</i>&nbsp;            }
+<b class="fc"><i>1022</i>&nbsp;        }</b>
+<b class="fc"><i>1023</i>&nbsp;    }</b>
+<i>1024</i>&nbsp;
+<i>1025</i>&nbsp;    // private void collectTreePriors() {
+<i>1026</i>&nbsp;    // // collect tree priors from model
+<i>1027</i>&nbsp;    // CompoundDistribution prior = (CompoundDistribution)
+<i>1028</i>&nbsp;    // pluginmap.get(&quot;prior&quot;);
+<i>1029</i>&nbsp;    // while (treePriors.size() &lt; partitionNames.size()) {
+<i>1030</i>&nbsp;    // try {
+<i>1031</i>&nbsp;    // CompoundDistribution distr = new CompoundDistribution();
+<i>1032</i>&nbsp;    // distr.pDistributions.setValue(new YuleModel(), distr);
+<i>1033</i>&nbsp;    // List&lt;BeautiSubTemplate&gt; availableBEASTObjects =
+<i>1034</i>&nbsp;    // inputEditorFactory.getAvailableTemplates(distr.pDistributions, distr,
+<i>1035</i>&nbsp;    // null, this);
+<i>1036</i>&nbsp;    // for (int i = availableBEASTObjects.size() - 1; i &gt;= 0; i--) {
+<i>1037</i>&nbsp;    // if
+<i>1038</i>&nbsp;    // (!TreeDistribution.class.isAssignableFrom(availableBEASTObjects.get(i)._class))
+<i>1039</i>&nbsp;    // {
+<i>1040</i>&nbsp;    // availableBEASTObjects.remove(i);
+<i>1041</i>&nbsp;    // }
+<i>1042</i>&nbsp;    // }
+<i>1043</i>&nbsp;    // if (availableBEASTObjects.size() &gt; 0) {
+<i>1044</i>&nbsp;    // BEASTObject beastObject =
+<i>1045</i>&nbsp;    // availableBEASTObjects.get(0).createSubNet(partitionNames.get(treePriors.size()));
+<i>1046</i>&nbsp;    // treePriors.add((TreeDistribution) beastObject);
+<i>1047</i>&nbsp;    // } else {
+<i>1048</i>&nbsp;    // treePriors.add(null);
+<i>1049</i>&nbsp;    // }
+<i>1050</i>&nbsp;    // } catch (Exception e) {
+<i>1051</i>&nbsp;    // // TODO Auto-generated catch block
+<i>1052</i>&nbsp;    // e.printStackTrace();
+<i>1053</i>&nbsp;    // }
+<i>1054</i>&nbsp;    // }
+<i>1055</i>&nbsp;    //
+<i>1056</i>&nbsp;    // // find tree priors that are in the posterior somewhere
+<i>1057</i>&nbsp;    // // by inspecting outputs of *[id=likelihood]/TreeLikelihood/Tree
+<i>1058</i>&nbsp;    // // and match tree prior to partition of tree
+<i>1059</i>&nbsp;    // CompoundDistribution likelihood = (CompoundDistribution)
+<i>1060</i>&nbsp;    // pluginmap.get(&quot;likelihood&quot;);
+<i>1061</i>&nbsp;    // for (Distribution distr : likelihood.pDistributions.get()) {
+<i>1062</i>&nbsp;    // if (distr instanceof TreeLikelihood) {
+<i>1063</i>&nbsp;    // TreeLikelihood tl = (TreeLikelihood) distr;
+<i>1064</i>&nbsp;    // Tree tree = tl.m_tree.get();
+<i>1065</i>&nbsp;    // int partition = getPartitionNr(tree);
+<i>1066</i>&nbsp;    // for (BEASTObject beastObject : tree.outputs) {
+<i>1067</i>&nbsp;    // if (beastObject instanceof TreeDistribution &amp;&amp;
+<i>1068</i>&nbsp;    // posteriorPredecessors.contains(beastObject)) {
+<i>1069</i>&nbsp;    // treePriors.set(partition, (TreeDistribution) beastObject);
+<i>1070</i>&nbsp;    // }
+<i>1071</i>&nbsp;    // }
+<i>1072</i>&nbsp;    // }
+<i>1073</i>&nbsp;    // }
+<i>1074</i>&nbsp;    // }
+<i>1075</i>&nbsp;
+<i>1076</i>&nbsp;    BranchRateModel getClockModel(String partition) {
+<b class="fc"><i>1077</i>&nbsp;        int k = 0;</b>
+<b class="fc"><i>1078</i>&nbsp;        for (Alignment data : alignments) {</b>
+<b class="fc"><i>1079</i>&nbsp;            if (data.getID().equals(partition)) {</b>
+<b class="fc"><i>1080</i>&nbsp;                return clockModels.get(k);</b>
+<i>1081</i>&nbsp;            }
+<b class="fc"><i>1082</i>&nbsp;            k++;</b>
+<b class="fc"><i>1083</i>&nbsp;        }</b>
+<b class="nc"><i>1084</i>&nbsp;        return null;</b>
+<i>1085</i>&nbsp;    }
+<i>1086</i>&nbsp;
+<i>1087</i>&nbsp;    // TreeDistribution getTreePrior(String partition) {
+<i>1088</i>&nbsp;    // int k = 0;
+<i>1089</i>&nbsp;    // for (Alignment data : alignments) {
+<i>1090</i>&nbsp;    // if (data.getID().equals(partition)) {
+<i>1091</i>&nbsp;    // return treePriors.get(k);
+<i>1092</i>&nbsp;    // }
+<i>1093</i>&nbsp;    // k++;
+<i>1094</i>&nbsp;    // }
+<i>1095</i>&nbsp;    // return null;
+<i>1096</i>&nbsp;    // }
+<i>1097</i>&nbsp;
+<i>1098</i>&nbsp;    synchronized public void scrubAll(boolean useNotEstimatedStateNodes, boolean isInitial) {
+<i>1099</i>&nbsp;        try {
+<b class="fc"><i>1100</i>&nbsp;            if (autoSetClockRate) {</b>
+<b class="fc"><i>1101</i>&nbsp;                setClockRate();</b>
+<i>1102</i>&nbsp;            }
+<b class="fc"><i>1103</i>&nbsp;            if (autoUpdateFixMeanSubstRate) {</b>
+<b class="fc"><i>1104</i>&nbsp;            	SiteModelInputEditor.customConnector(this);</b>
+<i>1105</i>&nbsp;            }
+<i>1106</i>&nbsp;
+<i>1107</i>&nbsp;            // set estimate flag on tree, only if tree occurs in a partition
+<i>1108</i>&nbsp;//            for (BEASTInterface beastObject : pluginmap.values()) {
+<i>1109</i>&nbsp;//                if (beastObject instanceof Tree) {
+<i>1110</i>&nbsp;//                    Tree tree = (Tree) beastObject;
+<i>1111</i>&nbsp;//                    tree.isEstimatedInput.setValue(false, tree);
+<i>1112</i>&nbsp;//                }
+<i>1113</i>&nbsp;//            }
+<i>1114</i>&nbsp;//            for (BEASTInterface beastObject : pPartition[2]) {
+<i>1115</i>&nbsp;//                // TODO: this might not be a valid type conversion from TreeInterface to Tree
+<i>1116</i>&nbsp;//                Tree tree = (Tree) ((GenericTreeLikelihood) beastObject).treeInput.get();
+<i>1117</i>&nbsp;//                tree.isEstimatedInput.setValue(true, tree);
+<i>1118</i>&nbsp;//            }
+<b class="fc"><i>1119</i>&nbsp;            if (pluginmap.containsKey(&quot;Tree.t:Species&quot;)) {</b>
+<b class="fc"><i>1120</i>&nbsp;                Tree tree = (Tree) pluginmap.get(&quot;Tree.t:Species&quot;);</b>
+<b class="fc"><i>1121</i>&nbsp;                tree.isEstimatedInput.setValue(true, tree);</b>
+<i>1122</i>&nbsp;            }
+<i>1123</i>&nbsp;
+<i>1124</i>&nbsp;            // go through all templates, and process connectors in relevant ones
+<b class="fc"><i>1125</i>&nbsp;            boolean progress = true;</b>
+<b class="fc"><i>1126</i>&nbsp;            while (progress) {</b>
+<b class="fc"><i>1127</i>&nbsp;                warning(&quot;============================ start scrubbing ===========================&quot;);</b>
+<b class="fc"><i>1128</i>&nbsp;                progress = false;</b>
+<b class="fc"><i>1129</i>&nbsp;                setUpActivePlugins();</b>
+<i>1130</i>&nbsp;
+<i>1131</i>&nbsp;                // process MRCA priors
+<b class="fc"><i>1132</i>&nbsp;                for (String id : pluginmap.keySet()) {</b>
+<b class="fc"><i>1133</i>&nbsp;                    if (id.endsWith(&quot;.prior&quot;)) {</b>
+<b class="fc"><i>1134</i>&nbsp;                    	BEASTInterface beastObject = pluginmap.get(id);</b>
+<b class="fc"><i>1135</i>&nbsp;                        if (beastObject instanceof MRCAPrior) {</b>
+<b class="nc"><i>1136</i>&nbsp;                            MRCAPrior prior = (MRCAPrior) beastObject;</b>
+<b class="nc"><i>1137</i>&nbsp;                            if (prior.treeInput.get().isEstimatedInput.get() == false) {</b>
+<i>1138</i>&nbsp;                                // disconnect
+<b class="nc"><i>1139</i>&nbsp;                                disconnect(beastObject, &quot;prior&quot;, &quot;distribution&quot;);</b>
+<i>1140</i>&nbsp;                            } else {
+<i>1141</i>&nbsp;                                // connect
+<b class="nc"><i>1142</i>&nbsp;                                connect(beastObject, &quot;prior&quot;, &quot;distribution&quot;);</b>
+<i>1143</i>&nbsp;                            }
+<i>1144</i>&nbsp;                        }
+<i>1145</i>&nbsp;                    }
+<b class="fc"><i>1146</i>&nbsp;                }</b>
+<i>1147</i>&nbsp;
+<b class="fc"><i>1148</i>&nbsp;                List&lt;BeautiSubTemplate&gt; templates = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>1149</i>&nbsp;                templates.add(beautiConfig.partitionTemplate.get());</b>
+<b class="fc"><i>1150</i>&nbsp;                templates.addAll(beautiConfig.subTemplates);</b>
+<i>1151</i>&nbsp;
+<b class="fc"><i>1152</i>&nbsp;                for (PartitionContext context : possibleContexts) {</b>
+<b class="fc"><i>1153</i>&nbsp;                    applyBeautiRules(templates, isInitial, context);</b>
+<b class="fc"><i>1154</i>&nbsp;                }</b>
+<i>1155</i>&nbsp;                // add &#39;Species&#39; as special partition name
+<b class="fc"><i>1156</i>&nbsp;                applyBeautiRules(templates, isInitial, new PartitionContext(&quot;Species&quot;));</b>
+<i>1157</i>&nbsp;
+<i>1158</i>&nbsp;                // if the model changed, some rules that use inposterior() may
+<i>1159</i>&nbsp;                // not have been triggered properly
+<i>1160</i>&nbsp;                // so we need to check that the model changed, and if so,
+<i>1161</i>&nbsp;                // revisit the BeautiConnectors
+<b class="fc"><i>1162</i>&nbsp;                List&lt;BEASTInterface&gt; posteriorPredecessors2 = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>1163</i>&nbsp;                collectPredecessors(((MCMC) mcmc.get()).posteriorInput.get(), posteriorPredecessors2);</b>
+<b class="fc"><i>1164</i>&nbsp;                if (posteriorPredecessors.size() != posteriorPredecessors2.size()) {</b>
+<b class="fc"><i>1165</i>&nbsp;                    progress = true;</b>
+<i>1166</i>&nbsp;                } else {
+<b class="fc"><i>1167</i>&nbsp;                    for (BEASTInterface beastObject : posteriorPredecessors2) {</b>
+<b class="fc"><i>1168</i>&nbsp;                        if (!posteriorPredecessors.contains(beastObject)) {</b>
+<b class="fc"><i>1169</i>&nbsp;                            progress = true;</b>
+<b class="fc"><i>1170</i>&nbsp;                            break;</b>
+<i>1171</i>&nbsp;                        }
+<b class="fc"><i>1172</i>&nbsp;                    }</b>
+<i>1173</i>&nbsp;                }
+<b class="fc"><i>1174</i>&nbsp;            }</b>
+<i>1175</i>&nbsp;
+<b class="fc"><i>1176</i>&nbsp;            List&lt;BeautiSubTemplate&gt; templates = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>1177</i>&nbsp;            templates.add(beautiConfig.hyperPriorTemplate);</b>
+<b class="fc"><i>1178</i>&nbsp;            for (BEASTInterface beastObject : pluginmap.values()) {</b>
+<b class="fc"><i>1179</i>&nbsp;                if (beastObject instanceof RealParameter) {</b>
+<b class="fc"><i>1180</i>&nbsp;                    if (beastObject.getID().startsWith(&quot;parameter.&quot;)) {</b>
+<b class="nc"><i>1181</i>&nbsp;                        PartitionContext context = new PartitionContext(beastObject.getID().substring(&quot;parameter.&quot;.length()));</b>
+<b class="nc"><i>1182</i>&nbsp;                        applyBeautiRules(templates, isInitial, context);</b>
+<i>1183</i>&nbsp;                    }
+<i>1184</i>&nbsp;                }
+<b class="fc"><i>1185</i>&nbsp;            }</b>
+<i>1186</i>&nbsp;
+<i>1187</i>&nbsp;
+<b class="fc"><i>1188</i>&nbsp;            collectClockModels();</b>
+<i>1189</i>&nbsp;            // collectTreePriors();
+<i>1190</i>&nbsp;
+<b class="fc"><i>1191</i>&nbsp;            Log.warning.println(&quot;PARTITIONS:\n&quot;);</b>
+<b class="fc"><i>1192</i>&nbsp;            Log.warning.println(Arrays.toString(currentPartitions));</b>
+<i>1193</i>&nbsp;
+<b class="fc"><i>1194</i>&nbsp;            determineLinks();</b>
+<b class="fc"><i>1195</i>&nbsp;        } catch (Exception e) {</b>
+<b class="fc"><i>1196</i>&nbsp;            Log.err.println(e.getMessage());</b>
+<b class="fc"><i>1197</i>&nbsp;        }</b>
+<i>1198</i>&nbsp;
+<b class="fc"><i>1199</i>&nbsp;        if (autoUpdateOperatorWeights) {</b>
+<b class="fc"><i>1200</i>&nbsp;        	reweightSpeciesPartitionOperators();</b>
+<i>1201</i>&nbsp;        }
+<b class="fc"><i>1202</i>&nbsp;    } // scrubAll</b>
+<i>1203</i>&nbsp;
+<i>1204</i>&nbsp;    protected void setUpActivePlugins() {
+<b class="fc"><i>1205</i>&nbsp;        posteriorPredecessors = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>1206</i>&nbsp;        collectPredecessors(((MCMC) mcmc.get()).posteriorInput.get(), posteriorPredecessors);</b>
+<b class="fc"><i>1207</i>&nbsp;        likelihoodPredecessors = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>1208</i>&nbsp;        if (pluginmap.containsKey(&quot;likelihood&quot;)) {</b>
+<b class="fc"><i>1209</i>&nbsp;            collectPredecessors(pluginmap.get(&quot;likelihood&quot;), likelihoodPredecessors);</b>
+<i>1210</i>&nbsp;        }
+<i>1211</i>&nbsp;
+<i>1212</i>&nbsp;
+<b class="fc"><i>1213</i>&nbsp;        Log.trace.print(&quot;InPosterior=&quot;);</b>
+<b class="fc"><i>1214</i>&nbsp;        for (BEASTInterface o : posteriorPredecessors) {</b>
+<b class="fc"><i>1215</i>&nbsp;        	pluginmap.put(o.getID(), o);</b>
+<b class="fc"><i>1216</i>&nbsp;        	Log.trace.print(o.getID() + &quot; &quot;);</b>
+<i>1217</i>&nbsp;        	//if (!pluginmap.containsKey(o)) {
+<i>1218</i>&nbsp;        	//	System.err.println(&quot;MISSING: &quot; + o.getID());
+<i>1219</i>&nbsp;        	//}
+<b class="fc"><i>1220</i>&nbsp;        }</b>
+<b class="fc"><i>1221</i>&nbsp;        Log.trace.println();</b>
+<b class="fc"><i>1222</i>&nbsp;    }</b>
+<i>1223</i>&nbsp;
+<i>1224</i>&nbsp;    public static String translatePartitionNames(String str, PartitionContext partition) {
+<i>1225</i>&nbsp;//        str = str.replaceAll(&quot;.s:\\$\\(n\\)&quot;, &quot;.s:&quot; + partition.siteModel);
+<i>1226</i>&nbsp;//        str = str.replaceAll(&quot;.c:\\$\\(n\\)&quot;, &quot;.c:&quot; + partition.clockModel);
+<i>1227</i>&nbsp;//        str = str.replaceAll(&quot;.t:\\$\\(n\\)&quot;, &quot;.t:&quot; + partition.tree);
+<i>1228</i>&nbsp;//        str = str.replaceAll(&quot;\\$\\(n\\)&quot;, partition.partition);
+<i>1229</i>&nbsp;        // optimised code, based on (probably incorrect) profiler output
+<b class="fc"><i>1230</i>&nbsp;		StringBuilder sb = new StringBuilder();</b>
+<b class="fc"><i>1231</i>&nbsp;		int len = str.length();</b>
+<b class="fc"><i>1232</i>&nbsp;		for (int i = 0; i &lt; len; i++) {</b>
+<b class="fc"><i>1233</i>&nbsp;			char c = str.charAt(i);</b>
+<b class="fc"><i>1234</i>&nbsp;			if (c == &#39;.&#39; &amp;&amp; i &lt; len - 6) {</b>
+<b class="fc"><i>1235</i>&nbsp;				if (str.charAt(i + 2) == &#39;:&#39; &amp;&amp; str.charAt(i + 3) == &#39;$&#39; &amp;&amp;</b>
+<b class="fc"><i>1236</i>&nbsp;						str.charAt(i + 4) == &#39;(&#39; &amp;&amp; str.charAt(i + 5) == &#39;n&#39; &amp;&amp; str.charAt(i + 6) == &#39;)&#39;) {</b>
+<b class="fc"><i>1237</i>&nbsp;					switch (str.charAt(i+1)) {</b>
+<i>1238</i>&nbsp;					case &#39;s&#39;: // .s:$(n)
+<b class="fc"><i>1239</i>&nbsp;						sb.append(&quot;.s:&quot;).append(partition.siteModel);</b>
+<b class="fc"><i>1240</i>&nbsp;						i += 6;</b>
+<b class="fc"><i>1241</i>&nbsp;						break;</b>
+<i>1242</i>&nbsp;					case &#39;c&#39;:
+<b class="fc"><i>1243</i>&nbsp;						sb.append(&quot;.c:&quot;).append(partition.clockModel);</b>
+<b class="fc"><i>1244</i>&nbsp;						i += 6;</b>
+<b class="fc"><i>1245</i>&nbsp;						break;</b>
+<i>1246</i>&nbsp;					case &#39;t&#39;:
+<b class="fc"><i>1247</i>&nbsp;						sb.append(&quot;.t:&quot;).append(partition.tree);</b>
+<b class="fc"><i>1248</i>&nbsp;						i += 6;</b>
+<b class="fc"><i>1249</i>&nbsp;						break;</b>
+<i>1250</i>&nbsp;					default:
+<b class="nc"><i>1251</i>&nbsp;						sb.append(&#39;.&#39;);</b>
+<i>1252</i>&nbsp;					}
+<i>1253</i>&nbsp;				} else {
+<b class="fc"><i>1254</i>&nbsp;					sb.append(&#39;.&#39;);</b>
+<i>1255</i>&nbsp;				}
+<b class="fc"><i>1256</i>&nbsp;			} else if (c == &#39;$&#39; &amp;&amp; i &lt; len - 3) {</b>
+<b class="fc"><i>1257</i>&nbsp;				if (str.charAt(i + 1) == &#39;(&#39; &amp;&amp; str.charAt(i + 2) == &#39;n&#39; &amp;&amp; str.charAt(i + 3) == &#39;)&#39;) {</b>
+<b class="fc"><i>1258</i>&nbsp;					sb.append(partition.partition);</b>
+<b class="fc"><i>1259</i>&nbsp;					i+= 3;</b>
+<i>1260</i>&nbsp;				} else {
+<b class="fc"><i>1261</i>&nbsp;					sb.append(c);</b>
+<i>1262</i>&nbsp;				}
+<i>1263</i>&nbsp;			} else {
+<b class="fc"><i>1264</i>&nbsp;				sb.append(c);</b>
+<i>1265</i>&nbsp;			}
+<i>1266</i>&nbsp;		}
+<b class="fc"><i>1267</i>&nbsp;        return sb.toString();</b>
+<i>1268</i>&nbsp;    }
+<i>1269</i>&nbsp;
+<i>1270</i>&nbsp;    void applyBeautiRules(List&lt;BeautiSubTemplate&gt; templates, boolean isInitial, PartitionContext context) {
+<b class="fc"><i>1271</i>&nbsp;        for (BeautiSubTemplate template : templates) {</b>
+<b class="fc"><i>1272</i>&nbsp;            String templateID = translatePartitionNames(template.getMainID(), context);</b>
+<b class="fc"><i>1273</i>&nbsp;            BEASTInterface beastObject = pluginmap.get(templateID);</b>
+<i>1274</i>&nbsp;
+<i>1275</i>&nbsp;            // check if template is in use
+<b class="fc"><i>1276</i>&nbsp;            if (beastObject != null) {</b>
+<i>1277</i>&nbsp;                // if so, run through all connectors
+<b class="fc"><i>1278</i>&nbsp;                for (BeautiConnector connector : template.connectors) {</b>
+<i>1279</i>&nbsp;
+<b class="fc"><i>1280</i>&nbsp;                    if (connector.atInitialisationOnly()) {</b>
+<b class="fc"><i>1281</i>&nbsp;                        if (isInitial) {</b>
+<b class="fc"><i>1282</i>&nbsp;                            warning(&quot;connect: &quot; + connector.toString(context) + &quot;\n&quot;);</b>
+<b class="fc"><i>1283</i>&nbsp;                            connect(connector, context);</b>
+<i>1284</i>&nbsp;                        }
+<b class="fc"><i>1285</i>&nbsp;                    } else if (connector.isActivated(context, posteriorPredecessors,</b>
+<i>1286</i>&nbsp;                            likelihoodPredecessors, this)) {
+<b class="fc"><i>1287</i>&nbsp;                        warning(&quot;connect: &quot; + connector.toString(context) + &quot;\n&quot;);</b>
+<i>1288</i>&nbsp;                        try {
+<b class="fc"><i>1289</i>&nbsp;                            connect(connector, context);</b>
+<b class="fc"><i>1290</i>&nbsp;                        } catch (Exception e) {</b>
+<b class="fc"><i>1291</i>&nbsp;                            warning(e.getMessage());</b>
+<b class="fc"><i>1292</i>&nbsp;                        }</b>
+<i>1293</i>&nbsp;
+<i>1294</i>&nbsp;                    } else {
+<b class="fc"><i>1295</i>&nbsp;                        warning(&quot;DISconnect: &quot; + connector.toString(context) + &quot;\n&quot;);</b>
+<i>1296</i>&nbsp;                        try {
+<b class="fc"><i>1297</i>&nbsp;                            disconnect(connector, context);</b>
+<b class="nc"><i>1298</i>&nbsp;                        } catch (Exception e) {</b>
+<b class="nc"><i>1299</i>&nbsp;                            warning(e.getMessage() + &quot;\n&quot;);</b>
+<b class="fc"><i>1300</i>&nbsp;                        }</b>
+<i>1301</i>&nbsp;                    }
+<b class="fc"><i>1302</i>&nbsp;                }</b>
+<i>1303</i>&nbsp;            }
+<b class="fc"><i>1304</i>&nbsp;        }</b>
+<b class="fc"><i>1305</i>&nbsp;    }</b>
+<i>1306</i>&nbsp;
+<i>1307</i>&nbsp;    void setClockRate()  {
+<b class="fc"><i>1308</i>&nbsp;    	boolean needsEstimationBySPTree = false;</b>
+<b class="fc"><i>1309</i>&nbsp;        if (pluginmap.containsKey(&quot;Tree.t:Species&quot;)) {</b>
+<b class="fc"><i>1310</i>&nbsp;        	Tree sptree = (Tree) pluginmap.get(&quot;Tree.t:Species&quot;);</b>
+<i>1311</i>&nbsp;	        // check whether there is a calibration
+<b class="fc"><i>1312</i>&nbsp;	        for (Object beastObject : sptree.getOutputs()) {</b>
+<b class="fc"><i>1313</i>&nbsp;	            if (beastObject instanceof MRCAPrior) {</b>
+<b class="nc"><i>1314</i>&nbsp;	                MRCAPrior prior = (MRCAPrior) beastObject;</b>
+<b class="nc"><i>1315</i>&nbsp;	                if (prior.distInput.get() != null) {</b>
+<b class="nc"><i>1316</i>&nbsp;	                    needsEstimationBySPTree = true;</b>
+<i>1317</i>&nbsp;	                }
+<i>1318</i>&nbsp;	            }
+<b class="fc"><i>1319</i>&nbsp;	        }</b>
+<i>1320</i>&nbsp;        }
+<i>1321</i>&nbsp;
+<b class="fc"><i>1322</i>&nbsp;        BEASTInterface likelihood = pluginmap.get(&quot;likelihood&quot;);</b>
+<b class="fc"><i>1323</i>&nbsp;        if (likelihood instanceof CompoundDistribution) {</b>
+<b class="fc"><i>1324</i>&nbsp;            int i = 0;</b>
+<b class="fc"><i>1325</i>&nbsp;            RealParameter firstClock = null;</b>
+<b class="fc"><i>1326</i>&nbsp;            for (Distribution distr : ((CompoundDistribution) likelihood).pDistributions.get()) {</b>
+<b class="fc"><i>1327</i>&nbsp;                if (distr instanceof GenericTreeLikelihood) {</b>
+<b class="fc"><i>1328</i>&nbsp;                    GenericTreeLikelihood treeLikelihood = (GenericTreeLikelihood) distr;</b>
+<b class="fc"><i>1329</i>&nbsp;                    boolean needsEstimation = needsEstimationBySPTree;</b>
+<b class="fc"><i>1330</i>&nbsp;                    if (i &gt; 0) {</b>
+<b class="fc"><i>1331</i>&nbsp;                        BranchRateModel.Base model = treeLikelihood.branchRateModelInput.get();</b>
+<b class="fc"><i>1332</i>&nbsp;                        needsEstimation = (model.meanRateInput.get() != firstClock) || firstClock.isEstimatedInput.get();</b>
+<b class="fc"><i>1333</i>&nbsp;                    } else {</b>
+<i>1334</i>&nbsp;                        // TODO: this might not be a valid type conversion from TreeInterface to Tree
+<b class="fc"><i>1335</i>&nbsp;                        Tree tree = (Tree) treeLikelihood.treeInput.get();</b>
+<i>1336</i>&nbsp;                        // check whether there are tip dates
+<b class="fc"><i>1337</i>&nbsp;                        if (tree.hasDateTrait()) {</b>
+<b class="nc"><i>1338</i>&nbsp;                            needsEstimation = true;</b>
+<i>1339</i>&nbsp;                        }
+<i>1340</i>&nbsp;                        // check whether there is a calibration
+<b class="fc"><i>1341</i>&nbsp;                        for (Object beastObject : tree.getOutputs()) {</b>
+<b class="fc"><i>1342</i>&nbsp;                            if (beastObject instanceof MRCAPrior) {</b>
+<b class="nc"><i>1343</i>&nbsp;                                MRCAPrior prior = (MRCAPrior) beastObject;</b>
+<b class="nc"><i>1344</i>&nbsp;                                if (prior.distInput.get() != null) {</b>
+<b class="nc"><i>1345</i>&nbsp;                                    needsEstimation = true;</b>
+<i>1346</i>&nbsp;                                }
+<i>1347</i>&nbsp;                            }
+<b class="fc"><i>1348</i>&nbsp;                        }</b>
+<i>1349</i>&nbsp;                    }
+<b class="fc"><i>1350</i>&nbsp;                    BranchRateModel.Base model = treeLikelihood.branchRateModelInput.get();</b>
+<b class="fc"><i>1351</i>&nbsp;                    if (model != null) {</b>
+<b class="fc"><i>1352</i>&nbsp;                        RealParameter clockRate = model.meanRateInput.get();</b>
+<b class="fc"><i>1353</i>&nbsp;                        clockRate.isEstimatedInput.setValue(needsEstimation, clockRate);</b>
+<b class="fc"><i>1354</i>&nbsp;                        if (firstClock == null) {</b>
+<b class="fc"><i>1355</i>&nbsp;                            firstClock = clockRate;</b>
+<i>1356</i>&nbsp;                        }
+<i>1357</i>&nbsp;                    }
+<b class="fc"><i>1358</i>&nbsp;                    i++;</b>
+<i>1359</i>&nbsp;                }
+<b class="fc"><i>1360</i>&nbsp;            }</b>
+<i>1361</i>&nbsp;        }
+<b class="fc"><i>1362</i>&nbsp;    }</b>
+<i>1363</i>&nbsp;
+<i>1364</i>&nbsp;    public void addPlugin(final BEASTInterface beastObject) { //  {
+<i>1365</i>&nbsp;        // SwingUtilities.invokeLater(new Runnable() {
+<i>1366</i>&nbsp;        // @Override
+<i>1367</i>&nbsp;        // public void run() {
+<i>1368</i>&nbsp;        //
+<b class="fc"><i>1369</i>&nbsp;        BEASTObjectPanel.addPluginToMap(beastObject, this);</b>
+<i>1370</i>&nbsp;        try {
+<b class="fc"><i>1371</i>&nbsp;            for (Input&lt;?&gt; input : beastObject.listInputs()) {</b>
+<b class="fc"><i>1372</i>&nbsp;                if (input.get() != null) {</b>
+<b class="fc"><i>1373</i>&nbsp;                    if (input.get() instanceof BEASTInterface) {</b>
+<b class="fc"><i>1374</i>&nbsp;                        BEASTObjectPanel.addPluginToMap((BEASTInterface) input.get(), this);</b>
+<i>1375</i>&nbsp;                    }
+<b class="fc"><i>1376</i>&nbsp;                    if (input.get() instanceof List&lt;?&gt;) {</b>
+<b class="fc"><i>1377</i>&nbsp;                        for (Object o : (List&lt;?&gt;) input.get()) {</b>
+<b class="fc"><i>1378</i>&nbsp;                            if (o instanceof BEASTInterface) {</b>
+<b class="fc"><i>1379</i>&nbsp;                                BEASTObjectPanel.addPluginToMap((BEASTInterface) o, this);</b>
+<i>1380</i>&nbsp;                            }
+<b class="fc"><i>1381</i>&nbsp;                        }</b>
+<i>1382</i>&nbsp;                    }
+<i>1383</i>&nbsp;                }
+<b class="fc"><i>1384</i>&nbsp;            }</b>
+<b class="nc"><i>1385</i>&nbsp;        } catch (Exception e) {</b>
+<i>1386</i>&nbsp;            // ignore
+<b class="nc"><i>1387</i>&nbsp;        	Log.warning.println(e.getClass().getName() + &quot; &quot; + e.getMessage());</b>
+<b class="fc"><i>1388</i>&nbsp;        }</b>
+<i>1389</i>&nbsp;
+<i>1390</i>&nbsp;        // }});
+<i>1391</i>&nbsp;
+<i>1392</i>&nbsp;        // m_sIDMap.put(beastObject.getID(), beastObject);
+<i>1393</i>&nbsp;        // for (BEASTObject beastObject2 : beastObject.listActivePlugins()) {
+<i>1394</i>&nbsp;        // addPlugin(beastObject2);
+<i>1395</i>&nbsp;        // }
+<b class="fc"><i>1396</i>&nbsp;    }</b>
+<i>1397</i>&nbsp;
+<i>1398</i>&nbsp;    /**
+<i>1399</i>&nbsp;     * connect source beastObject with target beastObject
+<i>1400</i>&nbsp;     *
+<i>1401</i>&nbsp;     * @ *
+<i>1402</i>&nbsp;     */
+<i>1403</i>&nbsp;    public void connect(BeautiConnector connector, PartitionContext context) {
+<b class="fc"><i>1404</i>&nbsp;        if (!connector.isRegularConnector) {</b>
+<b class="fc"><i>1405</i>&nbsp;            return;</b>
+<i>1406</i>&nbsp;        }
+<b class="fc"><i>1407</i>&nbsp;        String srcID = translatePartitionNames(connector.sourceID, context);</b>
+<b class="fc"><i>1408</i>&nbsp;        BEASTInterface srcBEASTObject = pluginmap.get(srcID);</b>
+<b class="fc"><i>1409</i>&nbsp;        if (srcBEASTObject == null) {</b>
+<b class="fc"><i>1410</i>&nbsp;            throw new IllegalArgumentException(&quot;Could not find beastObject with id &quot; + srcID + &quot;. Typo in template perhaps?\n&quot;);</b>
+<i>1411</i>&nbsp;        }
+<b class="fc"><i>1412</i>&nbsp;        String targetID = translatePartitionNames(connector.targetID, context);</b>
+<b class="fc"><i>1413</i>&nbsp;        connect(srcBEASTObject, targetID, connector.targetInput);</b>
+<b class="fc"><i>1414</i>&nbsp;    }</b>
+<i>1415</i>&nbsp;
+<i>1416</i>&nbsp;    public void connect(BEASTInterface srcBEASTObject, String targetID, String inputName) {
+<i>1417</i>&nbsp;        try {
+<b class="fc"><i>1418</i>&nbsp;        	BEASTInterface target = pluginmap.get(targetID);</b>
+<b class="fc"><i>1419</i>&nbsp;            if (target == null) {</b>
+<b class="nc"><i>1420</i>&nbsp;            	Log.trace.println(&quot;BeautiDoc: Could not find object &quot; + targetID);</b>
+<b class="nc"><i>1421</i>&nbsp;            	return;</b>
+<i>1422</i>&nbsp;            }
+<i>1423</i>&nbsp;            // prevent duplication inserts in list
+<b class="fc"><i>1424</i>&nbsp;            Object o = target.getInputValue(inputName);</b>
+<b class="fc"><i>1425</i>&nbsp;            if (o instanceof List) {</b>
+<i>1426</i>&nbsp;                // System.err.println(&quot;   &quot; + ((List)o).size());
+<b class="fc"><i>1427</i>&nbsp;                if (((List&lt;?&gt;) o).contains(srcBEASTObject)) {</b>
+<b class="fc"><i>1428</i>&nbsp;                    warning(&quot;   &quot; + targetID + &quot;/&quot; + inputName + &quot; already contains &quot; + (srcBEASTObject == null ? &quot;nulls&quot; : srcBEASTObject.getID()) + &quot;\n&quot;);</b>
+<b class="fc"><i>1429</i>&nbsp;                    return;</b>
+<i>1430</i>&nbsp;                }
+<i>1431</i>&nbsp;            }
+<i>1432</i>&nbsp;
+<b class="fc"><i>1433</i>&nbsp;            target.setInputValue(inputName, srcBEASTObject);</b>
+<b class="nc"><i>1434</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>1435</i>&nbsp;            e.printStackTrace();</b>
+<b class="fc"><i>1436</i>&nbsp;        }</b>
+<b class="fc"><i>1437</i>&nbsp;    }</b>
+<i>1438</i>&nbsp;
+<i>1439</i>&nbsp;    /**
+<i>1440</i>&nbsp;     * disconnect source beastObject with target beastObject *
+<i>1441</i>&nbsp;     */
+<i>1442</i>&nbsp;    public void disconnect(BeautiConnector connector, PartitionContext context) {
+<b class="fc"><i>1443</i>&nbsp;        if (!connector.isRegularConnector) {</b>
+<b class="fc"><i>1444</i>&nbsp;            return;</b>
+<i>1445</i>&nbsp;        }
+<b class="fc"><i>1446</i>&nbsp;        BEASTInterface srcBEASTObject = pluginmap.get(translatePartitionNames(connector.sourceID, context));</b>
+<b class="fc"><i>1447</i>&nbsp;        String targetID = translatePartitionNames(connector.targetID, context);</b>
+<b class="fc"><i>1448</i>&nbsp;        disconnect(srcBEASTObject, targetID, connector.targetInput);</b>
+<b class="fc"><i>1449</i>&nbsp;    }</b>
+<i>1450</i>&nbsp;
+<i>1451</i>&nbsp;    public void disconnect(BEASTInterface srcBEASTObject, String targetID, String inputName) {
+<i>1452</i>&nbsp;        try {
+<b class="fc"><i>1453</i>&nbsp;        	BEASTInterface target = pluginmap.get(targetID);</b>
+<b class="fc"><i>1454</i>&nbsp;            if (target == null) {</b>
+<b class="fc"><i>1455</i>&nbsp;                return;</b>
+<i>1456</i>&nbsp;            }
+<b class="fc"><i>1457</i>&nbsp;            final Input&lt;?&gt; input = target.getInput(inputName);</b>
+<b class="fc"><i>1458</i>&nbsp;            Object o = input.get();</b>
+<b class="fc"><i>1459</i>&nbsp;            if (o instanceof List) {</b>
+<b class="fc"><i>1460</i>&nbsp;                List&lt;?&gt; list = (List&lt;?&gt;) o;</b>
+<i>1461</i>&nbsp;                // System.err.println(&quot;   &quot; + ((List)o).size());
+<b class="fc"><i>1462</i>&nbsp;                for (int i = 0; i &lt; list.size(); i++) {</b>
+<b class="fc"><i>1463</i>&nbsp;                    if (list.get(i) == srcBEASTObject) {</b>
+<b class="fc"><i>1464</i>&nbsp;                        warning(&quot;  DEL &quot; + targetID + &quot;/&quot; + inputName + &quot; contains &quot; + (srcBEASTObject == null ? &quot;null&quot; : srcBEASTObject.getID()) + &quot;\n&quot;);</b>
+<b class="fc"><i>1465</i>&nbsp;                        list.remove(i);</b>
+<i>1466</i>&nbsp;                    }
+<i>1467</i>&nbsp;                }
+<b class="fc"><i>1468</i>&nbsp;                if (srcBEASTObject != null &amp;&amp; srcBEASTObject.getOutputs() != null) {</b>
+<b class="fc"><i>1469</i>&nbsp;                    srcBEASTObject.getOutputs().remove(target);</b>
+<i>1470</i>&nbsp;                }
+<b class="fc"><i>1471</i>&nbsp;            } else {</b>
+<b class="fc"><i>1472</i>&nbsp;                if (input.get() != null &amp;&amp; input.get() instanceof BEASTInterface &amp;&amp;</b>
+<b class="fc"><i>1473</i>&nbsp;                		input.get() == srcBEASTObject) {</b>
+<i>1474</i>&nbsp;                        //((BEASTInterface) input.get()).getID().equals(targetID)) {
+<b class="fc"><i>1475</i>&nbsp;                    input.setValue(null, target);</b>
+<i>1476</i>&nbsp;                }
+<i>1477</i>&nbsp;            }
+<i>1478</i>&nbsp;
+<b class="nc"><i>1479</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>1480</i>&nbsp;            e.printStackTrace();</b>
+<b class="fc"><i>1481</i>&nbsp;        }</b>
+<b class="fc"><i>1482</i>&nbsp;    }</b>
+<i>1483</i>&nbsp;
+<i>1484</i>&nbsp;    public void addAlignmentWithSubnet(Alignment data, BeautiSubTemplate template) {
+<b class="fc"><i>1485</i>&nbsp;        alignments.add(data);</b>
+<b class="fc"><i>1486</i>&nbsp;        template.createSubNet(data, this, true);</b>
+<i>1487</i>&nbsp;        // re-determine partitions
+<b class="fc"><i>1488</i>&nbsp;        determinePartitions();</b>
+<b class="fc"><i>1489</i>&nbsp;    }</b>
+<i>1490</i>&nbsp;
+<i>1491</i>&nbsp;    /**
+<i>1492</i>&nbsp;      * Reweight total weight of operators that work on the Species partition to 20%
+<i>1493</i>&nbsp;      * of total operator weights. This helps *BEAST analyses in convergence. For non
+<i>1494</i>&nbsp;      * *BEAST analyses, this bit of code has no effect.
+<i>1495</i>&nbsp;      */
+<i>1496</i>&nbsp;    private void reweightSpeciesPartitionOperators() {
+<b class="fc"><i>1497</i>&nbsp;    	if (!(mcmc.get() instanceof MCMC)) {</b>
+<b class="nc"><i>1498</i>&nbsp;    		return;</b>
+<i>1499</i>&nbsp;    	}
+<b class="fc"><i>1500</i>&nbsp;    	List&lt;Operator&gt; speciesOperators = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>1501</i>&nbsp;    	double totalWeight = 0;</b>
+<b class="fc"><i>1502</i>&nbsp;    	double speciesWeight = 0;</b>
+<b class="fc"><i>1503</i>&nbsp;    	for (Operator operator : ((MCMC)mcmc.get()).operatorsInput.get()) {</b>
+<b class="fc"><i>1504</i>&nbsp;			if (operator.getID().endsWith(&quot;Species&quot;)) {</b>
+<b class="fc"><i>1505</i>&nbsp;				speciesOperators.add(operator);</b>
+<b class="fc"><i>1506</i>&nbsp;				speciesWeight += operator.getWeight();</b>
+<i>1507</i>&nbsp;			}
+<b class="fc"><i>1508</i>&nbsp;			totalWeight += operator.getWeight();</b>
+<b class="fc"><i>1509</i>&nbsp;    	}</b>
+<i>1510</i>&nbsp;
+<b class="fc"><i>1511</i>&nbsp;    	if (speciesWeight &gt; 0 &amp;&amp; speciesWeight &lt; totalWeight) {</b>
+<i>1512</i>&nbsp;    		// we have a Species-related operator AND an alignment
+<i>1513</i>&nbsp;    		// rescale weights so that 20% of operator weights is dedicated to Species operators
+<b class="fc"><i>1514</i>&nbsp;    		final double fraction = 0.2;</b>
+<i>1515</i>&nbsp;    		//double scale = fraction/(1.0 - fraction) / (speciesWeight / (totalWeight - speciesWeight));
+<b class="fc"><i>1516</i>&nbsp;    		double scale = fraction /(1-fraction) * ((totalWeight-speciesWeight) / speciesWeight);</b>
+<b class="fc"><i>1517</i>&nbsp;    		for (Operator operator : speciesOperators) {</b>
+<b class="fc"><i>1518</i>&nbsp;    			operator.m_pWeight.setValue(scale * operator.getWeight(), operator);</b>
+<b class="fc"><i>1519</i>&nbsp;    		}</b>
+<i>1520</i>&nbsp;    	}
+<i>1521</i>&nbsp;
+<b class="fc"><i>1522</i>&nbsp;	}</b>
+<i>1523</i>&nbsp;
+<i>1524</i>&nbsp;	public BEASTInterface addAlignmentWithSubnet(PartitionContext context, BeautiSubTemplate template)  {
+<b class="nc"><i>1525</i>&nbsp;        BEASTInterface data = template.createSubNet(context, true);</b>
+<b class="nc"><i>1526</i>&nbsp;        alignments.add((Alignment) data);</b>
+<i>1527</i>&nbsp;        // re-determine partitions
+<b class="nc"><i>1528</i>&nbsp;        determinePartitions();</b>
+<b class="nc"><i>1529</i>&nbsp;        return data;</b>
+<i>1530</i>&nbsp;    }
+<i>1531</i>&nbsp;
+<i>1532</i>&nbsp;    public void delAlignmentWithSubnet(Alignment data) {
+<b class="fc"><i>1533</i>&nbsp;        alignments.remove(data);</b>
+<i>1534</i>&nbsp;        try {
+<b class="fc"><i>1535</i>&nbsp;            PartitionContext context = null;</b>
+<b class="fc"><i>1536</i>&nbsp;            for (PartitionContext context2 : partitionNames) {</b>
+<b class="fc"><i>1537</i>&nbsp;                if (context2.partition.equals(data.getID())) {</b>
+<b class="fc"><i>1538</i>&nbsp;                    context = context2;</b>
+<b class="fc"><i>1539</i>&nbsp;                    break;</b>
+<i>1540</i>&nbsp;                }
+<b class="fc"><i>1541</i>&nbsp;            }</b>
+<b class="fc"><i>1542</i>&nbsp;            BeautiSubTemplate template = beautiConfig.partitionTemplate.get();</b>
+<b class="fc"><i>1543</i>&nbsp;            template.removeSubNet(template, context);</b>
+<b class="fc"><i>1544</i>&nbsp;            for (BeautiSubTemplate template2 : beautiConfig.subTemplates) {</b>
+<b class="fc"><i>1545</i>&nbsp;                template2.removeSubNet(template2, context);</b>
+<b class="fc"><i>1546</i>&nbsp;            }</b>
+<i>1547</i>&nbsp;
+<i>1548</i>&nbsp;            // remove from possible contexts
+<b class="fc"><i>1549</i>&nbsp;            PartitionContext[] contexts = possibleContexts.toArray(new PartitionContext[0]);</b>
+<b class="fc"><i>1550</i>&nbsp;            determinePartitions();</b>
+<b class="fc"><i>1551</i>&nbsp;            scrubAll(true, false);</b>
+<b class="fc"><i>1552</i>&nbsp;            for (PartitionContext context2 : contexts) {</b>
+<b class="fc"><i>1553</i>&nbsp;                if (context2.equals(context)) {</b>
+<b class="fc"><i>1554</i>&nbsp;                    possibleContexts.remove(context2);</b>
+<i>1555</i>&nbsp;                }
+<i>1556</i>&nbsp;            }
+<b class="nc"><i>1557</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>1558</i>&nbsp;            e.printStackTrace();</b>
+<b class="fc"><i>1559</i>&nbsp;        }</b>
+<i>1560</i>&nbsp;        // re-determine partitions
+<b class="fc"><i>1561</i>&nbsp;        determinePartitions();</b>
+<b class="fc"><i>1562</i>&nbsp;        scrubAll(true, true);</b>
+<b class="fc"><i>1563</i>&nbsp;    }</b>
+<i>1564</i>&nbsp;
+<i>1565</i>&nbsp;    public void determinePartitions() {
+<b class="fc"><i>1566</i>&nbsp;        CompoundDistribution likelihood = (CompoundDistribution) pluginmap.get(&quot;likelihood&quot;);</b>
+<b class="fc"><i>1567</i>&nbsp;        if (likelihood == null) {</b>
+<b class="fc"><i>1568</i>&nbsp;            return;</b>
+<i>1569</i>&nbsp;        }
+<b class="fc"><i>1570</i>&nbsp;        partitionNames.clear();</b>
+<b class="fc"><i>1571</i>&nbsp;        possibleContexts.clear();</b>
+<b class="fc"><i>1572</i>&nbsp;        for (Distribution distr : likelihood.pDistributions.get()) {</b>
+<b class="fc"><i>1573</i>&nbsp;            if (distr instanceof GenericTreeLikelihood) {</b>
+<b class="fc"><i>1574</i>&nbsp;                GenericTreeLikelihood treeLikelihood = (GenericTreeLikelihood) distr;</b>
+<b class="fc"><i>1575</i>&nbsp;                alignments.add(treeLikelihood.dataInput.get());</b>
+<b class="fc"><i>1576</i>&nbsp;                PartitionContext context = new PartitionContext(treeLikelihood);</b>
+<b class="fc"><i>1577</i>&nbsp;                partitionNames.add(context);</b>
+<b class="fc"><i>1578</i>&nbsp;                boolean found = false;</b>
+<b class="fc"><i>1579</i>&nbsp;                for (PartitionContext context2 : possibleContexts) {</b>
+<b class="fc"><i>1580</i>&nbsp;                    if (context.equals(context2)) {</b>
+<b class="nc"><i>1581</i>&nbsp;                        found = true;</b>
+<i>1582</i>&nbsp;                    }
+<b class="fc"><i>1583</i>&nbsp;                }</b>
+<b class="fc"><i>1584</i>&nbsp;                if (!found) {</b>
+<b class="fc"><i>1585</i>&nbsp;                    possibleContexts.add(context);</b>
+<i>1586</i>&nbsp;                }
+<i>1587</i>&nbsp;            }
+<b class="fc"><i>1588</i>&nbsp;        }</b>
+<i>1589</i>&nbsp;
+<b class="fc"><i>1590</i>&nbsp;        alignments.clear();</b>
+<b class="fc"><i>1591</i>&nbsp;        for (int i = 0; i &lt; 3; i++) {</b>
+<b class="fc"><i>1592</i>&nbsp;            pPartitionByAlignments[i].clear();</b>
+<b class="fc"><i>1593</i>&nbsp;            pPartition[i].clear();</b>
+<b class="fc"><i>1594</i>&nbsp;            currentPartitions[i].clear();</b>
+<i>1595</i>&nbsp;        }
+<b class="fc"><i>1596</i>&nbsp;        List&lt;GenericTreeLikelihood&gt; treeLikelihoods = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>1597</i>&nbsp;        for (Distribution distr : likelihood.pDistributions.get()) {</b>
+<b class="fc"><i>1598</i>&nbsp;            if (distr instanceof GenericTreeLikelihood) {</b>
+<b class="fc"><i>1599</i>&nbsp;                GenericTreeLikelihood treeLikelihood = (GenericTreeLikelihood) distr;</b>
+<b class="fc"><i>1600</i>&nbsp;                alignments.add(treeLikelihood.dataInput.get());</b>
+<b class="fc"><i>1601</i>&nbsp;                treeLikelihoods.add(treeLikelihood);</b>
+<i>1602</i>&nbsp;            }
+<b class="fc"><i>1603</i>&nbsp;        }</b>
+<b class="fc"><i>1604</i>&nbsp;        for (Distribution distr : likelihood.pDistributions.get()) {</b>
+<b class="fc"><i>1605</i>&nbsp;            if (distr instanceof GenericTreeLikelihood) {</b>
+<b class="fc"><i>1606</i>&nbsp;                GenericTreeLikelihood treeLikelihood = (GenericTreeLikelihood) distr;</b>
+<i>1607</i>&nbsp;                try {
+<i>1608</i>&nbsp;                    // sync SiteModel, ClockModel and Tree to any changes that
+<i>1609</i>&nbsp;                    // may have occurred
+<i>1610</i>&nbsp;                    // this should only affect the clock model in practice
+<b class="fc"><i>1611</i>&nbsp;                    int partition = getPartitionNr((BEASTInterface) treeLikelihood.siteModelInput.get());</b>
+<b class="fc"><i>1612</i>&nbsp;                    GenericTreeLikelihood treeLikelihood2 = treeLikelihoods.get(partition);</b>
+<b class="fc"><i>1613</i>&nbsp;                    treeLikelihood.siteModelInput.setValue(treeLikelihood2.siteModelInput.get(), treeLikelihood);</b>
+<b class="fc"><i>1614</i>&nbsp;                    currentPartitions[0].add(partition);</b>
+<i>1615</i>&nbsp;
+<b class="fc"><i>1616</i>&nbsp;                    BranchRateModel rateModel = treeLikelihood.branchRateModelInput.get();</b>
+<b class="fc"><i>1617</i>&nbsp;                    if (rateModel != null) {</b>
+<b class="fc"><i>1618</i>&nbsp;                        partition = getPartitionNr((BEASTInterface) rateModel);</b>
+<b class="fc"><i>1619</i>&nbsp;                        treeLikelihood2 = treeLikelihoods.get(partition);</b>
+<b class="fc"><i>1620</i>&nbsp;                        treeLikelihood.branchRateModelInput.setValue(treeLikelihood2.branchRateModelInput.get(),</b>
+<i>1621</i>&nbsp;                                treeLikelihood);
+<b class="fc"><i>1622</i>&nbsp;                        currentPartitions[1].add(partition);</b>
+<i>1623</i>&nbsp;                    } else {
+<b class="nc"><i>1624</i>&nbsp;                        currentPartitions[1].add(0);</b>
+<i>1625</i>&nbsp;                    }
+<i>1626</i>&nbsp;
+<b class="fc"><i>1627</i>&nbsp;                    partition = getPartitionNr((BEASTInterface) treeLikelihood.treeInput.get());</b>
+<b class="fc"><i>1628</i>&nbsp;                    treeLikelihood2 = treeLikelihoods.get(partition);</b>
+<b class="fc"><i>1629</i>&nbsp;                    treeLikelihood.treeInput.setValue(treeLikelihood2.treeInput.get(), treeLikelihood);</b>
+<b class="fc"><i>1630</i>&nbsp;                    currentPartitions[2].add(partition);</b>
+<b class="nc"><i>1631</i>&nbsp;                } catch (Exception e) {</b>
+<b class="nc"><i>1632</i>&nbsp;                    e.printStackTrace();</b>
+<b class="fc"><i>1633</i>&nbsp;                }</b>
+<i>1634</i>&nbsp;
+<b class="fc"><i>1635</i>&nbsp;                pPartitionByAlignments[0].add(treeLikelihood);</b>
+<b class="fc"><i>1636</i>&nbsp;                pPartitionByAlignments[1].add(treeLikelihood);</b>
+<b class="fc"><i>1637</i>&nbsp;                pPartitionByAlignments[2].add(treeLikelihood);</b>
+<i>1638</i>&nbsp;            }
+<b class="fc"><i>1639</i>&nbsp;        }</b>
+<i>1640</i>&nbsp;
+<b class="fc"><i>1641</i>&nbsp;        int partitionCount = partitionNames.size();</b>
+<b class="fc"><i>1642</i>&nbsp;        for (int i = 0; i &lt; 3; i++) {</b>
+<b class="fc"><i>1643</i>&nbsp;            boolean[] usedPartition = new boolean[partitionCount];</b>
+<b class="fc"><i>1644</i>&nbsp;            for (int j = 0; j &lt; partitionCount; j++) {</b>
+<b class="fc"><i>1645</i>&nbsp;                int partitionIndex = currentPartitions[i].get(j);// getPartitionNr(m_pPartitionByAlignments[i].get(j));</b>
+<b class="fc"><i>1646</i>&nbsp;                usedPartition[partitionIndex] = true;</b>
+<i>1647</i>&nbsp;            }
+<b class="fc"><i>1648</i>&nbsp;            for (int j = 0; j &lt; partitionCount; j++) {</b>
+<b class="fc"><i>1649</i>&nbsp;                if (usedPartition[j]) {</b>
+<b class="fc"><i>1650</i>&nbsp;                    pPartition[i].add(pPartitionByAlignments[i].get(j));</b>
+<i>1651</i>&nbsp;                }
+<i>1652</i>&nbsp;            }
+<i>1653</i>&nbsp;        }
+<b class="fc"><i>1654</i>&nbsp;        Log.warning.println(&quot;PARTITIONS0:\n&quot;);</b>
+<b class="fc"><i>1655</i>&nbsp;        Log.warning.println(Arrays.toString(currentPartitions));</b>
+<b class="fc"><i>1656</i>&nbsp;    }</b>
+<i>1657</i>&nbsp;
+<i>1658</i>&nbsp;    int getPartitionNr(String partition, int partitionID) {
+<b class="fc"><i>1659</i>&nbsp;        for (int i = 0; i &lt; partitionNames.size(); i++) {</b>
+<b class="fc"><i>1660</i>&nbsp;            PartitionContext context = partitionNames.get(i);</b>
+<b class="fc"><i>1661</i>&nbsp;            switch (partitionID) {</b>
+<i>1662</i>&nbsp;                case ALIGNMENT_PARTITION:
+<b class="fc"><i>1663</i>&nbsp;                    if (context.partition.equals(partition)) {</b>
+<b class="fc"><i>1664</i>&nbsp;                        return i;</b>
+<i>1665</i>&nbsp;                    }
+<i>1666</i>&nbsp;                    break;
+<i>1667</i>&nbsp;                case SITEMODEL_PARTITION:
+<b class="fc"><i>1668</i>&nbsp;                    if (context.siteModel.equals(partition)) {</b>
+<b class="fc"><i>1669</i>&nbsp;                        return i;</b>
+<i>1670</i>&nbsp;                    }
+<i>1671</i>&nbsp;                    break;
+<i>1672</i>&nbsp;                case CLOCKMODEL_PARTITION:
+<b class="fc"><i>1673</i>&nbsp;                    if (context.clockModel.equals(partition)) {</b>
+<b class="fc"><i>1674</i>&nbsp;                        return i;</b>
+<i>1675</i>&nbsp;                    }
+<i>1676</i>&nbsp;                    break;
+<i>1677</i>&nbsp;                case TREEMODEL_PARTITION:
+<b class="fc"><i>1678</i>&nbsp;                    if (context.tree.equals(partition)) {</b>
+<b class="fc"><i>1679</i>&nbsp;                        return i;</b>
+<i>1680</i>&nbsp;                    }
+<i>1681</i>&nbsp;                    break;
+<i>1682</i>&nbsp;            }
+<i>1683</i>&nbsp;        }
+<b class="fc"><i>1684</i>&nbsp;        return -1;</b>
+<i>1685</i>&nbsp;    }
+<i>1686</i>&nbsp;
+<i>1687</i>&nbsp;    int getPartitionNr(BEASTInterface beastObject) {
+<b class="fc"><i>1688</i>&nbsp;        String ID = beastObject.getID();</b>
+<b class="fc"><i>1689</i>&nbsp;        String partition = ID;</b>
+<b class="fc"><i>1690</i>&nbsp;        if (ID.indexOf(&#39;.&#39;) &gt;= 0) {</b>
+<b class="fc"><i>1691</i>&nbsp;            partition = ID.substring(ID.indexOf(&#39;.&#39;) + 1);</b>
+<i>1692</i>&nbsp;        }
+<b class="fc"><i>1693</i>&nbsp;        int partitionID = ALIGNMENT_PARTITION;</b>
+<b class="fc"><i>1694</i>&nbsp;        if (ID.indexOf(&#39;:&#39;) &gt;= 0) {</b>
+<b class="fc"><i>1695</i>&nbsp;            char c = ID.charAt(ID.length() - partition.length());</b>
+<b class="fc"><i>1696</i>&nbsp;            switch (c) {</b>
+<i>1697</i>&nbsp;                case &#39;s&#39;:
+<b class="fc"><i>1698</i>&nbsp;                    partitionID = SITEMODEL_PARTITION;</b>
+<b class="fc"><i>1699</i>&nbsp;                    break;</b>
+<i>1700</i>&nbsp;                case &#39;c&#39;:
+<b class="fc"><i>1701</i>&nbsp;                    partitionID = CLOCKMODEL_PARTITION;</b>
+<b class="fc"><i>1702</i>&nbsp;                    break;</b>
+<i>1703</i>&nbsp;                case &#39;t&#39;:
+<b class="fc"><i>1704</i>&nbsp;                    partitionID = TREEMODEL_PARTITION;</b>
+<i>1705</i>&nbsp;                    break;
+<i>1706</i>&nbsp;            }
+<b class="fc"><i>1707</i>&nbsp;            partition = partition.substring(partition.indexOf(&#39;:&#39;) + 1);</b>
+<i>1708</i>&nbsp;        }
+<b class="fc"><i>1709</i>&nbsp;        return getPartitionNr(partition, partitionID);</b>
+<i>1710</i>&nbsp;    }
+<i>1711</i>&nbsp;
+<i>1712</i>&nbsp;    public List&lt;BEASTInterface&gt; getPartitions(String typeName) {
+<b class="fc"><i>1713</i>&nbsp;        if (typeName == null) {</b>
+<b class="nc"><i>1714</i>&nbsp;            return pPartition[2];</b>
+<i>1715</i>&nbsp;        }
+<b class="fc"><i>1716</i>&nbsp;        if (typeName.contains(&quot;Partitions&quot;)) {</b>
+<b class="nc"><i>1717</i>&nbsp;            List&lt;BEASTInterface&gt; beastObjects = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>1718</i>&nbsp;            beastObjects.addAll(alignments);</b>
+<b class="nc"><i>1719</i>&nbsp;            return beastObjects;</b>
+<i>1720</i>&nbsp;        }
+<b class="fc"><i>1721</i>&nbsp;        if (typeName.contains(&quot;SiteModel&quot;)) {</b>
+<b class="fc"><i>1722</i>&nbsp;            return pPartition[0];</b>
+<i>1723</i>&nbsp;        }
+<b class="fc"><i>1724</i>&nbsp;        if (typeName.contains(&quot;ClockModel&quot;)) {</b>
+<b class="fc"><i>1725</i>&nbsp;            return pPartition[1];</b>
+<i>1726</i>&nbsp;        }
+<b class="fc"><i>1727</i>&nbsp;        return pPartition[2];</b>
+<i>1728</i>&nbsp;    }
+<i>1729</i>&nbsp;
+<i>1730</i>&nbsp;    public void setCurrentPartition(int colNr, int rowNr, String partition) {
+<b class="fc"><i>1731</i>&nbsp;        int currentPartion = getPartitionNr(partition, colNr);</b>
+<b class="fc"><i>1732</i>&nbsp;        currentPartitions[colNr].set(rowNr, currentPartion);</b>
+<b class="fc"><i>1733</i>&nbsp;    }</b>
+<i>1734</i>&nbsp;
+<i>1735</i>&nbsp;    @Override
+<i>1736</i>&nbsp;    public Object createInput(BEASTInterface beastObject, Input&lt;?&gt; input, PartitionContext context) {
+<b class="fc"><i>1737</i>&nbsp;        for (BeautiSubTemplate template : beautiConfig.subTemplates) {</b>
+<i>1738</i>&nbsp;            try {
+<b class="fc"><i>1739</i>&nbsp;                if (input.canSetValue(template.instance, beastObject)) {</b>
+<b class="fc"><i>1740</i>&nbsp;                    String partition = beastObject.getID();</b>
+<b class="fc"><i>1741</i>&nbsp;                    partition = parsePartition(partition);</b>
+<b class="fc"><i>1742</i>&nbsp;                    Object o = template.createSubNet(context, beastObject, input, true);</b>
+<b class="fc"><i>1743</i>&nbsp;                    return o;</b>
+<i>1744</i>&nbsp;                }
+<b class="fc"><i>1745</i>&nbsp;            } catch (Exception e) {</b>
+<i>1746</i>&nbsp;                // ignore, cannot set value
+<b class="nc"><i>1747</i>&nbsp;            }</b>
+<b class="fc"><i>1748</i>&nbsp;        }</b>
+<b class="nc"><i>1749</i>&nbsp;        return null;</b>
+<i>1750</i>&nbsp;    }
+<i>1751</i>&nbsp;
+<i>1752</i>&nbsp;    private void warning(String s) {
+<b class="fc"><i>1753</i>&nbsp;        if (Boolean.valueOf(System.getProperty(&quot;beast.debug&quot;))) {</b>
+<b class="nc"><i>1754</i>&nbsp;        	Log.warning.print(s);</b>
+<i>1755</i>&nbsp;        }
+<b class="fc"><i>1756</i>&nbsp;    }</b>
+<i>1757</i>&nbsp;
+<i>1758</i>&nbsp;    public boolean isExpertMode() {
+<b class="fc"><i>1759</i>&nbsp;        return isExpertMode;</b>
+<i>1760</i>&nbsp;    }
+<i>1761</i>&nbsp;
+<i>1762</i>&nbsp;    public void setExpertMode(boolean expertMode) {
+<b class="fc"><i>1763</i>&nbsp;        isExpertMode = expertMode;</b>
+<b class="fc"><i>1764</i>&nbsp;    }</b>
+<i>1765</i>&nbsp;
+<i>1766</i>&nbsp;    static public String parsePartition(String id) {
+<b class="fc"><i>1767</i>&nbsp;        String partition = id.substring(id.indexOf(&#39;.&#39;) + 1);</b>
+<b class="fc"><i>1768</i>&nbsp;        if (partition.indexOf(&#39;:&#39;) &gt;= 0) {</b>
+<b class="fc"><i>1769</i>&nbsp;            partition = partition.substring(partition.indexOf(&#39;:&#39;) + 1);</b>
+<i>1770</i>&nbsp;        }
+<b class="fc"><i>1771</i>&nbsp;        return partition;</b>
+<i>1772</i>&nbsp;    }
+<i>1773</i>&nbsp;
+<i>1774</i>&nbsp;    /**
+<i>1775</i>&nbsp;     * Create a deep copy of a beastObject, but in a different partition context
+<i>1776</i>&nbsp;     * First, find all beastObjects that are predecesors of the beastObject to be copied
+<i>1777</i>&nbsp;     * that are ancestors of statenodes
+<i>1778</i>&nbsp;     *
+<i>1779</i>&nbsp;     * @param beastObject
+<i>1780</i>&nbsp;     * @param parent
+<i>1781</i>&nbsp;     * @return
+<i>1782</i>&nbsp;     */
+<i>1783</i>&nbsp;    static public BEASTInterface deepCopyPlugin(BEASTInterface beastObject, BEASTInterface parent, MCMC mcmc,
+<i>1784</i>&nbsp;    										PartitionContext oldContext,
+<i>1785</i>&nbsp;                                            PartitionContext newContext, BeautiDoc doc, List&lt;BEASTInterface&gt; tabooList)
+<i>1786</i>&nbsp;          {
+<i>1787</i>&nbsp;        /** taboo = list of beastObjects that should not be copied **/
+<b class="fc"><i>1788</i>&nbsp;        Set&lt;BEASTInterface&gt; taboo = new HashSet&lt;&gt;();</b>
+<b class="fc"><i>1789</i>&nbsp;        taboo.add(parent);</b>
+<i>1790</i>&nbsp;        // add state
+<b class="fc"><i>1791</i>&nbsp;        taboo.add(mcmc.startStateInput.get());</b>
+<i>1792</i>&nbsp;        // add likelihood and prior
+<b class="fc"><i>1793</i>&nbsp;        if (mcmc.posteriorInput.get() instanceof CompoundDistribution) {</b>
+<b class="fc"><i>1794</i>&nbsp;            for (Distribution distr : ((CompoundDistribution) mcmc.posteriorInput.get()).pDistributions.get()) {</b>
+<b class="fc"><i>1795</i>&nbsp;                if (distr instanceof CompoundDistribution) {</b>
+<b class="fc"><i>1796</i>&nbsp;                    taboo.add(distr);</b>
+<i>1797</i>&nbsp;                }
+<b class="fc"><i>1798</i>&nbsp;            }</b>
+<i>1799</i>&nbsp;        }
+<i>1800</i>&nbsp;        // add posterior
+<b class="fc"><i>1801</i>&nbsp;        taboo.add(mcmc.posteriorInput.get());</b>
+<i>1802</i>&nbsp;        // parent of operators
+<b class="fc"><i>1803</i>&nbsp;        taboo.add(mcmc);</b>
+<i>1804</i>&nbsp;        // add loggers
+<b class="fc"><i>1805</i>&nbsp;        taboo.addAll(mcmc.loggersInput.get());</b>
+<i>1806</i>&nbsp;        // add exception for *BEAST logger (perhaps need to be generalised?)
+<b class="fc"><i>1807</i>&nbsp;        if (doc.pluginmap.containsKey(&quot;SpeciesTreeLoggerX&quot;)) {</b>
+<b class="nc"><i>1808</i>&nbsp;        	taboo.add(doc.pluginmap.get(&quot;SpeciesTreeLoggerX&quot;));</b>
+<i>1809</i>&nbsp;        }
+<i>1810</i>&nbsp;        // add trees
+<b class="fc"><i>1811</i>&nbsp;        for (StateNode node : mcmc.startStateInput.get().stateNodeInput.get()) {</b>
+<b class="fc"><i>1812</i>&nbsp;            if (node instanceof Tree) {</b>
+<b class="fc"><i>1813</i>&nbsp;                taboo.add(node);</b>
+<i>1814</i>&nbsp;            }
+<b class="fc"><i>1815</i>&nbsp;        }</b>
+<i>1816</i>&nbsp;        // add MRCAPriors
+<b class="fc"><i>1817</i>&nbsp;		for (String id : doc.pluginmap.keySet()) {</b>
+<b class="fc"><i>1818</i>&nbsp;			BEASTInterface o = doc.pluginmap.get(id);</b>
+<b class="fc"><i>1819</i>&nbsp;			if (o instanceof MRCAPrior) {</b>
+<b class="nc"><i>1820</i>&nbsp;				taboo.add(o);</b>
+<i>1821</i>&nbsp;			}
+<b class="fc"><i>1822</i>&nbsp;		}</b>
+<b class="fc"><i>1823</i>&nbsp;        if (tabooList != null) {</b>
+<b class="nc"><i>1824</i>&nbsp;            taboo.addAll(tabooList);</b>
+<i>1825</i>&nbsp;        }
+<i>1826</i>&nbsp;
+<i>1827</i>&nbsp;        // find predecessors of beastObject to be copied
+<b class="fc"><i>1828</i>&nbsp;        List&lt;BEASTInterface&gt; predecessors = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>1829</i>&nbsp;        collectPredecessors(beastObject, predecessors);</b>
+<i>1830</i>&nbsp;
+<i>1831</i>&nbsp;        // find ancestors of StateNodes that are predecessors + the beastObject
+<i>1832</i>&nbsp;        // itself
+<b class="fc"><i>1833</i>&nbsp;        Set&lt;BEASTInterface&gt; ancestors = new HashSet&lt;&gt;();</b>
+<b class="fc"><i>1834</i>&nbsp;        collectAncestors(beastObject, ancestors, taboo);</b>
+<b class="fc"><i>1835</i>&nbsp;		Log.info.print(Arrays.toString(ancestors.toArray()));</b>
+<b class="fc"><i>1836</i>&nbsp;        for (BEASTInterface beastObject2 : predecessors) {</b>
+<b class="fc"><i>1837</i>&nbsp;            if (beastObject2 instanceof StateNode) {</b>
+<b class="fc"><i>1838</i>&nbsp;                Set&lt;BEASTInterface&gt; ancestors2 = new HashSet&lt;&gt;();</b>
+<b class="fc"><i>1839</i>&nbsp;                collectAncestors(beastObject2, ancestors2, taboo);</b>
+<b class="fc"><i>1840</i>&nbsp;                ancestors.addAll(ancestors2);</b>
+<b class="fc"><i>1841</i>&nbsp;            } else if (beastObject2 instanceof Alignment || beastObject2 instanceof FilteredAlignment) {</b>
+<b class="fc"><i>1842</i>&nbsp;                for (Object output : beastObject2.getOutputs()) {</b>
+<b class="fc"><i>1843</i>&nbsp;                    if (!taboo.contains(output)) {</b>
+<b class="fc"><i>1844</i>&nbsp;                        Set&lt;BEASTInterface&gt; ancestors2 = new HashSet&lt;&gt;();</b>
+<b class="fc"><i>1845</i>&nbsp;                        collectAncestors((BEASTInterface)output, ancestors2, taboo);</b>
+<b class="fc"><i>1846</i>&nbsp;                        ancestors.addAll(ancestors2);</b>
+<i>1847</i>&nbsp;                    }
+<b class="fc"><i>1848</i>&nbsp;                }</b>
+<i>1849</i>&nbsp;            }
+<b class="fc"><i>1850</i>&nbsp;        }</b>
+<i>1851</i>&nbsp;
+<i>1852</i>&nbsp;//		Log.info.print(Arrays.toString(predecessors.toArray()));
+<i>1853</i>&nbsp;//		for (BEASTObject p : ancestors) {
+<i>1854</i>&nbsp;//			Log.info.print(&quot;(&quot;);
+<i>1855</i>&nbsp;//			for (BEASTObject p2 : p.listActivePlugins()) {
+<i>1856</i>&nbsp;//				if (ancestors.contains(p2)) {
+<i>1857</i>&nbsp;//					Log.info.print(p2.getID()+ &quot; &quot;);
+<i>1858</i>&nbsp;//				}
+<i>1859</i>&nbsp;//			}
+<i>1860</i>&nbsp;//			Log.info.print(&quot;) &quot;);
+<i>1861</i>&nbsp;//			Log.info.println(p.getID());
+<i>1862</i>&nbsp;//		}
+<i>1863</i>&nbsp;
+<i>1864</i>&nbsp;        // now the ancestors contain all beastObjects to be copied
+<i>1865</i>&nbsp;        // make a copy of all individual BEASTObjects, before connecting them up
+<b class="fc"><i>1866</i>&nbsp;        Map&lt;String, BEASTInterface&gt; copySet = new HashMap&lt;&gt;();</b>
+<b class="fc"><i>1867</i>&nbsp;        for (BEASTInterface beastObject2 : ancestors) {</b>
+<b class="fc"><i>1868</i>&nbsp;            String id = beastObject2.getID();</b>
+<b class="fc"><i>1869</i>&nbsp;            String copyID = renameId(id, oldContext, newContext);</b>
+<b class="fc"><i>1870</i>&nbsp;            if (!id.equals(copyID)) {</b>
+<b class="fc"><i>1871</i>&nbsp;	            if (doc.pluginmap.containsKey(copyID)) {</b>
+<b class="fc"><i>1872</i>&nbsp;	            	BEASTInterface org = doc.pluginmap.get(copyID);</b>
+<b class="fc"><i>1873</i>&nbsp;	                copySet.put(id, org);</b>
+<b class="fc"><i>1874</i>&nbsp;	            } else {</b>
+<i>1875</i>&nbsp;	            	BEASTInterface copy;
+<i>1876</i>&nbsp;					try {
+<b class="fc"><i>1877</i>&nbsp;						copy = beastObject2.getClass().newInstance();</b>
+<b class="fc"><i>1878</i>&nbsp;		            	copy.setID(copyID);</b>
+<b class="fc"><i>1879</i>&nbsp;		                copySet.put(id, copy);</b>
+<b class="nc"><i>1880</i>&nbsp;					} catch (InstantiationException | IllegalAccessException e) {</b>
+<b class="nc"><i>1881</i>&nbsp;						e.printStackTrace();</b>
+<b class="nc"><i>1882</i>&nbsp;						throw new RuntimeException(&quot;Programmer error: every object in the model should have a default constructor that is publicly accessible&quot;);</b>
+<b class="fc"><i>1883</i>&nbsp;					}</b>
+<i>1884</i>&nbsp;	            }
+<i>1885</i>&nbsp;            }
+<b class="fc"><i>1886</i>&nbsp;            Log.warning.println(&quot;Copy: &quot; + id + &quot; -&gt; &quot; + copyID);</b>
+<b class="fc"><i>1887</i>&nbsp;        }</b>
+<i>1888</i>&nbsp;
+<i>1889</i>&nbsp;        // set all inputs of copied beastObjects + outputs to taboo
+<b class="fc"><i>1890</i>&nbsp;		for (BEASTInterface beastObject2 : ancestors) {</b>
+<b class="fc"><i>1891</i>&nbsp;            String id = beastObject2.getID();</b>
+<b class="fc"><i>1892</i>&nbsp;            BEASTInterface copy = copySet.get(id);</b>
+<b class="fc"><i>1893</i>&nbsp;            if (copy != null) {</b>
+<b class="fc"><i>1894</i>&nbsp;            	Log.warning.println(&quot;Processing: &quot; + id + &quot; -&gt; &quot; + copy.getID());</b>
+<i>1895</i>&nbsp;            // set inputs
+<b class="fc"><i>1896</i>&nbsp;            for (Input&lt;?&gt; input : beastObject2.listInputs()) {</b>
+<b class="fc"><i>1897</i>&nbsp;                if (input.get() != null) {</b>
+<b class="fc"><i>1898</i>&nbsp;                    if (input.get() instanceof List) {</b>
+<i>1899</i>&nbsp;                        // handle lists
+<i>1900</i>&nbsp;                    	//((List)copy.getInput(input.getName())).clear();
+<b class="fc"><i>1901</i>&nbsp;                        for (Object o : (List&lt;?&gt;) input.get()) {</b>
+<b class="fc"><i>1902</i>&nbsp;                            if (o instanceof BEASTInterface) {</b>
+<b class="fc"><i>1903</i>&nbsp;                            	BEASTInterface value = getCopyValue((BEASTInterface) o, copySet, oldContext, newContext, doc);</b>
+<i>1904</i>&nbsp;                            	// make sure it is not already in the list
+<b class="fc"><i>1905</i>&nbsp;                            	Object o2 = copy.getInput(input.getName()).get();</b>
+<b class="fc"><i>1906</i>&nbsp;                            	boolean alreadyInList = false;</b>
+<b class="fc"><i>1907</i>&nbsp;                            	if (o2 instanceof List) {</b>
+<b class="fc"><i>1908</i>&nbsp;                            		List&lt;?&gt; currentList = (List&lt;?&gt;) o2;</b>
+<b class="fc"><i>1909</i>&nbsp;	                            	for (Object v : currentList) {</b>
+<b class="fc"><i>1910</i>&nbsp;	                            		if (v == value) {</b>
+<b class="fc"><i>1911</i>&nbsp;	                            			alreadyInList = true;</b>
+<b class="fc"><i>1912</i>&nbsp;	                            			break;</b>
+<i>1913</i>&nbsp;	                            		}
+<b class="fc"><i>1914</i>&nbsp;	                            	}</b>
+<i>1915</i>&nbsp;                            	}
+<b class="fc"><i>1916</i>&nbsp;                            	if (!alreadyInList) {</b>
+<i>1917</i>&nbsp;                            		// add to the list
+<b class="fc"><i>1918</i>&nbsp;                            		copy.setInputValue(input.getName(), value);</b>
+<i>1919</i>&nbsp;                            	}
+<b class="fc"><i>1920</i>&nbsp;                            } else {</b>
+<i>1921</i>&nbsp;                                // it is a primitive value
+<b class="fc"><i>1922</i>&nbsp;                            	if (copy instanceof Parameter.Base &amp;&amp; input.getName().equals(&quot;value&quot;)) {</b>
+<i>1923</i>&nbsp;                            	//	// prevent appending to parameter values
+<b class="fc"><i>1924</i>&nbsp;                            		Parameter.Base&lt;?&gt; p = ((Parameter.Base&lt;?&gt;) copy);</b>
+<b class="fc"><i>1925</i>&nbsp;                            		((List&lt;?&gt;) p.valuesInput.get()).clear();</b>
+<i>1926</i>&nbsp;                            	}
+<b class="fc"><i>1927</i>&nbsp;                                copy.setInputValue(input.getName(), input.get());</b>
+<i>1928</i>&nbsp;                            }
+<b class="fc"><i>1929</i>&nbsp;                        }</b>
+<b class="fc"><i>1930</i>&nbsp;                    } else if (input.get() instanceof BEASTInterface) {</b>
+<i>1931</i>&nbsp;                        // handle BEASTObject
+<b class="fc"><i>1932</i>&nbsp;                    	BEASTInterface value = getCopyValue((BEASTInterface) input.get(), copySet, oldContext, newContext, doc);</b>
+<b class="fc"><i>1933</i>&nbsp;                        copy.setInputValue(input.getName(), value);</b>
+<b class="fc"><i>1934</i>&nbsp;                    } else if (input.get() instanceof String) {</b>
+<i>1935</i>&nbsp;                		// may need to replace partition info
+<b class="fc"><i>1936</i>&nbsp;                		String s = (String) input.get();</b>
+<b class="fc"><i>1937</i>&nbsp;                		s = s.replaceAll(&quot;\\.c:[a-zA-Z0-9_]*&quot;, &quot;.c:&quot; + newContext.clockModel);</b>
+<b class="fc"><i>1938</i>&nbsp;                		s = s.replaceAll(&quot;\\.s:[a-zA-Z0-9_]*&quot;, &quot;.s:&quot; + newContext.siteModel);</b>
+<b class="fc"><i>1939</i>&nbsp;                		s = s.replaceAll(&quot;\\.t:[a-zA-Z0-9_]*&quot;, &quot;.t:&quot; + newContext.tree);</b>
+<b class="fc"><i>1940</i>&nbsp;                		copy.setInputValue(input.getName(), s);</b>
+<b class="fc"><i>1941</i>&nbsp;                	} else {</b>
+<i>1942</i>&nbsp;                        // it is a primitive value
+<b class="fc"><i>1943</i>&nbsp;                		copy.setInputValue(input.getName(), input.get());</b>
+<i>1944</i>&nbsp;                	}
+<i>1945</i>&nbsp;                }
+<b class="fc"><i>1946</i>&nbsp;            }</b>
+<i>1947</i>&nbsp;
+<i>1948</i>&nbsp;            // set outputs
+<b class="fc"><i>1949</i>&nbsp;            for (Object output : beastObject2.getOutputs()) {</b>
+<b class="fc"><i>1950</i>&nbsp;                if (taboo.contains(output) &amp;&amp; output != parent) {</b>
+<b class="fc"><i>1951</i>&nbsp;                	BEASTInterface output2 = getCopyValue((BEASTInterface)output, copySet, oldContext, newContext, doc);</b>
+<b class="fc"><i>1952</i>&nbsp;                    for (Input&lt;?&gt; input : ((BEASTInterface)output).listInputs()) {</b>
+<i>1953</i>&nbsp;                        // do not add state node initialisers automatically
+<b class="fc"><i>1954</i>&nbsp;                        if (input.get() instanceof List &amp;&amp;</b>
+<i>1955</i>&nbsp;                                // do not update state node initialisers
+<b class="fc"><i>1956</i>&nbsp;                                !(taboo.contains(output2) &amp;&amp; input.getName().equals(&quot;init&quot;))) {</b>
+<b class="fc"><i>1957</i>&nbsp;                            List&lt;?&gt; list = (List&lt;?&gt;) input.get();</b>
+<b class="fc"><i>1958</i>&nbsp;                            if (list.contains(beastObject2)) {</b>
+<b class="fc"><i>1959</i>&nbsp;                            	List&lt;?&gt; list2 = (List&lt;?&gt;)output2.getInput(input.getName()).get();</b>
+<b class="fc"><i>1960</i>&nbsp;                            	if (!list2.contains(copy)) {</b>
+<b class="fc"><i>1961</i>&nbsp;                            		output2.setInputValue(input.getName(), copy);</b>
+<i>1962</i>&nbsp;                            	}
+<i>1963</i>&nbsp;                            }
+<i>1964</i>&nbsp;                        }
+<b class="fc"><i>1965</i>&nbsp;                    }</b>
+<i>1966</i>&nbsp;
+<i>1967</i>&nbsp;                }
+<b class="fc"><i>1968</i>&nbsp;            }</b>
+<i>1969</i>&nbsp;
+<b class="fc"><i>1970</i>&nbsp;            copySet.put(id, copy);</b>
+<i>1971</i>&nbsp;    		//Log.warning.println(base.operatorsAsString());
+<i>1972</i>&nbsp;            }
+<b class="fc"><i>1973</i>&nbsp;        }</b>
+<i>1974</i>&nbsp;
+<i>1975</i>&nbsp;		// deep copy must be obtained from copyset, before sorting
+<i>1976</i>&nbsp;        // since the sorting changes (deletes items) from the copySet map
+<b class="fc"><i>1977</i>&nbsp;        BEASTInterface deepCopy = copySet.get(beastObject.getID());</b>
+<i>1978</i>&nbsp;
+<i>1979</i>&nbsp;        // first need to sort copySet by topology, before we can initAndValidate
+<i>1980</i>&nbsp;        // them
+<b class="fc"><i>1981</i>&nbsp;        List&lt;BEASTInterface&gt; sorted = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>1982</i>&nbsp;        Collection&lt;BEASTInterface&gt; values = copySet.values();</b>
+<b class="fc"><i>1983</i>&nbsp;        while (values.size() &gt; 0) {</b>
+<b class="fc"><i>1984</i>&nbsp;            for (BEASTInterface copy : values) {</b>
+<b class="fc"><i>1985</i>&nbsp;                boolean found = false;</b>
+<b class="fc"><i>1986</i>&nbsp;                for (BEASTInterface beastObject2 : copy.listActiveBEASTObjects()) {</b>
+<b class="fc"><i>1987</i>&nbsp;                    if (values.contains(beastObject2)) {</b>
+<b class="fc"><i>1988</i>&nbsp;                        found = true;</b>
+<b class="fc"><i>1989</i>&nbsp;                        break;</b>
+<i>1990</i>&nbsp;                    }
+<b class="fc"><i>1991</i>&nbsp;                }</b>
+<b class="fc"><i>1992</i>&nbsp;                if (!found) {</b>
+<b class="fc"><i>1993</i>&nbsp;                    sorted.add(copy);</b>
+<i>1994</i>&nbsp;                }
+<b class="fc"><i>1995</i>&nbsp;            }</b>
+<b class="fc"><i>1996</i>&nbsp;            values.remove(sorted.get(sorted.size() - 1));</b>
+<i>1997</i>&nbsp;        }
+<i>1998</i>&nbsp;        // initialise copied beastObjects
+<b class="fc"><i>1999</i>&nbsp;        Set&lt;BEASTInterface&gt; done = new HashSet&lt;&gt;();</b>
+<b class="fc"><i>2000</i>&nbsp;        for (BEASTInterface copy : sorted) {</b>
+<i>2001</i>&nbsp;            try {
+<b class="fc"><i>2002</i>&nbsp;                if (!done.contains(copy)) {</b>
+<b class="fc"><i>2003</i>&nbsp;                    copy.initAndValidate();</b>
+<b class="fc"><i>2004</i>&nbsp;                    done.add(copy);</b>
+<i>2005</i>&nbsp;                }
+<b class="nc"><i>2006</i>&nbsp;            } catch (Exception e) {</b>
+<i>2007</i>&nbsp;                // ignore
+<b class="nc"><i>2008</i>&nbsp;            	Log.warning.print(e.getMessage());</b>
+<b class="fc"><i>2009</i>&nbsp;            }</b>
+<b class="fc"><i>2010</i>&nbsp;            if (doc != null) {</b>
+<b class="fc"><i>2011</i>&nbsp;                doc.addPlugin(copy);</b>
+<i>2012</i>&nbsp;            }
+<b class="fc"><i>2013</i>&nbsp;        }</b>
+<i>2014</i>&nbsp;
+<b class="fc"><i>2015</i>&nbsp;        doc.scrubAll(true, false);</b>
+<b class="fc"><i>2016</i>&nbsp;        return deepCopy;</b>
+<i>2017</i>&nbsp;    } // deepCopyPlugin
+<i>2018</i>&nbsp;
+<i>2019</i>&nbsp;    private static BEASTInterface getCopyValue(BEASTInterface value, Map&lt;String, BEASTInterface&gt; copySet, PartitionContext oldContext, PartitionContext partitionContext, BeautiDoc doc) {
+<b class="fc"><i>2020</i>&nbsp;        if (copySet.containsKey(value.getID())) {</b>
+<b class="fc"><i>2021</i>&nbsp;            value = copySet.get(value.getID());</b>
+<b class="fc"><i>2022</i>&nbsp;            return value;</b>
+<i>2023</i>&nbsp;        }
+<b class="fc"><i>2024</i>&nbsp;        String valueID = value.getID();</b>
+<b class="fc"><i>2025</i>&nbsp;        if (valueID == null) {</b>
+<b class="nc"><i>2026</i>&nbsp;            return value;</b>
+<i>2027</i>&nbsp;        }
+<b class="fc"><i>2028</i>&nbsp;        if (valueID.indexOf(&#39;.&#39;) &gt;= 0) {</b>
+<b class="fc"><i>2029</i>&nbsp;            String valueCopyID = renameId(valueID, oldContext, partitionContext);</b>
+<b class="fc"><i>2030</i>&nbsp;            if (doc.pluginmap.containsKey(valueCopyID)) {</b>
+<b class="fc"><i>2031</i>&nbsp;                value = doc.pluginmap.get(valueCopyID);</b>
+<i>2032</i>&nbsp;            }
+<b class="fc"><i>2033</i>&nbsp;        } else if (doc.pluginmap.get(valueID) instanceof Alignment || doc.pluginmap.get(valueID) instanceof FilteredAlignment) {</b>
+<b class="fc"><i>2034</i>&nbsp;            return doc.pluginmap.get(partitionContext.partition);</b>
+<i>2035</i>&nbsp;        }
+<b class="fc"><i>2036</i>&nbsp;        return value;</b>
+<i>2037</i>&nbsp;    }
+<i>2038</i>&nbsp;
+<i>2039</i>&nbsp;    public static String renameId(String id, PartitionContext oldContext, PartitionContext newContext) {
+<b class="fc"><i>2040</i>&nbsp;        String oldPartition = id.substring(id.indexOf(&#39;.&#39;) + 1);</b>
+<b class="fc"><i>2041</i>&nbsp;        String newPartition = null;</b>
+<b class="fc"><i>2042</i>&nbsp;        if (oldPartition.indexOf(&#39;:&#39;) &gt;= 0) {</b>
+<b class="fc"><i>2043</i>&nbsp;            char c = oldPartition.charAt(0);</b>
+<b class="fc"><i>2044</i>&nbsp;            switch (c) {</b>
+<i>2045</i>&nbsp;                case &#39;s&#39;:
+<b class="fc"><i>2046</i>&nbsp;                    newPartition = newContext.siteModel;</b>
+<b class="fc"><i>2047</i>&nbsp;                    oldPartition  = oldContext.siteModel;</b>
+<b class="fc"><i>2048</i>&nbsp;                    break;</b>
+<i>2049</i>&nbsp;                case &#39;c&#39;:
+<b class="fc"><i>2050</i>&nbsp;                    newPartition = newContext.clockModel;</b>
+<b class="fc"><i>2051</i>&nbsp;                    oldPartition  = oldContext.clockModel;</b>
+<b class="fc"><i>2052</i>&nbsp;                    break;</b>
+<i>2053</i>&nbsp;                case &#39;t&#39;:
+<b class="fc"><i>2054</i>&nbsp;                    newPartition = newContext.tree;</b>
+<b class="fc"><i>2055</i>&nbsp;                    oldPartition  = oldContext.tree;</b>
+<i>2056</i>&nbsp;                    break;
+<i>2057</i>&nbsp;            }
+<i>2058</i>&nbsp;            //oldPartition = oldPartition.substring(oldPartition.indexOf(&#39;:&#39;) + 1);
+<b class="fc"><i>2059</i>&nbsp;        } else {</b>
+<b class="fc"><i>2060</i>&nbsp;            newPartition = newContext.partition;</b>
+<b class="fc"><i>2061</i>&nbsp;            oldPartition = oldContext.partition;</b>
+<i>2062</i>&nbsp;        }
+<b class="fc"><i>2063</i>&nbsp;        if (id.indexOf(&#39;.&#39;) &lt; 0 || !(id.endsWith(oldPartition))) {</b>
+<i>2064</i>&nbsp;        	// original id does not contain partition info
+<b class="fc"><i>2065</i>&nbsp;        	return id;</b>
+<i>2066</i>&nbsp;        }
+<b class="fc"><i>2067</i>&nbsp;        id = id.substring(0, id.length() - oldPartition.length()) + newPartition;</b>
+<b class="fc"><i>2068</i>&nbsp;        return id;</b>
+<i>2069</i>&nbsp;    }
+<i>2070</i>&nbsp;
+<i>2071</i>&nbsp;    static public void collectPredecessors(BEASTInterface beastObject, List&lt;BEASTInterface&gt; predecessors) {
+<b class="fc"><i>2072</i>&nbsp;        predecessors.add(beastObject);</b>
+<b class="fc"><i>2073</i>&nbsp;        if (beastObject instanceof Alignment || beastObject instanceof FilteredAlignment) {</b>
+<b class="fc"><i>2074</i>&nbsp;            return;</b>
+<i>2075</i>&nbsp;        }
+<i>2076</i>&nbsp;        try {
+<b class="fc"><i>2077</i>&nbsp;            for (BEASTInterface beastObject2 : beastObject.listActiveBEASTObjects()) {</b>
+<b class="fc"><i>2078</i>&nbsp;                if (!predecessors.contains(beastObject2)) {</b>
+<b class="fc"><i>2079</i>&nbsp;                    collectPredecessors(beastObject2, predecessors);</b>
+<i>2080</i>&nbsp;                }
+<b class="fc"><i>2081</i>&nbsp;            }</b>
+<b class="nc"><i>2082</i>&nbsp;        } catch (IllegalArgumentException e) {</b>
+<b class="nc"><i>2083</i>&nbsp;            e.printStackTrace();</b>
+<b class="fc"><i>2084</i>&nbsp;        }</b>
+<b class="fc"><i>2085</i>&nbsp;    }</b>
+<i>2086</i>&nbsp;
+<i>2087</i>&nbsp;    static public void collectAncestors(BEASTInterface beastObject, Set&lt;BEASTInterface&gt; ancestors, Set&lt;BEASTInterface&gt; tabu) {
+<b class="fc"><i>2088</i>&nbsp;        if ((beastObject instanceof GenericTreeLikelihood) || (beastObject instanceof BeautiPanelConfig)) {</b>
+<b class="fc"><i>2089</i>&nbsp;            return;</b>
+<i>2090</i>&nbsp;        }
+<b class="fc"><i>2091</i>&nbsp;        ancestors.add(beastObject);</b>
+<i>2092</i>&nbsp;        try {
+<b class="fc"><i>2093</i>&nbsp;            for (Object beastObject2 : beastObject.getOutputs()) {</b>
+<b class="fc"><i>2094</i>&nbsp;                if (!ancestors.contains(beastObject2) &amp;&amp; !tabu.contains(beastObject2)) {</b>
+<b class="fc"><i>2095</i>&nbsp;                    collectAncestors((BEASTInterface)beastObject2, ancestors, tabu);</b>
+<i>2096</i>&nbsp;                }
+<b class="fc"><i>2097</i>&nbsp;            }</b>
+<b class="nc"><i>2098</i>&nbsp;        } catch (IllegalArgumentException e) {</b>
+<b class="nc"><i>2099</i>&nbsp;            e.printStackTrace();</b>
+<b class="fc"><i>2100</i>&nbsp;        }</b>
+<b class="fc"><i>2101</i>&nbsp;    }</b>
+<i>2102</i>&nbsp;
+<i>2103</i>&nbsp;    public void renamePartition(int partitionID, String oldName, String newName)  {
+<b class="fc"><i>2104</i>&nbsp;    	Log.warning.println(&quot;renamePartition: &quot; + partitionID + &quot; &quot; + oldName + &quot; &quot; + newName);</b>
+<i>2105</i>&nbsp;        // sanity check: make sure newName is not already in use by another partition
+<b class="fc"><i>2106</i>&nbsp;        String newsuffix = null;</b>
+<b class="fc"><i>2107</i>&nbsp;        switch (partitionID) {</b>
+<i>2108</i>&nbsp;            case ALIGNMENT_PARTITION:
+<b class="fc"><i>2109</i>&nbsp;                newsuffix = &quot;.&quot; + newName;</b>
+<b class="fc"><i>2110</i>&nbsp;                break;</b>
+<i>2111</i>&nbsp;            case SITEMODEL_PARTITION:
+<b class="nc"><i>2112</i>&nbsp;                newsuffix = &quot;.s:&quot; + newName;</b>
+<b class="nc"><i>2113</i>&nbsp;                break;</b>
+<i>2114</i>&nbsp;            case CLOCKMODEL_PARTITION:
+<b class="nc"><i>2115</i>&nbsp;                newsuffix = &quot;.c:&quot; + newName;</b>
+<b class="nc"><i>2116</i>&nbsp;                break;</b>
+<i>2117</i>&nbsp;            case TREEMODEL_PARTITION:
+<b class="nc"><i>2118</i>&nbsp;                newsuffix = &quot;.t:&quot; + newName;</b>
+<b class="nc"><i>2119</i>&nbsp;                break;</b>
+<i>2120</i>&nbsp;            default:
+<b class="nc"><i>2121</i>&nbsp;                throw new IllegalArgumentException();</b>
+<i>2122</i>&nbsp;        }
+<b class="fc"><i>2123</i>&nbsp;        for (BEASTInterface beastObject : pluginmap.values()) {</b>
+<b class="fc"><i>2124</i>&nbsp;            if (beastObject.getID().endsWith(newsuffix)) {</b>
+<b class="nc"><i>2125</i>&nbsp;                throw new IllegalArgumentException(&quot;Name &quot; + newName + &quot; is already in use&quot;);</b>
+<i>2126</i>&nbsp;            }
+<b class="fc"><i>2127</i>&nbsp;        }</b>
+<i>2128</i>&nbsp;
+<i>2129</i>&nbsp;        // do the renaming
+<b class="fc"><i>2130</i>&nbsp;        String oldsuffix = null;</b>
+<b class="fc"><i>2131</i>&nbsp;        switch (partitionID) {</b>
+<i>2132</i>&nbsp;            case ALIGNMENT_PARTITION:
+<b class="fc"><i>2133</i>&nbsp;                oldsuffix = &quot;.&quot; + oldName;</b>
+<b class="fc"><i>2134</i>&nbsp;                break;</b>
+<i>2135</i>&nbsp;            case SITEMODEL_PARTITION:
+<b class="nc"><i>2136</i>&nbsp;                oldsuffix = &quot;.s:&quot; + oldName;</b>
+<b class="nc"><i>2137</i>&nbsp;                break;</b>
+<i>2138</i>&nbsp;            case CLOCKMODEL_PARTITION:
+<b class="nc"><i>2139</i>&nbsp;                oldsuffix = &quot;.c:&quot; + oldName;</b>
+<b class="nc"><i>2140</i>&nbsp;                break;</b>
+<i>2141</i>&nbsp;            case TREEMODEL_PARTITION:
+<b class="nc"><i>2142</i>&nbsp;                oldsuffix = &quot;.t:&quot; + oldName;</b>
+<b class="nc"><i>2143</i>&nbsp;                break;</b>
+<i>2144</i>&nbsp;            default:
+<b class="nc"><i>2145</i>&nbsp;                throw new IllegalArgumentException();</b>
+<i>2146</i>&nbsp;        }
+<b class="fc"><i>2147</i>&nbsp;        for (BEASTInterface beastObject : pluginmap.values()) {</b>
+<b class="fc"><i>2148</i>&nbsp;            if (beastObject.getID().endsWith(oldsuffix)) {</b>
+<b class="fc"><i>2149</i>&nbsp;                String id = beastObject.getID();</b>
+<b class="fc"><i>2150</i>&nbsp;                id = id.substring(0, id.indexOf(oldsuffix)) + newsuffix;</b>
+<b class="fc"><i>2151</i>&nbsp;                beastObject.setID(id);</b>
+<i>2152</i>&nbsp;            }
+<b class="fc"><i>2153</i>&nbsp;        }</b>
+<b class="fc"><i>2154</i>&nbsp;        if (partitionID == ALIGNMENT_PARTITION) {</b>
+<i>2155</i>&nbsp;            // make exception for renaming alignment: its ID does not contain a dot
+<b class="fc"><i>2156</i>&nbsp;            for (BEASTInterface beastObject : pluginmap.values()) {</b>
+<b class="fc"><i>2157</i>&nbsp;                if (beastObject.getID().equals(oldName)) {</b>
+<b class="fc"><i>2158</i>&nbsp;                    beastObject.setID(newName);</b>
+<i>2159</i>&nbsp;                }
+<b class="fc"><i>2160</i>&nbsp;            }</b>
+<i>2161</i>&nbsp;        }
+<i>2162</i>&nbsp;
+<i>2163</i>&nbsp;        // update beastObject map
+<b class="fc"><i>2164</i>&nbsp;        String[] keyset = pluginmap.keySet().toArray(new String[0]);</b>
+<b class="fc"><i>2165</i>&nbsp;        for (String key : keyset) {</b>
+<b class="fc"><i>2166</i>&nbsp;            if (key.endsWith(oldsuffix)) {</b>
+<b class="fc"><i>2167</i>&nbsp;            	BEASTInterface beastObject = pluginmap.remove(key);</b>
+<b class="fc"><i>2168</i>&nbsp;                key = key.substring(0, key.indexOf(oldsuffix)) + newsuffix;</b>
+<b class="fc"><i>2169</i>&nbsp;                pluginmap.put(key, beastObject);</b>
+<i>2170</i>&nbsp;            }
+<i>2171</i>&nbsp;        }
+<i>2172</i>&nbsp;
+<i>2173</i>&nbsp;        // update tip text map
+<b class="fc"><i>2174</i>&nbsp;        keyset = tipTextMap.keySet().toArray(new String[0]);</b>
+<b class="fc"><i>2175</i>&nbsp;        for (String key : keyset) {</b>
+<b class="fc"><i>2176</i>&nbsp;            if (key.endsWith(oldsuffix)) {</b>
+<b class="nc"><i>2177</i>&nbsp;                String tip = tipTextMap.remove(key);</b>
+<b class="nc"><i>2178</i>&nbsp;                key = key.substring(0, key.indexOf(oldsuffix)) + newsuffix;</b>
+<b class="nc"><i>2179</i>&nbsp;                tip = tip.replaceAll(oldsuffix, newsuffix);</b>
+<b class="nc"><i>2180</i>&nbsp;                tipTextMap.put(key, tip);</b>
+<i>2181</i>&nbsp;            }
+<i>2182</i>&nbsp;        }
+<i>2183</i>&nbsp;
+<i>2184</i>&nbsp;        // update partition name table
+<b class="fc"><i>2185</i>&nbsp;        determinePartitions();</b>
+<b class="fc"><i>2186</i>&nbsp;    } // renamePartition</b>
+<i>2187</i>&nbsp;
+<i>2188</i>&nbsp;    public PartitionContext getContextFor(BEASTInterface beastObject) {
+<b class="fc"><i>2189</i>&nbsp;        String id = beastObject.getID();</b>
+<b class="fc"><i>2190</i>&nbsp;        String partition = id.substring(id.indexOf(&#39;.&#39;) + 1);</b>
+<i>2191</i>&nbsp;
+<b class="fc"><i>2192</i>&nbsp;        int partitionID = ALIGNMENT_PARTITION;</b>
+<b class="fc"><i>2193</i>&nbsp;        if (partition.indexOf(&#39;:&#39;) &gt;= 0) {</b>
+<b class="fc"><i>2194</i>&nbsp;            char c = partition.charAt(0);</b>
+<b class="fc"><i>2195</i>&nbsp;            switch (c) {</b>
+<i>2196</i>&nbsp;                case &#39;s&#39;:
+<b class="fc"><i>2197</i>&nbsp;                    partitionID = SITEMODEL_PARTITION;</b>
+<b class="fc"><i>2198</i>&nbsp;                    break;</b>
+<i>2199</i>&nbsp;                case &#39;c&#39;:
+<b class="fc"><i>2200</i>&nbsp;                    partitionID = CLOCKMODEL_PARTITION;</b>
+<b class="fc"><i>2201</i>&nbsp;                    break;</b>
+<i>2202</i>&nbsp;                case &#39;t&#39;:
+<b class="fc"><i>2203</i>&nbsp;                    partitionID = TREEMODEL_PARTITION;</b>
+<i>2204</i>&nbsp;                    break;
+<i>2205</i>&nbsp;            }
+<b class="fc"><i>2206</i>&nbsp;            partition = parsePartition(id);</b>
+<i>2207</i>&nbsp;        }
+<i>2208</i>&nbsp;
+<b class="fc"><i>2209</i>&nbsp;        for (PartitionContext context : partitionNames) {</b>
+<b class="fc"><i>2210</i>&nbsp;            switch (partitionID) {</b>
+<i>2211</i>&nbsp;                case ALIGNMENT_PARTITION:
+<b class="fc"><i>2212</i>&nbsp;                    if (context.partition.equals(partition)) {</b>
+<b class="fc"><i>2213</i>&nbsp;                        return context;</b>
+<i>2214</i>&nbsp;                    }
+<i>2215</i>&nbsp;                    break;
+<i>2216</i>&nbsp;                case SITEMODEL_PARTITION:
+<b class="fc"><i>2217</i>&nbsp;                    if (context.siteModel.equals(partition)) {</b>
+<b class="fc"><i>2218</i>&nbsp;                        return context;</b>
+<i>2219</i>&nbsp;                    }
+<i>2220</i>&nbsp;                    break;
+<i>2221</i>&nbsp;                case CLOCKMODEL_PARTITION:
+<b class="fc"><i>2222</i>&nbsp;                    if (context.clockModel.equals(partition)) {</b>
+<b class="fc"><i>2223</i>&nbsp;                        return context;</b>
+<i>2224</i>&nbsp;                    }
+<i>2225</i>&nbsp;                    break;
+<i>2226</i>&nbsp;                case TREEMODEL_PARTITION:
+<b class="fc"><i>2227</i>&nbsp;                    if (context.tree.equals(partition)) {</b>
+<b class="fc"><i>2228</i>&nbsp;                        return context;</b>
+<i>2229</i>&nbsp;                    }
+<i>2230</i>&nbsp;                    break;
+<i>2231</i>&nbsp;                default:
+<i>2232</i>&nbsp;                    // should never get here, unless template contains .X$(n) where X is not &#39;c&#39;, &#39;t&#39;, or &#39;s&#39;
+<b class="nc"><i>2233</i>&nbsp;                    return null;</b>
+<i>2234</i>&nbsp;            }
+<b class="fc"><i>2235</i>&nbsp;        }</b>
+<b class="nc"><i>2236</i>&nbsp;        return new PartitionContext(partition);</b>
+<i>2237</i>&nbsp;    }
+<i>2238</i>&nbsp;
+<i>2239</i>&nbsp;
+<i>2240</i>&nbsp;    // methods for dealing with linking
+<i>2241</i>&nbsp;    void determineLinks() {
+<b class="fc"><i>2242</i>&nbsp;        if (!allowLinking) {</b>
+<b class="fc"><i>2243</i>&nbsp;            return;</b>
+<i>2244</i>&nbsp;        }
+<b class="nc"><i>2245</i>&nbsp;        linked.clear();</b>
+<b class="nc"><i>2246</i>&nbsp;        for (BEASTInterface beastObject : posteriorPredecessors) {</b>
+<b class="nc"><i>2247</i>&nbsp;            Map&lt;String, Integer&gt; outputIDs = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>2248</i>&nbsp;            for (Object output : beastObject.getOutputs()) {</b>
+<b class="nc"><i>2249</i>&nbsp;                if (posteriorPredecessors.contains(output)) {</b>
+<b class="nc"><i>2250</i>&nbsp;                    String id = ((BEASTInterface)output).getID();</b>
+<b class="nc"><i>2251</i>&nbsp;                    if (id.indexOf(&#39;.&#39;) &gt;= 0) {</b>
+<b class="nc"><i>2252</i>&nbsp;                        id = id.substring(0, id.indexOf(&#39;.&#39;));</b>
+<b class="nc"><i>2253</i>&nbsp;                        if (outputIDs.containsKey(id)) {</b>
+<b class="nc"><i>2254</i>&nbsp;                            outputIDs.put(id, outputIDs.get(id) + 1);</b>
+<i>2255</i>&nbsp;                        } else {
+<b class="nc"><i>2256</i>&nbsp;                            outputIDs.put(id, 1);</b>
+<i>2257</i>&nbsp;                        }
+<i>2258</i>&nbsp;                    }
+<i>2259</i>&nbsp;                }
+<b class="nc"><i>2260</i>&nbsp;            }</b>
+<b class="nc"><i>2261</i>&nbsp;            for (Object output : beastObject.getOutputs()) {</b>
+<b class="nc"><i>2262</i>&nbsp;                if (posteriorPredecessors.contains(output)) {</b>
+<b class="nc"><i>2263</i>&nbsp;                    String id = ((BEASTInterface)output).getID();</b>
+<b class="nc"><i>2264</i>&nbsp;                    if (id.indexOf(&#39;.&#39;) &gt;= 0) {</b>
+<b class="nc"><i>2265</i>&nbsp;                        id = id.substring(0, id.indexOf(&#39;.&#39;));</b>
+<b class="nc"><i>2266</i>&nbsp;                        if (outputIDs.get(id) &gt; 1) {</b>
+<b class="nc"><i>2267</i>&nbsp;                            addLink(beastObject, (BEASTInterface)output);</b>
+<i>2268</i>&nbsp;                        }
+<i>2269</i>&nbsp;                    }
+<i>2270</i>&nbsp;                }
+<b class="nc"><i>2271</i>&nbsp;            }</b>
+<i>2272</i>&nbsp;            // add parameters that have more than 1 outputs into susbtitution models
+<b class="nc"><i>2273</i>&nbsp;            if (beastObject instanceof Parameter&lt;?&gt;) {</b>
+<b class="nc"><i>2274</i>&nbsp;                for (Object output : beastObject.getOutputs()) {</b>
+<b class="nc"><i>2275</i>&nbsp;                    if (posteriorPredecessors.contains(output)) {</b>
+<b class="nc"><i>2276</i>&nbsp;                        if (output instanceof SubstitutionModel) {</b>
+<b class="nc"><i>2277</i>&nbsp;                            int nrOfSubstModelsInOutput = 0;</b>
+<i>2278</i>&nbsp;                            try {
+<b class="nc"><i>2279</i>&nbsp;                                for (Input&lt;?&gt; input : ((BEASTInterface)output).listInputs()) {</b>
+<b class="nc"><i>2280</i>&nbsp;                                    if (input.get() != null &amp;&amp; input.get().equals(beastObject)) {</b>
+<b class="nc"><i>2281</i>&nbsp;                                        nrOfSubstModelsInOutput++;</b>
+<i>2282</i>&nbsp;                                    }
+<b class="nc"><i>2283</i>&nbsp;                                }</b>
+<b class="nc"><i>2284</i>&nbsp;                            } catch (Exception e) {</b>
+<i>2285</i>&nbsp;                                // ignore
+<b class="nc"><i>2286</i>&nbsp;                            }</b>
+<b class="nc"><i>2287</i>&nbsp;                            if (nrOfSubstModelsInOutput &gt; 1) {</b>
+<b class="nc"><i>2288</i>&nbsp;                                addLink(beastObject, (BEASTInterface)output);</b>
+<i>2289</i>&nbsp;                            }
+<i>2290</i>&nbsp;                        }
+<i>2291</i>&nbsp;                    }
+<b class="nc"><i>2292</i>&nbsp;                }</b>
+<i>2293</i>&nbsp;            }
+<b class="nc"><i>2294</i>&nbsp;        }</b>
+<i>2295</i>&nbsp;
+<b class="nc"><i>2296</i>&nbsp;        hasLinkedAtLeastOnce = false;</b>
+<b class="nc"><i>2297</i>&nbsp;        for (Input&lt;?&gt; input : linked) {</b>
+<b class="nc"><i>2298</i>&nbsp;            if (input.getType().isAssignableFrom(RealParameter.class)) {</b>
+<b class="nc"><i>2299</i>&nbsp;                hasLinkedAtLeastOnce = true;</b>
+<b class="nc"><i>2300</i>&nbsp;                break;</b>
+<i>2301</i>&nbsp;            }
+<b class="nc"><i>2302</i>&nbsp;        }</b>
+<b class="nc"><i>2303</i>&nbsp;    }</b>
+<i>2304</i>&nbsp;
+<i>2305</i>&nbsp;    void addLink(BEASTInterface from, BEASTInterface to) {
+<i>2306</i>&nbsp;        try {
+<b class="nc"><i>2307</i>&nbsp;            for (Input&lt;?&gt; input : to.listInputs()) {</b>
+<b class="nc"><i>2308</i>&nbsp;                if (input.get() instanceof BEASTInterface) {</b>
+<b class="nc"><i>2309</i>&nbsp;                    if (input.get() == from) {</b>
+<b class="nc"><i>2310</i>&nbsp;                        linked.add(input);</b>
+<b class="nc"><i>2311</i>&nbsp;                        return;</b>
+<i>2312</i>&nbsp;                    }
+<i>2313</i>&nbsp;                }
+<i>2314</i>&nbsp;                // does it make sense to link list inputs?
+<i>2315</i>&nbsp;//				if (input.get() instanceof List&lt;?&gt;) {
+<i>2316</i>&nbsp;//					for (Object o : (List&lt;?&gt;) input.get()) {
+<i>2317</i>&nbsp;//						if (o instanceof BEASTObject) {
+<i>2318</i>&nbsp;//							if (o == from) {
+<i>2319</i>&nbsp;//								addLink(input);
+<i>2320</i>&nbsp;//								return;
+<i>2321</i>&nbsp;//							}
+<i>2322</i>&nbsp;//						}
+<i>2323</i>&nbsp;//					}
+<i>2324</i>&nbsp;//				}
+<b class="nc"><i>2325</i>&nbsp;            }</b>
+<b class="nc"><i>2326</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>2327</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>2328</i>&nbsp;        }</b>
+<b class="nc"><i>2329</i>&nbsp;    }</b>
+<i>2330</i>&nbsp;
+<i>2331</i>&nbsp;    public void addLink(Input&lt;?&gt; input) {
+<b class="nc"><i>2332</i>&nbsp;        linked.add(input);</b>
+<b class="nc"><i>2333</i>&nbsp;        hasLinkedAtLeastOnce = true;</b>
+<b class="nc"><i>2334</i>&nbsp;    }</b>
+<i>2335</i>&nbsp;
+<i>2336</i>&nbsp;    public void deLink(Input&lt;?&gt; input) {
+<b class="nc"><i>2337</i>&nbsp;        linked.remove(input);</b>
+<b class="nc"><i>2338</i>&nbsp;    }</b>
+<i>2339</i>&nbsp;
+<i>2340</i>&nbsp;    public boolean isLinked(Input&lt;?&gt; input) {
+<b class="nc"><i>2341</i>&nbsp;        return linked.contains(input);</b>
+<i>2342</i>&nbsp;    }
+<i>2343</i>&nbsp;
+<i>2344</i>&nbsp;    /**
+<i>2345</i>&nbsp;     * return all RealParameters that have
+<i>2346</i>&nbsp;     * the same ID in another partition, or
+<i>2347</i>&nbsp;     * the same partition with the same substitution model as output
+<i>2348</i>&nbsp;     *
+<i>2349</i>&nbsp;     * @param beastObject
+<i>2350</i>&nbsp;     * @return
+<i>2351</i>&nbsp;     */
+<i>2352</i>&nbsp;    public List&lt;BEASTInterface&gt; suggestedLinks(BEASTInterface beastObject) {
+<b class="nc"><i>2353</i>&nbsp;        String id = beastObject.getID();</b>
+<b class="nc"><i>2354</i>&nbsp;        List&lt;BEASTInterface&gt; list = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>2355</i>&nbsp;        String partitionID = null;</b>
+<b class="nc"><i>2356</i>&nbsp;        if (id.indexOf(&#39;.&#39;) &gt;= 0) {</b>
+<b class="nc"><i>2357</i>&nbsp;            partitionID = id.substring(id.indexOf(&#39;.&#39;) + 1);</b>
+<b class="nc"><i>2358</i>&nbsp;            id = id.substring(0, id.indexOf(&#39;.&#39;));</b>
+<i>2359</i>&nbsp;        } else {
+<b class="nc"><i>2360</i>&nbsp;            return list;</b>
+<i>2361</i>&nbsp;        }
+<b class="nc"><i>2362</i>&nbsp;        for (BEASTInterface candidate : posteriorPredecessors) {</b>
+<b class="nc"><i>2363</i>&nbsp;            String id2 = candidate.getID();</b>
+<b class="nc"><i>2364</i>&nbsp;            if (id2.indexOf(&#39;.&#39;) &gt;= 0) {</b>
+<b class="nc"><i>2365</i>&nbsp;                String partitionID2 = id2.substring(id2.indexOf(&#39;.&#39;) + 1);</b>
+<b class="nc"><i>2366</i>&nbsp;                id2 = id2.substring(0, id2.indexOf(&#39;.&#39;));</b>
+<b class="nc"><i>2367</i>&nbsp;                if (id2.equals(id)) {</b>
+<b class="nc"><i>2368</i>&nbsp;                    list.add(candidate);</b>
+<i>2369</i>&nbsp;                }
+<b class="nc"><i>2370</i>&nbsp;                if (beastObject instanceof Parameter&lt;?&gt; &amp;&amp;</b>
+<b class="nc"><i>2371</i>&nbsp;                        partitionID2.equals(partitionID) &amp;&amp;</b>
+<b class="nc"><i>2372</i>&nbsp;                        candidate.getClass().equals(beastObject.getClass())) {</b>
+<b class="nc"><i>2373</i>&nbsp;                    boolean dimensionMatches = true;</b>
+<b class="nc"><i>2374</i>&nbsp;                    if (((Parameter&lt;?&gt;) beastObject).getDimension() != ((Parameter&lt;?&gt;) candidate).getDimension()) {</b>
+<b class="nc"><i>2375</i>&nbsp;                        dimensionMatches = false;</b>
+<i>2376</i>&nbsp;                    }
+<i>2377</i>&nbsp;                    // ensure they share an output
+<b class="nc"><i>2378</i>&nbsp;                    boolean foundCommonOutput = false;</b>
+<b class="nc"><i>2379</i>&nbsp;                    for (Object out1 : beastObject.getOutputs()) {</b>
+<b class="nc"><i>2380</i>&nbsp;                        for (Object out2 : candidate.getOutputs()) {</b>
+<b class="nc"><i>2381</i>&nbsp;                            if (out1 == out2 &amp;&amp; out1 instanceof SubstitutionModel) {</b>
+<b class="nc"><i>2382</i>&nbsp;                                foundCommonOutput = true;</b>
+<b class="nc"><i>2383</i>&nbsp;                                break;</b>
+<i>2384</i>&nbsp;                            }
+<b class="nc"><i>2385</i>&nbsp;                        }</b>
+<b class="nc"><i>2386</i>&nbsp;                    }</b>
+<b class="nc"><i>2387</i>&nbsp;                    if (dimensionMatches &amp;&amp; foundCommonOutput) {</b>
+<b class="nc"><i>2388</i>&nbsp;                        list.add(candidate);</b>
+<i>2389</i>&nbsp;                    }
+<i>2390</i>&nbsp;                }
+<i>2391</i>&nbsp;            }
+<b class="nc"><i>2392</i>&nbsp;        }</b>
+<b class="nc"><i>2393</i>&nbsp;        list.remove(beastObject);</b>
+<b class="nc"><i>2394</i>&nbsp;        return list;</b>
+<i>2395</i>&nbsp;    }
+<i>2396</i>&nbsp;
+<i>2397</i>&nbsp;    public BEASTInterface getUnlinkCandidate(Input&lt;?&gt; input, BEASTInterface parent) {
+<b class="nc"><i>2398</i>&nbsp;        PartitionContext oldContext = getContextFor((BEASTInterface)input.get());</b>
+<b class="nc"><i>2399</i>&nbsp;        PartitionContext newContext = getContextFor(parent);</b>
+<b class="nc"><i>2400</i>&nbsp;        BEASTInterface beastObject = deepCopyPlugin((BEASTInterface) input.get(), parent, (MCMC) mcmc.get(), oldContext, newContext, this, null);</b>
+<b class="nc"><i>2401</i>&nbsp;        return beastObject;</b>
+<i>2402</i>&nbsp;    }
+<i>2403</i>&nbsp;
+<i>2404</i>&nbsp;    public void setBeauti(Beauti beauti) {
+<b class="fc"><i>2405</i>&nbsp;        this.beauti = beauti;</b>
+<b class="fc"><i>2406</i>&nbsp;    }</b>
+<i>2407</i>&nbsp;
+<i>2408</i>&nbsp;    public JFrame getFrame() {
+<b class="nc"><i>2409</i>&nbsp;        return beauti.frame;</b>
+<i>2410</i>&nbsp;    }
+<i>2411</i>&nbsp;
+<i>2412</i>&nbsp;    @Override
+<i>2413</i>&nbsp;    public void initAndValidate() {
+<b class="nc"><i>2414</i>&nbsp;    }</b>
+<i>2415</i>&nbsp;
+<i>2416</i>&nbsp;    /** create taxonset, one taxon for each sequence in the alignment
+<i>2417</i>&nbsp;     * and assign taxonset to the alignment
+<i>2418</i>&nbsp;     * **/
+<i>2419</i>&nbsp;    static void createTaxonSet(Alignment a, BeautiDoc doc) {
+<b class="nc"><i>2420</i>&nbsp;		List&lt;String&gt; taxaNames = a.getTaxaNames();</b>
+<b class="nc"><i>2421</i>&nbsp;		TaxonSet taxonset = new TaxonSet();</b>
+<b class="nc"><i>2422</i>&nbsp;        for (final String taxaName : taxaNames) {</b>
+<b class="nc"><i>2423</i>&nbsp;        	taxonset.taxonsetInput.get().add(doc.getTaxon(taxaName));</b>
+<b class="nc"><i>2424</i>&nbsp;        }</b>
+<b class="nc"><i>2425</i>&nbsp;        taxonset.setID(&quot;TaxonSet0.&quot; + a.getID());</b>
+<i>2426</i>&nbsp;        try {
+<b class="nc"><i>2427</i>&nbsp;			taxonset.initAndValidate();</b>
+<b class="nc"><i>2428</i>&nbsp;		} catch (Exception e) {</b>
+<b class="nc"><i>2429</i>&nbsp;			e.printStackTrace();</b>
+<b class="nc"><i>2430</i>&nbsp;		}</b>
+<b class="nc"><i>2431</i>&nbsp;		doc.registerPlugin(taxonset);</b>
+<b class="nc"><i>2432</i>&nbsp;	}</b>
+<i>2433</i>&nbsp;
+<i>2434</i>&nbsp;    /** create Taxon with given name, reuse if a taxon
+<i>2435</i>&nbsp;     *  with this name already exists
+<i>2436</i>&nbsp;     **/
+<i>2437</i>&nbsp;	public Taxon getTaxon(String taxaName) {
+<b class="nc"><i>2438</i>&nbsp;    	if (taxaset.keySet().contains(taxaName)) {</b>
+<b class="nc"><i>2439</i>&nbsp;    		return taxaset.get(taxaName);</b>
+<i>2440</i>&nbsp;    	} else {
+<i>2441</i>&nbsp;    		try {
+<b class="nc"><i>2442</i>&nbsp;    			Taxon taxon = new Taxon(taxaName);</b>
+<b class="nc"><i>2443</i>&nbsp;    			registerPlugin(taxon);</b>
+<b class="nc"><i>2444</i>&nbsp;    			return taxon;</b>
+<b class="nc"><i>2445</i>&nbsp;    		} catch (Exception e) {</b>
+<b class="nc"><i>2446</i>&nbsp;    			e.printStackTrace();</b>
+<i>2447</i>&nbsp;    		}
+<i>2448</i>&nbsp;    	}
+<b class="nc"><i>2449</i>&nbsp;		return null;</b>
+<i>2450</i>&nbsp;	}
+<i>2451</i>&nbsp;
+<i>2452</i>&nbsp;	public void addMRCAPrior(MRCAPrior mrcaPrior) {
+<b class="nc"><i>2453</i>&nbsp;			Tree tree = (Tree) pluginmap.get(&quot;Tree.t:&quot; + alignments.get(0).getID());</b>
+<i>2454</i>&nbsp;			// TODO: make sure we have the appropriate tree
+<b class="nc"><i>2455</i>&nbsp;			CompoundDistribution prior = (CompoundDistribution) pluginmap.get(&quot;prior&quot;);</b>
+<b class="nc"><i>2456</i>&nbsp;			mrcaPrior.treeInput.setValue(tree, mrcaPrior);</b>
+<b class="nc"><i>2457</i>&nbsp;			ParametricDistribution distr = mrcaPrior.distInput.get();</b>
+<i>2458</i>&nbsp;
+<b class="nc"><i>2459</i>&nbsp;			TaxonSet t = mrcaPrior.taxonsetInput.get();</b>
+<b class="nc"><i>2460</i>&nbsp;			if (taxaset.keySet().contains(t.getID())) {</b>
+<b class="nc"><i>2461</i>&nbsp;				Log.warning.println(&quot;taxonset &quot; + t.getID() + &quot; already exists: MRCAPrior &quot; + mrcaPrior.getID() + &quot; can not be added&quot;);</b>
+<i>2462</i>&nbsp;			} else {
+<b class="nc"><i>2463</i>&nbsp;				taxaset.put(t.getID(), t);</b>
+<i>2464</i>&nbsp;				// ensure TaxonSets are not duplicated
+<b class="nc"><i>2465</i>&nbsp;				List&lt;Taxon&gt; taxa = t.taxonsetInput.get();</b>
+<b class="nc"><i>2466</i>&nbsp;				for (int i = 0; i&lt; taxa.size(); i++) {</b>
+<b class="nc"><i>2467</i>&nbsp;					if (taxaset.containsKey(taxa.get(i).getID())) {</b>
+<b class="nc"><i>2468</i>&nbsp;						taxa.set(i, taxaset.get(taxa.get(i).getID()));</b>
+<i>2469</i>&nbsp;					} else {
+<b class="nc"><i>2470</i>&nbsp;						taxaset.put(taxa.get(i).getID(), taxa.get(i));</b>
+<i>2471</i>&nbsp;					}
+<i>2472</i>&nbsp;				}
+<b class="nc"><i>2473</i>&nbsp;				if (distr instanceof Uniform &amp;&amp; ((Uniform)distr).lowerInput.get() == ((Uniform)distr).upperInput.get()) {</b>
+<i>2474</i>&nbsp;					// it is a &#39;fixed&#39; calibration, no need to add a distribution
+<i>2475</i>&nbsp;				} else {
+<b class="nc"><i>2476</i>&nbsp;					prior.pDistributions.setValue(mrcaPrior, prior);</b>
+<i>2477</i>&nbsp;				}
+<i>2478</i>&nbsp;			}
+<b class="nc"><i>2479</i>&nbsp;			if (t.taxonsetInput.get().size() == 1) {</b>
+<i>2480</i>&nbsp;				// it is a calibration on a tip -- better start sampling that tip
+<b class="nc"><i>2481</i>&nbsp;		        TipDatesRandomWalker operator = new TipDatesRandomWalker();</b>
+<b class="nc"><i>2482</i>&nbsp;		        t.initAndValidate();</b>
+<b class="nc"><i>2483</i>&nbsp;		        operator.initByName(&quot;taxonset&quot;, t, &quot;weight&quot;, 1.0, &quot;tree&quot;, tree, &quot;windowSize&quot;, 1.0);</b>
+<b class="nc"><i>2484</i>&nbsp;		        operator.setID(&quot;TipDatesRandomWalker.&quot; + t.getID());</b>
+<b class="nc"><i>2485</i>&nbsp;		        MCMC mcmc = (MCMC) this.mcmc.get();</b>
+<b class="nc"><i>2486</i>&nbsp;		        mcmc.operatorsInput.setValue(operator, mcmc);</b>
+<i>2487</i>&nbsp;		        
+<i>2488</i>&nbsp;		        // set up date trait
+<b class="nc"><i>2489</i>&nbsp;		        double date = distr.getMean();</b>
+<b class="nc"><i>2490</i>&nbsp;		        TraitSet dateTrait = null;</b>
+<b class="nc"><i>2491</i>&nbsp;		        for (TraitSet ts : tree.m_traitList.get()) {</b>
+<b class="nc"><i>2492</i>&nbsp;		        	if (ts.isDateTrait()) {</b>
+<b class="nc"><i>2493</i>&nbsp;		        		dateTrait = ts;</b>
+<i>2494</i>&nbsp;		        	}
+<b class="nc"><i>2495</i>&nbsp;		        }</b>
+<b class="nc"><i>2496</i>&nbsp;		        if (dateTrait == null) {</b>
+<b class="nc"><i>2497</i>&nbsp;		        	dateTrait = new TraitSet();</b>
+<b class="nc"><i>2498</i>&nbsp;		        	dateTrait.initByName(&quot;traitname&quot;, TraitSet.DATE_BACKWARD_TRAIT, &quot;taxa&quot;, tree.getTaxonset(), </b>
+<b class="nc"><i>2499</i>&nbsp;		        			&quot;value&quot;, t.taxonsetInput.get().get(0).getID() + &quot;=&quot; + date);</b>
+<b class="nc"><i>2500</i>&nbsp;		        	tree.m_traitList.setValue(dateTrait, tree);</b>
+<b class="nc"><i>2501</i>&nbsp;		        	tree.initAndValidate();</b>
+<i>2502</i>&nbsp;		        } else {
+<b class="nc"><i>2503</i>&nbsp;		        	dateTrait.traitsInput.setValue(dateTrait.traitsInput.get() + &quot;,\n&quot; +</b>
+<b class="nc"><i>2504</i>&nbsp;		        			t.taxonsetInput.get().get(0).getID() + &quot;=&quot; + date</b>
+<i>2505</i>&nbsp;		        			, dateTrait);	
+<i>2506</i>&nbsp;		        }
+<i>2507</i>&nbsp;			}
+<b class="nc"><i>2508</i>&nbsp;	}</b>
+<i>2509</i>&nbsp;
+<i>2510</i>&nbsp;
+<i>2511</i>&nbsp;} // class BeautiDoc
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,373 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TreeSetAnalyser</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.tools</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TreeSetAnalyser (beast.app.tools)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+</tr>
+  <tr>
+    <td class="name">TreeSetAnalyser$1</td>
+  </tr>
+  <tr>
+    <td class="name">TreeSetAnalyser$2</td>
+  </tr>
+  <tr>
+    <td class="name">TreeSetAnalyser$TSAConsoleApp</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.tools;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import beast.app.BEASTVersion;
+<i>4</i>&nbsp;import beast.app.util.Arguments;
+<i>5</i>&nbsp;import beast.app.util.ErrorLogHandler;
+<i>6</i>&nbsp;import beast.app.util.MessageLogHandler;
+<i>7</i>&nbsp;import beast.app.util.Version;
+<i>8</i>&nbsp;import beast.evolution.tree.TreeTraceAnalysis;
+<i>9</i>&nbsp;import beast.util.NexusParser;
+<i>10</i>&nbsp;import beast.util.Randomizer;
+<i>11</i>&nbsp;import jam.util.IconUtils;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;import javax.swing.*;
+<i>14</i>&nbsp;import javax.swing.filechooser.FileFilter;
+<i>15</i>&nbsp;import java.io.File;
+<i>16</i>&nbsp;import java.io.IOException;
+<i>17</i>&nbsp;import java.util.logging.*;
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;public class TreeSetAnalyser {
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;    private final static Version version = new BEASTVersion();
+<i>22</i>&nbsp;    
+<i>23</i>&nbsp;    static class TSAConsoleApp extends jam.console.ConsoleApplication {
+<i>24</i>&nbsp;
+<i>25</i>&nbsp;        public TSAConsoleApp(String nameString, String aboutString, javax.swing.Icon icon) throws IOException {
+<i>26</i>&nbsp;            super(nameString, aboutString, icon, false);
+<i>27</i>&nbsp;            getDefaultFrame().setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+<i>28</i>&nbsp;        }
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;        public void doStop() {
+<i>31</i>&nbsp;            // thread.stop is deprecated so need to send a message to running threads...
+<i>32</i>&nbsp;//            Iterator iter = parser.getThreads();
+<i>33</i>&nbsp;//            while (iter.hasNext()) {
+<i>34</i>&nbsp;//                Thread thread = (Thread) iter.next();
+<i>35</i>&nbsp;//                thread.stop(); // http://java.sun.com/j2se/1.5.0/docs/guide/misc/threadPrimitiveDeprecation.html
+<i>36</i>&nbsp;//            }
+<i>37</i>&nbsp;        }
+<i>38</i>&nbsp;
+<i>39</i>&nbsp;        public void setTitle(String title) {
+<i>40</i>&nbsp;            getDefaultFrame().setTitle(title);
+<i>41</i>&nbsp;        }
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;        TreeTraceAnalysis analyser;
+<i>44</i>&nbsp;    }
+<i>45</i>&nbsp;
+<i>46</i>&nbsp;    public TreeSetAnalyser(TreeTraceAnalysis analyser, TSAConsoleApp consoleApp, int maxErrorCount) {
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;        final Logger infoLogger = Logger.getLogger(&quot;beast.app&quot;);
+<i>49</i>&nbsp;        try {
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;            if (consoleApp != null) {
+<i>52</i>&nbsp;                consoleApp.analyser = analyser;
+<i>53</i>&nbsp;            }
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;            // Add a handler to handle warnings and errors. This is a ConsoleHandler
+<i>56</i>&nbsp;            // so the messages will go to StdOut..
+<i>57</i>&nbsp;            Logger logger = Logger.getLogger(&quot;beast&quot;);
+<i>58</i>&nbsp;
+<i>59</i>&nbsp;            Handler handler = new MessageLogHandler();
+<i>60</i>&nbsp;            handler.setFilter(new Filter() {
+<i>61</i>&nbsp;                public boolean isLoggable(LogRecord record) {
+<i>62</i>&nbsp;                    return record.getLevel().intValue() &lt; Level.WARNING.intValue();
+<i>63</i>&nbsp;                }
+<i>64</i>&nbsp;            });
+<i>65</i>&nbsp;            logger.addHandler(handler);
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;            logger.setUseParentHandlers(false);
+<i>68</i>&nbsp;
+<i>69</i>&nbsp;            // This is a special logger that is for logging numerical and statistical errors
+<i>70</i>&nbsp;            // during the MCMC run. It will tolerate up to maxErrorCount before throwing a
+<i>71</i>&nbsp;            // RuntimeException to shut down the run.
+<i>72</i>&nbsp;            //Logger errorLogger = Logger.getLogger(&quot;error&quot;);
+<i>73</i>&nbsp;            handler = new ErrorLogHandler(maxErrorCount);
+<i>74</i>&nbsp;            handler.setLevel(Level.WARNING);
+<i>75</i>&nbsp;            logger.addHandler(handler);
+<i>76</i>&nbsp;
+<i>77</i>&nbsp;            analyser.report(System.out);
+<i>78</i>&nbsp;
+<i>79</i>&nbsp;        } catch (Exception ex) {
+<i>80</i>&nbsp;
+<i>81</i>&nbsp;        	infoLogger.severe(&quot;Fatal exception: &quot; + ex.getMessage());
+<i>82</i>&nbsp;            System.err.println(&quot;Fatal exception: &quot; + ex.getMessage());
+<i>83</i>&nbsp;            ex.printStackTrace(System.err);
+<i>84</i>&nbsp;        }
+<i>85</i>&nbsp;    }
+<i>86</i>&nbsp;
+<i>87</i>&nbsp;    static String getFileNameByDialog(String title) {
+<i>88</i>&nbsp;        JFileChooser fc = new JFileChooser(System.getProperty(&quot;user.dir&quot;));
+<i>89</i>&nbsp;        fc.addChoosableFileFilter(new FileFilter() {
+<i>90</i>&nbsp;            public boolean accept(File f) {
+<i>91</i>&nbsp;                if (f.isDirectory()) {
+<i>92</i>&nbsp;                    return true;
+<i>93</i>&nbsp;                }
+<i>94</i>&nbsp;                String name = f.getName().toLowerCase();
+<i>95</i>&nbsp;                if (name.endsWith(&quot;.xml&quot;)) {
+<i>96</i>&nbsp;                    return true;
+<i>97</i>&nbsp;                }
+<i>98</i>&nbsp;                return false;
+<i>99</i>&nbsp;            }
+<i>100</i>&nbsp;
+<i>101</i>&nbsp;            // The description of this filter
+<i>102</i>&nbsp;            public String getDescription() {
+<i>103</i>&nbsp;                return &quot;xml files&quot;;
+<i>104</i>&nbsp;            }
+<i>105</i>&nbsp;        });
+<i>106</i>&nbsp;
+<i>107</i>&nbsp;        fc.setDialogTitle(title);
+<i>108</i>&nbsp;        int rval = fc.showOpenDialog(null);
+<i>109</i>&nbsp;
+<i>110</i>&nbsp;        if (rval == JFileChooser.APPROVE_OPTION) {
+<i>111</i>&nbsp;            return fc.getSelectedFile().toString();
+<i>112</i>&nbsp;        }
+<i>113</i>&nbsp;        return null;
+<i>114</i>&nbsp;    } // getFileNameByDialog
+<i>115</i>&nbsp;
+<i>116</i>&nbsp;
+<i>117</i>&nbsp;    public static void centreLine(String line, int pageWidth) {
+<i>118</i>&nbsp;        int n = pageWidth - line.length();
+<i>119</i>&nbsp;        int n1 = n / 2;
+<i>120</i>&nbsp;        for (int i = 0; i &lt; n1; i++) {
+<i>121</i>&nbsp;            System.out.print(&quot; &quot;);
+<i>122</i>&nbsp;        }
+<i>123</i>&nbsp;        System.out.println(line);
+<i>124</i>&nbsp;    }
+<i>125</i>&nbsp;
+<i>126</i>&nbsp;    public static void printTitle() {
+<i>127</i>&nbsp;        System.out.println();
+<i>128</i>&nbsp;        centreLine(&quot;BEAST &quot; + version.getVersionString() + &quot;, &quot; + version.getDateString(), 60);
+<i>129</i>&nbsp;        centreLine(&quot;Tree Set Analyser&quot;, 60);
+<i>130</i>&nbsp;        for (String creditLine : version.getCredits()) {
+<i>131</i>&nbsp;            centreLine(creditLine, 60);
+<i>132</i>&nbsp;        }
+<i>133</i>&nbsp;        System.out.println();
+<i>134</i>&nbsp;
+<i>135</i>&nbsp;    }
+<i>136</i>&nbsp;
+<i>137</i>&nbsp;    public static void printUsage(Arguments arguments) {
+<i>138</i>&nbsp;        arguments.printUsage(&quot;treeSetAnalyser&quot;, &quot;[&lt;input-file-name&gt;]&quot;);
+<i>139</i>&nbsp;        System.exit(0);
+<i>140</i>&nbsp;    }
+<i>141</i>&nbsp;
+<i>142</i>&nbsp;    //Main method
+<i>143</i>&nbsp;    public static void main(String[] args) throws java.io.IOException {
+<i>144</i>&nbsp;
+<i>145</i>&nbsp;        Arguments arguments = new Arguments(
+<i>146</i>&nbsp;                new Arguments.Option[]{
+<i>147</i>&nbsp;                        new Arguments.Option(&quot;window&quot;, &quot;Provide a console window&quot;),
+<i>148</i>&nbsp;                        new Arguments.Option(&quot;options&quot;, &quot;Display an options dialog&quot;),
+<i>149</i>&nbsp;                        new Arguments.Option(&quot;working&quot;, &quot;Change working directory to input file&#39;s directory&quot;),
+<i>150</i>&nbsp;                        new Arguments.IntegerOption(&quot;HPD&quot;, &quot;HPD percentage to report, default 95%&quot;),
+<i>151</i>&nbsp;                        new Arguments.IntegerOption(&quot;burnin&quot;, &quot;Percentage of trees to be considered burn-in, default 10%&quot;),
+<i>152</i>&nbsp;                        new Arguments.IntegerOption(&quot;b&quot;, &quot;Percentage of trees to be considered burn-in, default 10%&quot;),
+<i>153</i>&nbsp;                        new Arguments.StringOption(&quot;file&quot;, &quot;input-filename&quot;, &quot;tree set file&quot;),
+<i>154</i>&nbsp;                        new Arguments.Option(&quot;help&quot;, &quot;Print this information and stop&quot;),
+<i>155</i>&nbsp;                });
+<i>156</i>&nbsp;
+<i>157</i>&nbsp;        try {
+<i>158</i>&nbsp;            arguments.parseArguments(args);
+<i>159</i>&nbsp;        } catch (Arguments.ArgumentException ae) {
+<i>160</i>&nbsp;            System.out.println();
+<i>161</i>&nbsp;            System.out.println(ae.getMessage());
+<i>162</i>&nbsp;            System.out.println();
+<i>163</i>&nbsp;            printUsage(arguments);
+<i>164</i>&nbsp;            System.exit(1);
+<i>165</i>&nbsp;        }
+<i>166</i>&nbsp;
+<i>167</i>&nbsp;        if (arguments.hasOption(&quot;help&quot;)) {
+<i>168</i>&nbsp;            printUsage(arguments);
+<i>169</i>&nbsp;            System.exit(0);
+<i>170</i>&nbsp;        }
+<i>171</i>&nbsp;
+<i>172</i>&nbsp;        final boolean window = arguments.hasOption(&quot;window&quot;);
+<i>173</i>&nbsp;        final boolean options = arguments.hasOption(&quot;options&quot;);
+<i>174</i>&nbsp;        final boolean working = arguments.hasOption(&quot;working&quot;);
+<i>175</i>&nbsp;        String fileNamePrefix = null;
+<i>176</i>&nbsp;
+<i>177</i>&nbsp;        long seed = Randomizer.getSeed();
+<i>178</i>&nbsp;
+<i>179</i>&nbsp;        int maxErrorCount = 0;
+<i>180</i>&nbsp;        if (arguments.hasOption(&quot;errors&quot;)) {
+<i>181</i>&nbsp;            maxErrorCount = arguments.getIntegerOption(&quot;errors&quot;);
+<i>182</i>&nbsp;            if (maxErrorCount &lt; 0) {
+<i>183</i>&nbsp;                maxErrorCount = 0;
+<i>184</i>&nbsp;            }
+<i>185</i>&nbsp;        }
+<i>186</i>&nbsp;
+<i>187</i>&nbsp;        TSAConsoleApp consoleApp = null;
+<i>188</i>&nbsp;
+<i>189</i>&nbsp;        String nameString = &quot;SNAPP &quot; + version.getVersionString();
+<i>190</i>&nbsp;
+<i>191</i>&nbsp;        if (window) {
+<i>192</i>&nbsp;            System.setProperty(&quot;com.apple.macos.useScreenMenuBar&quot;, &quot;true&quot;);
+<i>193</i>&nbsp;            System.setProperty(&quot;apple.laf.useScreenMenuBar&quot;, &quot;true&quot;);
+<i>194</i>&nbsp;            System.setProperty(&quot;apple.awt.showGrowBox&quot;, &quot;true&quot;);
+<i>195</i>&nbsp;            System.setProperty(&quot;beast.useWindow&quot;, &quot;true&quot;);
+<i>196</i>&nbsp;
+<i>197</i>&nbsp;            javax.swing.Icon icon = IconUtils.getIcon(TreeSetAnalyser.class, &quot;snapp.png&quot;);
+<i>198</i>&nbsp;
+<i>199</i>&nbsp;            String aboutString = &quot;&lt;html&gt;&lt;div style=\&quot;font-family:sans-serif;\&quot;&gt;&lt;center&gt;&quot; +
+<i>200</i>&nbsp;                    &quot;&lt;div style=\&quot;font-size:12;\&quot;&gt;&lt;p&gt;BEAST Tree Set Analyser&lt;br&gt;&quot; +
+<i>201</i>&nbsp;                    &quot;Version &quot; + version.getVersionString() + &quot;, &quot; + version.getDateString() + &quot;&lt;/p&gt;&quot; +
+<i>202</i>&nbsp;                    version.getHTMLCredits() +
+<i>203</i>&nbsp;                    &quot;&lt;/div&gt;&lt;/center&gt;&lt;/div&gt;&lt;/html&gt;&quot;;
+<i>204</i>&nbsp;
+<i>205</i>&nbsp;            consoleApp = new TSAConsoleApp(nameString, aboutString, icon);
+<i>206</i>&nbsp;        }
+<i>207</i>&nbsp;
+<i>208</i>&nbsp;        printTitle();
+<i>209</i>&nbsp;
+<i>210</i>&nbsp;        File inputFile = null;
+<i>211</i>&nbsp;
+<i>212</i>&nbsp;        if (options) {
+<i>213</i>&nbsp;            String titleString = &quot;&lt;html&gt;&lt;center&gt;&lt;p&gt;BEAST Tree Set Analyser&lt;br&gt;&quot; +
+<i>214</i>&nbsp;                    &quot;Version &quot; + version.getVersionString() + &quot;, &quot; + version.getDateString() + &quot;&lt;/p&gt;&lt;/center&gt;&lt;/html&gt;&quot;;
+<i>215</i>&nbsp;            javax.swing.Icon icon = IconUtils.getIcon(TreeSetAnalyser.class, &quot;treesetanalyser.png&quot;);
+<i>216</i>&nbsp;
+<i>217</i>&nbsp;            TreeSetAnalyserDialog dialog = new TreeSetAnalyserDialog(new JFrame(), titleString, icon);
+<i>218</i>&nbsp;
+<i>219</i>&nbsp;            if (arguments.hasOption(&quot;burnin&quot;) || arguments.hasOption(&quot;b&quot;)) {
+<i>220</i>&nbsp;                int burnin = arguments.hasOption(&quot;burnin&quot;) ? arguments.getIntegerOption(&quot;burnin&quot;) : arguments.getIntegerOption(&quot;b&quot;);
+<i>221</i>&nbsp;                dialog.burninText.setValue(burnin);
+<i>222</i>&nbsp;            } else {
+<i>223</i>&nbsp;                dialog.burninText.setValue(10);
+<i>224</i>&nbsp;            }
+<i>225</i>&nbsp;            if (arguments.hasOption(&quot;HPD&quot;)) {
+<i>226</i>&nbsp;                dialog.HPDPercentageText.setText(arguments.getStringOption(&quot;HPD&quot;));
+<i>227</i>&nbsp;            } else {
+<i>228</i>&nbsp;            	dialog.HPDPercentageText.setValue(95);
+<i>229</i>&nbsp;            }
+<i>230</i>&nbsp;            if (arguments.hasOption(&quot;file&quot;)) {
+<i>231</i>&nbsp;                dialog.inputFileNameText.setText(arguments.getStringOption(&quot;file&quot;));
+<i>232</i>&nbsp;            }
+<i>233</i>&nbsp;            if (!dialog.showDialog(nameString, seed)) {
+<i>234</i>&nbsp;            	System.exit(0);
+<i>235</i>&nbsp;                return;
+<i>236</i>&nbsp;            }
+<i>237</i>&nbsp;            try {
+<i>238</i>&nbsp;            	arguments.parseArguments(new String[] {&quot;-burnin&quot;, dialog.burninText.getText(), &quot;-HPD&quot;, dialog.HPDPercentageText.getText()});
+<i>239</i>&nbsp;            } catch (Exception e) {
+<i>240</i>&nbsp;				e.printStackTrace();
+<i>241</i>&nbsp;				System.exit(0);
+<i>242</i>&nbsp;			}
+<i>243</i>&nbsp;            inputFile = dialog.getInputFile();
+<i>244</i>&nbsp;        } else {
+<i>245</i>&nbsp;           	inputFile = new File(arguments.getStringOption(&quot;file&quot;));
+<i>246</i>&nbsp;        }
+<i>247</i>&nbsp;
+<i>248</i>&nbsp;        if (inputFile == null) {
+<i>249</i>&nbsp;
+<i>250</i>&nbsp;//            String[] args2 = arguments.getLeftoverArguments();
+<i>251</i>&nbsp;//
+<i>252</i>&nbsp;//            if (args2.length &gt; 1) {
+<i>253</i>&nbsp;//                System.err.println(&quot;Unknown option: &quot; + args2[1]);
+<i>254</i>&nbsp;//                System.err.println();
+<i>255</i>&nbsp;                printUsage(arguments);
+<i>256</i>&nbsp;//                return;
+<i>257</i>&nbsp;//            }
+<i>258</i>&nbsp;//
+<i>259</i>&nbsp;//            String inputFileName = null;
+<i>260</i>&nbsp;//
+<i>261</i>&nbsp;//
+<i>262</i>&nbsp;//            if (args2.length &gt; 0) {
+<i>263</i>&nbsp;//                inputFileName = args2[0];
+<i>264</i>&nbsp;//                inputFile = new File(inputFileName);
+<i>265</i>&nbsp;//            }
+<i>266</i>&nbsp;//
+<i>267</i>&nbsp;//            if (inputFileName == null) {
+<i>268</i>&nbsp;//                // No input file name was given so throw up a dialog box...
+<i>269</i>&nbsp;//                inputFile = new File(getFileNameByDialog(&quot;BEAST &quot; + version.getVersionString() + &quot; - Select XML input file&quot;));
+<i>270</i>&nbsp;//            }
+<i>271</i>&nbsp;        }
+<i>272</i>&nbsp;
+<i>273</i>&nbsp;        if (inputFile != null &amp;&amp; inputFile.getParent() != null &amp;&amp; working) {
+<i>274</i>&nbsp;            System.setProperty(&quot;user.dir&quot;, inputFile.getParent());
+<i>275</i>&nbsp;        }
+<i>276</i>&nbsp;
+<i>277</i>&nbsp;        if (window) {
+<i>278</i>&nbsp;            if (inputFile == null) {
+<i>279</i>&nbsp;                consoleApp.setTitle(&quot;null&quot;);
+<i>280</i>&nbsp;            } else {
+<i>281</i>&nbsp;                consoleApp.setTitle(inputFile.getName());
+<i>282</i>&nbsp;            }
+<i>283</i>&nbsp;        }
+<i>284</i>&nbsp;
+<i>285</i>&nbsp;        try {
+<i>286</i>&nbsp;			NexusParser parser = new NexusParser();
+<i>287</i>&nbsp;			parser.parseFile(new File(inputFile.getAbsolutePath()));
+<i>288</i>&nbsp;			double burnInpercentage = arguments.getIntegerOption(&quot;burnin&quot;);
+<i>289</i>&nbsp;			double HPDpercentage = arguments.getIntegerOption(&quot;HPD&quot;);
+<i>290</i>&nbsp;	        
+<i>291</i>&nbsp;	        TreeTraceAnalysis analyser = new TreeTraceAnalysis(parser.trees, burnInpercentage);
+<i>292</i>&nbsp;            analyser.analyze(HPDpercentage);
+<i>293</i>&nbsp;       		new TreeSetAnalyser(analyser, consoleApp, maxErrorCount);
+<i>294</i>&nbsp;       } catch (RuntimeException rte) {
+<i>295</i>&nbsp;            if (window) {
+<i>296</i>&nbsp;                // This sleep for 2 seconds is to ensure that the final message
+<i>297</i>&nbsp;                // appears at the end of the console.
+<i>298</i>&nbsp;                try {
+<i>299</i>&nbsp;                    Thread.sleep(2000);
+<i>300</i>&nbsp;                } catch (InterruptedException e) {
+<i>301</i>&nbsp;                    e.printStackTrace();
+<i>302</i>&nbsp;                }
+<i>303</i>&nbsp;                System.out.println();
+<i>304</i>&nbsp;                System.out.println(&quot;TreeSetAnalyser has terminated with an error. Please select QUIT from the menu.&quot;);
+<i>305</i>&nbsp;            }
+<i>306</i>&nbsp;            // logger.severe will throw a RTE but we want to keep the console visible
+<i>307</i>&nbsp;        } catch (Exception e) {
+<i>308</i>&nbsp;        	e.printStackTrace();
+<i>309</i>&nbsp;        }
+<i>310</i>&nbsp;
+<i>311</i>&nbsp;        if (!window) {
+<i>312</i>&nbsp;            System.exit(0);
+<i>313</i>&nbsp;        }
+<i>314</i>&nbsp;    }
+<i>315</i>&nbsp;}
+<i>316</i>&nbsp;
+<i>317</i>&nbsp;
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

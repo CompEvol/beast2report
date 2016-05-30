@@ -1,0 +1,436 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TreeAnnotatorDialog</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.treeannotator</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TreeAnnotatorDialog (beast.app.treeannotator)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TreeAnnotatorDialog</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 95)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TreeAnnotatorDialog$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TreeAnnotatorDialog$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TreeAnnotatorDialog$3</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TreeAnnotatorDialog$4</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TreeAnnotatorDialog$5</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 123)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp; * TreeAnnotatorDialog.java
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; * Copyright (C) 2002-2006 Alexei Drummond and Andrew Rambaut
+<i>5</i>&nbsp; *
+<i>6</i>&nbsp; * This file is part of BEAST.
+<i>7</i>&nbsp; * See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp; * information regarding copyright ownership and licensing.
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; * BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp; * it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp; * published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp; * of the License, or (at your option) any later version.
+<i>14</i>&nbsp; *
+<i>15</i>&nbsp; *  BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp; *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp; *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp; *  GNU Lesser General Public License for more details.
+<i>19</i>&nbsp; *
+<i>20</i>&nbsp; * You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp; * License along with BEAST; if not, write to the
+<i>22</i>&nbsp; * Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp; * Boston, MA  02110-1301  USA
+<i>24</i>&nbsp; */
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;package beast.app.treeannotator;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;import java.awt.BorderLayout;
+<i>29</i>&nbsp;import java.awt.Color;
+<i>30</i>&nbsp;import java.awt.FileDialog;
+<i>31</i>&nbsp;import java.awt.event.ItemEvent;
+<i>32</i>&nbsp;import java.awt.event.ItemListener;
+<i>33</i>&nbsp;import java.io.File;
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;import javax.swing.BorderFactory;
+<i>36</i>&nbsp;import javax.swing.JButton;
+<i>37</i>&nbsp;import javax.swing.JCheckBox;
+<i>38</i>&nbsp;import javax.swing.JComboBox;
+<i>39</i>&nbsp;import javax.swing.JDialog;
+<i>40</i>&nbsp;import javax.swing.JFrame;
+<i>41</i>&nbsp;import javax.swing.JLabel;
+<i>42</i>&nbsp;import javax.swing.JOptionPane;
+<i>43</i>&nbsp;import javax.swing.JPanel;
+<i>44</i>&nbsp;import javax.swing.JTextField;
+<i>45</i>&nbsp;import javax.swing.UIManager;
+<i>46</i>&nbsp;import javax.swing.border.Border;
+<i>47</i>&nbsp;import javax.swing.border.EmptyBorder;
+<i>48</i>&nbsp;
+<i>49</i>&nbsp;import beast.app.util.WholeNumberField;
+<i>50</i>&nbsp;import jam.panels.OptionsPanel;
+<i>51</i>&nbsp;
+<b class="nc"><i>52</i>&nbsp;public class TreeAnnotatorDialog {</b>
+<i>53</i>&nbsp;	private JFrame frame;
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;	private OptionsPanel optionPanel;
+<i>56</i>&nbsp;
+<b class="nc"><i>57</i>&nbsp;    private WholeNumberField burninText = new WholeNumberField(0, Integer.MAX_VALUE);</b>
+<b class="nc"><i>58</i>&nbsp;	private RealNumberField limitText = new RealNumberField(0.0, 1.0);</b>
+<i>59</i>&nbsp;
+<b class="nc"><i>60</i>&nbsp;    private JComboBox&lt;TreeAnnotator.Target&gt; summaryTreeCombo = new JComboBox&lt;&gt;(TreeAnnotator.Target.values());</b>
+<i>61</i>&nbsp;
+<b class="nc"><i>62</i>&nbsp;    private JComboBox&lt;TreeAnnotator.HeightsSummary&gt; nodeHeightsCombo = new JComboBox&lt;&gt;(TreeAnnotator.HeightsSummary.values());</b>
+<i>63</i>&nbsp;
+<b class="nc"><i>64</i>&nbsp;    private JCheckBox lowMemCheckbox = new JCheckBox();</b>
+<i>65</i>&nbsp;    
+<b class="nc"><i>66</i>&nbsp;	private File targetFile = null;</b>
+<b class="nc"><i>67</i>&nbsp;	private File inputFile = null;</b>
+<b class="nc"><i>68</i>&nbsp;	private File outputFile = null;</b>
+<i>69</i>&nbsp;
+<b class="nc"><i>70</i>&nbsp;	public TreeAnnotatorDialog(final JFrame frame) {</b>
+<b class="nc"><i>71</i>&nbsp;		this.frame = frame;</b>
+<i>72</i>&nbsp;
+<b class="nc"><i>73</i>&nbsp;		optionPanel = new OptionsPanel(12, 12);</b>
+<i>74</i>&nbsp;
+<b class="nc"><i>75</i>&nbsp;		this.frame = frame;</b>
+<i>76</i>&nbsp;
+<b class="nc"><i>77</i>&nbsp;		JPanel panel = new JPanel(new BorderLayout());</b>
+<b class="nc"><i>78</i>&nbsp;		panel.setOpaque(false);</b>
+<i>79</i>&nbsp;
+<b class="nc"><i>80</i>&nbsp;        burninText.setColumns(12);</b>
+<b class="nc"><i>81</i>&nbsp;        burninText.setValue(0);</b>
+<b class="nc"><i>82</i>&nbsp;        optionPanel.addComponentWithLabel(&quot;Burnin percentage: &quot;, burninText);</b>
+<i>83</i>&nbsp;
+<b class="nc"><i>84</i>&nbsp;		limitText.setColumns(12);</b>
+<b class="nc"><i>85</i>&nbsp;		limitText.setValue(0.0);</b>
+<b class="nc"><i>86</i>&nbsp;		optionPanel.addComponentWithLabel(&quot;Posterior probability limit: &quot;, limitText);</b>
+<i>87</i>&nbsp;
+<b class="nc"><i>88</i>&nbsp;        optionPanel.addComponentWithLabel(&quot;Target tree type: &quot;, summaryTreeCombo);</b>
+<b class="nc"><i>89</i>&nbsp;        optionPanel.addComponentWithLabel(&quot;Node heights: &quot;, nodeHeightsCombo);</b>
+<i>90</i>&nbsp;
+<b class="nc"><i>91</i>&nbsp;        optionPanel.addSeparator();</b>
+<i>92</i>&nbsp;
+<b class="nc"><i>93</i>&nbsp;        final JButton targetFileButton = new JButton(&quot;Choose File...&quot;);</b>
+<b class="nc"><i>94</i>&nbsp;		final JTextField targetFileNameText = new JTextField(&quot;not selected&quot;, 16);</b>
+<i>95</i>&nbsp;
+<b class="nc"><i>96</i>&nbsp;		targetFileButton.addActionListener(ae -&gt; {</b>
+<b class="nc"><i>97</i>&nbsp;				FileDialog dialog = new FileDialog(frame,</b>
+<i>98</i>&nbsp;						&quot;Select target file...&quot;,
+<i>99</i>&nbsp;						FileDialog.LOAD);
+<i>100</i>&nbsp;
+<b class="nc"><i>101</i>&nbsp;				dialog.setVisible(true);</b>
+<b class="nc"><i>102</i>&nbsp;				if (dialog.getFile() == null) {</b>
+<i>103</i>&nbsp;					// the dialog was cancelled...
+<b class="nc"><i>104</i>&nbsp;					return;</b>
+<i>105</i>&nbsp;				}
+<i>106</i>&nbsp;
+<b class="nc"><i>107</i>&nbsp;				targetFile = new File(dialog.getDirectory(), dialog.getFile());</b>
+<b class="nc"><i>108</i>&nbsp;				targetFileNameText.setText(targetFile.getName());</b>
+<i>109</i>&nbsp;
+<b class="nc"><i>110</i>&nbsp;			});</b>
+<b class="nc"><i>111</i>&nbsp;		targetFileNameText.setEditable(false);</b>
+<i>112</i>&nbsp;
+<b class="nc"><i>113</i>&nbsp;		JPanel panel1 = new JPanel(new BorderLayout(0,0));</b>
+<b class="nc"><i>114</i>&nbsp;		panel1.add(targetFileNameText, BorderLayout.CENTER);</b>
+<b class="nc"><i>115</i>&nbsp;		panel1.add(targetFileButton, BorderLayout.EAST);</b>
+<b class="nc"><i>116</i>&nbsp;		final JLabel label1 = optionPanel.addComponentWithLabel(&quot;Target Tree File: &quot;, panel1);</b>
+<i>117</i>&nbsp;
+<b class="nc"><i>118</i>&nbsp;		JButton inputFileButton = new JButton(&quot;Choose File...&quot;);</b>
+<b class="nc"><i>119</i>&nbsp;		final JTextField inputFileNameText = new JTextField(&quot;not selected&quot;, 16);</b>
+<i>120</i>&nbsp;
+<b class="nc"><i>121</i>&nbsp;		inputFileButton.addActionListener(ae -&gt; {</b>
+<b class="nc"><i>122</i>&nbsp;				FileDialog dialog = new FileDialog(frame,</b>
+<i>123</i>&nbsp;						&quot;Select input tree file...&quot;,
+<i>124</i>&nbsp;						FileDialog.LOAD);
+<i>125</i>&nbsp;
+<b class="nc"><i>126</i>&nbsp;				dialog.setVisible(true);</b>
+<b class="nc"><i>127</i>&nbsp;				if (dialog.getFile() == null) {</b>
+<i>128</i>&nbsp;					// the dialog was cancelled...
+<b class="nc"><i>129</i>&nbsp;					return;</b>
+<i>130</i>&nbsp;				}
+<i>131</i>&nbsp;
+<b class="nc"><i>132</i>&nbsp;				inputFile = new File(dialog.getDirectory(), dialog.getFile());</b>
+<b class="nc"><i>133</i>&nbsp;				inputFileNameText.setText(inputFile.getName());</b>
+<i>134</i>&nbsp;
+<b class="nc"><i>135</i>&nbsp;			});</b>
+<b class="nc"><i>136</i>&nbsp;		inputFileNameText.setEditable(false);</b>
+<b class="nc"><i>137</i>&nbsp;</b>
+<b class="nc"><i>138</i>&nbsp;        label1.setEnabled(false);</b>
+<b class="nc"><i>139</i>&nbsp;        targetFileNameText.setEnabled(false);</b>
+<b class="nc"><i>140</i>&nbsp;        targetFileButton.setEnabled(false);</b>
+<i>141</i>&nbsp;
+<b class="nc"><i>142</i>&nbsp;        summaryTreeCombo.addItemListener(new ItemListener() {</b>
+<i>143</i>&nbsp;            @Override
+<i>144</i>&nbsp;			public void itemStateChanged(ItemEvent itemEvent) {
+<b class="nc"><i>145</i>&nbsp;                boolean selected = summaryTreeCombo.getSelectedItem().toString().equals(&quot;User target tree&quot;);</b>
+<b class="nc"><i>146</i>&nbsp;                label1.setEnabled(selected);</b>
+<b class="nc"><i>147</i>&nbsp;                targetFileNameText.setEnabled(selected);</b>
+<b class="nc"><i>148</i>&nbsp;                targetFileButton.setEnabled(selected);</b>
+<b class="nc"><i>149</i>&nbsp;            }</b>
+<i>150</i>&nbsp;        });
+<b class="nc"><i>151</i>&nbsp;</b>
+<b class="nc"><i>152</i>&nbsp;        JPanel panel2 = new JPanel(new BorderLayout(0,0));</b>
+<b class="nc"><i>153</i>&nbsp;		panel2.add(inputFileNameText, BorderLayout.CENTER);</b>
+<b class="nc"><i>154</i>&nbsp;		panel2.add(inputFileButton, BorderLayout.EAST);</b>
+<i>155</i>&nbsp;
+<b class="nc"><i>156</i>&nbsp;        Color focusColor = UIManager.getColor(&quot;Focus.color&quot;);</b>
+<b class="nc"><i>157</i>&nbsp;        Border focusBorder = BorderFactory.createMatteBorder( 2, 2, 2, 2, focusColor );</b>
+<b class="nc"><i>158</i>&nbsp;        new FileDrop( null, inputFileNameText, focusBorder, new FileDrop.Listener()</b>
+<b class="nc"><i>159</i>&nbsp;        {   @Override</b>
+<i>160</i>&nbsp;		public void filesDropped( java.io.File[] files )
+<b class="nc"><i>161</i>&nbsp;            {</b>
+<b class="nc"><i>162</i>&nbsp;                inputFile = files[0];</b>
+<b class="nc"><i>163</i>&nbsp;                inputFileNameText.setText(inputFile.getName());</b>
+<b class="nc"><i>164</i>&nbsp;            }   // end filesDropped</b>
+<i>165</i>&nbsp;        }); // end FileDrop.Listener
+<i>166</i>&nbsp;
+<b class="nc"><i>167</i>&nbsp;        optionPanel.addComponentWithLabel(&quot;Input Tree File: &quot;, panel2);</b>
+<b class="nc"><i>168</i>&nbsp;</b>
+<b class="nc"><i>169</i>&nbsp;		JButton outputFileButton = new JButton(&quot;Choose File...&quot;);</b>
+<b class="nc"><i>170</i>&nbsp;		final JTextField outputFileNameText = new JTextField(&quot;not selected&quot;, 16);</b>
+<i>171</i>&nbsp;
+<b class="nc"><i>172</i>&nbsp;		outputFileButton.addActionListener(ae -&gt; {</b>
+<b class="nc"><i>173</i>&nbsp;				FileDialog dialog = new FileDialog(frame,</b>
+<b class="nc"><i>174</i>&nbsp;						&quot;Select output file...&quot;,</b>
+<i>175</i>&nbsp;						FileDialog.SAVE);
+<b class="nc"><i>176</i>&nbsp;</b>
+<b class="nc"><i>177</i>&nbsp;				dialog.setVisible(true);</b>
+<b class="nc"><i>178</i>&nbsp;				if (dialog.getFile() == null) {</b>
+<i>179</i>&nbsp;					// the dialog was cancelled...
+<b class="nc"><i>180</i>&nbsp;					return;</b>
+<i>181</i>&nbsp;				}
+<i>182</i>&nbsp;
+<b class="nc"><i>183</i>&nbsp;				outputFile = new File(dialog.getDirectory(), dialog.getFile());</b>
+<b class="nc"><i>184</i>&nbsp;				outputFileNameText.setText(outputFile.getName());</b>
+<i>185</i>&nbsp;
+<b class="nc"><i>186</i>&nbsp;			});</b>
+<b class="nc"><i>187</i>&nbsp;		outputFileNameText.setEditable(false);</b>
+<i>188</i>&nbsp;
+<b class="nc"><i>189</i>&nbsp;		JPanel panel3 = new JPanel(new BorderLayout(0,0));</b>
+<b class="nc"><i>190</i>&nbsp;		panel3.add(outputFileNameText, BorderLayout.CENTER);</b>
+<b class="nc"><i>191</i>&nbsp;		panel3.add(outputFileButton, BorderLayout.EAST);</b>
+<b class="nc"><i>192</i>&nbsp;		optionPanel.addComponentWithLabel(&quot;Output File: &quot;, panel3);</b>
+<i>193</i>&nbsp;
+<b class="nc"><i>194</i>&nbsp;		optionPanel.addComponentWithLabel(&quot;Low memory: &quot;, lowMemCheckbox);</b>
+<b class="nc"><i>195</i>&nbsp;	}</b>
+<i>196</i>&nbsp;
+<i>197</i>&nbsp;	public boolean showDialog(String title) {
+<i>198</i>&nbsp;
+<b class="nc"><i>199</i>&nbsp;		JOptionPane optionPane = new JOptionPane(optionPanel,</b>
+<i>200</i>&nbsp;				JOptionPane.PLAIN_MESSAGE,
+<i>201</i>&nbsp;				JOptionPane.OK_CANCEL_OPTION,
+<i>202</i>&nbsp;				null,
+<i>203</i>&nbsp;				new String[] { &quot;Run&quot;, &quot;Quit&quot; },
+<i>204</i>&nbsp;				null);
+<b class="nc"><i>205</i>&nbsp;		optionPane.setBorder(new EmptyBorder(12, 12, 12, 12));</b>
+<i>206</i>&nbsp;
+<b class="nc"><i>207</i>&nbsp;		final JDialog dialog = optionPane.createDialog(frame, title);</b>
+<i>208</i>&nbsp;		//dialog.setResizable(true);
+<b class="nc"><i>209</i>&nbsp;		dialog.pack();</b>
+<i>210</i>&nbsp;
+<b class="nc"><i>211</i>&nbsp;		dialog.setVisible(true);</b>
+<i>212</i>&nbsp;
+<b class="nc"><i>213</i>&nbsp;		return optionPane.getValue().equals(&quot;Run&quot;);</b>
+<i>214</i>&nbsp;	}
+<i>215</i>&nbsp;
+<i>216</i>&nbsp;    public int getBurninPercentage() {
+<b class="nc"><i>217</i>&nbsp;        return burninText.getValue();</b>
+<i>218</i>&nbsp;    }
+<i>219</i>&nbsp;
+<i>220</i>&nbsp;	public double getPosteriorLimit() {
+<b class="nc"><i>221</i>&nbsp;		return limitText.getValue();</b>
+<i>222</i>&nbsp;	}
+<i>223</i>&nbsp;
+<i>224</i>&nbsp;    public TreeAnnotator.Target getTargetOption() {
+<b class="nc"><i>225</i>&nbsp;        return (TreeAnnotator.Target)summaryTreeCombo.getSelectedItem();</b>
+<i>226</i>&nbsp;    }
+<i>227</i>&nbsp;
+<i>228</i>&nbsp;    public TreeAnnotator.HeightsSummary getHeightsOption() {
+<b class="nc"><i>229</i>&nbsp;        return (TreeAnnotator.HeightsSummary)nodeHeightsCombo.getSelectedItem();</b>
+<i>230</i>&nbsp;    }
+<i>231</i>&nbsp;
+<i>232</i>&nbsp;    public String getTargetFileName() {
+<b class="nc"><i>233</i>&nbsp;		if (targetFile == null) return null;</b>
+<b class="nc"><i>234</i>&nbsp;		return targetFile.getPath();</b>
+<i>235</i>&nbsp;	}
+<i>236</i>&nbsp;
+<i>237</i>&nbsp;	public String getInputFileName() {
+<b class="nc"><i>238</i>&nbsp;		if (inputFile == null) return null;</b>
+<b class="nc"><i>239</i>&nbsp;		return inputFile.getPath();</b>
+<i>240</i>&nbsp;	}
+<i>241</i>&nbsp;
+<i>242</i>&nbsp;	public String getOutputFileName() {
+<b class="nc"><i>243</i>&nbsp;		if (outputFile == null) return null;</b>
+<b class="nc"><i>244</i>&nbsp;		return outputFile.getPath();</b>
+<i>245</i>&nbsp;	}
+<i>246</i>&nbsp;
+<i>247</i>&nbsp;	public boolean useLowMem() {
+<b class="nc"><i>248</i>&nbsp;		return lowMemCheckbox.isSelected();</b>
+<i>249</i>&nbsp;	}
+<i>250</i>&nbsp;
+<i>251</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

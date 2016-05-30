@@ -1,0 +1,795 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TreeParser</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.util</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TreeParser (beast.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TreeParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    61.5%
+  </span>
+  <span class="absValue">
+    (8/ 13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    65.8%
+  </span>
+  <span class="absValue">
+    (96/ 146)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TreeParser$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/ 2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TreeParser$NewickASTVisitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/ 8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.4%
+  </span>
+  <span class="absValue">
+    (103/ 114)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    73.9%
+  </span>
+  <span class="absValue">
+    (17/ 23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.3%
+  </span>
+  <span class="absValue">
+    (200/ 262)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;* File TreeParser.java
+<i>3</i>&nbsp;*
+<i>4</i>&nbsp;* Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>5</i>&nbsp;*
+<i>6</i>&nbsp;* This file is part of BEAST2.
+<i>7</i>&nbsp;* See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp;* information regarding copyright ownership and licensing.
+<i>9</i>&nbsp;*
+<i>10</i>&nbsp;* BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp;* it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp;* published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp;* of the License, or (at your option) any later version.
+<i>14</i>&nbsp;*
+<i>15</i>&nbsp;*  BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp;*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp;*  GNU Lesser General Public License for more details.
+<i>19</i>&nbsp;*
+<i>20</i>&nbsp;* You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp;* License along with BEAST; if not, write to the
+<i>22</i>&nbsp;* Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp;* Boston, MA  02110-1301  USA
+<i>24</i>&nbsp;*/
+<i>25</i>&nbsp;package beast.util;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;import java.text.DecimalFormat;
+<i>28</i>&nbsp;import java.util.ArrayList;
+<i>29</i>&nbsp;import java.util.Arrays;
+<i>30</i>&nbsp;import java.util.BitSet;
+<i>31</i>&nbsp;import java.util.List;
+<i>32</i>&nbsp;import java.util.Map;
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;import org.antlr.v4.runtime.ANTLRInputStream;
+<i>35</i>&nbsp;import org.antlr.v4.runtime.BaseErrorListener;
+<i>36</i>&nbsp;import org.antlr.v4.runtime.CommonTokenStream;
+<i>37</i>&nbsp;import org.antlr.v4.runtime.RecognitionException;
+<i>38</i>&nbsp;import org.antlr.v4.runtime.Recognizer;
+<i>39</i>&nbsp;import org.antlr.v4.runtime.misc.NotNull;
+<i>40</i>&nbsp;import org.antlr.v4.runtime.misc.ParseCancellationException;
+<i>41</i>&nbsp;import org.antlr.v4.runtime.tree.ParseTree;
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;import beast.core.Description;
+<i>44</i>&nbsp;import beast.core.Input;
+<i>45</i>&nbsp;import beast.core.StateNode;
+<i>46</i>&nbsp;import beast.core.StateNodeInitialiser;
+<i>47</i>&nbsp;import beast.core.util.Log;
+<i>48</i>&nbsp;import beast.evolution.alignment.Alignment;
+<i>49</i>&nbsp;import beast.evolution.alignment.Taxon;
+<i>50</i>&nbsp;import beast.evolution.alignment.TaxonSet;
+<i>51</i>&nbsp;import beast.evolution.tree.Node;
+<i>52</i>&nbsp;import beast.evolution.tree.Tree;
+<i>53</i>&nbsp;import beast.evolution.tree.TreeUtils;
+<i>54</i>&nbsp;import beast.util.treeparser.NewickBaseVisitor;
+<i>55</i>&nbsp;import beast.util.treeparser.NewickLexer;
+<i>56</i>&nbsp;import beast.util.treeparser.NewickParser;
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;@Description(&quot;Create beast.tree by parsing from a specification of a beast.tree in Newick format &quot; +
+<i>59</i>&nbsp;        &quot;(includes parsing of any meta data in the Newick string).&quot;)
+<b class="fc"><i>60</i>&nbsp;public class TreeParser extends Tree implements StateNodeInitialiser {</b>
+<i>61</i>&nbsp;    /**
+<i>62</i>&nbsp;     * default beast.tree branch length, used when that info is not in the Newick beast.tree
+<i>63</i>&nbsp;     */
+<i>64</i>&nbsp;    final static double DEFAULT_LENGTH = 0.001f;
+<i>65</i>&nbsp;
+<i>66</i>&nbsp;    /**
+<i>67</i>&nbsp;     * labels of leafs, order of this list corresponds to node numbers
+<i>68</i>&nbsp;     */
+<b class="fc"><i>69</i>&nbsp;    List&lt;String&gt; labels = null;</b>
+<i>70</i>&nbsp;
+<i>71</i>&nbsp;    /**
+<i>72</i>&nbsp;     * for memory saving, set to true *
+<i>73</i>&nbsp;     */
+<b class="fc"><i>74</i>&nbsp;    final boolean suppressMetadata = false;</b>
+<i>75</i>&nbsp;
+<i>76</i>&nbsp;    /**
+<i>77</i>&nbsp;     * This solves issues where the taxa labels are numbers (in generated
+<i>78</i>&nbsp;     * beast.tree data for example).
+<i>79</i>&nbsp;     */
+<b class="fc"><i>80</i>&nbsp;    public final Input&lt;Boolean&gt; isLabelledNewickInput = new Input&lt;&gt;(</b>
+<i>81</i>&nbsp;            &quot;IsLabelledNewick&quot;,
+<b class="fc"><i>82</i>&nbsp;            &quot;Is the newick tree labelled (alternatively contains node numbers)? Default=false.&quot;, false);</b>
+<i>83</i>&nbsp;
+<b class="fc"><i>84</i>&nbsp;    public final Input&lt;Alignment&gt; dataInput = new Input&lt;&gt;(&quot;taxa&quot;,</b>
+<i>85</i>&nbsp;            &quot;Specifies the list of taxa represented by leaves in the beast.tree&quot;);
+<b class="fc"><i>86</i>&nbsp;    public final Input&lt;String&gt; newickInput = new Input&lt;&gt;(&quot;newick&quot;,</b>
+<i>87</i>&nbsp;            &quot;initial beast.tree represented in newick format&quot;);// not required, Beauti may need this for example
+<b class="fc"><i>88</i>&nbsp;    public final Input&lt;Integer&gt; offsetInput = new Input&lt;&gt;(&quot;offset&quot;,</b>
+<b class="fc"><i>89</i>&nbsp;            &quot;offset if numbers are used for taxa (offset=the lowest taxa number) default=1&quot;, 1);</b>
+<b class="fc"><i>90</i>&nbsp;    public final Input&lt;Double&gt; thresholdInput = new Input&lt;&gt;(&quot;threshold&quot;,</b>
+<b class="fc"><i>91</i>&nbsp;            &quot;threshold under which node heights (derived from lengths) are set to zero. Default=0.&quot;, 0.0);</b>
+<b class="fc"><i>92</i>&nbsp;    public final Input&lt;Boolean&gt; allowSingleChildInput = new Input&lt;&gt;(</b>
+<i>93</i>&nbsp;            &quot;singlechild&quot;,
+<b class="fc"><i>94</i>&nbsp;            &quot;flag to indicate that single child nodes are allowed. Default=true.&quot;, true);</b>
+<b class="fc"><i>95</i>&nbsp;    public final Input&lt;Boolean&gt; adjustTipHeightsInput = new Input&lt;&gt;(</b>
+<i>96</i>&nbsp;            &quot;adjustTipHeights&quot;,
+<b class="fc"><i>97</i>&nbsp;            &quot;flag to indicate if tipHeights shall be adjusted when date traits missing. Default=true.&quot;, true);</b>
+<b class="fc"><i>98</i>&nbsp;    public final Input&lt;Double&gt; scaleInput = new Input&lt;&gt;(&quot;scale&quot;,</b>
+<i>99</i>&nbsp;            &quot;scale used to multiply internal node heights during parsing. Useful for importing starting from external&quot; +
+<b class="fc"><i>100</i>&nbsp;                    &quot; programs, for instance, RaxML tree rooted using Path-o-gen.&quot;, 1.0);</b>
+<i>101</i>&nbsp;
+<b class="fc"><i>102</i>&nbsp;    boolean createUnrecognizedTaxa = false;</b>
+<i>103</i>&nbsp;
+<i>104</i>&nbsp;    /**
+<i>105</i>&nbsp;     * Flag to indicate whether integer leaf labels have been used.  If
+<i>106</i>&nbsp;     * they have, these will be used to interpret Nexus label translation maps
+<i>107</i>&nbsp;     * in place of the node numbers.
+<i>108</i>&nbsp;     */
+<b class="fc"><i>109</i>&nbsp;    boolean integerLeafLabels = true;</b>
+<i>110</i>&nbsp;
+<i>111</i>&nbsp;    /**
+<i>112</i>&nbsp;     * Ensure the class behaves properly, even when inputs are not specified.
+<i>113</i>&nbsp;     */
+<i>114</i>&nbsp;    @Override
+<i>115</i>&nbsp;    public void initAndValidate() {
+<b class="fc"><i>116</i>&nbsp;    	boolean sortNodesAlphabetically = false;</b>
+<i>117</i>&nbsp;
+<b class="fc"><i>118</i>&nbsp;        if (dataInput.get() != null) {</b>
+<b class="nc"><i>119</i>&nbsp;            labels = dataInput.get().getTaxaNames();</b>
+<b class="fc"><i>120</i>&nbsp;        } else if (m_taxonset.get() != null) {</b>
+<b class="fc"><i>121</i>&nbsp;        	if (labels == null) {</b>
+<b class="nc"><i>122</i>&nbsp;        		labels = m_taxonset.get().asStringList();</b>
+<i>123</i>&nbsp;        	} else { // else labels were set by TreeParser c&#39;tor
+<b class="fc"><i>124</i>&nbsp;        		sortNodesAlphabetically = true;</b>
+<i>125</i>&nbsp;        	}
+<i>126</i>&nbsp;        } else {
+<b class="fc"><i>127</i>&nbsp;            if (isLabelledNewickInput.get()) {</b>
+<b class="fc"><i>128</i>&nbsp;                if (m_initial.get() != null) {</b>
+<b class="nc"><i>129</i>&nbsp;                    labels = m_initial.get().getTaxonset().asStringList();</b>
+<i>130</i>&nbsp;                } else {
+<b class="fc"><i>131</i>&nbsp;                    labels = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>132</i>&nbsp;                    createUnrecognizedTaxa = true;</b>
+<b class="fc"><i>133</i>&nbsp;            		sortNodesAlphabetically = true;</b>
+<i>134</i>&nbsp;                }
+<i>135</i>&nbsp;            } else {
+<b class="fc"><i>136</i>&nbsp;                if (m_initial.get() != null) {</b>
+<i>137</i>&nbsp;                    // try to pick up taxa from initial tree
+<b class="nc"><i>138</i>&nbsp;                    final Tree tree = m_initial.get();</b>
+<b class="nc"><i>139</i>&nbsp;                    if (tree.m_taxonset.get() != null) {</b>
+<b class="nc"><i>140</i>&nbsp;                        labels = tree.m_taxonset.get().asStringList();</b>
+<i>141</i>&nbsp;                    } else {
+<i>142</i>&nbsp;                        // m_sLabels = null;
+<i>143</i>&nbsp;                    }
+<i>144</i>&nbsp;                } else {
+<i>145</i>&nbsp;                    // m_sLabels = null;
+<i>146</i>&nbsp;                }
+<i>147</i>&nbsp;            }
+<i>148</i>&nbsp;//            m_bIsLabelledNewick = false;
+<i>149</i>&nbsp;        }
+<b class="fc"><i>150</i>&nbsp;        final String newick = newickInput.get();</b>
+<b class="fc"><i>151</i>&nbsp;        if (newick == null || newick.equals(&quot;&quot;)) {</b>
+<i>152</i>&nbsp;            // can happen while initalising Beauti
+<b class="nc"><i>153</i>&nbsp;            final Node dummy = new Node();</b>
+<b class="nc"><i>154</i>&nbsp;            setRoot(dummy);</b>
+<b class="nc"><i>155</i>&nbsp;        } else {</b>
+<i>156</i>&nbsp;            try {
+<b class="fc"><i>157</i>&nbsp;                setRoot(parseNewick(newickInput.get()));</b>
+<b class="fc"><i>158</i>&nbsp;            } catch (ParseCancellationException e) {</b>
+<b class="fc"><i>159</i>&nbsp;                throw new RuntimeException(</b>
+<i>160</i>&nbsp;                        &quot;TreeParser cannot make sense of the Newick string &quot; +
+<i>161</i>&nbsp;                                &quot;provided.  It gives the following clue:\n&quot; +
+<b class="fc"><i>162</i>&nbsp;                                e.getMessage());</b>
+<b class="fc"><i>163</i>&nbsp;            }</b>
+<i>164</i>&nbsp;        }
+<i>165</i>&nbsp;
+<b class="fc"><i>166</i>&nbsp;        super.initAndValidate();</b>
+<i>167</i>&nbsp;        
+<b class="fc"><i>168</i>&nbsp;        if (sortNodesAlphabetically) {</b>
+<i>169</i>&nbsp;	        // correct for node ordering: ensure order is alphabetical
+<b class="fc"><i>170</i>&nbsp;	        for (int i = 0; i &lt; getNodeCount() &amp;&amp; i &lt; labels.size(); i++) {</b>
+<b class="fc"><i>171</i>&nbsp;	       		m_nodes[i].setID(labels.get(i));</b>
+<i>172</i>&nbsp;	        }
+<i>173</i>&nbsp;
+<b class="fc"><i>174</i>&nbsp;	        Node [] nodes = new Node[labels.size()];</b>
+<b class="fc"><i>175</i>&nbsp;            System.arraycopy(m_nodes, 0, nodes, 0, labels.size());</b>
+<i>176</i>&nbsp;
+<b class="fc"><i>177</i>&nbsp;	        Arrays.sort(nodes, (o1, o2) -&gt; o1.getID().compareTo(o2.getID()));</b>
+<b class="fc"><i>178</i>&nbsp;	        for (int i = 0; i &lt; labels.size(); i++) {</b>
+<b class="fc"><i>179</i>&nbsp;	        	m_nodes[i] = nodes[i];</b>
+<b class="fc"><i>180</i>&nbsp;	        	nodes[i].setNr(i);</b>
+<i>181</i>&nbsp;	        }
+<i>182</i>&nbsp;        }
+<i>183</i>&nbsp;        
+<i>184</i>&nbsp;        
+<b class="fc"><i>185</i>&nbsp;        if (m_initial.get() != null)</b>
+<b class="nc"><i>186</i>&nbsp;            processTraits(m_initial.get().m_traitList.get());</b>
+<i>187</i>&nbsp;        else
+<b class="fc"><i>188</i>&nbsp;            processTraits(m_traitList.get());</b>
+<i>189</i>&nbsp;
+<b class="fc"><i>190</i>&nbsp;        if (timeTraitSet != null) {</b>
+<b class="nc"><i>191</i>&nbsp;            adjustTreeNodeHeights(root);</b>
+<b class="fc"><i>192</i>&nbsp;        } else if (adjustTipHeightsInput.get()) {</b>
+<i>193</i>&nbsp;
+<b class="nc"><i>194</i>&nbsp;            double treeLength = TreeUtils.getTreeLength(this,getRoot());</b>
+<i>195</i>&nbsp;
+<b class="nc"><i>196</i>&nbsp;            double extraTreeLength = 0.0;</b>
+<b class="nc"><i>197</i>&nbsp;            double maxTipHeight = 0.0;</b>
+<i>198</i>&nbsp;
+<i>199</i>&nbsp;            // all nodes should be at zero height if no date-trait is available
+<b class="nc"><i>200</i>&nbsp;            for (int i = 0; i &lt; getLeafNodeCount(); i++) {</b>
+<b class="nc"><i>201</i>&nbsp;                double height = getNode(i).getHeight();</b>
+<b class="nc"><i>202</i>&nbsp;                if (maxTipHeight &lt; height) {</b>
+<b class="nc"><i>203</i>&nbsp;                    maxTipHeight = height;</b>
+<i>204</i>&nbsp;                }
+<b class="nc"><i>205</i>&nbsp;                extraTreeLength += height;</b>
+<b class="nc"><i>206</i>&nbsp;                getNode(i).setHeight(0);</b>
+<i>207</i>&nbsp;            }
+<i>208</i>&nbsp;
+<b class="nc"><i>209</i>&nbsp;            double scaleFactor = (treeLength+extraTreeLength)/treeLength;</b>
+<i>210</i>&nbsp;
+<b class="nc"><i>211</i>&nbsp;            final double SCALE_FACTOR_THRESHOLD = 0.001;</b>
+<i>212</i>&nbsp;
+<i>213</i>&nbsp;            // if the change in total tree length is more than 0.1% then give the user a warning!
+<b class="nc"><i>214</i>&nbsp;            if (scaleFactor &gt; 1.0 + SCALE_FACTOR_THRESHOLD) {</b>
+<i>215</i>&nbsp;
+<b class="nc"><i>216</i>&nbsp;                DecimalFormat format = new DecimalFormat(&quot;#.##&quot;);</b>
+<i>217</i>&nbsp;
+<b class="nc"><i>218</i>&nbsp;                Log.info.println(&quot;WARNING: Adjust tip heights attribute set to &#39;true&#39; in &quot; + getClass().getSimpleName());</b>
+<b class="nc"><i>219</i>&nbsp;                Log.info.println(&quot;         has resulted in significant (&gt;&quot; + format.format(SCALE_FACTOR_THRESHOLD*100.0) + &quot;%) change in tree length.&quot;);</b>
+<b class="nc"><i>220</i>&nbsp;                Log.info.println(&quot;         Use &quot;+adjustTipHeightsInput.getName()+&quot;=&#39;false&#39; to override this default.&quot;);</b>
+<b class="nc"><i>221</i>&nbsp;                Log.info.printf( &quot;  original max tip age = %8.3f\n&quot;, maxTipHeight);</b>
+<b class="nc"><i>222</i>&nbsp;                Log.info.printf( &quot;       new max tip age = %8.3f\n&quot;, 0.0);</b>
+<b class="nc"><i>223</i>&nbsp;                Log.info.printf( &quot;  original tree length = %8.3f\n&quot;, treeLength);</b>
+<b class="nc"><i>224</i>&nbsp;                Log.info.printf( &quot;       new tree length = %8.3f\n&quot;, treeLength+extraTreeLength);</b>
+<b class="nc"><i>225</i>&nbsp;                Log.info.printf( &quot;       TL scale factor = %8.3f\n&quot;, scaleFactor);</b>
+<i>226</i>&nbsp;            }
+<i>227</i>&nbsp;        }
+<i>228</i>&nbsp;
+<b class="fc"><i>229</i>&nbsp;        if( m_taxonset.get() == null &amp;&amp; labels != null &amp;&amp; isLabelledNewickInput.get() ) {</b>
+<b class="fc"><i>230</i>&nbsp;            m_taxonset.setValue(new TaxonSet(Taxon.createTaxonList(labels)), this);</b>
+<i>231</i>&nbsp;        }
+<i>232</i>&nbsp;
+<b class="fc"><i>233</i>&nbsp;        initStateNodes();</b>
+<b class="fc"><i>234</i>&nbsp;    } // init</b>
+<i>235</i>&nbsp;
+<b class="fc"><i>236</i>&nbsp;    public TreeParser() {</b>
+<b class="fc"><i>237</i>&nbsp;    }</b>
+<i>238</i>&nbsp;
+<b class="nc"><i>239</i>&nbsp;    public TreeParser(final Alignment alignment, final String newick) {</b>
+<b class="nc"><i>240</i>&nbsp;        dataInput.setValue(alignment, this);</b>
+<b class="nc"><i>241</i>&nbsp;        newickInput.setValue(newick, this);</b>
+<b class="nc"><i>242</i>&nbsp;        initAndValidate();</b>
+<b class="nc"><i>243</i>&nbsp;    }</b>
+<i>244</i>&nbsp;
+<i>245</i>&nbsp;    /**
+<i>246</i>&nbsp;     * Create a tree from the given newick format
+<i>247</i>&nbsp;     *
+<i>248</i>&nbsp;     * @param taxaNames a list of taxa names to use, or null.
+<i>249</i>&nbsp;     *                  If null then IsLabelledNewick will be set to true
+<i>250</i>&nbsp;     * @param newick    the newick of the tree
+<i>251</i>&nbsp;     * @param offset    the offset to map node numbers in newick format to indices in taxaNames.
+<i>252</i>&nbsp;     *                  so, name(node with nodeNumber) = taxaNames[nodeNumber-offset]
+<i>253</i>&nbsp;     * @param adjustTipHeightsWhenMissingDateTraits
+<i>254</i>&nbsp;     *                  true if tip heights should be adjusted to zero
+<i>255</i>&nbsp;     */
+<i>256</i>&nbsp;    public TreeParser(final List&lt;String&gt; taxaNames,
+<i>257</i>&nbsp;                      final String newick,
+<i>258</i>&nbsp;                      final int offset,
+<b class="fc"><i>259</i>&nbsp;                      final boolean adjustTipHeightsWhenMissingDateTraits) {</b>
+<i>260</i>&nbsp;
+<b class="fc"><i>261</i>&nbsp;        if (taxaNames == null) {</b>
+<b class="nc"><i>262</i>&nbsp;            isLabelledNewickInput.setValue(true, this);</b>
+<i>263</i>&nbsp;        } else {
+<b class="fc"><i>264</i>&nbsp;            m_taxonset.setValue(new TaxonSet(Taxon.createTaxonList(taxaNames)), this);</b>
+<i>265</i>&nbsp;        }
+<b class="fc"><i>266</i>&nbsp;        newickInput.setValue(newick, this);</b>
+<b class="fc"><i>267</i>&nbsp;        offsetInput.setValue(offset, this);</b>
+<b class="fc"><i>268</i>&nbsp;        adjustTipHeightsInput.setValue(adjustTipHeightsWhenMissingDateTraits, this);</b>
+<b class="fc"><i>269</i>&nbsp;        labels = taxaNames;</b>
+<b class="fc"><i>270</i>&nbsp;        initAndValidate();</b>
+<b class="fc"><i>271</i>&nbsp;    }</b>
+<i>272</i>&nbsp;
+<i>273</i>&nbsp;    /**
+<i>274</i>&nbsp;     * Parses newick format. The default does not adjust heights and allows single child nodes.
+<i>275</i>&nbsp;     * Modifications of the input should be deliberately made by calling e.g. new TreeParser(newick, true, false).
+<i>276</i>&nbsp;     *
+<i>277</i>&nbsp;     * @param newick a string representing a tree in newick format
+<i>278</i>&nbsp;     */
+<i>279</i>&nbsp;    public TreeParser(final String newick) {
+<b class="nc"><i>280</i>&nbsp;        this(newick, false, true, true, 1);</b>
+<b class="nc"><i>281</i>&nbsp;    }</b>
+<i>282</i>&nbsp;
+<i>283</i>&nbsp;    /**
+<i>284</i>&nbsp;     * @param newick                a string representing a tree in newick format
+<i>285</i>&nbsp;     * @param adjustTipHeights      true if the tip heights should be adjusted to 0 (i.e. contemporaneous) after reading in tree.
+<i>286</i>&nbsp;     * @param allowSingleChildNodes true if internal nodes with single children are allowed
+<i>287</i>&nbsp;     */
+<i>288</i>&nbsp;    public TreeParser(final String newick,
+<i>289</i>&nbsp;                      final boolean adjustTipHeights,
+<i>290</i>&nbsp;                      final boolean allowSingleChildNodes) {
+<b class="nc"><i>291</i>&nbsp;        this(newick, adjustTipHeights, allowSingleChildNodes, true, 1);</b>
+<b class="nc"><i>292</i>&nbsp;    }</b>
+<i>293</i>&nbsp;
+<i>294</i>&nbsp;    /**
+<i>295</i>&nbsp;     * @param newick           a string representing a tree in newick format
+<i>296</i>&nbsp;     * @param adjustTipHeights true if the tip heights should be adjusted to 0 (i.e. contemporaneous) after reading in tree.
+<i>297</i>&nbsp;     */
+<i>298</i>&nbsp;    public TreeParser(final String newick,
+<i>299</i>&nbsp;                      final boolean adjustTipHeights) {
+<b class="nc"><i>300</i>&nbsp;        this(newick, adjustTipHeights, true, true, 1);</b>
+<b class="nc"><i>301</i>&nbsp;    }</b>
+<i>302</i>&nbsp;
+<i>303</i>&nbsp;    /**
+<i>304</i>&nbsp;     * @param newick                a string representing a tree in newick format
+<i>305</i>&nbsp;     * @param adjustTipHeights      true if the tip heights should be adjusted to 0 (i.e. contemporaneous) after reading in tree.
+<i>306</i>&nbsp;     * @param allowSingleChildNodes true if internal nodes with single children are allowed
+<i>307</i>&nbsp;     * @param isLabeled             true if nodes are labeled with taxa labels
+<i>308</i>&nbsp;     * @param offset                if isLabeled == false and node labeling starts with x
+<i>309</i>&nbsp;     *                              then offset should be x. When isLabeled == true offset should
+<i>310</i>&nbsp;     *                              be 1 as by default.
+<i>311</i>&nbsp;     */
+<i>312</i>&nbsp;    public TreeParser(final String newick,
+<i>313</i>&nbsp;                      final boolean adjustTipHeights,
+<i>314</i>&nbsp;                      final boolean allowSingleChildNodes,
+<i>315</i>&nbsp;                      final boolean isLabeled,
+<b class="fc"><i>316</i>&nbsp;                      final int offset) {</b>
+<i>317</i>&nbsp;
+<b class="fc"><i>318</i>&nbsp;        newickInput.setValue(newick, this);</b>
+<b class="fc"><i>319</i>&nbsp;        isLabelledNewickInput.setValue(isLabeled, this);</b>
+<b class="fc"><i>320</i>&nbsp;        adjustTipHeightsInput.setValue(adjustTipHeights, this);</b>
+<b class="fc"><i>321</i>&nbsp;        allowSingleChildInput.setValue(allowSingleChildNodes, this);</b>
+<i>322</i>&nbsp;
+<b class="fc"><i>323</i>&nbsp;        offsetInput.setValue(offset, this);</b>
+<i>324</i>&nbsp;
+<b class="fc"><i>325</i>&nbsp;        initAndValidate();</b>
+<b class="fc"><i>326</i>&nbsp;    }</b>
+<i>327</i>&nbsp;
+<i>328</i>&nbsp;    /**
+<i>329</i>&nbsp;     * Parse a newick-ish string and generate the BEAST tree it describes.
+<i>330</i>&nbsp;     *
+<i>331</i>&nbsp;     * @param newick string to parse
+<i>332</i>&nbsp;     * @return root node of tree
+<i>333</i>&nbsp;     */
+<i>334</i>&nbsp;    public Node parseNewick(String newick) {
+<b class="fc"><i>335</i>&nbsp;        ANTLRInputStream input = new ANTLRInputStream(newick);</b>
+<i>336</i>&nbsp;
+<i>337</i>&nbsp;        // Custom parse/lexer error listener
+<b class="fc"><i>338</i>&nbsp;        BaseErrorListener errorListener = new BaseErrorListener() {</b>
+<i>339</i>&nbsp;            @Override
+<i>340</i>&nbsp;            public void syntaxError(Recognizer&lt;?, ?&gt; recognizer,
+<i>341</i>&nbsp;                                    Object offendingSymbol,
+<i>342</i>&nbsp;                                    int line, int charPositionInLine,
+<i>343</i>&nbsp;                                    String msg, RecognitionException e) {
+<b class="nc"><i>344</i>&nbsp;                throw new ParseCancellationException(&quot;Error parsing character &quot;</b>
+<i>345</i>&nbsp;                        + charPositionInLine + &quot; of Newick string: &quot; + msg);
+<i>346</i>&nbsp;            }
+<i>347</i>&nbsp;        };
+<i>348</i>&nbsp;
+<i>349</i>&nbsp;        // Use lexer to produce token stream
+<i>350</i>&nbsp;
+<b class="fc"><i>351</i>&nbsp;        NewickLexer lexer = new NewickLexer(input);</b>
+<b class="fc"><i>352</i>&nbsp;        lexer.removeErrorListeners();</b>
+<b class="fc"><i>353</i>&nbsp;        lexer.addErrorListener(errorListener);</b>
+<i>354</i>&nbsp;
+<b class="fc"><i>355</i>&nbsp;        CommonTokenStream tokens = new CommonTokenStream(lexer);</b>
+<i>356</i>&nbsp;
+<i>357</i>&nbsp;        // Parse token stream to produce parse tree
+<i>358</i>&nbsp;
+<b class="fc"><i>359</i>&nbsp;        NewickParser parser = new NewickParser(tokens);</b>
+<b class="fc"><i>360</i>&nbsp;        parser.removeErrorListeners();</b>
+<b class="fc"><i>361</i>&nbsp;        parser.addErrorListener(errorListener);</b>
+<i>362</i>&nbsp;
+<b class="fc"><i>363</i>&nbsp;        ParseTree parseTree = parser.tree();</b>
+<i>364</i>&nbsp;
+<i>365</i>&nbsp;        // Traverse parse tree, constructing BEAST tree along the way
+<i>366</i>&nbsp;
+<b class="fc"><i>367</i>&nbsp;        NewickASTVisitor visitor = new NewickASTVisitor();</b>
+<b class="fc"><i>368</i>&nbsp;        Node root = visitor.visit(parseTree);</b>
+<i>369</i>&nbsp;
+<b class="fc"><i>370</i>&nbsp;        return root;</b>
+<i>371</i>&nbsp;    }
+<i>372</i>&nbsp;
+<i>373</i>&nbsp;
+<i>374</i>&nbsp;    /**
+<i>375</i>&nbsp;     * Given a map of name translations (string to string),
+<i>376</i>&nbsp;     * rewrites all leaf ids that match a key in the map
+<i>377</i>&nbsp;     * to the respective value in the matching key/value pair.
+<i>378</i>&nbsp;     * If current leaf id is null, then interpret translation keys as node numbers (origin 1)
+<i>379</i>&nbsp;     * and set leaf id of node n to map.get(n-1).
+<i>380</i>&nbsp;     *
+<i>381</i>&nbsp;     * @param translationMap map of name translations
+<i>382</i>&nbsp;     */
+<i>383</i>&nbsp;    public void translateLeafIds(final Map&lt;String, String&gt; translationMap) {
+<i>384</i>&nbsp;
+<b class="fc"><i>385</i>&nbsp;        for (final Node leaf : getExternalNodes()) {</b>
+<b class="fc"><i>386</i>&nbsp;            String id = leaf.getID();</b>
+<i>387</i>&nbsp;
+<b class="fc"><i>388</i>&nbsp;            if (id == null || !integerLeafLabels) {</b>
+<b class="nc"><i>389</i>&nbsp;                id = Integer.toString(leaf.getNr() + 1);</b>
+<i>390</i>&nbsp;            }
+<i>391</i>&nbsp;
+<b class="fc"><i>392</i>&nbsp;            final String newId = translationMap.get(id);</b>
+<b class="fc"><i>393</i>&nbsp;            if (newId != null) {</b>
+<b class="nc"><i>394</i>&nbsp;                leaf.setID(newId);</b>
+<i>395</i>&nbsp;            }
+<b class="fc"><i>396</i>&nbsp;        }</b>
+<b class="fc"><i>397</i>&nbsp;    }</b>
+<i>398</i>&nbsp;
+<i>399</i>&nbsp;
+<i>400</i>&nbsp;    /**
+<i>401</i>&nbsp;     * Visits each component of the AST built from the Newick string, constructing
+<i>402</i>&nbsp;     * a BEAST tree along the way.
+<i>403</i>&nbsp;     */
+<b class="fc"><i>404</i>&nbsp;    class NewickASTVisitor extends NewickBaseVisitor&lt;Node&gt; {</b>
+<i>405</i>&nbsp;
+<b class="fc"><i>406</i>&nbsp;        private int numberedNodeCount = 0;</b>
+<i>407</i>&nbsp;
+<i>408</i>&nbsp;        @Override
+<i>409</i>&nbsp;        public Node visitTree(@NotNull NewickParser.TreeContext ctx) {
+<b class="fc"><i>410</i>&nbsp;            Node root = visit(ctx.node());</b>
+<i>411</i>&nbsp;
+<i>412</i>&nbsp;            // Ensure tree is properly sorted in terms of node numbers.
+<b class="fc"><i>413</i>&nbsp;            root.sort();</b>
+<i>414</i>&nbsp;
+<i>415</i>&nbsp;            // Replace lengths read from Newick with heights.
+<b class="fc"><i>416</i>&nbsp;            convertLengthToHeight(root);</b>
+<i>417</i>&nbsp;
+<i>418</i>&nbsp;            // Make sure internal nodes are numbered correctly
+<b class="fc"><i>419</i>&nbsp;            numberUnnumberedNodes(root);</b>
+<i>420</i>&nbsp;
+<i>421</i>&nbsp;            // Check for duplicate taxa
+<b class="fc"><i>422</i>&nbsp;            BitSet nodeNrSeen = new BitSet();</b>
+<b class="fc"><i>423</i>&nbsp;            for (Node leaf : root.getAllLeafNodes()) {</b>
+<b class="fc"><i>424</i>&nbsp;                if (leaf.getNr()&lt;0)</b>
+<b class="nc"><i>425</i>&nbsp;                   continue;  // Skip unnumbered leaves</b>
+<i>426</i>&nbsp;
+<b class="fc"><i>427</i>&nbsp;                if (nodeNrSeen.get(leaf.getNr()))</b>
+<b class="fc"><i>428</i>&nbsp;                    throw new ParseCancellationException(&quot;Duplicate taxon found: &quot; + labels.get(leaf.getNr()));</b>
+<i>429</i>&nbsp;                else
+<b class="fc"><i>430</i>&nbsp;                    nodeNrSeen.set(leaf.getNr());</b>
+<b class="fc"><i>431</i>&nbsp;            }</b>
+<i>432</i>&nbsp;
+<b class="fc"><i>433</i>&nbsp;            return root;</b>
+<i>434</i>&nbsp;        }
+<i>435</i>&nbsp;
+<i>436</i>&nbsp;        @Override
+<i>437</i>&nbsp;        public Node visitNode(NewickParser.NodeContext ctx) {
+<b class="fc"><i>438</i>&nbsp;            Node node = newNode();</b>
+<i>439</i>&nbsp;
+<b class="fc"><i>440</i>&nbsp;            for (NewickParser.NodeContext ctxChild : ctx.node()) {</b>
+<b class="fc"><i>441</i>&nbsp;                node.addChild(visit(ctxChild));</b>
+<b class="fc"><i>442</i>&nbsp;            }</b>
+<i>443</i>&nbsp;
+<b class="fc"><i>444</i>&nbsp;            NewickParser.PostContext postCtx = ctx.post();</b>
+<i>445</i>&nbsp;
+<i>446</i>&nbsp;            // Process metadata
+<i>447</i>&nbsp;
+<b class="fc"><i>448</i>&nbsp;            if (postCtx.meta() != null) {</b>
+<i>449</i>&nbsp;
+<b class="fc"><i>450</i>&nbsp;                node.metaDataString = &quot;&quot;;</b>
+<b class="fc"><i>451</i>&nbsp;                for (int i=0; i&lt;postCtx.meta().attrib().size(); i++) {</b>
+<b class="fc"><i>452</i>&nbsp;                    if (i&gt;0)</b>
+<b class="fc"><i>453</i>&nbsp;                        node.metaDataString += &quot;,&quot;;</b>
+<b class="fc"><i>454</i>&nbsp;                    node.metaDataString += postCtx.meta().attrib().get(i).getText();</b>
+<i>455</i>&nbsp;                }
+<i>456</i>&nbsp;
+<i>457</i>&nbsp;                if (!suppressMetadata) {
+<b class="fc"><i>458</i>&nbsp;                    for (NewickParser.AttribContext attribctx : postCtx.meta().attrib()) {</b>
+<b class="fc"><i>459</i>&nbsp;                        String key = attribctx.attribKey.getText();</b>
+<i>460</i>&nbsp;
+<b class="fc"><i>461</i>&nbsp;                        if (attribctx.attribValue().number() != null) {</b>
+<b class="fc"><i>462</i>&nbsp;                            node.setMetaData(key, Double.parseDouble(</b>
+<b class="fc"><i>463</i>&nbsp;                                    attribctx.attribValue().number().getText()));</b>
+<b class="fc"><i>464</i>&nbsp;                        } else if (attribctx.attribValue().STRING() != null) {</b>
+<b class="nc"><i>465</i>&nbsp;                            String stringValue = attribctx.attribValue().STRING().getText();</b>
+<b class="nc"><i>466</i>&nbsp;                            if (stringValue.startsWith(&quot;\&quot;&quot;) || stringValue.startsWith(&quot;\&#39;&quot;)) {</b>
+<b class="nc"><i>467</i>&nbsp;                                stringValue = stringValue.substring(1, stringValue.length()-1);</b>
+<i>468</i>&nbsp;                            }
+<b class="nc"><i>469</i>&nbsp;                            node.setMetaData(key, stringValue);</b>
+<i>470</i>&nbsp;                        } else {
+<i>471</i>&nbsp;                            // BEAST doesn&#39;t do anything with vectors yet.
+<i>472</i>&nbsp;                        }
+<b class="fc"><i>473</i>&nbsp;                    }</b>
+<i>474</i>&nbsp;                }
+<i>475</i>&nbsp;            }
+<i>476</i>&nbsp;
+<i>477</i>&nbsp;            // Process edge length
+<i>478</i>&nbsp;
+<b class="fc"><i>479</i>&nbsp;            if (postCtx.length != null)</b>
+<b class="fc"><i>480</i>&nbsp;                node.setHeight(Double.parseDouble(postCtx.length.getText()));</b>
+<i>481</i>&nbsp;            else
+<b class="fc"><i>482</i>&nbsp;                node.setHeight(DEFAULT_LENGTH);</b>
+<i>483</i>&nbsp;
+<i>484</i>&nbsp;            // Process label
+<i>485</i>&nbsp;
+<b class="fc"><i>486</i>&nbsp;            node.setNr(-1);</b>
+<b class="fc"><i>487</i>&nbsp;            if (postCtx.label() != null) {</b>
+<b class="fc"><i>488</i>&nbsp;                node.setID(postCtx.label().getText());</b>
+<i>489</i>&nbsp;
+<b class="fc"><i>490</i>&nbsp;                if (postCtx.label().number() == null</b>
+<b class="fc"><i>491</i>&nbsp;                        || postCtx.label().number().INT() == null)</b>
+<b class="fc"><i>492</i>&nbsp;                    integerLeafLabels = false;</b>
+<i>493</i>&nbsp;
+<i>494</i>&nbsp;                // RRB: next line is for debugging only?
+<i>495</i>&nbsp;                @SuppressWarnings(&quot;unused&quot;)
+<b class="fc"><i>496</i>&nbsp;				String postText = postCtx.getText();</b>
+<i>497</i>&nbsp;
+<i>498</i>&nbsp;                // Treat labels as node numbers in certain situations
+<b class="fc"><i>499</i>&nbsp;                if (!isLabelledNewickInput.get()</b>
+<b class="fc"><i>500</i>&nbsp;                        &amp;&amp; postCtx.label().number() != null</b>
+<b class="fc"><i>501</i>&nbsp;                        &amp;&amp; postCtx.label().number().INT() != null) {</b>
+<i>502</i>&nbsp;
+<b class="fc"><i>503</i>&nbsp;                    int nodeNr = Integer.parseInt(postCtx.label().getText()) - offsetInput.get();</b>
+<b class="fc"><i>504</i>&nbsp;                    if (nodeNr&lt;0)</b>
+<b class="nc"><i>505</i>&nbsp;                        throw new ParseCancellationException(&quot;Node number given &quot; +</b>
+<i>506</i>&nbsp;                                &quot;is smaller than current offset (&quot; +
+<b class="nc"><i>507</i>&nbsp;                                offsetInput.get() + &quot;).  Perhaps offset is &quot; +</b>
+<i>508</i>&nbsp;                                &quot;too high?&quot;);
+<i>509</i>&nbsp;
+<b class="fc"><i>510</i>&nbsp;                    node.setNr(nodeNr);</b>
+<b class="fc"><i>511</i>&nbsp;                    numberedNodeCount += 1;</b>
+<b class="fc"><i>512</i>&nbsp;                } else {</b>
+<b class="fc"><i>513</i>&nbsp;                    if (node.isLeaf()) {</b>
+<b class="fc"><i>514</i>&nbsp;                        node.setNr(getLabelIndex(postCtx.label().getText()));</b>
+<b class="fc"><i>515</i>&nbsp;                        numberedNodeCount += 1;</b>
+<i>516</i>&nbsp;                    }
+<i>517</i>&nbsp;                }
+<i>518</i>&nbsp;            }
+<i>519</i>&nbsp;
+<b class="fc"><i>520</i>&nbsp;            if (node.getChildCount()==1 &amp;&amp; !allowSingleChildInput.get())</b>
+<b class="nc"><i>521</i>&nbsp;                throw new ParseCancellationException(&quot;Node with single child found.&quot;);</b>
+<i>522</i>&nbsp;
+<i>523</i>&nbsp;            // Use length-zero edges to binarize multifurcations.
+<b class="fc"><i>524</i>&nbsp;            if (node.getChildCount()&gt;2) {</b>
+<b class="fc"><i>525</i>&nbsp;                List&lt;Node&gt; children = new ArrayList&lt;&gt;(node.getChildren());</b>
+<b class="fc"><i>526</i>&nbsp;                Node prevDummy = node;</b>
+<b class="fc"><i>527</i>&nbsp;                for (int i=1; i&lt;children.size()-1; i++) {</b>
+<b class="fc"><i>528</i>&nbsp;                    Node child = children.get(i);</b>
+<i>529</i>&nbsp;
+<b class="fc"><i>530</i>&nbsp;                    Node dummyNode = newNode();</b>
+<b class="fc"><i>531</i>&nbsp;                    dummyNode.setNr(-1);</b>
+<b class="fc"><i>532</i>&nbsp;                    dummyNode.setHeight(0);</b>
+<b class="fc"><i>533</i>&nbsp;                    prevDummy.addChild(dummyNode);</b>
+<i>534</i>&nbsp;
+<b class="fc"><i>535</i>&nbsp;                    node.removeChild(child);</b>
+<b class="fc"><i>536</i>&nbsp;                    dummyNode.addChild(child);</b>
+<i>537</i>&nbsp;
+<b class="fc"><i>538</i>&nbsp;                    prevDummy = dummyNode;</b>
+<i>539</i>&nbsp;                }
+<b class="fc"><i>540</i>&nbsp;                node.removeChild(children.get(children.size()-1));</b>
+<b class="fc"><i>541</i>&nbsp;                prevDummy.addChild(children.get(children.size()-1));</b>
+<i>542</i>&nbsp;            }
+<i>543</i>&nbsp;
+<b class="fc"><i>544</i>&nbsp;            return node;</b>
+<i>545</i>&nbsp;        }
+<i>546</i>&nbsp;
+<i>547</i>&nbsp;        /**
+<i>548</i>&nbsp;         * Try to map str into an index.
+<i>549</i>&nbsp;         */
+<i>550</i>&nbsp;        private int getLabelIndex(final String str) {
+<i>551</i>&nbsp;
+<i>552</i>&nbsp;            // look it up in list of taxa
+<b class="fc"><i>553</i>&nbsp;            for (int index = 0; index &lt; labels.size(); index++) {</b>
+<b class="fc"><i>554</i>&nbsp;                if (str.equals(labels.get(index))) {</b>
+<b class="fc"><i>555</i>&nbsp;                    return index;</b>
+<i>556</i>&nbsp;                }
+<i>557</i>&nbsp;            }
+<i>558</i>&nbsp;
+<i>559</i>&nbsp;            // if createUnrecognizedTaxon==true, then do it now, otherwise labels will not be populated and
+<i>560</i>&nbsp;            // out of bounds error will occur in m_sLabels later.
+<b class="fc"><i>561</i>&nbsp;            if (createUnrecognizedTaxa) {</b>
+<b class="fc"><i>562</i>&nbsp;                labels.add(str);</b>
+<b class="fc"><i>563</i>&nbsp;                return labels.size() - 1;</b>
+<i>564</i>&nbsp;            }
+<i>565</i>&nbsp;
+<b class="nc"><i>566</i>&nbsp;            throw new ParseCancellationException(&quot;Label &#39;&quot; + str + &quot;&#39; in Newick beast.tree could &quot; +</b>
+<i>567</i>&nbsp;                    &quot;not be identified. Perhaps taxa or taxonset is not specified?&quot;);
+<i>568</i>&nbsp;        }
+<i>569</i>&nbsp;
+<i>570</i>&nbsp;        /**
+<i>571</i>&nbsp;         * The node height field is initially populated with the length of the edge above due
+<i>572</i>&nbsp;         * to the way the tree is stored in Newick format.  This method converts these lengths
+<i>573</i>&nbsp;         * to actual ages before the most recent sample.
+<i>574</i>&nbsp;         *
+<i>575</i>&nbsp;         * @param root root of tree
+<i>576</i>&nbsp;         */
+<i>577</i>&nbsp;        private void convertLengthToHeight(final Node root) {
+<b class="fc"><i>578</i>&nbsp;            final double totalHeight = convertLengthToHeight(root, 0);</b>
+<b class="fc"><i>579</i>&nbsp;            offset(root, -totalHeight);</b>
+<b class="fc"><i>580</i>&nbsp;        }</b>
+<i>581</i>&nbsp;
+<i>582</i>&nbsp;        /**
+<i>583</i>&nbsp;         * Recursive method used to convert lengths to heights.  Applied to the root,
+<i>584</i>&nbsp;         * results in heights from 0 to -total_height_of_tree.
+<i>585</i>&nbsp;         *
+<i>586</i>&nbsp;         * @param node node of a clade to convert
+<i>587</i>&nbsp;         * @param height Parent height.
+<i>588</i>&nbsp;         * @return total height of clade
+<i>589</i>&nbsp;         */
+<i>590</i>&nbsp;        private double convertLengthToHeight(final Node node, final double height) {
+<b class="fc"><i>591</i>&nbsp;            final double length = node.getHeight();</b>
+<b class="fc"><i>592</i>&nbsp;            node.setHeight((height - length) * scaleInput.get());</b>
+<b class="fc"><i>593</i>&nbsp;            if (node.isLeaf()) {</b>
+<b class="fc"><i>594</i>&nbsp;                return node.getHeight();</b>
+<i>595</i>&nbsp;            } else {
+<b class="fc"><i>596</i>&nbsp;                final double left = convertLengthToHeight(node.getLeft(), height - length);</b>
+<b class="fc"><i>597</i>&nbsp;                if (node.getRight() == null) {</b>
+<b class="nc"><i>598</i>&nbsp;                    return left;</b>
+<i>599</i>&nbsp;                }
+<b class="fc"><i>600</i>&nbsp;                final double right = convertLengthToHeight(node.getRight(), height - length);</b>
+<b class="fc"><i>601</i>&nbsp;                return Math.min(left, right);</b>
+<i>602</i>&nbsp;            }
+<i>603</i>&nbsp;        }
+<i>604</i>&nbsp;
+<i>605</i>&nbsp;        /**
+<i>606</i>&nbsp;         * Method used by convertLengthToHeight(node) to remove negative offset from
+<i>607</i>&nbsp;         * node heights that is produced by convertLengthToHeight(node, height).
+<i>608</i>&nbsp;         *
+<i>609</i>&nbsp;         * @param node node of clade to offset
+<i>610</i>&nbsp;         * @param delta offset
+<i>611</i>&nbsp;         */
+<i>612</i>&nbsp;        private void offset(final Node node, final double delta) {
+<b class="fc"><i>613</i>&nbsp;            node.setHeight(node.getHeight() + delta);</b>
+<b class="fc"><i>614</i>&nbsp;            if (node.isLeaf()) {</b>
+<b class="fc"><i>615</i>&nbsp;                if (node.getHeight() &lt; thresholdInput.get()) {</b>
+<b class="nc"><i>616</i>&nbsp;                    node.setHeight(0);</b>
+<i>617</i>&nbsp;                }
+<i>618</i>&nbsp;            }
+<b class="fc"><i>619</i>&nbsp;            if (!node.isLeaf()) {</b>
+<b class="fc"><i>620</i>&nbsp;                offset(node.getLeft(), delta);</b>
+<b class="fc"><i>621</i>&nbsp;                if (node.getRight() != null) {</b>
+<b class="fc"><i>622</i>&nbsp;                    offset(node.getRight(), delta);</b>
+<i>623</i>&nbsp;                }
+<i>624</i>&nbsp;            }
+<b class="fc"><i>625</i>&nbsp;        }</b>
+<i>626</i>&nbsp;
+<i>627</i>&nbsp;        /**
+<i>628</i>&nbsp;         * Number any nodes in a clade which were not explicitly numbered by
+<i>629</i>&nbsp;         * the parsed string.
+<i>630</i>&nbsp;         *
+<i>631</i>&nbsp;         * @param node clade parent
+<i>632</i>&nbsp;         */
+<i>633</i>&nbsp;        private void numberUnnumberedNodes(Node node) {
+<b class="fc"><i>634</i>&nbsp;            if (node.isLeaf())</b>
+<b class="fc"><i>635</i>&nbsp;                return;</b>
+<i>636</i>&nbsp;
+<b class="fc"><i>637</i>&nbsp;            for (Node child : node.getChildren()) {</b>
+<b class="fc"><i>638</i>&nbsp;                numberUnnumberedNodes(child);</b>
+<b class="fc"><i>639</i>&nbsp;            }</b>
+<i>640</i>&nbsp;
+<b class="fc"><i>641</i>&nbsp;            if (node.getNr()&lt;0)</b>
+<b class="fc"><i>642</i>&nbsp;                node.setNr(numberedNodeCount);</b>
+<i>643</i>&nbsp;
+<b class="fc"><i>644</i>&nbsp;            numberedNodeCount += 1;</b>
+<b class="fc"><i>645</i>&nbsp;        }</b>
+<i>646</i>&nbsp;    }
+<i>647</i>&nbsp;
+<i>648</i>&nbsp;
+<i>649</i>&nbsp;    /*
+<i>650</i>&nbsp;     *StateNodeInitializer implementation
+<i>651</i>&nbsp;     */
+<i>652</i>&nbsp;
+<i>653</i>&nbsp;    @Override
+<i>654</i>&nbsp;    public void initStateNodes() {
+<b class="fc"><i>655</i>&nbsp;        if (m_initial.get() != null) {</b>
+<b class="nc"><i>656</i>&nbsp;            m_initial.get().assignFrom(this);</b>
+<i>657</i>&nbsp;        }
+<b class="fc"><i>658</i>&nbsp;    }</b>
+<i>659</i>&nbsp;
+<i>660</i>&nbsp;    @Override
+<i>661</i>&nbsp;    public void getInitialisedStateNodes(final List&lt;StateNode&gt; stateNodes) {
+<b class="nc"><i>662</i>&nbsp;        if (m_initial.get() != null) {</b>
+<b class="nc"><i>663</i>&nbsp;            stateNodes.add(m_initial.get());</b>
+<i>664</i>&nbsp;        }
+<b class="nc"><i>665</i>&nbsp;    }</b>
+<i>666</i>&nbsp;
+<i>667</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

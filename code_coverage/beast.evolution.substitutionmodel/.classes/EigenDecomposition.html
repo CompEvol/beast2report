@@ -1,0 +1,191 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: EigenDecomposition</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.substitutionmodel</a> ]
+</div>
+
+<h1>Coverage Summary for Class: EigenDecomposition (beast.evolution.substitutionmodel)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EigenDecomposition</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    40%
+  </span>
+  <span class="absValue">
+    (4/ 10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    30%
+  </span>
+  <span class="absValue">
+    (9/ 30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.substitutionmodel;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;/**
+<i>4</i>&nbsp; * A storage structure to hold an Eigen Decomposition of a rate matrix.
+<i>5</i>&nbsp; * This encapsulates everything and facilitates copying for store/restore
+<i>6</i>&nbsp; * mechanisms.
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; * @author Andrew Rambaut
+<i>9</i>&nbsp; * @author Alexei Drummond
+<i>10</i>&nbsp; * @author Marc A. Suchard
+<i>11</i>&nbsp; */
+<i>12</i>&nbsp;public class EigenDecomposition {
+<i>13</i>&nbsp;
+<b class="fc"><i>14</i>&nbsp;    public EigenDecomposition(double[] evec, double[] ievc, double[] eval) {</b>
+<b class="fc"><i>15</i>&nbsp;        Evec = evec;</b>
+<b class="fc"><i>16</i>&nbsp;        Ievc = ievc;</b>
+<b class="fc"><i>17</i>&nbsp;        Eval = eval;</b>
+<b class="fc"><i>18</i>&nbsp;        Evali = null;</b>
+<b class="fc"><i>19</i>&nbsp;    }</b>
+<i>20</i>&nbsp;
+<b class="nc"><i>21</i>&nbsp;    public EigenDecomposition(double[] evec, double[] ievc, double[] eval, double[] evali) {</b>
+<b class="nc"><i>22</i>&nbsp;        Evec = evec;</b>
+<b class="nc"><i>23</i>&nbsp;        Ievc = ievc;</b>
+<b class="nc"><i>24</i>&nbsp;        Eval = eval;</b>
+<b class="nc"><i>25</i>&nbsp;        Evali = evali;   // the imaginary parts are being ignored at the moment</b>
+<b class="nc"><i>26</i>&nbsp;    }</b>
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;    public EigenDecomposition copy() {
+<b class="nc"><i>29</i>&nbsp;        double[] evec = Evec.clone();</b>
+<b class="nc"><i>30</i>&nbsp;        double[] ievc = Ievc.clone();</b>
+<b class="nc"><i>31</i>&nbsp;        double[] eval = Eval.clone();</b>
+<i>32</i>&nbsp;
+<b class="nc"><i>33</i>&nbsp;        return new EigenDecomposition(evec, ievc, eval);</b>
+<i>34</i>&nbsp;    }
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;    /**
+<i>37</i>&nbsp;     * This function returns the Eigen vectors.
+<i>38</i>&nbsp;     *
+<i>39</i>&nbsp;     * @return the array
+<i>40</i>&nbsp;     */
+<i>41</i>&nbsp;    public final double[] getEigenVectors() {
+<b class="fc"><i>42</i>&nbsp;        return Evec;</b>
+<i>43</i>&nbsp;    }
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;    /**
+<i>46</i>&nbsp;     * This function returns the inverse Eigen vectors.
+<i>47</i>&nbsp;     *
+<i>48</i>&nbsp;     * @return the array
+<i>49</i>&nbsp;     */
+<i>50</i>&nbsp;    public final double[] getInverseEigenVectors() {
+<b class="fc"><i>51</i>&nbsp;        return Ievc;</b>
+<i>52</i>&nbsp;    }
+<i>53</i>&nbsp;
+<i>54</i>&nbsp;    /**
+<i>55</i>&nbsp;     * This function returns the Eigen values.
+<i>56</i>&nbsp;     *
+<i>57</i>&nbsp;     * @return the Eigen values
+<i>58</i>&nbsp;     */
+<i>59</i>&nbsp;    public final double[] getEigenValues() {
+<b class="fc"><i>60</i>&nbsp;        return Eval;</b>
+<i>61</i>&nbsp;    }
+<i>62</i>&nbsp;
+<i>63</i>&nbsp;    /**
+<i>64</i>&nbsp;     * This function returns the imaginary part of the Eigen values.
+<i>65</i>&nbsp;     *
+<i>66</i>&nbsp;     * @return the Eigen values
+<i>67</i>&nbsp;     */
+<i>68</i>&nbsp;    public final double[] getImEigenValues() {
+<b class="nc"><i>69</i>&nbsp;        return Evali;</b>
+<i>70</i>&nbsp;    }
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;    /**
+<i>73</i>&nbsp;     * This functions returns true if the diagonalization may be complex
+<i>74</i>&nbsp;     *
+<i>75</i>&nbsp;     * @return bool
+<i>76</i>&nbsp;     */
+<i>77</i>&nbsp;    public boolean canReturnComplexDiagonalization() {
+<b class="nc"><i>78</i>&nbsp;        return false;</b>
+<i>79</i>&nbsp;    }
+<i>80</i>&nbsp;
+<i>81</i>&nbsp;    /**
+<i>82</i>&nbsp;     * This function rescales the eigen values; this is more stable than
+<i>83</i>&nbsp;     * rescaling the original Q matrix, also O(stateCount) instead of O(stateCount^2)
+<i>84</i>&nbsp;     */
+<i>85</i>&nbsp;    public void normalizeEigenValues(double scale) {
+<b class="nc"><i>86</i>&nbsp;        int dim = Eval.length;</b>
+<b class="nc"><i>87</i>&nbsp;        for (int i = 0; i &lt; dim; i++)</b>
+<i>88</i>&nbsp;
+<b class="nc"><i>89</i>&nbsp;            Eval[i] /= scale;</b>
+<b class="nc"><i>90</i>&nbsp;    }</b>
+<i>91</i>&nbsp;
+<i>92</i>&nbsp;    public Boolean hasImagEigenvectors() {
+<b class="nc"><i>93</i>&nbsp;        if (Evali == null) return false;</b>
+<b class="nc"><i>94</i>&nbsp;        for (int i = 0; i &lt; Evali.length; i++)</b>
+<b class="nc"><i>95</i>&nbsp;            if (Evali[i] != 0) {</b>
+<i>96</i>&nbsp;//                System.err.println(&quot;Imaginary eigenvectors found. Discard.&quot;);
+<b class="nc"><i>97</i>&nbsp;                return true;</b>
+<i>98</i>&nbsp;            }
+<b class="nc"><i>99</i>&nbsp;        return false;</b>
+<i>100</i>&nbsp;    }
+<i>101</i>&nbsp;
+<i>102</i>&nbsp;    // Eigenvalues, eigenvectors, and inverse eigenvectors
+<i>103</i>&nbsp;    private final double[] Evec;
+<i>104</i>&nbsp;    private final double[] Ievc;
+<i>105</i>&nbsp;    private final double[] Eval;
+<i>106</i>&nbsp;    private final double[] Evali;   // imaginary part of eigenvalues
+<i>107</i>&nbsp;
+<i>108</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

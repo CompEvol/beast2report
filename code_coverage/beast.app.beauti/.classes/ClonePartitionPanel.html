@@ -1,0 +1,185 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: ClonePartitionPanel</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.beauti</a> ]
+</div>
+
+<h1>Coverage Summary for Class: ClonePartitionPanel (beast.app.beauti)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ClonePartitionPanel</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (34/ 34)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ClonePartitionPanel$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (4/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.9%
+  </span>
+  <span class="absValue">
+    (34/ 37)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.beauti;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.awt.Dimension;
+<i>4</i>&nbsp;import java.awt.FlowLayout;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;import javax.swing.Box;
+<i>7</i>&nbsp;import javax.swing.BoxLayout;
+<i>8</i>&nbsp;import javax.swing.DefaultListModel;
+<i>9</i>&nbsp;import javax.swing.JButton;
+<i>10</i>&nbsp;import javax.swing.JComboBox;
+<i>11</i>&nbsp;import javax.swing.JLabel;
+<i>12</i>&nbsp;import javax.swing.JPanel;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;import beast.app.beauti.guiutil.S11InitialSelection;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;public class ClonePartitionPanel extends JPanel {
+<i>18</i>&nbsp;    private static final long serialVersionUID = 1L;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;    final BeautiPanel beautiPanel;
+<i>21</i>&nbsp;    final JComboBox&lt;Object&gt; cloneFromComboBox;
+<b class="fc"><i>22</i>&nbsp;    final JButton okButton = new JButton(&quot;OK&quot;);</b>
+<i>23</i>&nbsp;
+<b class="fc"><i>24</i>&nbsp;	public ClonePartitionPanel(BeautiPanel beautiPanel) {</b>
+<b class="fc"><i>25</i>&nbsp;        this.beautiPanel = beautiPanel;</b>
+<i>26</i>&nbsp;
+<b class="fc"><i>27</i>&nbsp;        DefaultListModel&lt;String&gt; listModel = beautiPanel.listModel;</b>
+<b class="fc"><i>28</i>&nbsp;        Object[] models = new Object[listModel.getSize()];</b>
+<b class="fc"><i>29</i>&nbsp;        for(int i=0; i &lt; listModel.getSize(); i++){</b>
+<b class="fc"><i>30</i>&nbsp;            models[i] = listModel.getElementAt(i);</b>
+<i>31</i>&nbsp;        }
+<i>32</i>&nbsp;
+<b class="fc"><i>33</i>&nbsp;        cloneFromComboBox = new JComboBox&lt;&gt;(models);</b>
+<i>34</i>&nbsp;        // has to be editable
+<b class="fc"><i>35</i>&nbsp;        cloneFromComboBox.setEditable(true);</b>
+<i>36</i>&nbsp;        // change the editor&#39;s document
+<b class="fc"><i>37</i>&nbsp;        new S11InitialSelection(cloneFromComboBox);</b>
+<i>38</i>&nbsp;
+<b class="fc"><i>39</i>&nbsp;        init();</b>
+<b class="fc"><i>40</i>&nbsp;    }</b>
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;    public void init() {
+<b class="fc"><i>44</i>&nbsp;        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));</b>
+<i>45</i>&nbsp;
+<b class="fc"><i>46</i>&nbsp;        JPanel jPanel = new JPanel(new FlowLayout());</b>
+<i>47</i>&nbsp;
+<b class="fc"><i>48</i>&nbsp;        JLabel label = new JLabel(&quot;Clone from&quot;);</b>
+<b class="fc"><i>49</i>&nbsp;        jPanel.add(label);</b>
+<i>50</i>&nbsp;
+<b class="fc"><i>51</i>&nbsp;        cloneFromComboBox.setMaximumRowCount(10);</b>
+<b class="fc"><i>52</i>&nbsp;        jPanel.add(cloneFromComboBox);</b>
+<i>53</i>&nbsp;
+<b class="fc"><i>54</i>&nbsp;        add(Box.createRigidArea(new Dimension(0, 10)));</b>
+<b class="fc"><i>55</i>&nbsp;        add(jPanel);</b>
+<b class="pc"><i>56</i>&nbsp;        add(Box.createVerticalGlue());</b>
+<b class="fc"><i>57</i>&nbsp;        add(Box.createVerticalStrut(5));</b>
+<b class="nc"><i>58</i>&nbsp;</b>
+<b class="pc"><i>59</i>&nbsp;        okButton.setName(&quot;ok&quot;);</b>
+<b class="fc"><i>60</i>&nbsp;        okButton.setToolTipText(&quot;Click to clone configuration from the above selected partition &quot; +</b>
+<i>61</i>&nbsp;                &quot;into all selected partitions on the left.&quot;);
+<b class="fc"><i>62</i>&nbsp;        okButton.addActionListener(e -&gt; {</b>
+<b class="fc"><i>63</i>&nbsp;                clonePartitions();</b>
+<b class="fc"><i>64</i>&nbsp;            });</b>
+<b class="fc"><i>65</i>&nbsp;        add(okButton);</b>
+<i>66</i>&nbsp;
+<b class="fc"><i>67</i>&nbsp;    } // init</b>
+<i>68</i>&nbsp;
+<i>69</i>&nbsp;    protected void clonePartitions() {
+<b class="fc"><i>70</i>&nbsp;        String sourceId = cloneFromComboBox.getSelectedItem().toString();</b>
+<i>71</i>&nbsp;
+<b class="fc"><i>72</i>&nbsp;        for (Object targetId : beautiPanel.listOfPartitions.getSelectedValuesList()) {</b>
+<b class="fc"><i>73</i>&nbsp;             beautiPanel.cloneFrom(sourceId, targetId.toString());</b>
+<b class="fc"><i>74</i>&nbsp;        }</b>
+<b class="fc"><i>75</i>&nbsp;    }</b>
+<i>76</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

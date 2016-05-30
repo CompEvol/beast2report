@@ -1,0 +1,648 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: InputEditor</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.draw</a> ]
+</div>
+
+<h1>Coverage Summary for Class: InputEditor (beast.app.draw)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+  <tr>
+    <td class="name">InputEditor$Base</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.2%
+  </span>
+  <span class="absValue">
+    (25/ 26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.7%
+  </span>
+  <span class="absValue">
+    (154/ 184)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">InputEditor$Base$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (5/ 7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">InputEditor$ButtonStatus</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">InputEditor$ExpandOption</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">InputEditor$ValidationStatus</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/ 4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    94.1%
+  </span>
+  <span class="absValue">
+    (32/ 34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.8%
+  </span>
+  <span class="absValue">
+    (165/ 197)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.draw;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.awt.Color;
+<i>4</i>&nbsp;import java.awt.Component;
+<i>5</i>&nbsp;import java.awt.Dimension;
+<i>6</i>&nbsp;import java.util.ArrayList;
+<i>7</i>&nbsp;import java.util.HashSet;
+<i>8</i>&nbsp;import java.util.List;
+<i>9</i>&nbsp;import java.util.Set;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;import javax.swing.BorderFactory;
+<i>12</i>&nbsp;import javax.swing.Box;
+<i>13</i>&nbsp;import javax.swing.BoxLayout;
+<i>14</i>&nbsp;import javax.swing.JLabel;
+<i>15</i>&nbsp;import javax.swing.JPanel;
+<i>16</i>&nbsp;import javax.swing.JTextField;
+<i>17</i>&nbsp;import javax.swing.SwingConstants;
+<i>18</i>&nbsp;import javax.swing.border.Border;
+<i>19</i>&nbsp;import javax.swing.event.DocumentEvent;
+<i>20</i>&nbsp;import javax.swing.event.DocumentListener;
+<i>21</i>&nbsp;import javax.swing.event.ListSelectionListener;
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;import beast.app.beauti.BeautiDoc;
+<i>24</i>&nbsp;import beast.app.beauti.BeautiPanel;
+<i>25</i>&nbsp;import beast.app.beauti.BeautiPanelConfig;
+<i>26</i>&nbsp;import beast.core.BEASTInterface;
+<i>27</i>&nbsp;import beast.core.Input;
+<i>28</i>&nbsp;import beast.core.util.Log;
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;/**
+<i>31</i>&nbsp; * Base class for editors that provide a GUI for manipulating an Input for a BEASTObject.
+<i>32</i>&nbsp; * The idea is that for every type of Input there will be a dedicated editor, e.g.
+<i>33</i>&nbsp; * for a String Input, there will be an edit field, for a Boolean Input, there will
+<i>34</i>&nbsp; * be a checkbox in the editor.
+<i>35</i>&nbsp; * &lt;p/&gt;
+<i>36</i>&nbsp; * The default just provides an edit field and uses toString() on Input to get its value.
+<i>37</i>&nbsp; * To change the behaviour, override
+<i>38</i>&nbsp; * public void init(Input&lt;?&gt; input, BEASTObject beastObject, int itemNr, ExpandOption isExpandOption, boolean addButtons)
+<i>39</i>&nbsp; */
+<i>40</i>&nbsp;/** note that it is assumed that any InputEditor is a java.awt.Component **/
+<i>41</i>&nbsp;public interface InputEditor {
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;    final public static String NO_VALUE = &quot;&lt;none&gt;&quot;;
+<i>44</i>&nbsp;
+<b class="fc"><i>45</i>&nbsp;    public enum ExpandOption {TRUE, TRUE_START_COLLAPSED, FALSE, IF_ONE_ITEM}</b>
+<i>46</i>&nbsp;
+<b class="fc"><i>47</i>&nbsp;    public enum ButtonStatus {ALL, NONE, DELETE_ONLY, ADD_ONLY}</b>
+<i>48</i>&nbsp;    
+<b class="fc"><i>49</i>&nbsp;    public enum ValidationStatus {</b>
+<b class="fc"><i>50</i>&nbsp;        IS_VALID,</b>
+<b class="fc"><i>51</i>&nbsp;        IS_INVALID,</b>
+<b class="fc"><i>52</i>&nbsp;        HAS_INVALIDMEMBERS</b>
+<i>53</i>&nbsp;    }
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;    /** type of BEASTObject to which this editor can be used **/ 
+<i>56</i>&nbsp;    Class&lt;?&gt; type();
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;    /** list of types of BEASTObjects to which this editor can be used **/ 
+<i>59</i>&nbsp;    Class&lt;?&gt;[] types();
+<i>60</i>&nbsp;
+<i>61</i>&nbsp;    /** initialise InputEditor
+<i>62</i>&nbsp;     * @param input to be edited
+<i>63</i>&nbsp;     * @param beastObject parent beastObject containing the input
+<i>64</i>&nbsp;     * @param itemNr if the input is a list, itemNr indicates which item to edit in the list
+<i>65</i>&nbsp;     * @param isExpandOption start state of input editor
+<i>66</i>&nbsp;     * @param addButtons button status of input editor
+<i>67</i>&nbsp;     */
+<i>68</i>&nbsp;    void init(Input&lt;?&gt; input, BEASTInterface beastObject, int itemNr, ExpandOption isExpandOption, boolean addButtons);
+<i>69</i>&nbsp;
+<i>70</i>&nbsp;    /** set document with the model containing the input **/
+<i>71</i>&nbsp;    void setDoc(BeautiDoc doc);
+<i>72</i>&nbsp;
+<i>73</i>&nbsp;    /**
+<i>74</i>&nbsp;     * set decoration. This method is deprecated, because decoration can be handled by the JComponent with setBorder method on
+<i>75</i>&nbsp;     **/
+<i>76</i>&nbsp;    //@Deprecated
+<i>77</i>&nbsp;    //void setBorder(Border border);
+<i>78</i>&nbsp;
+<i>79</i>&nbsp;    /** prepare to validate input **/
+<i>80</i>&nbsp;    void startValidating(ValidationStatus state);
+<i>81</i>&nbsp;    
+<i>82</i>&nbsp;    /** validate input and update status of input editor if necessary **/
+<i>83</i>&nbsp;    void validateInput();
+<i>84</i>&nbsp;    
+<i>85</i>&nbsp;    /** add input editor to listen for changes **/
+<i>86</i>&nbsp;    void addValidationListener(InputEditor validateListener);
+<i>87</i>&nbsp;    
+<i>88</i>&nbsp;    /** propagate status of predecessor inputs through list of beastObjects **/
+<i>89</i>&nbsp;    void notifyValidationListeners(ValidationStatus state);
+<i>90</i>&nbsp;    
+<i>91</i>&nbsp;    Component getComponent();
+<i>92</i>&nbsp;
+<i>93</i>&nbsp;public abstract class Base extends JPanel implements InputEditor {
+<i>94</i>&nbsp;
+<i>95</i>&nbsp;    private static final long serialVersionUID = 1L;
+<i>96</i>&nbsp;
+<i>97</i>&nbsp;    /**
+<i>98</i>&nbsp;     * the input to be edited *
+<i>99</i>&nbsp;     */
+<i>100</i>&nbsp;    protected Input&lt;?&gt; m_input;
+<i>101</i>&nbsp;
+<i>102</i>&nbsp;    /**
+<i>103</i>&nbsp;     * parent beastObject *
+<i>104</i>&nbsp;     */
+<i>105</i>&nbsp;    protected BEASTInterface m_beastObject;
+<i>106</i>&nbsp;
+<i>107</i>&nbsp;    /**
+<i>108</i>&nbsp;     * text field used for primitive input editors *
+<i>109</i>&nbsp;     */
+<i>110</i>&nbsp;    protected JTextField m_entry;
+<i>111</i>&nbsp;    
+<i>112</i>&nbsp;    protected int itemNr;
+<i>113</i>&nbsp;
+<i>114</i>&nbsp;    public JTextField getEntry() {
+<b class="fc"><i>115</i>&nbsp;        return m_entry;</b>
+<i>116</i>&nbsp;    }
+<i>117</i>&nbsp;
+<i>118</i>&nbsp;    JLabel m_inputLabel;
+<b class="fc"><i>119</i>&nbsp;    protected static Dimension PREFERRED_SIZE = new Dimension(200, 25);</b>
+<b class="fc"><i>120</i>&nbsp;    protected static Dimension MAX_SIZE = new Dimension(1024, 25);</b>
+<i>121</i>&nbsp;
+<i>122</i>&nbsp;    /**
+<i>123</i>&nbsp;     * flag to indicate label, edit and validate buttons/labels should be added *
+<i>124</i>&nbsp;     */
+<b class="fc"><i>125</i>&nbsp;    protected boolean m_bAddButtons = true;</b>
+<i>126</i>&nbsp;
+<i>127</i>&nbsp;    /**
+<i>128</i>&nbsp;     * label that shows up when validation fails *
+<i>129</i>&nbsp;     */
+<i>130</i>&nbsp;    protected SmallLabel m_validateLabel;
+<i>131</i>&nbsp;
+<i>132</i>&nbsp;    /**
+<i>133</i>&nbsp;     * document that we are editing *
+<i>134</i>&nbsp;     */
+<i>135</i>&nbsp;    protected BeautiDoc doc;
+<i>136</i>&nbsp;
+<i>137</i>&nbsp;    /**
+<i>138</i>&nbsp;     * list of objects that want to be notified of the validation state when it changes *
+<i>139</i>&nbsp;     */
+<i>140</i>&nbsp;    List&lt;InputEditor&gt; m_validateListeners;
+<i>141</i>&nbsp;
+<i>142</i>&nbsp;    @Override
+<i>143</i>&nbsp;	public void addValidationListener(InputEditor validateListener) {
+<b class="fc"><i>144</i>&nbsp;        if (m_validateListeners == null) {</b>
+<b class="fc"><i>145</i>&nbsp;            m_validateListeners = new ArrayList&lt;&gt;();</b>
+<i>146</i>&nbsp;        }
+<b class="fc"><i>147</i>&nbsp;        m_validateListeners.add(validateListener);</b>
+<b class="fc"><i>148</i>&nbsp;    }</b>
+<i>149</i>&nbsp;
+<i>150</i>&nbsp;    @Override
+<i>151</i>&nbsp;	public void notifyValidationListeners(ValidationStatus state) {
+<b class="fc"><i>152</i>&nbsp;        if (m_validateListeners != null) {</b>
+<b class="fc"><i>153</i>&nbsp;            for (InputEditor listener : m_validateListeners) {</b>
+<b class="fc"><i>154</i>&nbsp;                listener.startValidating(state);</b>
+<b class="fc"><i>155</i>&nbsp;            }</b>
+<i>156</i>&nbsp;        }
+<b class="fc"><i>157</i>&nbsp;    }</b>
+<i>158</i>&nbsp;
+<i>159</i>&nbsp;    // TODO this should not be static. Better if it was an instance variable,
+<i>160</i>&nbsp;    // TODO since its currently set by an input of BeautiPanelConfig, which can be different for each BeautiPanel.
+<b class="fc"><i>161</i>&nbsp;    public static int g_nLabelWidth = 150;</b>
+<i>162</i>&nbsp;
+<b class="fc"><i>163</i>&nbsp;	public Base(BeautiDoc doc) {</b>
+<b class="fc"><i>164</i>&nbsp;		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));</b>
+<b class="fc"><i>165</i>&nbsp;		this.doc = doc;</b>
+<b class="fc"><i>166</i>&nbsp;		if (doc != null) {</b>
+<b class="fc"><i>167</i>&nbsp;			doc.currentInputEditors.add(this);</b>
+<i>168</i>&nbsp;		}
+<b class="fc"><i>169</i>&nbsp;	} // c&#39;tor</b>
+<i>170</i>&nbsp;
+<i>171</i>&nbsp;	protected BeautiDoc getDoc() {
+<b class="fc"><i>172</i>&nbsp;        if (doc == null) {</b>
+<b class="nc"><i>173</i>&nbsp;            Component c = this;</b>
+<b class="nc"><i>174</i>&nbsp;            while (c.getParent() != null) {</b>
+<b class="nc"><i>175</i>&nbsp;                c = c.getParent();</b>
+<b class="nc"><i>176</i>&nbsp;                if (c instanceof BeautiPanel) {</b>
+<b class="nc"><i>177</i>&nbsp;                    doc = ((BeautiPanel) c).getDoc();</b>
+<i>178</i>&nbsp;                }
+<i>179</i>&nbsp;            }
+<i>180</i>&nbsp;        }
+<b class="fc"><i>181</i>&nbsp;        return doc;</b>
+<i>182</i>&nbsp;    }
+<i>183</i>&nbsp;
+<i>184</i>&nbsp;    /**
+<i>185</i>&nbsp;     * return class the editor is suitable for.
+<i>186</i>&nbsp;     * Either implement type() or types() if multiple
+<i>187</i>&nbsp;     * types are supported *
+<i>188</i>&nbsp;     */
+<i>189</i>&nbsp;    @Override
+<i>190</i>&nbsp;	abstract public Class&lt;?&gt; type();
+<i>191</i>&nbsp;
+<i>192</i>&nbsp;    @Override
+<i>193</i>&nbsp;	public Class&lt;?&gt;[] types() {
+<b class="fc"><i>194</i>&nbsp;        Class&lt;?&gt;[] types = new Class&lt;?&gt;[1];</b>
+<b class="fc"><i>195</i>&nbsp;        types[0] = type();</b>
+<b class="fc"><i>196</i>&nbsp;        return types;</b>
+<i>197</i>&nbsp;    }
+<i>198</i>&nbsp;
+<i>199</i>&nbsp;    /**
+<i>200</i>&nbsp;     * construct an editor consisting of a label and input entry *
+<i>201</i>&nbsp;     */
+<i>202</i>&nbsp;    @Override
+<i>203</i>&nbsp;	public void init(Input&lt;?&gt; input, BEASTInterface beastObject, int itemNr, ExpandOption isExpandOption, boolean addButtons) {
+<b class="fc"><i>204</i>&nbsp;        m_bAddButtons = addButtons;</b>
+<b class="fc"><i>205</i>&nbsp;        m_input = input;</b>
+<b class="fc"><i>206</i>&nbsp;        m_beastObject = beastObject;</b>
+<b class="fc"><i>207</i>&nbsp;        this.itemNr= itemNr;</b>
+<i>208</i>&nbsp;        
+<b class="fc"><i>209</i>&nbsp;        addInputLabel();</b>
+<i>210</i>&nbsp;
+<b class="fc"><i>211</i>&nbsp;        setUpEntry();</b>
+<i>212</i>&nbsp;
+<b class="fc"><i>213</i>&nbsp;        add(m_entry);</b>
+<b class="fc"><i>214</i>&nbsp;        add(Box.createHorizontalGlue());</b>
+<b class="fc"><i>215</i>&nbsp;        addValidationLabel();</b>
+<b class="fc"><i>216</i>&nbsp;    } // init</b>
+<i>217</i>&nbsp;
+<i>218</i>&nbsp;    void setUpEntry() {
+<b class="fc"><i>219</i>&nbsp;        m_entry = new JTextField();</b>
+<b class="fc"><i>220</i>&nbsp;        m_entry.setName(m_input.getName());</b>
+<b class="fc"><i>221</i>&nbsp;        Dimension prefDim = new Dimension(PREFERRED_SIZE.width, m_entry.getPreferredSize().height);</b>
+<b class="fc"><i>222</i>&nbsp;        Dimension maxDim = new Dimension(MAX_SIZE.width, m_entry.getPreferredSize().height);</b>
+<b class="fc"><i>223</i>&nbsp;        m_entry.setMinimumSize(prefDim);</b>
+<b class="fc"><i>224</i>&nbsp;        m_entry.setPreferredSize(prefDim);</b>
+<b class="fc"><i>225</i>&nbsp;        m_entry.setSize(prefDim);</b>
+<b class="fc"><i>226</i>&nbsp;        initEntry();</b>
+<b class="fc"><i>227</i>&nbsp;        m_entry.setToolTipText(m_input.getHTMLTipText());</b>
+<b class="fc"><i>228</i>&nbsp;        m_entry.setMaximumSize(maxDim);</b>
+<i>229</i>&nbsp;
+<b class="fc"><i>230</i>&nbsp;        m_entry.getDocument().addDocumentListener(new DocumentListener() {</b>
+<i>231</i>&nbsp;            @Override
+<i>232</i>&nbsp;            public void removeUpdate(DocumentEvent e) {
+<b class="fc"><i>233</i>&nbsp;                processEntry();</b>
+<b class="fc"><i>234</i>&nbsp;            }</b>
+<i>235</i>&nbsp;
+<i>236</i>&nbsp;            @Override
+<i>237</i>&nbsp;            public void insertUpdate(DocumentEvent e) {
+<b class="fc"><i>238</i>&nbsp;                processEntry();</b>
+<b class="fc"><i>239</i>&nbsp;            }</b>
+<i>240</i>&nbsp;
+<i>241</i>&nbsp;            @Override
+<i>242</i>&nbsp;            public void changedUpdate(DocumentEvent e) {
+<b class="nc"><i>243</i>&nbsp;                processEntry();</b>
+<b class="nc"><i>244</i>&nbsp;            }</b>
+<i>245</i>&nbsp;        });
+<b class="fc"><i>246</i>&nbsp;    }</b>
+<i>247</i>&nbsp;
+<i>248</i>&nbsp;    protected void initEntry() {
+<b class="fc"><i>249</i>&nbsp;        if (m_input.get() != null) {</b>
+<b class="fc"><i>250</i>&nbsp;            m_entry.setText(m_input.get().toString());</b>
+<i>251</i>&nbsp;        }
+<b class="fc"><i>252</i>&nbsp;    }</b>
+<i>253</i>&nbsp;
+<i>254</i>&nbsp;    @SuppressWarnings({ &quot;unchecked&quot;, &quot;rawtypes&quot; })
+<i>255</i>&nbsp;	protected void setValue(Object o) {
+<b class="fc"><i>256</i>&nbsp;    	if (itemNr &lt; 0) {</b>
+<b class="fc"><i>257</i>&nbsp;    		m_input.setValue(o, m_beastObject);</b>
+<i>258</i>&nbsp;    	} else {
+<i>259</i>&nbsp;    		// set value of an item in a list
+<b class="nc"><i>260</i>&nbsp;    		List list = (List) m_input.get();</b>
+<b class="nc"><i>261</i>&nbsp;    		Object other = list.get(itemNr);</b>
+<b class="nc"><i>262</i>&nbsp;    		if (other != o) {</b>
+<b class="nc"><i>263</i>&nbsp;    			if (other instanceof BEASTInterface) {</b>
+<b class="nc"><i>264</i>&nbsp;    				BEASTInterface.getOutputs(other).remove(m_beastObject);</b>
+<i>265</i>&nbsp;    			}
+<b class="nc"><i>266</i>&nbsp;    			list.set(itemNr, o);</b>
+<b class="nc"><i>267</i>&nbsp;    			if (o instanceof BEASTInterface) {</b>
+<b class="nc"><i>268</i>&nbsp;    				BEASTInterface.getOutputs(o).add(m_beastObject);</b>
+<i>269</i>&nbsp;    			}
+<i>270</i>&nbsp;    		}
+<i>271</i>&nbsp;    	}
+<b class="fc"><i>272</i>&nbsp;    }</b>
+<i>273</i>&nbsp;    
+<i>274</i>&nbsp;    protected void processEntry() {
+<i>275</i>&nbsp;        try {
+<b class="fc"><i>276</i>&nbsp;        	setValue(m_entry.getText());</b>
+<b class="fc"><i>277</i>&nbsp;            validateInput();</b>
+<b class="fc"><i>278</i>&nbsp;            m_entry.requestFocusInWindow();</b>
+<b class="fc"><i>279</i>&nbsp;        } catch (Exception ex) {</b>
+<i>280</i>&nbsp;//			JOptionPane.showMessageDialog(null, &quot;Error while setting &quot; + m_input.getName() + &quot;: &quot; + ex.getMessage() +
+<i>281</i>&nbsp;//					&quot; Leaving value at &quot; + m_input.get());
+<i>282</i>&nbsp;//			m_entry.setText(m_input.get() + &quot;&quot;);
+<b class="fc"><i>283</i>&nbsp;            if (m_validateLabel != null) {</b>
+<b class="fc"><i>284</i>&nbsp;                m_validateLabel.setVisible(true);</b>
+<b class="fc"><i>285</i>&nbsp;                m_validateLabel.setToolTipText(&quot;&lt;html&gt;&lt;p&gt;Parsing error: &quot; + ex.getMessage() + &quot;. Value was left at &quot; + m_input.get() + &quot;.&lt;/p&gt;&lt;/html&gt;&quot;);</b>
+<b class="fc"><i>286</i>&nbsp;                m_validateLabel.m_circleColor = Color.orange;</b>
+<i>287</i>&nbsp;            }
+<b class="fc"><i>288</i>&nbsp;            repaint();</b>
+<b class="fc"><i>289</i>&nbsp;        }</b>
+<b class="fc"><i>290</i>&nbsp;    }</b>
+<i>291</i>&nbsp;
+<i>292</i>&nbsp;    protected void addInputLabel() {
+<b class="fc"><i>293</i>&nbsp;        if (m_bAddButtons) {</b>
+<b class="fc"><i>294</i>&nbsp;            String name = formatName(m_input.getName());</b>
+<b class="fc"><i>295</i>&nbsp;            addInputLabel(name, m_input.getHTMLTipText());</b>
+<i>296</i>&nbsp;        }
+<b class="fc"><i>297</i>&nbsp;    }</b>
+<i>298</i>&nbsp;
+<i>299</i>&nbsp;    protected String formatName(String name) {
+<b class="fc"><i>300</i>&nbsp;	    if (doc.beautiConfig.inputLabelMap.containsKey(m_beastObject.getClass().getName() + &quot;.&quot; + name)) {</b>
+<b class="fc"><i>301</i>&nbsp;	        name = doc.beautiConfig.inputLabelMap.get(m_beastObject.getClass().getName() + &quot;.&quot; + name);</b>
+<i>302</i>&nbsp;	    } else {
+<b class="fc"><i>303</i>&nbsp;	        name = name.replaceAll(&quot;([a-z])([A-Z])&quot;, &quot;$1 $2&quot;);</b>
+<b class="fc"><i>304</i>&nbsp;	        name = name.substring(0, 1).toUpperCase() + name.substring(1);</b>
+<i>305</i>&nbsp;	    }
+<b class="fc"><i>306</i>&nbsp;	    return name;</b>
+<i>307</i>&nbsp;    }
+<i>308</i>&nbsp;
+<i>309</i>&nbsp;    protected void addInputLabel(String label, String tipText) {
+<b class="fc"><i>310</i>&nbsp;        if (m_bAddButtons) {</b>
+<b class="fc"><i>311</i>&nbsp;            m_inputLabel = new JLabel(label);</b>
+<b class="fc"><i>312</i>&nbsp;            m_inputLabel.setToolTipText(tipText);</b>
+<b class="fc"><i>313</i>&nbsp;            m_inputLabel.setHorizontalTextPosition(SwingConstants.RIGHT);</b>
+<i>314</i>&nbsp;            //Dimension size = new Dimension(g_nLabelWidth, 20);
+<b class="fc"><i>315</i>&nbsp;            Dimension size = new Dimension(200, 20);</b>
+<b class="fc"><i>316</i>&nbsp;            m_inputLabel.setMaximumSize(size);</b>
+<b class="fc"><i>317</i>&nbsp;            m_inputLabel.setMinimumSize(size);</b>
+<b class="fc"><i>318</i>&nbsp;            m_inputLabel.setPreferredSize(size);</b>
+<b class="fc"><i>319</i>&nbsp;            m_inputLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));</b>
+<i>320</i>&nbsp;
+<i>321</i>&nbsp;//            m_inputLabel.setSize(size);
+<i>322</i>&nbsp;//            m_inputLabel.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+<i>323</i>&nbsp;            // RRB: temporary
+<i>324</i>&nbsp;            //m_inputLabel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+<b class="fc"><i>325</i>&nbsp;            add(m_inputLabel);</b>
+<i>326</i>&nbsp;        }
+<b class="fc"><i>327</i>&nbsp;    }</b>
+<i>328</i>&nbsp;
+<i>329</i>&nbsp;    protected void addValidationLabel() {
+<b class="fc"><i>330</i>&nbsp;        if (m_bAddButtons) {</b>
+<b class="fc"><i>331</i>&nbsp;            m_validateLabel = new SmallLabel(&quot;x&quot;, new Color(200, 0, 0));</b>
+<b class="fc"><i>332</i>&nbsp;            add(m_validateLabel);</b>
+<b class="fc"><i>333</i>&nbsp;            m_validateLabel.setVisible(true);</b>
+<b class="fc"><i>334</i>&nbsp;            validateInput();</b>
+<i>335</i>&nbsp;        }
+<b class="fc"><i>336</i>&nbsp;    }</b>
+<i>337</i>&nbsp;
+<i>338</i>&nbsp;    /* check the input is valid, continue checking recursively */
+<i>339</i>&nbsp;    protected void validateAllEditors() {
+<b class="nc"><i>340</i>&nbsp;        for (InputEditor editor : doc.currentInputEditors) {</b>
+<b class="nc"><i>341</i>&nbsp;            editor.validateInput();</b>
+<b class="nc"><i>342</i>&nbsp;        }</b>
+<b class="nc"><i>343</i>&nbsp;    }</b>
+<i>344</i>&nbsp;
+<i>345</i>&nbsp;    @Override
+<i>346</i>&nbsp;    public void validateInput() {
+<i>347</i>&nbsp;        try {
+<b class="fc"><i>348</i>&nbsp;            m_input.validate();</b>
+<b class="fc"><i>349</i>&nbsp;            if (m_entry != null &amp;&amp; !m_input.canSetValue(m_entry.getText(), m_beastObject)) {</b>
+<b class="nc"><i>350</i>&nbsp;                throw new IllegalArgumentException(&quot;invalid value&quot;);</b>
+<i>351</i>&nbsp;            }
+<i>352</i>&nbsp;            // recurse
+<i>353</i>&nbsp;            try {
+<b class="fc"><i>354</i>&nbsp;                validateRecursively(m_input, new HashSet&lt;&gt;());</b>
+<b class="nc"><i>355</i>&nbsp;            } catch (Exception e) {</b>
+<b class="nc"><i>356</i>&nbsp;                notifyValidationListeners(ValidationStatus.HAS_INVALIDMEMBERS);</b>
+<b class="nc"><i>357</i>&nbsp;                if (m_validateLabel != null) {</b>
+<b class="nc"><i>358</i>&nbsp;                    m_validateLabel.setVisible(true);</b>
+<b class="nc"><i>359</i>&nbsp;                    m_validateLabel.setToolTipText(&quot;&lt;html&gt;&lt;p&gt;Recursive error in &quot; + e.getMessage() + &quot;&lt;/p&gt;&lt;/html&gt;&quot;);</b>
+<b class="nc"><i>360</i>&nbsp;                    m_validateLabel.m_circleColor = Color.orange;</b>
+<i>361</i>&nbsp;                }
+<b class="nc"><i>362</i>&nbsp;                repaint();</b>
+<b class="nc"><i>363</i>&nbsp;                return;</b>
+<b class="fc"><i>364</i>&nbsp;            }</b>
+<b class="fc"><i>365</i>&nbsp;            if (m_validateLabel != null) {</b>
+<b class="fc"><i>366</i>&nbsp;                m_validateLabel.setVisible(false);</b>
+<i>367</i>&nbsp;            }
+<b class="fc"><i>368</i>&nbsp;            notifyValidationListeners(ValidationStatus.IS_VALID);</b>
+<b class="fc"><i>369</i>&nbsp;        } catch (Exception e) {</b>
+<b class="fc"><i>370</i>&nbsp;            Log.err.println(&quot;Validation message: &quot; + e.getMessage());</b>
+<b class="fc"><i>371</i>&nbsp;            if (m_validateLabel != null) {</b>
+<b class="fc"><i>372</i>&nbsp;                m_validateLabel.setToolTipText(e.getMessage());</b>
+<b class="fc"><i>373</i>&nbsp;                m_validateLabel.m_circleColor = Color.red;</b>
+<b class="fc"><i>374</i>&nbsp;                m_validateLabel.setVisible(true);</b>
+<i>375</i>&nbsp;            }
+<b class="fc"><i>376</i>&nbsp;            notifyValidationListeners(ValidationStatus.IS_INVALID);</b>
+<b class="fc"><i>377</i>&nbsp;        }</b>
+<b class="fc"><i>378</i>&nbsp;        repaint();</b>
+<b class="fc"><i>379</i>&nbsp;    }</b>
+<i>380</i>&nbsp;
+<i>381</i>&nbsp;    /* Recurse in any of the input beastObjects
+<i>382</i>&nbsp;      * and validate its inputs */
+<i>383</i>&nbsp;    void validateRecursively(Input&lt;?&gt; input, Set&lt;Input&lt;?&gt;&gt; done) {
+<b class="fc"><i>384</i>&nbsp;        if (done.contains(input)) {</b>
+<i>385</i>&nbsp;            // this prevent cycles to lock up validation
+<b class="fc"><i>386</i>&nbsp;            return;</b>
+<i>387</i>&nbsp;        } else {
+<b class="fc"><i>388</i>&nbsp;            done.add(input);</b>
+<i>389</i>&nbsp;        }
+<b class="fc"><i>390</i>&nbsp;        if (input.get() != null) {</b>
+<b class="fc"><i>391</i>&nbsp;            if (input.get() instanceof BEASTInterface) {</b>
+<b class="fc"><i>392</i>&nbsp;                BEASTInterface beastObject = ((BEASTInterface) input.get());</b>
+<b class="fc"><i>393</i>&nbsp;                for (Input&lt;?&gt; input2 : beastObject.listInputs()) {</b>
+<i>394</i>&nbsp;                    try {
+<b class="fc"><i>395</i>&nbsp;                        input2.validate();</b>
+<b class="nc"><i>396</i>&nbsp;                    } catch (Exception e) {</b>
+<b class="nc"><i>397</i>&nbsp;                        throw new IllegalArgumentException(((BEASTInterface) input.get()).getID() + &quot;&lt;/p&gt;&lt;p&gt; &quot; + e.getMessage());</b>
+<b class="fc"><i>398</i>&nbsp;                    }</b>
+<b class="fc"><i>399</i>&nbsp;                    validateRecursively(input2, done);</b>
+<b class="fc"><i>400</i>&nbsp;                }</b>
+<i>401</i>&nbsp;            }
+<b class="fc"><i>402</i>&nbsp;            if (input.get() instanceof List&lt;?&gt;) {</b>
+<b class="fc"><i>403</i>&nbsp;                for (Object o : (List&lt;?&gt;) input.get()) {</b>
+<b class="fc"><i>404</i>&nbsp;                    if (o != null &amp;&amp; o instanceof BEASTInterface) {</b>
+<b class="fc"><i>405</i>&nbsp;                        BEASTInterface beastObject = (BEASTInterface) o;</b>
+<b class="fc"><i>406</i>&nbsp;                        for (Input&lt;?&gt; input2 : beastObject.listInputs()) {</b>
+<i>407</i>&nbsp;                            try {
+<b class="fc"><i>408</i>&nbsp;                                input2.validate();</b>
+<b class="nc"><i>409</i>&nbsp;                            } catch (Exception e) {</b>
+<b class="nc"><i>410</i>&nbsp;                                throw new IllegalArgumentException(((BEASTInterface) o).getID() + &quot; &quot; + e.getMessage());</b>
+<b class="fc"><i>411</i>&nbsp;                            }</b>
+<b class="fc"><i>412</i>&nbsp;                            validateRecursively(input2, done);</b>
+<b class="fc"><i>413</i>&nbsp;                        }</b>
+<i>414</i>&nbsp;                    }
+<b class="fc"><i>415</i>&nbsp;                }</b>
+<i>416</i>&nbsp;            }
+<i>417</i>&nbsp;        }
+<b class="fc"><i>418</i>&nbsp;    } // validateRecursively</b>
+<i>419</i>&nbsp;
+<i>420</i>&nbsp;    @Override
+<i>421</i>&nbsp;    public void startValidating(ValidationStatus state) {
+<b class="fc"><i>422</i>&nbsp;        validateInput();</b>
+<b class="fc"><i>423</i>&nbsp;    }</b>
+<i>424</i>&nbsp;
+<i>425</i>&nbsp;
+<i>426</i>&nbsp;    public void refreshPanel() {
+<b class="fc"><i>427</i>&nbsp;        Component c = this;</b>
+<b class="fc"><i>428</i>&nbsp;        while (c.getParent() != null) {</b>
+<b class="fc"><i>429</i>&nbsp;            c = c.getParent();</b>
+<b class="fc"><i>430</i>&nbsp;            if (c instanceof ListSelectionListener) {</b>
+<b class="fc"><i>431</i>&nbsp;                ((ListSelectionListener) c).valueChanged(null);</b>
+<i>432</i>&nbsp;            }
+<i>433</i>&nbsp;        }
+<b class="fc"><i>434</i>&nbsp;    }</b>
+<i>435</i>&nbsp;
+<i>436</i>&nbsp;    /**
+<i>437</i>&nbsp;     * synchronise values in panel with current network *
+<i>438</i>&nbsp;     */
+<i>439</i>&nbsp;    protected void sync() {
+<b class="fc"><i>440</i>&nbsp;        Component c = this;</b>
+<b class="fc"><i>441</i>&nbsp;        while (c.getParent() != null) {</b>
+<b class="fc"><i>442</i>&nbsp;            c = c.getParent();</b>
+<b class="fc"><i>443</i>&nbsp;            if (c instanceof BeautiPanel) {</b>
+<b class="fc"><i>444</i>&nbsp;                BeautiPanel panel = (BeautiPanel) c;</b>
+<b class="fc"><i>445</i>&nbsp;                BeautiPanelConfig cfgPanel = panel.config;</b>
+<b class="fc"><i>446</i>&nbsp;                cfgPanel.sync(panel.partitionIndex);</b>
+<b class="fc"><i>447</i>&nbsp;            }</b>
+<i>448</i>&nbsp;        }
+<b class="fc"><i>449</i>&nbsp;    }</b>
+<i>450</i>&nbsp;
+<i>451</i>&nbsp;    // we should leave it to the component to set its own border
+<i>452</i>&nbsp;    @Override
+<i>453</i>&nbsp;	@Deprecated
+<i>454</i>&nbsp;    public void setBorder(Border border) {
+<b class="fc"><i>455</i>&nbsp;		super.setBorder(border);</b>
+<b class="fc"><i>456</i>&nbsp;    }</b>
+<i>457</i>&nbsp;
+<i>458</i>&nbsp;    @Override
+<i>459</i>&nbsp;    public void setDoc(BeautiDoc doc) {
+<b class="fc"><i>460</i>&nbsp;    	this.doc = doc;</b>
+<b class="fc"><i>461</i>&nbsp;    }</b>
+<i>462</i>&nbsp;
+<i>463</i>&nbsp;    // what is this method for? We should leave repainting to the standard mechanism
+<i>464</i>&nbsp;    // RRB: Did not always work in the past. The following should suffice (though perhaps
+<i>465</i>&nbsp;    // slightly less efficient to also revalidate, but have not noticed any difference)
+<i>466</i>&nbsp;	@Override
+<i>467</i>&nbsp;	public void repaint() {
+<i>468</i>&nbsp;		// tell Swing that an area of the window is dirty
+<b class="fc"><i>469</i>&nbsp;		super.repaint();</b>
+<i>470</i>&nbsp;		
+<i>471</i>&nbsp;		// tell the layout manager to recalculate the layout
+<b class="fc"><i>472</i>&nbsp;		super.revalidate();</b>
+<b class="fc"><i>473</i>&nbsp;	}</b>
+<i>474</i>&nbsp;
+<i>475</i>&nbsp;	@Override
+<i>476</i>&nbsp;	public Component getComponent() {
+<b class="fc"><i>477</i>&nbsp;		return this;</b>
+<i>478</i>&nbsp;	}
+<i>479</i>&nbsp;
+<i>480</i>&nbsp;} // class InputEditor.Base
+<i>481</i>&nbsp;
+<i>482</i>&nbsp;} // InputEditor interface
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

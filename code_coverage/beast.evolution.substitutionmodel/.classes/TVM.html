@@ -1,0 +1,185 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TVM</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.substitutionmodel</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TVM (beast.evolution.substitutionmodel)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TVM</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 46)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.substitutionmodel;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.lang.reflect.InvocationTargetException;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import beast.core.Description;
+<i>6</i>&nbsp;import beast.core.Input;
+<i>7</i>&nbsp;import beast.core.Input.Validate;
+<i>8</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>9</i>&nbsp;import beast.evolution.datatype.DataType;
+<i>10</i>&nbsp;import beast.evolution.datatype.Nucleotide;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;@Description(&quot;Transversion model of nucleotide evolution (variable transversion rates, equal transition rates).&quot; +
+<i>13</i>&nbsp;        &quot;Rates that are not specified are assumed to be 1.&quot;)
+<i>14</i>&nbsp;public class TVM extends GeneralSubstitutionModel {
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;    // Transversion rates
+<b class="nc"><i>17</i>&nbsp;    final public Input&lt;RealParameter&gt; rateACInput = new Input&lt;&gt;(&quot;rateAC&quot;, &quot;substitution rate for A to C (default 1)&quot;);</b>
+<b class="nc"><i>18</i>&nbsp;    final public Input&lt;RealParameter&gt; rateATInput = new Input&lt;&gt;(&quot;rateAT&quot;, &quot;substitution rate for A to T (default 1)&quot;);</b>
+<b class="nc"><i>19</i>&nbsp;    final public Input&lt;RealParameter&gt; rateCGInput = new Input&lt;&gt;(&quot;rateCG&quot;, &quot;substitution rate for C to G (default 1)&quot;);</b>
+<b class="nc"><i>20</i>&nbsp;    final public Input&lt;RealParameter&gt; rateGTInput = new Input&lt;&gt;(&quot;rateGT&quot;, &quot;substitution rate for G to T (default 1)&quot;);</b>
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;    // Transition rates
+<b class="nc"><i>23</i>&nbsp;    final public Input&lt;RealParameter&gt; rateTransitionsInput = new Input&lt;&gt;(&quot;rateTransitions&quot;, &quot;substitution rate for A&lt;-&gt;G and C&lt;-&gt;T&quot;);</b>
+<i>24</i>&nbsp;
+<i>25</i>&nbsp;    RealParameter rateAC;
+<i>26</i>&nbsp;    RealParameter rateGT;
+<i>27</i>&nbsp;    RealParameter rateAT;
+<i>28</i>&nbsp;    RealParameter rateCG;
+<i>29</i>&nbsp;    RealParameter rateTransitions;
+<i>30</i>&nbsp;
+<b class="nc"><i>31</i>&nbsp;    public TVM() {</b>
+<b class="nc"><i>32</i>&nbsp;        ratesInput.setRule(Validate.OPTIONAL);</b>
+<i>33</i>&nbsp;        try {
+<b class="nc"><i>34</i>&nbsp;            ratesInput.setValue(null, this);</b>
+<b class="nc"><i>35</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>36</i>&nbsp;            e.printStackTrace();</b>
+<i>37</i>&nbsp;            // TODO: handle exception
+<b class="nc"><i>38</i>&nbsp;        }</b>
+<i>39</i>&nbsp;    }
+<i>40</i>&nbsp;
+<i>41</i>&nbsp;    @Override
+<i>42</i>&nbsp;    public void initAndValidate() {
+<b class="nc"><i>43</i>&nbsp;        if (ratesInput.get() != null) {</b>
+<b class="nc"><i>44</i>&nbsp;            throw new IllegalArgumentException(&quot;the rates attribute should not be used. Use the individual rates rateAC, rateCG, etc, instead.&quot;);</b>
+<i>45</i>&nbsp;        }
+<i>46</i>&nbsp;
+<b class="nc"><i>47</i>&nbsp;        frequencies = frequenciesInput.get();</b>
+<b class="nc"><i>48</i>&nbsp;        updateMatrix = true;</b>
+<b class="nc"><i>49</i>&nbsp;        nrOfStates = frequencies.getFreqs().length;</b>
+<b class="nc"><i>50</i>&nbsp;        if (nrOfStates != 4) {</b>
+<b class="nc"><i>51</i>&nbsp;            throw new IllegalArgumentException(&quot;Frequencies has wrong size. Expected 4, but got &quot; + nrOfStates);</b>
+<i>52</i>&nbsp;        }
+<i>53</i>&nbsp;
+<i>54</i>&nbsp;        try {
+<b class="nc"><i>55</i>&nbsp;			eigenSystem = createEigenSystem();</b>
+<b class="nc"><i>56</i>&nbsp;		} catch (SecurityException | ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException</b>
+<i>57</i>&nbsp;				| InvocationTargetException e) {
+<b class="nc"><i>58</i>&nbsp;			throw new IllegalArgumentException(e.getMessage());</b>
+<b class="nc"><i>59</i>&nbsp;		}</b>
+<b class="nc"><i>60</i>&nbsp;        rateMatrix = new double[nrOfStates][nrOfStates];</b>
+<b class="nc"><i>61</i>&nbsp;        relativeRates = new double[nrOfStates * (nrOfStates - 1)];</b>
+<b class="nc"><i>62</i>&nbsp;        storedRelativeRates = new double[nrOfStates * (nrOfStates - 1)];</b>
+<i>63</i>&nbsp;
+<b class="nc"><i>64</i>&nbsp;        rateAC = getParameter(rateACInput);</b>
+<b class="nc"><i>65</i>&nbsp;        rateAT = getParameter(rateATInput);</b>
+<b class="nc"><i>66</i>&nbsp;        rateCG = getParameter(rateCGInput);</b>
+<b class="nc"><i>67</i>&nbsp;        rateGT = getParameter(rateGTInput);</b>
+<i>68</i>&nbsp;
+<b class="nc"><i>69</i>&nbsp;        rateTransitions = getParameter(rateTransitionsInput);</b>
+<i>70</i>&nbsp;    }
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;    private RealParameter getParameter(Input&lt;RealParameter&gt; parameterInput) {
+<b class="nc"><i>73</i>&nbsp;        if (parameterInput.get() != null) {</b>
+<b class="nc"><i>74</i>&nbsp;            return parameterInput.get();</b>
+<i>75</i>&nbsp;        }
+<b class="nc"><i>76</i>&nbsp;        return new RealParameter(&quot;1.0&quot;);</b>
+<i>77</i>&nbsp;    }
+<i>78</i>&nbsp;
+<i>79</i>&nbsp;    @Override
+<i>80</i>&nbsp;    protected void setupRelativeRates() {
+<b class="nc"><i>81</i>&nbsp;        relativeRates[0] = rateAC.getValue(); // A-&gt;C</b>
+<b class="nc"><i>82</i>&nbsp;        relativeRates[1] = rateTransitions.getValue(); // A-&gt;G</b>
+<b class="nc"><i>83</i>&nbsp;        relativeRates[2] = rateAT.getValue(); // A-&gt;T</b>
+<i>84</i>&nbsp;
+<b class="nc"><i>85</i>&nbsp;        relativeRates[3] = rateAC.getValue(); // C-&gt;A</b>
+<b class="nc"><i>86</i>&nbsp;        relativeRates[4] = rateCG.getValue(); // C-&gt;G</b>
+<b class="nc"><i>87</i>&nbsp;        relativeRates[5] = rateTransitions.getValue(); // C-&gt;T</b>
+<i>88</i>&nbsp;
+<b class="nc"><i>89</i>&nbsp;        relativeRates[6] = rateTransitions.getValue(); // G-&gt;A</b>
+<b class="nc"><i>90</i>&nbsp;        relativeRates[7] = rateCG.getValue(); // G-&gt;C</b>
+<b class="nc"><i>91</i>&nbsp;        relativeRates[8] = rateGT.getValue(); // G-&gt;T</b>
+<i>92</i>&nbsp;
+<b class="nc"><i>93</i>&nbsp;        relativeRates[9] = rateAT.getValue(); // T-&gt;A</b>
+<b class="nc"><i>94</i>&nbsp;        relativeRates[10] = rateTransitions.getValue(); //T-&gt;C</b>
+<b class="nc"><i>95</i>&nbsp;        relativeRates[11] = rateGT.getValue(); //T-&gt;G</b>
+<i>96</i>&nbsp;    }
+<i>97</i>&nbsp;
+<i>98</i>&nbsp;    @Override
+<i>99</i>&nbsp;    public boolean canHandleDataType(DataType dataType) {
+<b class="nc"><i>100</i>&nbsp;        return dataType instanceof Nucleotide;</b>
+<i>101</i>&nbsp;    }
+<i>102</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,281 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: SubstitutionModel</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.substitutionmodel</a> ]
+</div>
+
+<h1>Coverage Summary for Class: SubstitutionModel (beast.evolution.substitutionmodel)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+  <tr>
+    <td class="name">SubstitutionModel$Base</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (4/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (6/ 8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SubstitutionModel$NucleotideBase</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (10/ 12)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    70%
+  </span>
+  <span class="absValue">
+    (7/ 10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (16/ 20)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;* File SubstitutionModel.java
+<i>3</i>&nbsp;*
+<i>4</i>&nbsp;* Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>5</i>&nbsp;*
+<i>6</i>&nbsp;* This file is part of BEAST2.
+<i>7</i>&nbsp;* See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp;* information regarding copyright ownership and licensing.
+<i>9</i>&nbsp;*
+<i>10</i>&nbsp;* BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp;* it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp;* published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp;* of the License, or (at your option) any later version.
+<i>14</i>&nbsp;*
+<i>15</i>&nbsp;*  BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp;*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp;*  GNU Lesser General Public License for more details.
+<i>19</i>&nbsp;*
+<i>20</i>&nbsp;* You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp;* License along with BEAST; if not, write to the
+<i>22</i>&nbsp;* Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp;* Boston, MA  02110-1301  USA
+<i>24</i>&nbsp;*/
+<i>25</i>&nbsp;package beast.evolution.substitutionmodel;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;import beast.core.CalculationNode;
+<i>29</i>&nbsp;import beast.core.Description;
+<i>30</i>&nbsp;import beast.core.Input;
+<i>31</i>&nbsp;import beast.core.Input.Validate;
+<i>32</i>&nbsp;import beast.evolution.datatype.DataType;
+<i>33</i>&nbsp;import beast.evolution.tree.Node;
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;@Description(&quot;Specifies substitution model from which a transition probability matrix for a given &quot; +
+<i>37</i>&nbsp;        &quot;distance can be obtained.&quot;)
+<i>38</i>&nbsp;public interface SubstitutionModel {
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;    /**
+<i>41</i>&nbsp;     * get the complete transition probability matrix for the given distance
+<i>42</i>&nbsp;     * determined as (startTime-endTime)*rate
+<i>43</i>&nbsp;     *
+<i>44</i>&nbsp;     * @param node       tree node for which to calculate the probabilities
+<i>45</i>&nbsp;     * @param startTime
+<i>46</i>&nbsp;     * @param endTime   we assume start time is larger than end time
+<i>47</i>&nbsp;     * @param rate      rate, includes gamma rates and branch rates
+<i>48</i>&nbsp;     * @param matrix     an array to store the matrix which represents the transition probability
+<i>49</i>&nbsp;     *                   matrix in the form of an array. So, matrix must be of size n*n where n is number of states.
+<i>50</i>&nbsp;     */
+<i>51</i>&nbsp;    void getTransitionProbabilities(Node node, double startTime, double endTime, double rate, double[] matrix);
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;    /**
+<i>54</i>&nbsp;     * @param node In most cases, the rate matrix is independent of the tree, but if it changes
+<i>55</i>&nbsp;     *             throughout a tree, the node can provide this information.
+<i>56</i>&nbsp;     * @return instantaneous rate matrix Q, where Q is flattened into an array
+<i>57</i>&nbsp;     *         This is a square matrix, where rows add to zero, or null when no rate
+<i>58</i>&nbsp;     *         matrix is available.
+<i>59</i>&nbsp;     */
+<i>60</i>&nbsp;    double[] getRateMatrix(Node node);
+<i>61</i>&nbsp;
+<i>62</i>&nbsp;    /**
+<i>63</i>&nbsp;     * return frequencies for root distribution *
+<i>64</i>&nbsp;     */
+<i>65</i>&nbsp;    double[] getFrequencies();
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;    public int getStateCount();
+<i>68</i>&nbsp;
+<i>69</i>&nbsp;
+<i>70</i>&nbsp;    /**
+<i>71</i>&nbsp;     * This function returns the Eigen decomposition of the instantaneous rate matrix if available.
+<i>72</i>&nbsp;     * Such Eigen decomposition may not be available because the substitution model changes over time,
+<i>73</i>&nbsp;     * for example, when one HKY model applies for some time t less than threshold time T while a GTR
+<i>74</i>&nbsp;     * model applies when t &gt;= T.
+<i>75</i>&nbsp;     *
+<i>76</i>&nbsp;     * @param node In most cases, the rate matrix, and thus the Eigen decomposition, is independent of the tree,
+<i>77</i>&nbsp;     *             but if it changes throughout a tree, the node can provide this information.
+<i>78</i>&nbsp;     * @return the EigenDecomposition, null if not available
+<i>79</i>&nbsp;     */
+<i>80</i>&nbsp;    EigenDecomposition getEigenDecomposition(Node node);
+<i>81</i>&nbsp;
+<i>82</i>&nbsp;    /**
+<i>83</i>&nbsp;     * @return whether substitution model can return complex diagonalizations
+<i>84</i>&nbsp;     *         If so, for example, a treelikelihood needs to be able to deal with this.
+<i>85</i>&nbsp;     */
+<i>86</i>&nbsp;    boolean canReturnComplexDiagonalization();
+<i>87</i>&nbsp;
+<i>88</i>&nbsp;    /**
+<i>89</i>&nbsp;     * return true if this substitution model is suitable for the data type
+<i>90</i>&nbsp;     */
+<i>91</i>&nbsp;    boolean canHandleDataType(DataType dataType);
+<i>92</i>&nbsp;
+<i>93</i>&nbsp;    /**
+<i>94</i>&nbsp;     * basic implementation of a SubstitutionModel bringing together relevant super class*
+<i>95</i>&nbsp;     */
+<i>96</i>&nbsp;    @Description(value = &quot;Base implementation of a substitution model.&quot;, isInheritable = false)
+<b class="fc"><i>97</i>&nbsp;    public abstract class Base extends CalculationNode implements SubstitutionModel {</b>
+<b class="fc"><i>98</i>&nbsp;        final public Input&lt;Frequencies&gt; frequenciesInput =</b>
+<i>99</i>&nbsp;                new Input&lt;&gt;(&quot;frequencies&quot;, &quot;substitution model equilibrium state frequencies&quot;, Validate.REQUIRED);
+<i>100</i>&nbsp;
+<i>101</i>&nbsp;        /**
+<i>102</i>&nbsp;         * shadows frequencies, or can be set by subst model *
+<i>103</i>&nbsp;         */
+<i>104</i>&nbsp;        protected Frequencies frequencies;
+<i>105</i>&nbsp;
+<i>106</i>&nbsp;        /**
+<i>107</i>&nbsp;         * number of states *
+<i>108</i>&nbsp;         */
+<i>109</i>&nbsp;        protected int nrOfStates;
+<i>110</i>&nbsp;
+<i>111</i>&nbsp;        @Override
+<i>112</i>&nbsp;        public void initAndValidate() {
+<b class="fc"><i>113</i>&nbsp;            frequencies = frequenciesInput.get();</b>
+<b class="fc"><i>114</i>&nbsp;        }</b>
+<i>115</i>&nbsp;
+<i>116</i>&nbsp;        @Override
+<i>117</i>&nbsp;        public double[] getFrequencies() {
+<b class="fc"><i>118</i>&nbsp;            return frequencies.getFreqs();</b>
+<i>119</i>&nbsp;        }
+<i>120</i>&nbsp;
+<i>121</i>&nbsp;        @Override
+<i>122</i>&nbsp;        public int getStateCount() {
+<b class="nc"><i>123</i>&nbsp;            return nrOfStates;</b>
+<i>124</i>&nbsp;        }
+<i>125</i>&nbsp;
+<i>126</i>&nbsp;
+<i>127</i>&nbsp;        @Override
+<i>128</i>&nbsp;        public boolean canReturnComplexDiagonalization() {
+<b class="fc"><i>129</i>&nbsp;            return false;</b>
+<i>130</i>&nbsp;        }
+<i>131</i>&nbsp;
+<i>132</i>&nbsp;        @Override
+<i>133</i>&nbsp;        public double[] getRateMatrix(Node node) {
+<b class="nc"><i>134</i>&nbsp;            return null;</b>
+<i>135</i>&nbsp;        }
+<i>136</i>&nbsp;
+<i>137</i>&nbsp;    } // class Base
+<i>138</i>&nbsp;
+<i>139</i>&nbsp;    /**
+<i>140</i>&nbsp;     * basic implementation of a SubstitutionModel bringing together relevant super class*
+<i>141</i>&nbsp;     */
+<b class="fc"><i>142</i>&nbsp;    @Description(value = &quot;Base implementation of a nucleotide substitution model.&quot;, isInheritable = false)</b>
+<b class="fc"><i>143</i>&nbsp;    public abstract class NucleotideBase extends Base {</b>
+<i>144</i>&nbsp;
+<i>145</i>&nbsp;        public double freqA, freqC, freqG, freqT,
+<i>146</i>&nbsp;        // A+G
+<i>147</i>&nbsp;        freqR,
+<i>148</i>&nbsp;        // C+T
+<i>149</i>&nbsp;        freqY;
+<i>150</i>&nbsp;
+<i>151</i>&nbsp;
+<i>152</i>&nbsp;        @Override
+<i>153</i>&nbsp;        public int getStateCount() {
+<b class="nc"><i>154</i>&nbsp;            assert nrOfStates == 4;</b>
+<b class="nc"><i>155</i>&nbsp;            return nrOfStates;</b>
+<i>156</i>&nbsp;        }
+<i>157</i>&nbsp;
+<i>158</i>&nbsp;        protected void calculateFreqRY() {
+<b class="fc"><i>159</i>&nbsp;            double[] freqs = frequencies.getFreqs();</b>
+<b class="fc"><i>160</i>&nbsp;            freqA = freqs[0];</b>
+<b class="fc"><i>161</i>&nbsp;            freqC = freqs[1];</b>
+<b class="fc"><i>162</i>&nbsp;            freqG = freqs[2];</b>
+<b class="fc"><i>163</i>&nbsp;            freqT = freqs[3];</b>
+<b class="fc"><i>164</i>&nbsp;            freqR = freqA + freqG;</b>
+<b class="fc"><i>165</i>&nbsp;            freqY = freqC + freqT;</b>
+<b class="fc"><i>166</i>&nbsp;        }</b>
+<i>167</i>&nbsp;
+<i>168</i>&nbsp;
+<i>169</i>&nbsp;    } // class NucleotideBase
+<i>170</i>&nbsp;
+<i>171</i>&nbsp;
+<i>172</i>&nbsp;} // class SubstitutionModel
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,354 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: CPREV</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.substitutionmodel</a> ]
+</div>
+
+<h1>Coverage Summary for Class: CPREV (beast.evolution.substitutionmodel)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CPREV</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    99.6%
+  </span>
+  <span class="absValue">
+    (222/ 223)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.substitutionmodel;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import beast.core.Description;
+<i>4</i>&nbsp;import beast.evolution.datatype.Aminoacid;
+<i>5</i>&nbsp;import beast.evolution.datatype.DataType;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;@Description(&quot; CPREV 45 model of amino acid evolution &quot; +
+<i>8</i>&nbsp;        &quot; Adachi, J., P.J. Waddell, W. Martin, and M. Hasegawa. 2000. JME 50:348-358&quot;)
+<b class="fc"><i>9</i>&nbsp;public class CPREV extends EmpiricalSubstitutionModel {</b>
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;    @Override
+<i>13</i>&nbsp;    double[][] getEmpiricalRates() {
+<b class="fc"><i>14</i>&nbsp;        double[][] rate = new double[20][20];</b>
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;        // Q matrix from Beast 1
+<b class="fc"><i>17</i>&nbsp;        rate[0][1] = 105;</b>
+<b class="fc"><i>18</i>&nbsp;        rate[0][2] = 227;</b>
+<b class="fc"><i>19</i>&nbsp;        rate[0][3] = 175;</b>
+<b class="fc"><i>20</i>&nbsp;        rate[0][4] = 669;</b>
+<b class="fc"><i>21</i>&nbsp;        rate[0][5] = 157;</b>
+<b class="fc"><i>22</i>&nbsp;        rate[0][6] = 499;</b>
+<b class="fc"><i>23</i>&nbsp;        rate[0][7] = 665;</b>
+<b class="fc"><i>24</i>&nbsp;        rate[0][8] = 66;</b>
+<b class="fc"><i>25</i>&nbsp;        rate[0][9] = 145;</b>
+<b class="fc"><i>26</i>&nbsp;        rate[0][10] = 197;</b>
+<b class="fc"><i>27</i>&nbsp;        rate[0][11] = 236;</b>
+<b class="fc"><i>28</i>&nbsp;        rate[0][12] = 185;</b>
+<b class="fc"><i>29</i>&nbsp;        rate[0][13] = 68;</b>
+<b class="fc"><i>30</i>&nbsp;        rate[0][14] = 490;</b>
+<b class="fc"><i>31</i>&nbsp;        rate[0][15] = 2440;</b>
+<b class="fc"><i>32</i>&nbsp;        rate[0][16] = 1340;</b>
+<b class="fc"><i>33</i>&nbsp;        rate[0][17] = 14;</b>
+<b class="fc"><i>34</i>&nbsp;        rate[0][18] = 56;</b>
+<b class="fc"><i>35</i>&nbsp;        rate[0][19] = 968;</b>
+<i>36</i>&nbsp;
+<b class="fc"><i>37</i>&nbsp;        rate[1][2] = 357;</b>
+<b class="fc"><i>38</i>&nbsp;        rate[1][3] = 43;</b>
+<b class="fc"><i>39</i>&nbsp;        rate[1][4] = 823;</b>
+<b class="fc"><i>40</i>&nbsp;        rate[1][5] = 1745;</b>
+<b class="fc"><i>41</i>&nbsp;        rate[1][6] = 152;</b>
+<b class="fc"><i>42</i>&nbsp;        rate[1][7] = 243;</b>
+<b class="fc"><i>43</i>&nbsp;        rate[1][8] = 715;</b>
+<b class="fc"><i>44</i>&nbsp;        rate[1][9] = 136;</b>
+<b class="fc"><i>45</i>&nbsp;        rate[1][10] = 203;</b>
+<b class="fc"><i>46</i>&nbsp;        rate[1][11] = 4482;</b>
+<b class="fc"><i>47</i>&nbsp;        rate[1][12] = 125;</b>
+<b class="fc"><i>48</i>&nbsp;        rate[1][13] = 53;</b>
+<b class="fc"><i>49</i>&nbsp;        rate[1][14] = 87;</b>
+<b class="fc"><i>50</i>&nbsp;        rate[1][15] = 385;</b>
+<b class="fc"><i>51</i>&nbsp;        rate[1][16] = 314;</b>
+<b class="fc"><i>52</i>&nbsp;        rate[1][17] = 230;</b>
+<b class="fc"><i>53</i>&nbsp;        rate[1][18] = 323;</b>
+<b class="fc"><i>54</i>&nbsp;        rate[1][19] = 92;</b>
+<i>55</i>&nbsp;
+<b class="fc"><i>56</i>&nbsp;        rate[2][3] = 4435;</b>
+<b class="fc"><i>57</i>&nbsp;        rate[2][4] = 538;</b>
+<b class="fc"><i>58</i>&nbsp;        rate[2][5] = 768;</b>
+<b class="fc"><i>59</i>&nbsp;        rate[2][6] = 1055;</b>
+<b class="fc"><i>60</i>&nbsp;        rate[2][7] = 653;</b>
+<b class="fc"><i>61</i>&nbsp;        rate[2][8] = 1405;</b>
+<b class="fc"><i>62</i>&nbsp;        rate[2][9] = 168;</b>
+<b class="fc"><i>63</i>&nbsp;        rate[2][10] = 113;</b>
+<b class="fc"><i>64</i>&nbsp;        rate[2][11] = 2430;</b>
+<b class="fc"><i>65</i>&nbsp;        rate[2][12] = 61;</b>
+<b class="fc"><i>66</i>&nbsp;        rate[2][13] = 97;</b>
+<b class="fc"><i>67</i>&nbsp;        rate[2][14] = 173;</b>
+<b class="fc"><i>68</i>&nbsp;        rate[2][15] = 2085;</b>
+<b class="fc"><i>69</i>&nbsp;        rate[2][16] = 1393;</b>
+<b class="fc"><i>70</i>&nbsp;        rate[2][17] = 40;</b>
+<b class="fc"><i>71</i>&nbsp;        rate[2][18] = 754;</b>
+<b class="fc"><i>72</i>&nbsp;        rate[2][19] = 83;</b>
+<i>73</i>&nbsp;
+<b class="fc"><i>74</i>&nbsp;        rate[3][4] = 10;</b>
+<b class="fc"><i>75</i>&nbsp;        rate[3][5] = 400;</b>
+<b class="fc"><i>76</i>&nbsp;        rate[3][6] = 3691;</b>
+<b class="fc"><i>77</i>&nbsp;        rate[3][7] = 431;</b>
+<b class="fc"><i>78</i>&nbsp;        rate[3][8] = 331;</b>
+<b class="fc"><i>79</i>&nbsp;        rate[3][9] = 10;</b>
+<b class="fc"><i>80</i>&nbsp;        rate[3][10] = 10;</b>
+<b class="fc"><i>81</i>&nbsp;        rate[3][11] = 412;</b>
+<b class="fc"><i>82</i>&nbsp;        rate[3][12] = 47;</b>
+<b class="fc"><i>83</i>&nbsp;        rate[3][13] = 22;</b>
+<b class="fc"><i>84</i>&nbsp;        rate[3][14] = 170;</b>
+<b class="fc"><i>85</i>&nbsp;        rate[3][15] = 590;</b>
+<b class="fc"><i>86</i>&nbsp;        rate[3][16] = 266;</b>
+<b class="fc"><i>87</i>&nbsp;        rate[3][17] = 18;</b>
+<b class="fc"><i>88</i>&nbsp;        rate[3][18] = 281;</b>
+<b class="fc"><i>89</i>&nbsp;        rate[3][19] = 75;</b>
+<i>90</i>&nbsp;
+<b class="fc"><i>91</i>&nbsp;        rate[4][5] = 10;</b>
+<b class="fc"><i>92</i>&nbsp;        rate[4][6] = 10;</b>
+<b class="fc"><i>93</i>&nbsp;        rate[4][7] = 303;</b>
+<b class="fc"><i>94</i>&nbsp;        rate[4][8] = 441;</b>
+<b class="fc"><i>95</i>&nbsp;        rate[4][9] = 280;</b>
+<b class="fc"><i>96</i>&nbsp;        rate[4][10] = 396;</b>
+<b class="fc"><i>97</i>&nbsp;        rate[4][11] = 48;</b>
+<b class="fc"><i>98</i>&nbsp;        rate[4][12] = 159;</b>
+<b class="fc"><i>99</i>&nbsp;        rate[4][13] = 726;</b>
+<b class="fc"><i>100</i>&nbsp;        rate[4][14] = 285;</b>
+<b class="fc"><i>101</i>&nbsp;        rate[4][15] = 2331;</b>
+<b class="fc"><i>102</i>&nbsp;        rate[4][16] = 576;</b>
+<b class="fc"><i>103</i>&nbsp;        rate[4][17] = 435;</b>
+<b class="fc"><i>104</i>&nbsp;        rate[4][18] = 1466;</b>
+<b class="fc"><i>105</i>&nbsp;        rate[4][19] = 592;</b>
+<i>106</i>&nbsp;
+<b class="fc"><i>107</i>&nbsp;        rate[5][6] = 3122;</b>
+<b class="fc"><i>108</i>&nbsp;        rate[5][7] = 133;</b>
+<b class="fc"><i>109</i>&nbsp;        rate[5][8] = 1269;</b>
+<b class="fc"><i>110</i>&nbsp;        rate[5][9] = 92;</b>
+<b class="fc"><i>111</i>&nbsp;        rate[5][10] = 286;</b>
+<b class="fc"><i>112</i>&nbsp;        rate[5][11] = 3313;</b>
+<b class="fc"><i>113</i>&nbsp;        rate[5][12] = 202;</b>
+<b class="fc"><i>114</i>&nbsp;        rate[5][13] = 10;</b>
+<b class="fc"><i>115</i>&nbsp;        rate[5][14] = 323;</b>
+<b class="fc"><i>116</i>&nbsp;        rate[5][15] = 396;</b>
+<b class="fc"><i>117</i>&nbsp;        rate[5][16] = 241;</b>
+<b class="fc"><i>118</i>&nbsp;        rate[5][17] = 53;</b>
+<b class="fc"><i>119</i>&nbsp;        rate[5][18] = 391;</b>
+<b class="fc"><i>120</i>&nbsp;        rate[5][19] = 54;</b>
+<i>121</i>&nbsp;
+<b class="fc"><i>122</i>&nbsp;        rate[6][7] = 379;</b>
+<b class="fc"><i>123</i>&nbsp;        rate[6][8] = 162;</b>
+<b class="fc"><i>124</i>&nbsp;        rate[6][9] = 148;</b>
+<b class="fc"><i>125</i>&nbsp;        rate[6][10] = 82;</b>
+<b class="fc"><i>126</i>&nbsp;        rate[6][11] = 2629;</b>
+<b class="fc"><i>127</i>&nbsp;        rate[6][12] = 113;</b>
+<b class="fc"><i>128</i>&nbsp;        rate[6][13] = 145;</b>
+<b class="fc"><i>129</i>&nbsp;        rate[6][14] = 185;</b>
+<b class="fc"><i>130</i>&nbsp;        rate[6][15] = 568;</b>
+<b class="fc"><i>131</i>&nbsp;        rate[6][16] = 369;</b>
+<b class="fc"><i>132</i>&nbsp;        rate[6][17] = 63;</b>
+<b class="fc"><i>133</i>&nbsp;        rate[6][18] = 142;</b>
+<b class="fc"><i>134</i>&nbsp;        rate[6][19] = 200;</b>
+<i>135</i>&nbsp;
+<b class="fc"><i>136</i>&nbsp;        rate[7][8] = 19;</b>
+<b class="fc"><i>137</i>&nbsp;        rate[7][9] = 40;</b>
+<b class="fc"><i>138</i>&nbsp;        rate[7][10] = 20;</b>
+<b class="fc"><i>139</i>&nbsp;        rate[7][11] = 263;</b>
+<b class="fc"><i>140</i>&nbsp;        rate[7][12] = 21;</b>
+<b class="fc"><i>141</i>&nbsp;        rate[7][13] = 25;</b>
+<b class="fc"><i>142</i>&nbsp;        rate[7][14] = 28;</b>
+<b class="fc"><i>143</i>&nbsp;        rate[7][15] = 691;</b>
+<b class="fc"><i>144</i>&nbsp;        rate[7][16] = 92;</b>
+<b class="fc"><i>145</i>&nbsp;        rate[7][17] = 82;</b>
+<b class="fc"><i>146</i>&nbsp;        rate[7][18] = 10;</b>
+<b class="fc"><i>147</i>&nbsp;        rate[7][19] = 91;</b>
+<i>148</i>&nbsp;
+<b class="fc"><i>149</i>&nbsp;        rate[8][9] = 29;</b>
+<b class="fc"><i>150</i>&nbsp;        rate[8][10] = 66;</b>
+<b class="fc"><i>151</i>&nbsp;        rate[8][11] = 305;</b>
+<b class="fc"><i>152</i>&nbsp;        rate[8][12] = 10;</b>
+<b class="fc"><i>153</i>&nbsp;        rate[8][13] = 127;</b>
+<b class="fc"><i>154</i>&nbsp;        rate[8][14] = 152;</b>
+<b class="fc"><i>155</i>&nbsp;        rate[8][15] = 303;</b>
+<b class="fc"><i>156</i>&nbsp;        rate[8][16] = 32;</b>
+<b class="fc"><i>157</i>&nbsp;        rate[8][17] = 69;</b>
+<b class="fc"><i>158</i>&nbsp;        rate[8][18] = 1971;</b>
+<b class="fc"><i>159</i>&nbsp;        rate[8][19] = 25;</b>
+<i>160</i>&nbsp;
+<b class="fc"><i>161</i>&nbsp;        rate[9][10] = 1745;</b>
+<b class="fc"><i>162</i>&nbsp;        rate[9][11] = 345;</b>
+<b class="fc"><i>163</i>&nbsp;        rate[9][12] = 1772;</b>
+<b class="fc"><i>164</i>&nbsp;        rate[9][13] = 454;</b>
+<b class="fc"><i>165</i>&nbsp;        rate[9][14] = 117;</b>
+<b class="fc"><i>166</i>&nbsp;        rate[9][15] = 216;</b>
+<b class="fc"><i>167</i>&nbsp;        rate[9][16] = 1040;</b>
+<b class="fc"><i>168</i>&nbsp;        rate[9][17] = 42;</b>
+<b class="fc"><i>169</i>&nbsp;        rate[9][18] = 89;</b>
+<b class="fc"><i>170</i>&nbsp;        rate[9][19] = 4797;</b>
+<i>171</i>&nbsp;
+<b class="fc"><i>172</i>&nbsp;        rate[10][11] = 218;</b>
+<b class="fc"><i>173</i>&nbsp;        rate[10][12] = 1351;</b>
+<b class="fc"><i>174</i>&nbsp;        rate[10][13] = 1268;</b>
+<b class="fc"><i>175</i>&nbsp;        rate[10][14] = 219;</b>
+<b class="fc"><i>176</i>&nbsp;        rate[10][15] = 516;</b>
+<b class="fc"><i>177</i>&nbsp;        rate[10][16] = 156;</b>
+<b class="fc"><i>178</i>&nbsp;        rate[10][17] = 159;</b>
+<b class="fc"><i>179</i>&nbsp;        rate[10][18] = 189;</b>
+<b class="fc"><i>180</i>&nbsp;        rate[10][19] = 865;</b>
+<i>181</i>&nbsp;
+<b class="fc"><i>182</i>&nbsp;        rate[11][12] = 193;</b>
+<b class="fc"><i>183</i>&nbsp;        rate[11][13] = 72;</b>
+<b class="fc"><i>184</i>&nbsp;        rate[11][14] = 302;</b>
+<b class="fc"><i>185</i>&nbsp;        rate[11][15] = 868;</b>
+<b class="fc"><i>186</i>&nbsp;        rate[11][16] = 918;</b>
+<b class="fc"><i>187</i>&nbsp;        rate[11][17] = 10;</b>
+<b class="fc"><i>188</i>&nbsp;        rate[11][18] = 247;</b>
+<b class="fc"><i>189</i>&nbsp;        rate[11][19] = 249;</b>
+<i>190</i>&nbsp;
+<b class="fc"><i>191</i>&nbsp;        rate[12][13] = 327;</b>
+<b class="fc"><i>192</i>&nbsp;        rate[12][14] = 100;</b>
+<b class="fc"><i>193</i>&nbsp;        rate[12][15] = 93;</b>
+<b class="fc"><i>194</i>&nbsp;        rate[12][16] = 645;</b>
+<b class="fc"><i>195</i>&nbsp;        rate[12][17] = 86;</b>
+<b class="fc"><i>196</i>&nbsp;        rate[12][18] = 215;</b>
+<b class="fc"><i>197</i>&nbsp;        rate[12][19] = 475;</b>
+<i>198</i>&nbsp;
+<b class="fc"><i>199</i>&nbsp;        rate[13][14] = 43;</b>
+<b class="fc"><i>200</i>&nbsp;        rate[13][15] = 487;</b>
+<b class="fc"><i>201</i>&nbsp;        rate[13][16] = 148;</b>
+<b class="fc"><i>202</i>&nbsp;        rate[13][17] = 468;</b>
+<b class="fc"><i>203</i>&nbsp;        rate[13][18] = 2370;</b>
+<b class="fc"><i>204</i>&nbsp;        rate[13][19] = 317;</b>
+<i>205</i>&nbsp;
+<b class="fc"><i>206</i>&nbsp;        rate[14][15] = 1202;</b>
+<b class="fc"><i>207</i>&nbsp;        rate[14][16] = 260;</b>
+<b class="fc"><i>208</i>&nbsp;        rate[14][17] = 49;</b>
+<b class="fc"><i>209</i>&nbsp;        rate[14][18] = 97;</b>
+<b class="fc"><i>210</i>&nbsp;        rate[14][19] = 122;</b>
+<i>211</i>&nbsp;
+<b class="fc"><i>212</i>&nbsp;        rate[15][16] = 2151;</b>
+<b class="fc"><i>213</i>&nbsp;        rate[15][17] = 73;</b>
+<b class="fc"><i>214</i>&nbsp;        rate[15][18] = 522;</b>
+<b class="fc"><i>215</i>&nbsp;        rate[15][19] = 167;</b>
+<i>216</i>&nbsp;
+<b class="fc"><i>217</i>&nbsp;        rate[16][17] = 29;</b>
+<b class="fc"><i>218</i>&nbsp;        rate[16][18] = 71;</b>
+<b class="fc"><i>219</i>&nbsp;        rate[16][19] = 760;</b>
+<i>220</i>&nbsp;
+<b class="fc"><i>221</i>&nbsp;        rate[17][18] = 346;</b>
+<b class="fc"><i>222</i>&nbsp;        rate[17][19] = 10;</b>
+<i>223</i>&nbsp;
+<b class="fc"><i>224</i>&nbsp;        rate[18][19] = 119;</b>
+<i>225</i>&nbsp;
+<b class="fc"><i>226</i>&nbsp;        return rate;</b>
+<i>227</i>&nbsp;    }
+<i>228</i>&nbsp;
+<i>229</i>&nbsp;    @Override
+<i>230</i>&nbsp;    public double[] getEmpiricalFrequencies() {
+<b class="fc"><i>231</i>&nbsp;        double[] f = new double[20];</b>
+<b class="fc"><i>232</i>&nbsp;        f[0] = 0.076;</b>
+<b class="fc"><i>233</i>&nbsp;        f[1] = 0.062;</b>
+<b class="fc"><i>234</i>&nbsp;        f[2] = 0.041;</b>
+<b class="fc"><i>235</i>&nbsp;        f[3] = 0.037;</b>
+<b class="fc"><i>236</i>&nbsp;        f[4] = 0.009;</b>
+<b class="fc"><i>237</i>&nbsp;        f[5] = 0.038;</b>
+<b class="fc"><i>238</i>&nbsp;        f[6] = 0.049;</b>
+<b class="fc"><i>239</i>&nbsp;        f[7] = 0.084;</b>
+<b class="fc"><i>240</i>&nbsp;        f[8] = 0.025;</b>
+<b class="fc"><i>241</i>&nbsp;        f[9] = 0.081;</b>
+<b class="fc"><i>242</i>&nbsp;        f[10] = 0.101;</b>
+<b class="fc"><i>243</i>&nbsp;        f[11] = 0.050;</b>
+<b class="fc"><i>244</i>&nbsp;        f[12] = 0.022;</b>
+<b class="fc"><i>245</i>&nbsp;        f[13] = 0.051;</b>
+<b class="fc"><i>246</i>&nbsp;        f[14] = 0.043;</b>
+<b class="fc"><i>247</i>&nbsp;        f[15] = 0.062;</b>
+<b class="fc"><i>248</i>&nbsp;        f[16] = 0.054;</b>
+<b class="fc"><i>249</i>&nbsp;        f[17] = 0.018;</b>
+<b class="fc"><i>250</i>&nbsp;        f[18] = 0.031;</b>
+<b class="fc"><i>251</i>&nbsp;        f[19] = 0.066;</b>
+<b class="fc"><i>252</i>&nbsp;        return f;</b>
+<i>253</i>&nbsp;    }
+<i>254</i>&nbsp;
+<i>255</i>&nbsp;    @Override
+<i>256</i>&nbsp;    public int[] getEncodingOrder() {
+<b class="fc"><i>257</i>&nbsp;        Aminoacid dataType = new Aminoacid();</b>
+<b class="fc"><i>258</i>&nbsp;        String codeMap = dataType.getCodeMap();</b>
+<b class="fc"><i>259</i>&nbsp;        int[] codeMapNrs = new int[dataType.getStateCount()];</b>
+<b class="fc"><i>260</i>&nbsp;        String encoding = &quot;ARNDCQEGHILKMFPSTWYV&quot;;</b>
+<b class="fc"><i>261</i>&nbsp;        for (int i = 0; i &lt; dataType.getStateCount(); i++) {</b>
+<b class="fc"><i>262</i>&nbsp;            codeMapNrs[i] = encoding.indexOf(codeMap.charAt(i));</b>
+<i>263</i>&nbsp;        }
+<b class="fc"><i>264</i>&nbsp;        return codeMapNrs;</b>
+<i>265</i>&nbsp;    }
+<i>266</i>&nbsp;
+<i>267</i>&nbsp;    @Override
+<i>268</i>&nbsp;    public boolean canHandleDataType(DataType dataType) {
+<b class="nc"><i>269</i>&nbsp;        return dataType instanceof Aminoacid;</b>
+<i>270</i>&nbsp;    }
+<i>271</i>&nbsp;} // class WAG
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

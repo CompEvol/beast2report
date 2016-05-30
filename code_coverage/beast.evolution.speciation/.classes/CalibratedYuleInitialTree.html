@@ -1,0 +1,169 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: CalibratedYuleInitialTree</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.speciation</a> ]
+</div>
+
+<h1>Coverage Summary for Class: CalibratedYuleInitialTree (beast.evolution.speciation)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CalibratedYuleInitialTree</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp; * CalibratedYuleInitialTree.java
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; * Copyright (C) 2002-2006 Alexei Drummond and Andrew Rambaut
+<i>5</i>&nbsp; *
+<i>6</i>&nbsp; * This file is part of BEAST.
+<i>7</i>&nbsp; * See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp; * information regarding copyright ownership and licensing.
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; * BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp; * it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp; * published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp; * of the License, or (at your option) any later version.
+<i>14</i>&nbsp; *
+<i>15</i>&nbsp; *  BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp; *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp; *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp; *  GNU Lesser General Public License for more details.
+<i>19</i>&nbsp; *
+<i>20</i>&nbsp; * You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp; * License along with BEAST; if not, write to the
+<i>22</i>&nbsp; * Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp; * Boston, MA  02110-1301  USA
+<i>24</i>&nbsp; */
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;package beast.evolution.speciation;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;import java.util.ArrayList;
+<i>30</i>&nbsp;import java.util.List;
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;import org.apache.commons.math.MathException;
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;import beast.core.Description;
+<i>35</i>&nbsp;import beast.core.Input;
+<i>36</i>&nbsp;import beast.core.StateNode;
+<i>37</i>&nbsp;import beast.core.StateNodeInitialiser;
+<i>38</i>&nbsp;import beast.evolution.tree.Tree;
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;/**
+<i>41</i>&nbsp;* @author Joseph Heled
+<i>42</i>&nbsp; */
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;@Description(&quot;A tree compatible with a set of monophyletic clades and hard limits on the clade root.&quot;)
+<b class="nc"><i>45</i>&nbsp;public class CalibratedYuleInitialTree extends Tree implements StateNodeInitialiser {</b>
+<i>46</i>&nbsp;
+<b class="nc"><i>47</i>&nbsp;    final public Input&lt;List&lt;CalibrationPoint&gt;&gt; calibrationsInput =</b>
+<i>48</i>&nbsp;            new Input&lt;&gt;(&quot;calibrations&quot;, &quot;Set of calibrated nodes&quot;, new ArrayList&lt;&gt;(),
+<i>49</i>&nbsp;                    Input.Validate.REQUIRED);
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;    @Override
+<i>52</i>&nbsp;    public void initAndValidate() {
+<b class="nc"><i>53</i>&nbsp;        super.initAndValidate();</b>
+<b class="nc"><i>54</i>&nbsp;        initStateNodes();</b>
+<i>55</i>&nbsp;    }
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;    @Override
+<i>58</i>&nbsp;    public void initStateNodes() {
+<i>59</i>&nbsp;        // Would have been nice to use the MCMC CalibratedYuleModel beastObject directly, but at this point
+<i>60</i>&nbsp;        // it does not exist since the tree being initialized is one of its arguments. So, build a temporary
+<i>61</i>&nbsp;        // one using the initializer tree.
+<i>62</i>&nbsp;
+<b class="nc"><i>63</i>&nbsp;        final List&lt;CalibrationPoint&gt; cals = calibrationsInput.get();</b>
+<i>64</i>&nbsp;
+<b class="nc"><i>65</i>&nbsp;        final CalibratedYuleModel cym = new CalibratedYuleModel();</b>
+<b class="nc"><i>66</i>&nbsp;        for( final CalibrationPoint cal : cals ) {</b>
+<b class="nc"><i>67</i>&nbsp;          cym.setInputValue(&quot;calibrations&quot;, cal);</b>
+<b class="nc"><i>68</i>&nbsp;        }</b>
+<b class="nc"><i>69</i>&nbsp;        cym.setInputValue(&quot;tree&quot;, this);</b>
+<b class="nc"><i>70</i>&nbsp;        cym.setInputValue(&quot;type&quot;, CalibratedYuleModel.Type.NONE);</b>
+<b class="nc"><i>71</i>&nbsp;        cym.initAndValidate();</b>
+<i>72</i>&nbsp;
+<i>73</i>&nbsp;        Tree t;
+<i>74</i>&nbsp;		try {
+<b class="nc"><i>75</i>&nbsp;			t = cym.compatibleInitialTree();</b>
+<b class="nc"><i>76</i>&nbsp;		} catch (MathException e) {</b>
+<b class="nc"><i>77</i>&nbsp;			throw new IllegalArgumentException(e.getMessage());</b>
+<b class="nc"><i>78</i>&nbsp;		}</b>
+<b class="nc"><i>79</i>&nbsp;        m_initial.get().assignFromWithoutID(t);</b>
+<i>80</i>&nbsp;    }
+<i>81</i>&nbsp;
+<i>82</i>&nbsp;    @Override
+<i>83</i>&nbsp;    public void getInitialisedStateNodes(final List&lt;StateNode&gt; stateNodes) {
+<b class="nc"><i>84</i>&nbsp;        stateNodes.add(m_initial.get());</b>
+<i>85</i>&nbsp;    }
+<i>86</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

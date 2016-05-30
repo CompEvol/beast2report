@@ -1,0 +1,693 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: DocMaker</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app</a> ]
+</div>
+
+<h1>Coverage Summary for Class: DocMaker (beast.app)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DocMaker</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 238)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DocMaker$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    7.1%
+  </span>
+  <span class="absValue">
+    (1/ 14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0.4%
+  </span>
+  <span class="absValue">
+    (1/ 239)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;* File DocMaker.java
+<i>3</i>&nbsp;*
+<i>4</i>&nbsp;* Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>5</i>&nbsp;*
+<i>6</i>&nbsp;* This file is part of BEAST2.
+<i>7</i>&nbsp;* See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp;* information regarding copyright ownership and licensing.
+<i>9</i>&nbsp;*
+<i>10</i>&nbsp;* BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp;* it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp;* published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp;* of the License, or (at your option) any later version.
+<i>14</i>&nbsp;*
+<i>15</i>&nbsp;*  BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp;*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp;*  GNU Lesser General Public License for more details.
+<i>19</i>&nbsp;*
+<i>20</i>&nbsp;* You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp;* License along with BEAST; if not, write to the
+<i>22</i>&nbsp;* Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp;* Boston, MA  02110-1301  USA
+<i>24</i>&nbsp;*/
+<i>25</i>&nbsp;package beast.app;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;import java.io.File;
+<i>30</i>&nbsp;import java.io.FileInputStream;
+<i>31</i>&nbsp;import java.io.FileNotFoundException;
+<i>32</i>&nbsp;import java.io.FileOutputStream;
+<i>33</i>&nbsp;import java.io.InputStream;
+<i>34</i>&nbsp;import java.io.OutputStream;
+<i>35</i>&nbsp;import java.io.PrintStream;
+<i>36</i>&nbsp;import java.lang.annotation.Annotation;
+<i>37</i>&nbsp;import java.lang.reflect.Field;
+<i>38</i>&nbsp;import java.lang.reflect.ParameterizedType;
+<i>39</i>&nbsp;import java.lang.reflect.Type;
+<i>40</i>&nbsp;import java.util.ArrayList;
+<i>41</i>&nbsp;import java.util.HashMap;
+<i>42</i>&nbsp;import java.util.HashSet;
+<i>43</i>&nbsp;import java.util.List;
+<i>44</i>&nbsp;import java.util.Set;
+<i>45</i>&nbsp;
+<i>46</i>&nbsp;import beast.core.BEASTObject;
+<i>47</i>&nbsp;import beast.core.Citation;
+<i>48</i>&nbsp;import beast.core.Description;
+<i>49</i>&nbsp;import beast.core.Input;
+<i>50</i>&nbsp;import beast.core.Loggable;
+<i>51</i>&nbsp;import beast.core.util.Log;
+<i>52</i>&nbsp;import beast.util.AddOnManager;
+<i>53</i>&nbsp;
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;
+<i>56</i>&nbsp;/**
+<i>57</i>&nbsp; * Plug in documentation generator.
+<i>58</i>&nbsp; * Goes through all plug-ins and generate one page per plug-in.
+<i>59</i>&nbsp; * &lt;p/&gt;
+<i>60</i>&nbsp; * Usage: DocMaker &lt;target directory&gt;
+<i>61</i>&nbsp; * where &lt;target directory&gt; is the place where the HTML files
+<i>62</i>&nbsp; * should go. Default directory is /tmp.
+<i>63</i>&nbsp; * *
+<i>64</i>&nbsp; */
+<i>65</i>&nbsp;public class DocMaker {
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;    /**
+<i>68</i>&nbsp;     * output directory *
+<i>69</i>&nbsp;     */
+<b class="nc"><i>70</i>&nbsp;    String m_sDir = &quot;/tmp&quot;;</b>
+<i>71</i>&nbsp;    /**
+<i>72</i>&nbsp;     * names of the plug-ins to document *
+<i>73</i>&nbsp;     */
+<i>74</i>&nbsp;    List&lt;String&gt; m_beastObjectNames;
+<i>75</i>&nbsp;    /**
+<i>76</i>&nbsp;     * map of plug-in name to its derived plug-ins *
+<i>77</i>&nbsp;     */
+<i>78</i>&nbsp;    HashMap&lt;String, String[]&gt; m_isa;
+<i>79</i>&nbsp;    /**
+<i>80</i>&nbsp;     * map of plug-in name to its ancestor plug-ins *
+<i>81</i>&nbsp;     */
+<i>82</i>&nbsp;    HashMap&lt;String, List&lt;String&gt;&gt; m_ancestors;
+<i>83</i>&nbsp;    /**
+<i>84</i>&nbsp;     * map of plug-in name to its description (from @Description annotations) *
+<i>85</i>&nbsp;     */
+<i>86</i>&nbsp;    HashMap&lt;String, String&gt; m_descriptions;
+<i>87</i>&nbsp;
+<i>88</i>&nbsp;    Set&lt;String&gt; m_sLoggables;
+<i>89</i>&nbsp;    
+<b class="nc"><i>90</i>&nbsp;    BEASTVersion2 version = new BEASTVersion2();</b>
+<i>91</i>&nbsp;    
+<i>92</i>&nbsp;    public DocMaker(String[] args) {
+<b class="nc"><i>93</i>&nbsp;        this();</b>
+<b class="nc"><i>94</i>&nbsp;        if (args.length &gt; 0) {</b>
+<b class="nc"><i>95</i>&nbsp;            if (args[0].equals(&quot;-javadoc&quot;)) {</b>
+<b class="nc"><i>96</i>&nbsp;                makeJavaDoc();</b>
+<b class="nc"><i>97</i>&nbsp;                System.exit(0);</b>
+<i>98</i>&nbsp;            }
+<b class="nc"><i>99</i>&nbsp;            m_sDir = args[0];</b>
+<i>100</i>&nbsp;        }
+<b class="nc"><i>101</i>&nbsp;    } // c&#39;tor</b>
+<i>102</i>&nbsp;
+<b class="nc"><i>103</i>&nbsp;    public DocMaker() {</b>
+<i>104</i>&nbsp;        // find plug ins to document
+<b class="nc"><i>105</i>&nbsp;        m_beastObjectNames = AddOnManager.find(beast.core.BEASTObject.class, AddOnManager.IMPLEMENTATION_DIR);</b>
+<i>106</i>&nbsp;        /** determine hierarchical relation between plug-ins **/
+<b class="nc"><i>107</i>&nbsp;        m_isa = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>108</i>&nbsp;        m_ancestors = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>109</i>&nbsp;        m_descriptions = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>110</i>&nbsp;        m_sLoggables = new HashSet&lt;&gt;();</b>
+<b class="nc"><i>111</i>&nbsp;        for (String beastObjectName : m_beastObjectNames) {</b>
+<b class="nc"><i>112</i>&nbsp;            m_ancestors.put(beastObjectName, new ArrayList&lt;&gt;());</b>
+<b class="nc"><i>113</i>&nbsp;        }</b>
+<b class="nc"><i>114</i>&nbsp;        for (String beastObjectName : m_beastObjectNames) {</b>
+<i>115</i>&nbsp;            try {
+<b class="nc"><i>116</i>&nbsp;                Class&lt;?&gt; _class = Class.forName(beastObjectName);</b>
+<b class="nc"><i>117</i>&nbsp;                BEASTObject beastObject = (BEASTObject) _class.newInstance();</b>
+<b class="nc"><i>118</i>&nbsp;                String description = getInheritableDescription(beastObject.getClass());</b>
+<b class="nc"><i>119</i>&nbsp;                Log.warning.println(beastObjectName + &quot; =&gt; &quot; + description);</b>
+<b class="nc"><i>120</i>&nbsp;                m_descriptions.put(beastObjectName, description);</b>
+<b class="nc"><i>121</i>&nbsp;                String[] implementations = getImplementations(beastObject);</b>
+<b class="nc"><i>122</i>&nbsp;                m_isa.put(beastObjectName, implementations);</b>
+<b class="nc"><i>123</i>&nbsp;                for (String imp : implementations) {</b>
+<b class="nc"><i>124</i>&nbsp;                    m_ancestors.get(imp).add(beastObjectName);</b>
+<i>125</i>&nbsp;                }
+<b class="nc"><i>126</i>&nbsp;                if (beastObject instanceof Loggable) {</b>
+<b class="nc"><i>127</i>&nbsp;                    m_sLoggables.add(beastObjectName);</b>
+<i>128</i>&nbsp;                }
+<b class="nc"><i>129</i>&nbsp;            } catch (Exception e) {</b>
+<b class="nc"><i>130</i>&nbsp;                Log.err.println(beastObjectName + &quot; not documented :&quot; + e.getMessage());</b>
+<b class="nc"><i>131</i>&nbsp;            }</b>
+<b class="nc"><i>132</i>&nbsp;        }</b>
+<b class="nc"><i>133</i>&nbsp;    } // c&#39;tor</b>
+<i>134</i>&nbsp;
+<i>135</i>&nbsp;
+<i>136</i>&nbsp;    /**
+<i>137</i>&nbsp;     * print @Description and Input.description info so that it can
+<i>138</i>&nbsp;     * be inserted in the code before creating Javadoc documentation
+<i>139</i>&nbsp;     * for the Beast II SDK.
+<i>140</i>&nbsp;     */
+<i>141</i>&nbsp;    void makeJavaDoc() {
+<b class="nc"><i>142</i>&nbsp;        for (String beastObjectName : m_beastObjectNames) {</b>
+<i>143</i>&nbsp;            try {
+<b class="nc"><i>144</i>&nbsp;                BEASTObject beastObject = (BEASTObject) Class.forName(beastObjectName).newInstance();</b>
+<b class="nc"><i>145</i>&nbsp;                Log.info.println(beastObjectName + &quot;:@description:&quot; + beastObject.getDescription());</b>
+<b class="nc"><i>146</i>&nbsp;                for (Input&lt;?&gt; input : beastObject.listInputs()) {</b>
+<b class="nc"><i>147</i>&nbsp;                    Log.info.println(beastObjectName + &quot;:&quot; + input.getName() + &quot;:&quot; + input.getTipText());</b>
+<b class="nc"><i>148</i>&nbsp;                }</b>
+<b class="nc"><i>149</i>&nbsp;            } catch (Exception e) {</b>
+<b class="nc"><i>150</i>&nbsp;                e.printStackTrace();</b>
+<b class="nc"><i>151</i>&nbsp;            }</b>
+<b class="nc"><i>152</i>&nbsp;        }</b>
+<b class="nc"><i>153</i>&nbsp;    }</b>
+<i>154</i>&nbsp;
+<i>155</i>&nbsp;    /**
+<i>156</i>&nbsp;     * create CSS style sheet for all pages 
+<i>157</i>&nbsp;     * @throws FileNotFoundException *
+<i>158</i>&nbsp;     */
+<i>159</i>&nbsp;    void createCSS() throws FileNotFoundException  {
+<b class="nc"><i>160</i>&nbsp;        PrintStream out = new PrintStream(m_sDir + &quot;/doc.css&quot;);</b>
+<b class="nc"><i>161</i>&nbsp;        out.println(getCSS());</b>
+<b class="nc"><i>162</i>&nbsp;        out.close();</b>
+<b class="nc"><i>163</i>&nbsp;    }</b>
+<i>164</i>&nbsp;
+<i>165</i>&nbsp;    String getCSS() {
+<b class="nc"><i>166</i>&nbsp;    		return  &quot;&lt;!--\n&quot; +</b>
+<i>167</i>&nbsp;    				 &quot;a.summary-letter {text-decoration: none}\n&quot; +
+<i>168</i>&nbsp;    				 &quot;blockquote.smallquotation {font-size: smaller}\n&quot; +
+<i>169</i>&nbsp;    				 &quot;div.display {margin-left: 3.2em}\n&quot; +
+<i>170</i>&nbsp;    				 &quot;div.example {margin-left: 3.2em}\n&quot; +
+<i>171</i>&nbsp;    				 &quot;div.indentedblock {margin-left: 3.2em}\n&quot; +
+<i>172</i>&nbsp;    				 &quot;div.lisp {margin-left: 3.2em}\n&quot; +
+<i>173</i>&nbsp;    				 &quot;div.smalldisplay {margin-left: 3.2em}\n&quot; +
+<i>174</i>&nbsp;    				 &quot;div.smallexample {margin-left: 3.2em}\n&quot; +
+<i>175</i>&nbsp;    				 &quot;div.smallindentedblock {margin-left: 3.2em; font-size: smaller}\n&quot; +
+<i>176</i>&nbsp;    				 &quot;div.smalllisp {margin-left: 3.2em}\n&quot; +
+<i>177</i>&nbsp;    				 &quot;kbd {font-style:oblique}\n&quot; +
+<i>178</i>&nbsp;    				 &quot;pre.display {font-family: inherit}\n&quot; +
+<i>179</i>&nbsp;    				 &quot;pre.format {font-family: inherit}\n&quot; +
+<i>180</i>&nbsp;    				 &quot;pre.menu-comment {font-family: serif}\n&quot; +
+<i>181</i>&nbsp;    				 &quot;pre.menu-preformatted {font-family: serif}\n&quot; +
+<i>182</i>&nbsp;    				 &quot;pre.smalldisplay {font-family: inherit; font-size: smaller}\n&quot; +
+<i>183</i>&nbsp;    				 &quot;pre.smallexample {font-size: smaller}\n&quot; +
+<i>184</i>&nbsp;    				 &quot;pre.smallformat {font-family: inherit; font-size: smaller}\n&quot; +
+<i>185</i>&nbsp;    				 &quot;pre.smalllisp {font-size: smaller}\n&quot; +
+<i>186</i>&nbsp;    				 &quot;span.nocodebreak {white-space:nowrap}\n&quot; +
+<i>187</i>&nbsp;    				 &quot;span.nolinebreak {white-space:nowrap}\n&quot; +
+<i>188</i>&nbsp;    				 &quot;span.roman {font-family:serif; font-weight:normal}\n&quot; +
+<i>189</i>&nbsp;    				 &quot;span.sansserif {font-family:sans-serif; font-weight:normal}\n&quot; +
+<i>190</i>&nbsp;    				 &quot;ul.no-bullet {list-style: none}\n&quot; +
+<i>191</i>&nbsp;    				 &quot;body {margin-left: 5%; margin-right: 5%;}\n&quot; +
+<i>192</i>&nbsp;    				 &quot;\n&quot; +
+<i>193</i>&nbsp;    				 &quot;H1 {             \n&quot; +
+<i>194</i>&nbsp;    				 &quot;    background: white;\n&quot; +
+<i>195</i>&nbsp;    				 &quot;    color: rgb(25%, 25%, 25%);\n&quot; +
+<i>196</i>&nbsp;    				 &quot;    font-family: monospace;\n&quot; +
+<i>197</i>&nbsp;    				 &quot;    font-size: xx-large;\n&quot; +
+<i>198</i>&nbsp;    				 &quot;    text-align: center\n&quot; +
+<i>199</i>&nbsp;    				 &quot;}\n&quot; +
+<i>200</i>&nbsp;    				 &quot;\n&quot; +
+<i>201</i>&nbsp;    				 &quot;H2 {\n&quot; +
+<i>202</i>&nbsp;    				 &quot;    background: white;\n&quot; +
+<i>203</i>&nbsp;    				 &quot;    color: rgb(40%, 40%, 40%);\n&quot; +
+<i>204</i>&nbsp;    				 &quot;    font-family: monospace;\n&quot; +
+<i>205</i>&nbsp;    				 &quot;    font-size: x-large;\n&quot; +
+<i>206</i>&nbsp;    				 &quot;    text-align: center\n&quot; +
+<i>207</i>&nbsp;    				 &quot;}\n&quot; +
+<i>208</i>&nbsp;    				 &quot;\n&quot; +
+<i>209</i>&nbsp;    				 &quot;H3 {\n&quot; +
+<i>210</i>&nbsp;    				 &quot;    background: white;\n&quot; +
+<i>211</i>&nbsp;    				 &quot;    color: rgb(40%, 40%, 40%);\n&quot; +
+<i>212</i>&nbsp;    				 &quot;    font-family: monospace;\n&quot; +
+<i>213</i>&nbsp;    				 &quot;    font-size: large\n&quot; +
+<i>214</i>&nbsp;    				 &quot;}\n&quot; +
+<i>215</i>&nbsp;    				 &quot;\n&quot; +
+<i>216</i>&nbsp;    				 &quot;H4 {\n&quot; +
+<i>217</i>&nbsp;    				 &quot;    background: white;\n&quot; +
+<i>218</i>&nbsp;    				 &quot;    color: rgb(40%, 40%, 40%);\n&quot; +
+<i>219</i>&nbsp;    				 &quot;    font-family: monospace\n&quot; +
+<i>220</i>&nbsp;    				 &quot;}\n&quot; +
+<i>221</i>&nbsp;    				 &quot;\n&quot; +
+<i>222</i>&nbsp;    				 &quot;span.samp{font-family: monospace}\n&quot; +
+<i>223</i>&nbsp;    				 &quot;span.command{font-family: monospace}\n&quot; +
+<i>224</i>&nbsp;    				 &quot;span.option{font-family: monospace}\n&quot; +
+<i>225</i>&nbsp;    				 &quot;span.file{font-family: monospace}\n&quot; +
+<i>226</i>&nbsp;    				 &quot;span.env{font-family: monospace}\n&quot; +
+<i>227</i>&nbsp;    				 &quot;\n&quot; +
+<i>228</i>&nbsp;    				 &quot;ul {\n&quot; +
+<i>229</i>&nbsp;    				 &quot;    margin-top: 0.25ex;\n&quot; +
+<i>230</i>&nbsp;    				 &quot;    margin-bottom: 0.25ex;\n&quot; +
+<i>231</i>&nbsp;    				 &quot;}\n&quot; +
+<i>232</i>&nbsp;    				 &quot;li {\n&quot; +
+<i>233</i>&nbsp;    				 &quot;    margin-top: 0.25ex;\n&quot; +
+<i>234</i>&nbsp;    				 &quot;    margin-bottom: 0.25ex;\n&quot; +
+<i>235</i>&nbsp;    				 &quot;}\n&quot; +
+<i>236</i>&nbsp;    				 &quot;p {\n&quot; +
+<i>237</i>&nbsp;    				 &quot;    margin-top: 0.6ex;\n&quot; +
+<i>238</i>&nbsp;    				 &quot;    margin-bottom: 1.2ex;\n&quot; +
+<i>239</i>&nbsp;    				 &quot;}\n&quot; +
+<i>240</i>&nbsp;    				 &quot;caption {\n&quot; +
+<i>241</i>&nbsp;	                 &quot;	font:  20pt Arial, Helvetica, sans-serif;\n&quot; +
+<i>242</i>&nbsp;	                 &quot;	text-align: left;\n&quot; +
+<i>243</i>&nbsp;	                 &quot;	height: 45px;\n&quot; +
+<i>244</i>&nbsp;	                 &quot;	color: #243D02;\n&quot; +
+<i>245</i>&nbsp;	                 &quot;	border-top: 1px solid #243D02;\n&quot; +
+<i>246</i>&nbsp;	                 &quot;}\n&quot; +
+<i>247</i>&nbsp;	                 &quot;table, th, td {border: 0px;)\n&quot;
+<i>248</i>&nbsp;    				 ;
+<i>249</i>&nbsp;    }
+<i>250</i>&nbsp;
+<i>251</i>&nbsp;    /**
+<i>252</i>&nbsp;     * create plug in index pages, shown in left frame 
+<i>253</i>&nbsp;     * @throws FileNotFoundException *
+<i>254</i>&nbsp;     */
+<i>255</i>&nbsp;    void createIndex() throws FileNotFoundException  {
+<i>256</i>&nbsp;        {
+<b class="nc"><i>257</i>&nbsp;            PrintStream out = new PrintStream(m_sDir + &quot;/index.html&quot;);</b>
+<b class="nc"><i>258</i>&nbsp;            out.println(&quot;&lt;!DOCTYPE HTML PUBLIC &#39;-//W3C//DTD HTML 4.01 Frameset//EN&#39;\n&quot; +</b>
+<i>259</i>&nbsp;                    &quot;		   &#39;http://www.w3.org/TR/html4/frameset.dtd&#39;&gt;\n&quot; +
+<i>260</i>&nbsp;                    &quot;		&lt;HTML&gt;\n&quot; +
+<i>261</i>&nbsp;                    &quot;		&lt;HEAD&gt;\n&quot; +
+<b class="nc"><i>262</i>&nbsp;                    &quot;		&lt;TITLE&gt;BEAST &quot; + version.getVersionString() + &quot; Documentation&lt;/TITLE&gt;\n&quot; +</b>
+<i>263</i>&nbsp;                    &quot;		&lt;/HEAD&gt;\n&quot; +
+<i>264</i>&nbsp;                    &quot;		&lt;FRAMESET cols=&#39;20%, 80%&#39;&gt;\n&quot; +
+<i>265</i>&nbsp;                    &quot;		  &lt;FRAMESET rows=&#39;50, 200&#39;&gt;\n&quot; +
+<i>266</i>&nbsp;//                    &quot;		      &lt;FRAME src=&#39;http://www.omnomnomnom.com/random/rotate.php&#39; align=&#39;center&#39;&gt;\n&quot; +
+<i>267</i>&nbsp;                    &quot;		      &lt;FRAME src=&#39;beast.png&#39; align=&#39;center&#39;&gt;\n&quot; +
+<i>268</i>&nbsp;                    &quot;		      &lt;FRAME src=&#39;contents.html&#39;&gt;\n&quot; +
+<i>269</i>&nbsp;                    &quot;		  &lt;/FRAMESET&gt;\n&quot; +
+<i>270</i>&nbsp;                    &quot;		  &lt;FRAME name=&#39;display&#39; src=&#39;contents.html&#39;&gt;\n&quot; +
+<i>271</i>&nbsp;                    &quot;		&lt;/FRAMESET&gt;\n&quot; +
+<i>272</i>&nbsp;                    &quot;		&lt;/HTML&gt;&quot;);
+<b class="nc"><i>273</i>&nbsp;            out.close();</b>
+<i>274</i>&nbsp;        }
+<i>275</i>&nbsp;
+<i>276</i>&nbsp;        {
+<i>277</i>&nbsp;        }
+<i>278</i>&nbsp;
+<i>279</i>&nbsp;        {
+<i>280</i>&nbsp;        	try {
+<b class="nc"><i>281</i>&nbsp;	            InputStream in = new FileInputStream(new File(&quot;src/beast/app/draw/icons/beast.png&quot;));</b>
+<b class="nc"><i>282</i>&nbsp;	            OutputStream out = new FileOutputStream(new File(m_sDir + &quot;/beast.png&quot;));</b>
+<b class="nc"><i>283</i>&nbsp;	            byte[] buf = new byte[1024];</b>
+<i>284</i>&nbsp;	            int len;
+<b class="nc"><i>285</i>&nbsp;	            while ((len = in.read(buf)) &gt; 0) {</b>
+<b class="nc"><i>286</i>&nbsp;	                out.write(buf, 0, len);</b>
+<i>287</i>&nbsp;	            }
+<b class="nc"><i>288</i>&nbsp;	            in.close();</b>
+<b class="nc"><i>289</i>&nbsp;	            out.close();</b>
+<b class="nc"><i>290</i>&nbsp;        	} catch (Exception e) {</b>
+<i>291</i>&nbsp;				// ignore exception -- too bad we could not 
+<b class="nc"><i>292</i>&nbsp;        		Log.warning.println(&quot;WARNING: something went wrong copying beast.png image:&quot; + e.getMessage());</b>
+<b class="nc"><i>293</i>&nbsp;			}</b>
+<i>294</i>&nbsp;        }
+<b class="nc"><i>295</i>&nbsp;        PrintStream out = new PrintStream(m_sDir + &quot;/contents.html&quot;);</b>
+<b class="nc"><i>296</i>&nbsp;        out.println(&quot;&lt;html&gt;\n&lt;head&gt;&lt;title&gt;BEAST &quot; + version.getVersionString() + &quot; Documentation index&lt;/title&gt;\n&quot; +</b>
+<i>297</i>&nbsp;                &quot;&lt;link rel=&#39;StyleSheet&#39; href=&#39;doc.css&#39; type=&#39;text/css&#39;&gt;\n&quot; +
+<i>298</i>&nbsp;                &quot;&lt;/head&gt;\n&quot;);
+<b class="nc"><i>299</i>&nbsp;        out.println(&quot;&lt;body&gt;\n&quot;);</b>
+<b class="nc"><i>300</i>&nbsp;        out.println(&quot;&lt;h1&gt;BEAST &quot; + version.getVersionString() + &quot; Documentation index&lt;/h1&gt;\n&quot;);</b>
+<b class="nc"><i>301</i>&nbsp;        String prev = null;</b>
+<b class="nc"><i>302</i>&nbsp;        String prevPackage = null;</b>
+<b class="nc"><i>303</i>&nbsp;        for (String beastObjectName : m_beastObjectNames) {</b>
+<b class="nc"><i>304</i>&nbsp;            String next = beastObjectName.substring(0, beastObjectName.indexOf(&#39;.&#39;));</b>
+<b class="nc"><i>305</i>&nbsp;            if (prev != null &amp;&amp; !next.equals(prev)) {</b>
+<b class="nc"><i>306</i>&nbsp;                out.println(&quot;&lt;hr/&gt;&quot;);</b>
+<i>307</i>&nbsp;            }
+<b class="nc"><i>308</i>&nbsp;            prev = next;</b>
+<b class="nc"><i>309</i>&nbsp;            String name = beastObjectName.substring(beastObjectName.lastIndexOf(&#39;.&#39;) + 1);</b>
+<b class="nc"><i>310</i>&nbsp;            String packageName = beastObjectName.substring(0, beastObjectName.lastIndexOf(&#39;.&#39;));</b>
+<i>311</i>&nbsp;            // count nr of packages
+<b class="nc"><i>312</i>&nbsp;            int i = 0;</b>
+<b class="nc"><i>313</i>&nbsp;            while (beastObjectName.indexOf(&#39;.&#39;, i) &gt; 0) {</b>
+<b class="nc"><i>314</i>&nbsp;                name = &quot;.&quot; + name;</b>
+<b class="nc"><i>315</i>&nbsp;                i = beastObjectName.indexOf(&#39;.&#39;, i) + 1;</b>
+<i>316</i>&nbsp;            }
+<b class="nc"><i>317</i>&nbsp;            Log.warning.println(name + &quot; &lt;= &quot; + beastObjectName);</b>
+<b class="nc"><i>318</i>&nbsp;            if (prevPackage == null || !packageName.equals(prevPackage)) {</b>
+<b class="nc"><i>319</i>&nbsp;                out.println(&quot;&lt;span style=&#39;color:grey&#39;&gt;&quot; + packageName + &quot;&lt;/span&gt;&lt;br/&gt;&quot;);</b>
+<i>320</i>&nbsp;            }
+<b class="nc"><i>321</i>&nbsp;            out.println(&quot;&lt;a href=&#39;&quot; + beastObjectName + &quot;.html&#39; target=&#39;display&#39;&gt;&quot; + name + &quot;&lt;/a&gt;&lt;br/&gt;&quot;);</b>
+<b class="nc"><i>322</i>&nbsp;            prevPackage = packageName;</b>
+<b class="nc"><i>323</i>&nbsp;        }</b>
+<b class="nc"><i>324</i>&nbsp;        out.println(&quot;&lt;/body&gt;\n&quot;);</b>
+<b class="nc"><i>325</i>&nbsp;        out.println(&quot;&lt;/html&gt;\n&quot;);</b>
+<b class="nc"><i>326</i>&nbsp;        out.close();</b>
+<b class="nc"><i>327</i>&nbsp;    } // createIndex</b>
+<i>328</i>&nbsp;
+<i>329</i>&nbsp;    /**
+<i>330</i>&nbsp;     * Find all beastObjects that are derived from given beastObject *
+<i>331</i>&nbsp;     */
+<i>332</i>&nbsp;    String[] getImplementations(BEASTObject beastObject) {
+<b class="nc"><i>333</i>&nbsp;        String name = beastObject.getClass().getName();</b>
+<b class="nc"><i>334</i>&nbsp;        List&lt;String&gt; implementations = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>335</i>&nbsp;        for (String beastObjectName : m_beastObjectNames) {</b>
+<i>336</i>&nbsp;            try {
+<b class="nc"><i>337</i>&nbsp;                if (!beastObjectName.equals(name) &amp;&amp; beastObject.getClass().isAssignableFrom(Class.forName(beastObjectName))) {</b>
+<b class="nc"><i>338</i>&nbsp;                    implementations.add(beastObjectName);</b>
+<i>339</i>&nbsp;                }
+<b class="nc"><i>340</i>&nbsp;            } catch (ClassNotFoundException e) {</b>
+<b class="nc"><i>341</i>&nbsp;            }</b>
+<b class="nc"><i>342</i>&nbsp;        }</b>
+<b class="nc"><i>343</i>&nbsp;        return implementations.toArray(new String[0]);</b>
+<i>344</i>&nbsp;    }
+<i>345</i>&nbsp;
+<i>346</i>&nbsp;    /**
+<i>347</i>&nbsp;     * Extract description from @Description annotation
+<i>348</i>&nbsp;     * but only if the description is inheritable *
+<i>349</i>&nbsp;     */
+<i>350</i>&nbsp;    String getInheritableDescription(Class&lt;?&gt; beastObjectClass) {
+<b class="nc"><i>351</i>&nbsp;        String str = &quot;&quot;;</b>
+<b class="nc"><i>352</i>&nbsp;        Class&lt;?&gt; superClass = beastObjectClass.getSuperclass();</b>
+<b class="nc"><i>353</i>&nbsp;        if (superClass != null) {</b>
+<b class="nc"><i>354</i>&nbsp;            String superName = getInheritableDescription(superClass);</b>
+<b class="nc"><i>355</i>&nbsp;            if (superName != null) {</b>
+<b class="nc"><i>356</i>&nbsp;                str += superName + &quot;&lt;br/&gt;&quot;;</b>
+<i>357</i>&nbsp;            }
+<i>358</i>&nbsp;        }
+<b class="nc"><i>359</i>&nbsp;        Annotation[] classAnnotations = beastObjectClass.getAnnotations();</b>
+<b class="nc"><i>360</i>&nbsp;        for (Annotation annotation : classAnnotations) {</b>
+<b class="nc"><i>361</i>&nbsp;            if (annotation instanceof Description) {</b>
+<b class="nc"><i>362</i>&nbsp;                Description description = (Description) annotation;</b>
+<b class="nc"><i>363</i>&nbsp;                if (description.isInheritable()) {</b>
+<b class="nc"><i>364</i>&nbsp;                    str += description.value();</b>
+<i>365</i>&nbsp;                } else {
+<b class="nc"><i>366</i>&nbsp;                    return null;</b>
+<i>367</i>&nbsp;                }
+<i>368</i>&nbsp;            }
+<i>369</i>&nbsp;        }
+<b class="nc"><i>370</i>&nbsp;        return str;</b>
+<i>371</i>&nbsp;    }
+<i>372</i>&nbsp;
+<i>373</i>&nbsp;    /**
+<i>374</i>&nbsp;     * Create page for individual plug-in 
+<i>375</i>&nbsp;     * @throws FileNotFoundException *
+<i>376</i>&nbsp;     */
+<i>377</i>&nbsp;    void createBEASTObjectPage(String beastObjectName) throws FileNotFoundException {
+<b class="nc"><i>378</i>&nbsp;        PrintStream out = new PrintStream(m_sDir + &quot;/&quot; + beastObjectName + &quot;.html&quot;);</b>
+<i>379</i>&nbsp;        try {
+<b class="nc"><i>380</i>&nbsp;            out.print(getHTML(beastObjectName, true));</b>
+<b class="nc"><i>381</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>382</i>&nbsp;        	Log.warning.println(&quot;Page creation failed for &quot; + beastObjectName + &quot;: &quot; + e.getMessage());</b>
+<b class="nc"><i>383</i>&nbsp;        }</b>
+<b class="nc"><i>384</i>&nbsp;        out.close();</b>
+<b class="nc"><i>385</i>&nbsp;    } // createBEASTObjectPage</b>
+<i>386</i>&nbsp;
+<i>387</i>&nbsp;
+<i>388</i>&nbsp;    public String getHTML(String beastObjectName, boolean useExternalStyleSheet) throws InstantiationException, IllegalAccessException, ClassNotFoundException  {
+<b class="nc"><i>389</i>&nbsp;        StringBuffer buf = new StringBuffer();</b>
+<b class="nc"><i>390</i>&nbsp;        buf.append(&quot;&lt;html&gt;\n&lt;head&gt;\n&lt;title&gt;BEAST &quot; + version.getVersionString() + &quot; Documentation: &quot; + beastObjectName + &quot;&lt;/title&gt;\n&quot;);</b>
+<b class="nc"><i>391</i>&nbsp;        if (useExternalStyleSheet) {</b>
+<b class="nc"><i>392</i>&nbsp;            buf.append(&quot;&lt;link rel=&#39;StyleSheet&#39; href=&#39;/tmp/styles.css&#39; type=&#39;text/css&#39;&gt;\n&quot;);</b>
+<i>393</i>&nbsp;        } else {
+<b class="nc"><i>394</i>&nbsp;            buf.append(&quot;&lt;style type=&#39;text/css&#39;&gt;\n&quot;);</b>
+<b class="nc"><i>395</i>&nbsp;            buf.append(getCSS());</b>
+<b class="nc"><i>396</i>&nbsp;            buf.append(&quot;&lt;/style&gt;\n&quot;);</b>
+<i>397</i>&nbsp;        }
+<b class="nc"><i>398</i>&nbsp;        buf.append(&quot;&lt;/head&gt;\n&quot;);</b>
+<b class="nc"><i>399</i>&nbsp;        buf.append(&quot;&lt;body&gt;\n&quot;);</b>
+<b class="nc"><i>400</i>&nbsp;        buf.append(&quot;&lt;h1&gt;BEAST &quot; + version.getVersionString() + &quot; Documentation: &quot; + beastObjectName + &quot;&lt;/h1&gt;\n&quot;);</b>
+<b class="nc"><i>401</i>&nbsp;        BEASTObject beastObject = (BEASTObject) Class.forName(beastObjectName).newInstance();</b>
+<i>402</i>&nbsp;
+<i>403</i>&nbsp;        // show all implementation of this plug-in
+<b class="nc"><i>404</i>&nbsp;        String[] implementations = m_isa.get(beastObjectName);</b>
+<b class="nc"><i>405</i>&nbsp;        if (implementations == null) {</b>
+<i>406</i>&nbsp;            // this class is not documented, perhaps outside ClassDiscover path?
+<b class="nc"><i>407</i>&nbsp;            buf.append(&quot;No documentation available for &quot; + beastObjectName + &quot;. Perhaps it is not in the ClassDiscovery path\n&quot;);</b>
+<b class="nc"><i>408</i>&nbsp;            buf.append(&quot;&lt;/body&gt;\n&quot;);</b>
+<b class="nc"><i>409</i>&nbsp;            buf.append(&quot;&lt;/html&gt;\n&quot;);</b>
+<b class="nc"><i>410</i>&nbsp;            return buf.toString();</b>
+<i>411</i>&nbsp;        }
+<i>412</i>&nbsp;
+<b class="nc"><i>413</i>&nbsp;        if (implementations.length &gt; 0) {</b>
+<b class="nc"><i>414</i>&nbsp;            buf.append(&quot;&lt;table border=&#39;1px&#39;&gt;\n&quot;);</b>
+<b class="nc"><i>415</i>&nbsp;            buf.append(&quot;&lt;thead&gt;&lt;tr&gt;&lt;td&gt;implemented by the following&lt;/td&gt;&lt;/tr&gt;&lt;/thead&gt;\n&quot;);</b>
+<b class="nc"><i>416</i>&nbsp;            for (String imp : implementations) {</b>
+<b class="nc"><i>417</i>&nbsp;                buf.append(&quot;&lt;tr&gt;&lt;td&gt;&lt;a href=&#39;&quot; + imp + &quot;.html&#39;&gt;&quot; + imp + &quot;&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;\n&quot;);</b>
+<i>418</i>&nbsp;            }
+<b class="nc"><i>419</i>&nbsp;            buf.append(&quot;&lt;/table&gt;\n&quot;);</b>
+<i>420</i>&nbsp;        }
+<i>421</i>&nbsp;
+<i>422</i>&nbsp;        // show descriptions of all plug-ins implemented by this plug in...
+<b class="nc"><i>423</i>&nbsp;        buf.append(&quot;&lt;p&gt;&quot; + m_descriptions.get(beastObjectName) + &quot;&lt;/p&gt;\n&quot;);</b>
+<i>424</i>&nbsp;
+<i>425</i>&nbsp;        // show citation (if any)
+<b class="nc"><i>426</i>&nbsp;        Citation citation = beastObject.getCitation();</b>
+<b class="nc"><i>427</i>&nbsp;        if (citation != null) {</b>
+<b class="nc"><i>428</i>&nbsp;            buf.append(&quot;&lt;h2&gt;Reference:&lt;/h2&gt;&lt;p&gt;&quot; + citation.value() + &quot;&lt;/p&gt;\n&quot;);</b>
+<b class="nc"><i>429</i>&nbsp;            if (citation.DOI().length() &gt; 0) {</b>
+<b class="nc"><i>430</i>&nbsp;                buf.append(&quot;&lt;p&gt;&lt;a href=\&quot;http://dx.doi.org/&quot; + citation.DOI() + &quot;\&quot;&gt;doi:&quot; + citation.DOI() + &quot;&lt;/a&gt;&lt;/p&gt;\n&quot;);</b>
+<i>431</i>&nbsp;            }
+<i>432</i>&nbsp;        }
+<i>433</i>&nbsp;
+<i>434</i>&nbsp;        // show if this is Loggable
+<b class="nc"><i>435</i>&nbsp;        if (m_sLoggables.contains(beastObjectName)) {</b>
+<b class="nc"><i>436</i>&nbsp;            buf.append(&quot;&lt;p&gt;Logable:&quot;);</b>
+<b class="nc"><i>437</i>&nbsp;            buf.append(&quot; yes, this can be used in a log.&quot;);</b>
+<b class="nc"><i>438</i>&nbsp;            buf.append(&quot;&lt;/p&gt;\n&quot;);</b>
+<i>439</i>&nbsp;//        } else {
+<i>440</i>&nbsp;//        	buf.append(&quot; no, this cannot be used in a log.&quot;);
+<i>441</i>&nbsp;        }
+<i>442</i>&nbsp;
+<i>443</i>&nbsp;        // show short list its inputs
+<b class="nc"><i>444</i>&nbsp;        buf.append(&quot;&lt;h2&gt;Inputs:&lt;/h2&gt;\n&quot;);</b>
+<b class="nc"><i>445</i>&nbsp;        buf.append(&quot;&lt;p&gt;&quot;);</b>
+<b class="nc"><i>446</i>&nbsp;        List&lt;Input&lt;?&gt;&gt; inputs = beastObject.listInputs();</b>
+<b class="nc"><i>447</i>&nbsp;        for (Input&lt;?&gt; input : inputs) {</b>
+<b class="nc"><i>448</i>&nbsp;        	buf.append(&quot;&lt;a href=&#39;#&quot; + input.getName()+&quot;&#39;&gt;&quot; + input.getName() + &quot;&lt;/a&gt;, &quot;);</b>
+<b class="nc"><i>449</i>&nbsp;        }</b>
+<b class="nc"><i>450</i>&nbsp;        buf.delete(buf.length() - 3, buf.length()-1);</b>
+<b class="nc"><i>451</i>&nbsp;        buf.append(&quot;&lt;/p&gt;\n&quot;);</b>
+<i>452</i>&nbsp;        
+<i>453</i>&nbsp;        // list its inputs
+<b class="nc"><i>454</i>&nbsp;        if (inputs.size() == 0) {</b>
+<b class="nc"><i>455</i>&nbsp;            buf.append(&quot;&amp;lt;none&amp;gt;&quot;);</b>
+<i>456</i>&nbsp;        }
+<b class="nc"><i>457</i>&nbsp;        for (Input&lt;?&gt; input : inputs) {</b>
+<b class="nc"><i>458</i>&nbsp;        	buf.append(&quot;&lt;p&gt;&amp;nbsp&lt;/p&gt;&quot;);</b>
+<b class="nc"><i>459</i>&nbsp;            buf.append(&quot;&lt;table id=&#39;&quot; + input.getName() + &quot;&#39; border=&#39;1px&#39; width=&#39;90%&#39;&gt;\n&quot;);</b>
+<b class="nc"><i>460</i>&nbsp;            buf.append(&quot;&lt;caption&gt;&quot; + input.getName() + &quot;&lt;/caption&gt;\n&quot;);</b>
+<b class="nc"><i>461</i>&nbsp;            buf.append(&quot;&lt;thead&gt;&lt;tr bgcolor=&#39;#AAAAAA&#39;&gt;&lt;td&gt;type: &quot; + getType(beastObject, input.getName()) + &quot;&lt;/td&gt;&lt;/tr&gt;&lt;/thead&gt;\n&quot;);</b>
+<b class="nc"><i>462</i>&nbsp;            buf.append(&quot;&lt;tr&gt;&lt;td&gt;&quot; + input.getTipText() + &quot;&lt;/td&gt;&lt;/tr&gt;\n&quot;);</b>
+<b class="nc"><i>463</i>&nbsp;            buf.append(&quot;&lt;tr&gt;&lt;td&gt;\n&quot;);</b>
+<b class="pc"><i>464</i>&nbsp;            switch (input.getRule()) {</b>
+<i>465</i>&nbsp;                case OPTIONAL:
+<b class="nc"><i>466</i>&nbsp;                    buf.append(&quot;Optional input&quot;);</b>
+<b class="nc"><i>467</i>&nbsp;                    if (input.defaultValue != null) {</b>
+<b class="nc"><i>468</i>&nbsp;                        if (input.defaultValue instanceof Integer ||</b>
+<i>469</i>&nbsp;                                input.defaultValue instanceof Double ||
+<i>470</i>&nbsp;                                input.defaultValue instanceof Boolean ||
+<i>471</i>&nbsp;                                input.defaultValue instanceof String) {
+<b class="nc"><i>472</i>&nbsp;                            buf.append(&quot;. Default: &quot; + input.defaultValue.toString());</b>
+<i>473</i>&nbsp;                        }
+<i>474</i>&nbsp;                    }
+<i>475</i>&nbsp;                    break;
+<i>476</i>&nbsp;                case REQUIRED:
+<b class="nc"><i>477</i>&nbsp;                    buf.append(&quot;Required input&quot;);</b>
+<b class="nc"><i>478</i>&nbsp;                    break;</b>
+<i>479</i>&nbsp;                case XOR:
+<b class="nc"><i>480</i>&nbsp;                    buf.append(&quot;Either this, or &quot; + input.getOther().getName() + &quot; needs to be specified&quot;);</b>
+<b class="nc"><i>481</i>&nbsp;                    break;</b>
+<i>482</i>&nbsp;                case FORBIDDEN:
+<b class="nc"><i>483</i>&nbsp;                    buf.append(&quot;Forbidden: must not be specified&quot;);</b>
+<i>484</i>&nbsp;                    break;
+<i>485</i>&nbsp;            }
+<b class="nc"><i>486</i>&nbsp;            buf.append(&quot;&lt;/td&gt;&lt;/tr&gt;\n&quot;);</b>
+<b class="nc"><i>487</i>&nbsp;            buf.append(&quot;&lt;/table&gt;\n&quot;);</b>
+<b class="nc"><i>488</i>&nbsp;        }</b>
+<b class="nc"><i>489</i>&nbsp;        buf.append(&quot;&lt;/body&gt;\n&quot;);</b>
+<b class="nc"><i>490</i>&nbsp;        buf.append(&quot;&lt;/html&gt;\n&quot;);</b>
+<b class="nc"><i>491</i>&nbsp;        return buf.toString();</b>
+<i>492</i>&nbsp;    } // getHTML
+<i>493</i>&nbsp;
+<i>494</i>&nbsp;    /**
+<i>495</i>&nbsp;     * determine type of input of a plug in with name name
+<i>496</i>&nbsp;     */
+<i>497</i>&nbsp;    String getType(BEASTObject beastObject, String name) {
+<i>498</i>&nbsp;        try {
+<b class="nc"><i>499</i>&nbsp;            Field[] fields = beastObject.getClass().getFields();</b>
+<b class="nc"><i>500</i>&nbsp;            for (int i = 0; i &lt; fields.length; i++) {</b>
+<b class="nc"><i>501</i>&nbsp;                if (fields[i].getType().isAssignableFrom(Input.class)) {</b>
+<b class="nc"><i>502</i>&nbsp;                    final Input&lt;?&gt; input = (Input&lt;?&gt;) fields[i].get(beastObject);</b>
+<b class="nc"><i>503</i>&nbsp;                    if (input.getName().equals(name)) {</b>
+<b class="nc"><i>504</i>&nbsp;                        Type t = fields[i].getGenericType();</b>
+<b class="nc"><i>505</i>&nbsp;                        Type[] genericTypes = ((ParameterizedType) t).getActualTypeArguments();</b>
+<b class="nc"><i>506</i>&nbsp;                        if (input.getType() != null) {</b>
+<b class="nc"><i>507</i>&nbsp;                            return (input.getType().isAssignableFrom(BEASTObject.class) ? &quot;&lt;a href=&#39;&quot; + input.getType().getName() + &quot;.html&#39;&gt;&quot; : &quot;&quot;) +</b>
+<b class="nc"><i>508</i>&nbsp;                                    input.getType().getName() +</b>
+<b class="nc"><i>509</i>&nbsp;                                    (input.get() != null &amp;&amp; input.get() instanceof List&lt;?&gt; ? &quot;***&quot; : &quot;&quot;) +</b>
+<b class="nc"><i>510</i>&nbsp;                                    (input.getType().isAssignableFrom(BEASTObject.class) ? &quot;&lt;/a&gt;&quot; : &quot;&quot;);</b>
+<i>511</i>&nbsp;                        }
+<b class="nc"><i>512</i>&nbsp;                        if (input.get() != null &amp;&amp; input.get() instanceof List&lt;?&gt;) {</b>
+<b class="nc"><i>513</i>&nbsp;                            Type[] genericTypes2 = ((ParameterizedType) genericTypes[0]).getActualTypeArguments();</b>
+<b class="nc"><i>514</i>&nbsp;                            Class&lt;?&gt; _class = (Class&lt;?&gt;) genericTypes2[0];</b>
+<b class="nc"><i>515</i>&nbsp;                            Object o = null;</b>
+<i>516</i>&nbsp;                            try {
+<b class="nc"><i>517</i>&nbsp;                                o = Class.forName(_class.getName()).newInstance();</b>
+<b class="nc"><i>518</i>&nbsp;                            } catch (Exception e) {</b>
+<b class="nc"><i>519</i>&nbsp;                            }</b>
+<b class="nc"><i>520</i>&nbsp;                            if (o != null &amp;&amp; o instanceof BEASTObject) {</b>
+<b class="nc"><i>521</i>&nbsp;                                return &quot;&lt;a href=&#39;&quot; + _class.getName() + &quot;.html&#39;&gt;&quot; + _class.getName() + &quot;***&lt;/a&gt;&quot;;</b>
+<i>522</i>&nbsp;                            } else {
+<b class="nc"><i>523</i>&nbsp;                                return _class.getName() + &quot;***&quot;;</b>
+<i>524</i>&nbsp;                            }
+<i>525</i>&nbsp;                        } else {
+<b class="nc"><i>526</i>&nbsp;                            Class&lt;?&gt; genericType = (Class&lt;?&gt;) genericTypes[0];</b>
+<b class="nc"><i>527</i>&nbsp;                            Class&lt;?&gt; _class = genericType;</b>
+<b class="nc"><i>528</i>&nbsp;                            Object o = null;</b>
+<i>529</i>&nbsp;                            try {
+<b class="nc"><i>530</i>&nbsp;                                o = Class.forName(_class.getName()).newInstance();</b>
+<b class="nc"><i>531</i>&nbsp;                            } catch (Exception e) {</b>
+<b class="nc"><i>532</i>&nbsp;                            }</b>
+<b class="nc"><i>533</i>&nbsp;                            if (o != null &amp;&amp; o instanceof BEASTObject) {</b>
+<b class="nc"><i>534</i>&nbsp;                                return &quot;&lt;a href=&#39;&quot; + _class.getName() + &quot;.html&#39;&gt;&quot; + _class.getName() + &quot;&lt;/a&gt;&quot;;</b>
+<i>535</i>&nbsp;                            } else {
+<b class="nc"><i>536</i>&nbsp;                                return _class.getName();</b>
+<i>537</i>&nbsp;                            }
+<i>538</i>&nbsp;                        }
+<i>539</i>&nbsp;                    }
+<i>540</i>&nbsp;                }
+<i>541</i>&nbsp;            }
+<b class="nc"><i>542</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>543</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>544</i>&nbsp;        }</b>
+<b class="nc"><i>545</i>&nbsp;        return &quot;?&quot;;</b>
+<i>546</i>&nbsp;    } // getType
+<i>547</i>&nbsp;
+<i>548</i>&nbsp;    /**
+<i>549</i>&nbsp;     * generate set of documents for plug ins
+<i>550</i>&nbsp;     * including index page + frame
+<i>551</i>&nbsp;     * individual pages for each plug in
+<i>552</i>&nbsp;     * *
+<i>553</i>&nbsp;     * @throws FileNotFoundException 
+<i>554</i>&nbsp;     */
+<i>555</i>&nbsp;    public void generateDocs() throws FileNotFoundException {
+<i>556</i>&nbsp;        // first, produce CSS &amp; index page
+<b class="nc"><i>557</i>&nbsp;        createCSS();</b>
+<b class="nc"><i>558</i>&nbsp;        createIndex();</b>
+<i>559</i>&nbsp;        // next, produce pages for individual plug-ins
+<b class="nc"><i>560</i>&nbsp;        for (String beastObjectName : m_beastObjectNames) {</b>
+<b class="nc"><i>561</i>&nbsp;            createBEASTObjectPage(beastObjectName);</b>
+<b class="nc"><i>562</i>&nbsp;        }</b>
+<b class="nc"><i>563</i>&nbsp;    } // generateDocs</b>
+<i>564</i>&nbsp;
+<i>565</i>&nbsp;
+<i>566</i>&nbsp;    /**
+<i>567</i>&nbsp;     * Usage: DocMaker &lt;target directory&gt;
+<i>568</i>&nbsp;     * where &lt;target directory&gt; is the place where the HTML files
+<i>569</i>&nbsp;     * should go. Default directory is /tmp
+<i>570</i>&nbsp;     */
+<i>571</i>&nbsp;    public static void main(String[] args) {
+<i>572</i>&nbsp;        try {
+<b class="nc"><i>573</i>&nbsp;            System.err.println(&quot;Producing documentation...&quot;);</b>
+<b class="nc"><i>574</i>&nbsp;            AddOnManager.loadExternalJars();</b>
+<b class="nc"><i>575</i>&nbsp;            DocMaker b = new DocMaker(args);</b>
+<b class="nc"><i>576</i>&nbsp;            b.generateDocs();</b>
+<b class="nc"><i>577</i>&nbsp;            System.err.println(&quot;Done!!!&quot;);</b>
+<b class="nc"><i>578</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>579</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>580</i>&nbsp;        }</b>
+<b class="nc"><i>581</i>&nbsp;    } // main</b>
+<i>582</i>&nbsp;
+<i>583</i>&nbsp;
+<i>584</i>&nbsp;} // BeastDocMaker
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,166 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TableEditorStopper</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.tools</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TableEditorStopper (beast.app.tools)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TableEditorStopper</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 22)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.tools;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.awt.Component;
+<i>4</i>&nbsp;import java.awt.event.FocusAdapter;
+<i>5</i>&nbsp;import java.awt.event.FocusEvent;
+<i>6</i>&nbsp;import java.beans.PropertyChangeEvent;
+<i>7</i>&nbsp;import java.beans.PropertyChangeListener;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;import javax.swing.JTable;
+<i>10</i>&nbsp;import javax.swing.table.TableCellEditor;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;// TODO: check whetehr this is still relevant. Last complaint was at 16-JUN-2011! 
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;/**
+<i>15</i>&nbsp; * This class is a workaround for a bug in Java (4503845)
+<i>16</i>&nbsp; * see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4503845
+<i>17</i>&nbsp; * Although the state appears as fixed, it does not yet work on 1.5
+<i>18</i>&nbsp; * (see the comments at the end on the previous page)
+<i>19</i>&nbsp; * &lt;p/&gt;
+<i>20</i>&nbsp; * The bug refers to tables with editing cells. When the user interacts
+<i>21</i>&nbsp; * with other UI element -or other cell in the table-, the editor component
+<i>22</i>&nbsp; * should receive a stopCellEditing call.
+<i>23</i>&nbsp; * This does not happen if the user selects a UI element outside the table.
+<i>24</i>&nbsp; * &lt;p/&gt;
+<i>25</i>&nbsp; * For example:
+<i>26</i>&nbsp; * - A dialog contains a table and a Cancel button that, before closing,
+<i>27</i>&nbsp; * verifies whether there are changes to save.
+<i>28</i>&nbsp; * -The user is modifying one cell and then presses the Cancel button
+<i>29</i>&nbsp; * -Then the cell editor does not receive an stopCellEditing call, so
+<i>30</i>&nbsp; * there seems to be no changes to save!
+<i>31</i>&nbsp; * &lt;p/&gt;
+<i>32</i>&nbsp; * A basic solution for this last example would be to call to
+<i>33</i>&nbsp; * table.getCellEditor().stopCellEditing() when reacting to events on the
+<i>34</i>&nbsp; * Cancel button, but this call should be made on every event handler for
+<i>35</i>&nbsp; * each UI element!
+<i>36</i>&nbsp; * &lt;p/&gt;
+<i>37</i>&nbsp; * This class works by listening to focus events when a cell editor is selected.
+<i>38</i>&nbsp; * If the focus is transfered to any place outside the table, it calls to
+<i>39</i>&nbsp; * stopCellEditing()
+<i>40</i>&nbsp; * Why is it not enough to check the focus on just the editor component?
+<i>41</i>&nbsp; * =&gt; Because the TableCellEditor could be composed of multiple Components
+<i>42</i>&nbsp; */
+<i>43</i>&nbsp;public class TableEditorStopper extends FocusAdapter implements PropertyChangeListener {
+<i>44</i>&nbsp;    public static void ensureEditingStopWhenTableLosesFocus(JTable table) {
+<b class="nc"><i>45</i>&nbsp;        new TableEditorStopper(table);</b>
+<b class="nc"><i>46</i>&nbsp;    }</b>
+<i>47</i>&nbsp;
+<b class="nc"><i>48</i>&nbsp;    private TableEditorStopper(JTable table) {</b>
+<b class="nc"><i>49</i>&nbsp;        this.table = table;</b>
+<b class="nc"><i>50</i>&nbsp;        table.addPropertyChangeListener(&quot;tableCellEditor&quot;, this);</b>
+<b class="nc"><i>51</i>&nbsp;    }</b>
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;    @Override
+<i>54</i>&nbsp;	public void propertyChange(PropertyChangeEvent evt) {
+<b class="nc"><i>55</i>&nbsp;        if (focused != null) {</b>
+<b class="nc"><i>56</i>&nbsp;            focused.removeFocusListener(this);</b>
+<i>57</i>&nbsp;        }
+<b class="nc"><i>58</i>&nbsp;        focused = table.getEditorComponent();</b>
+<b class="nc"><i>59</i>&nbsp;        if (focused != null) {</b>
+<b class="nc"><i>60</i>&nbsp;            focused.addFocusListener(this);</b>
+<i>61</i>&nbsp;        }
+<b class="nc"><i>62</i>&nbsp;    }</b>
+<i>63</i>&nbsp;
+<i>64</i>&nbsp;    @Override
+<i>65</i>&nbsp;	public void focusLost(FocusEvent e) {
+<b class="nc"><i>66</i>&nbsp;        if (focused != null) {</b>
+<b class="nc"><i>67</i>&nbsp;            focused.removeFocusListener(this);</b>
+<b class="nc"><i>68</i>&nbsp;            focused = e.getOppositeComponent();</b>
+<b class="nc"><i>69</i>&nbsp;            if (table == focused || table.isAncestorOf(focused)) {</b>
+<b class="nc"><i>70</i>&nbsp;                focused.addFocusListener(this);</b>
+<i>71</i>&nbsp;            } else {
+<b class="nc"><i>72</i>&nbsp;                focused = null;</b>
+<b class="nc"><i>73</i>&nbsp;                TableCellEditor editor = table.getCellEditor();</b>
+<b class="nc"><i>74</i>&nbsp;                if (editor != null) {</b>
+<b class="nc"><i>75</i>&nbsp;                    editor.stopCellEditing();</b>
+<i>76</i>&nbsp;                }
+<i>77</i>&nbsp;            }
+<i>78</i>&nbsp;        }
+<b class="nc"><i>79</i>&nbsp;    }</b>
+<i>80</i>&nbsp;
+<i>81</i>&nbsp;    private Component focused;
+<i>82</i>&nbsp;    private JTable table;
+<i>83</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

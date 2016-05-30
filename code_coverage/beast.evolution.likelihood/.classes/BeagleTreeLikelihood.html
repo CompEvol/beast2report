@@ -1,0 +1,1283 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: BeagleTreeLikelihood</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.likelihood</a> ]
+</div>
+
+<h1>Coverage Summary for Class: BeagleTreeLikelihood (beast.evolution.likelihood)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BeagleTreeLikelihood</td>
+<td class="coverageStat">
+  <span class="percent">
+    61.1%
+  </span>
+  <span class="absValue">
+    (11/ 18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    54.2%
+  </span>
+  <span class="absValue">
+    (257/ 474)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BeagleTreeLikelihood$BufferIndexHelper</td>
+<td class="coverageStat">
+  <span class="percent">
+    57.1%
+  </span>
+  <span class="absValue">
+    (4/ 7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60.9%
+  </span>
+  <span class="absValue">
+    (14/ 23)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BeagleTreeLikelihood$PartialsRescalingScheme</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    73.3%
+  </span>
+  <span class="absValue">
+    (11/ 15)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    63.3%
+  </span>
+  <span class="absValue">
+    (19/ 30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    55.1%
+  </span>
+  <span class="absValue">
+    (282/ 512)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp; * TreeLikelihood.java
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; * Copyright (C) 2002-2006 Alexei Drummond and Andrew Rambaut
+<i>5</i>&nbsp; *
+<i>6</i>&nbsp; * This file is part of BEAST.
+<i>7</i>&nbsp; * See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp; * information regarding copyright ownership and licensing.
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; * BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp; * it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp; * published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp; * of the License, or (at your option) any later version.
+<i>14</i>&nbsp; *
+<i>15</i>&nbsp; *  BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp; *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp; *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp; *  GNU Lesser General Public License for more details.
+<i>19</i>&nbsp; *
+<i>20</i>&nbsp; * You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp; * License along with BEAST; if not, write to the
+<i>22</i>&nbsp; * Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp; * Boston, MA  02110-1301  USA
+<i>24</i>&nbsp; */
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;package beast.evolution.likelihood;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;import java.util.ArrayList;
+<i>29</i>&nbsp;import java.util.List;
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;import beagle.Beagle;
+<i>32</i>&nbsp;import beagle.BeagleFactory;
+<i>33</i>&nbsp;import beagle.BeagleFlag;
+<i>34</i>&nbsp;import beagle.BeagleInfo;
+<i>35</i>&nbsp;import beagle.InstanceDetails;
+<i>36</i>&nbsp;import beagle.ResourceDetails;
+<i>37</i>&nbsp;import beast.core.CalculationNode;
+<i>38</i>&nbsp;import beast.core.Description;
+<i>39</i>&nbsp;import beast.core.util.Log;
+<i>40</i>&nbsp;import beast.evolution.alignment.Alignment;
+<i>41</i>&nbsp;import beast.evolution.branchratemodel.StrictClockModel;
+<i>42</i>&nbsp;import beast.evolution.sitemodel.SiteModel;
+<i>43</i>&nbsp;import beast.evolution.substitutionmodel.EigenDecomposition;
+<i>44</i>&nbsp;import beast.evolution.tree.Node;
+<i>45</i>&nbsp;import beast.evolution.tree.Tree;
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;/**
+<i>49</i>&nbsp; * BeagleTreeLikelihoodModel - implements a Likelihood Function for sequences on a tree.
+<i>50</i>&nbsp; *
+<i>51</i>&nbsp; * @author Andrew Rambaut
+<i>52</i>&nbsp; * @author Alexei Drummond
+<i>53</i>&nbsp; * @author Marc Suchard
+<i>54</i>&nbsp; * @version $Id$
+<i>55</i>&nbsp; */
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;@Description(&quot;Uses Beagle library to calculate Tree likelihood&quot;)
+<b class="fc"><i>58</i>&nbsp;public class BeagleTreeLikelihood extends TreeLikelihood {</b>
+<i>59</i>&nbsp;
+<i>60</i>&nbsp;    // This property is a comma-delimited list of resource numbers (0 == CPU) to
+<i>61</i>&nbsp;    // allocate each BEAGLE instance to. If less than the number of instances then
+<i>62</i>&nbsp;    // will wrap around.
+<i>63</i>&nbsp;    // note: to use a different device, say device 2, start beast with
+<i>64</i>&nbsp;    // java -Dbeagle.resource.order=2 beast.app.BeastMCMC
+<i>65</i>&nbsp;    private static final String RESOURCE_ORDER_PROPERTY = &quot;beagle.resource.order&quot;;
+<i>66</i>&nbsp;    private static final String PREFERRED_FLAGS_PROPERTY = &quot;beagle.preferred.flags&quot;;
+<i>67</i>&nbsp;    private static final String REQUIRED_FLAGS_PROPERTY = &quot;beagle.required.flags&quot;;
+<i>68</i>&nbsp;    private static final String SCALING_PROPERTY = &quot;beagle.scaling&quot;;
+<i>69</i>&nbsp;    private static final String RESCALE_FREQUENCY_PROPERTY = &quot;beagle.rescale&quot;;
+<i>70</i>&nbsp;    // Which scheme to use if choice not specified (or &#39;default&#39; is selected):
+<b class="fc"><i>71</i>&nbsp;    private static final PartialsRescalingScheme DEFAULT_RESCALING_SCHEME = PartialsRescalingScheme.DYNAMIC;</b>
+<i>72</i>&nbsp;
+<b class="fc"><i>73</i>&nbsp;    private static int instanceCount = 0;</b>
+<b class="fc"><i>74</i>&nbsp;    private static List&lt;Integer&gt; resourceOrder = null;</b>
+<b class="fc"><i>75</i>&nbsp;    private static List&lt;Integer&gt; preferredOrder = null;</b>
+<b class="fc"><i>76</i>&nbsp;    private static List&lt;Integer&gt; requiredOrder = null;</b>
+<b class="fc"><i>77</i>&nbsp;    private static List&lt;String&gt; scalingOrder = null;</b>
+<i>78</i>&nbsp;
+<i>79</i>&nbsp;    private static final int RESCALE_FREQUENCY = 10000;
+<i>80</i>&nbsp;    private static final int RESCALE_TIMES = 1;
+<i>81</i>&nbsp;
+<i>82</i>&nbsp;    boolean m_bUseAmbiguities, m_bUseTipLikelihoods;
+<i>83</i>&nbsp;    int m_nStateCount;
+<i>84</i>&nbsp;    int m_nNodeCount;
+<i>85</i>&nbsp;    
+<i>86</i>&nbsp;    private double [] currentCategoryRates;
+<i>87</i>&nbsp;//    private double [] storedCurrentCategoryRates;
+<i>88</i>&nbsp;    private double [] currentFreqs;
+<i>89</i>&nbsp;    private double [] currentCategoryWeights;
+<i>90</i>&nbsp;    
+<b class="fc"><i>91</i>&nbsp;    private int invariantCategory = -1;</b>
+<i>92</i>&nbsp;
+<i>93</i>&nbsp;    @Override
+<i>94</i>&nbsp;    public void initAndValidate() {
+<b class="fc"><i>95</i>&nbsp;        boolean forceJava = Boolean.valueOf(System.getProperty(&quot;java.only&quot;));</b>
+<b class="fc"><i>96</i>&nbsp;        if (forceJava) {</b>
+<b class="fc"><i>97</i>&nbsp;        	return;</b>
+<i>98</i>&nbsp;        }
+<b class="fc"><i>99</i>&nbsp;        initialize();</b>
+<b class="fc"><i>100</i>&nbsp;    }</b>
+<i>101</i>&nbsp;
+<i>102</i>&nbsp;    private boolean initialize() {
+<b class="fc"><i>103</i>&nbsp;        m_nNodeCount = treeInput.get().getNodeCount();</b>
+<b class="fc"><i>104</i>&nbsp;        m_bUseAmbiguities = m_useAmbiguities.get();</b>
+<b class="fc"><i>105</i>&nbsp;        m_bUseTipLikelihoods = m_useTipLikelihoods.get();</b>
+<b class="fc"><i>106</i>&nbsp;        if (!(siteModelInput.get() instanceof SiteModel.Base)) {</b>
+<b class="nc"><i>107</i>&nbsp;        	throw new IllegalArgumentException(&quot;siteModel input should be of type SiteModel.Base&quot;);</b>
+<i>108</i>&nbsp;        }
+<b class="fc"><i>109</i>&nbsp;        m_siteModel = (SiteModel.Base) siteModelInput.get();</b>
+<b class="fc"><i>110</i>&nbsp;        m_siteModel.setDataType(dataInput.get().getDataType());</b>
+<b class="fc"><i>111</i>&nbsp;        substitutionModel = m_siteModel.substModelInput.get();</b>
+<b class="fc"><i>112</i>&nbsp;        branchRateModel = branchRateModelInput.get();</b>
+<b class="fc"><i>113</i>&nbsp;        if (branchRateModel == null) {</b>
+<b class="fc"><i>114</i>&nbsp;        	branchRateModel = new StrictClockModel();</b>
+<i>115</i>&nbsp;        }
+<b class="fc"><i>116</i>&nbsp;        m_branchLengths = new double[m_nNodeCount];</b>
+<b class="fc"><i>117</i>&nbsp;        storedBranchLengths = new double[m_nNodeCount];</b>
+<i>118</i>&nbsp;
+<b class="fc"><i>119</i>&nbsp;        m_nStateCount = dataInput.get().getMaxStateCount();</b>
+<b class="fc"><i>120</i>&nbsp;        patternCount = dataInput.get().getPatternCount();</b>
+<i>121</i>&nbsp;
+<i>122</i>&nbsp;        //System.err.println(&quot;Attempt to load BEAGLE TreeLikelihood&quot;);
+<i>123</i>&nbsp;
+<b class="fc"><i>124</i>&nbsp;        eigenCount = 1;//this.branchSubstitutionModel.getEigenCount();</b>
+<i>125</i>&nbsp;
+<b class="fc"><i>126</i>&nbsp;        double[] categoryRates = m_siteModel.getCategoryRates(null);</b>
+<i>127</i>&nbsp;        // check for invariant rates category
+<b class="fc"><i>128</i>&nbsp;        if (m_siteModel.hasPropInvariantCategory) {</b>
+<b class="fc"><i>129</i>&nbsp;	        for (int i = 0; i &lt; categoryRates.length; i++) {</b>
+<b class="fc"><i>130</i>&nbsp;	        	if (categoryRates[i] == 0) {</b>
+<b class="nc"><i>131</i>&nbsp;	        		proportionInvariant = m_siteModel.getRateForCategory(i, null);</b>
+<b class="nc"><i>132</i>&nbsp;	                int stateCount = dataInput.get().getMaxStateCount();</b>
+<b class="nc"><i>133</i>&nbsp;	                int patterns = dataInput.get().getPatternCount();</b>
+<b class="nc"><i>134</i>&nbsp;	                calcConstantPatternIndices(patterns, stateCount);</b>
+<b class="nc"><i>135</i>&nbsp;	                invariantCategory = i;</b>
+<i>136</i>&nbsp;	                
+<b class="nc"><i>137</i>&nbsp;	                double [] tmp = new double [categoryRates.length - 1];</b>
+<b class="nc"><i>138</i>&nbsp;	                for (int k = 0; k &lt; invariantCategory; k++) {</b>
+<b class="nc"><i>139</i>&nbsp;	                	tmp[k] = categoryRates[k];</b>
+<i>140</i>&nbsp;	                }
+<b class="nc"><i>141</i>&nbsp;	                for (int k = invariantCategory + 1; k &lt; categoryRates.length; k++) {</b>
+<b class="nc"><i>142</i>&nbsp;	                	tmp[k-1] = categoryRates[k];</b>
+<i>143</i>&nbsp;	                }
+<b class="nc"><i>144</i>&nbsp;	                categoryRates = tmp;</b>
+<b class="nc"><i>145</i>&nbsp;	        		break;</b>
+<i>146</i>&nbsp;	        	}
+<i>147</i>&nbsp;	        }
+<b class="fc"><i>148</i>&nbsp;	        if (constantPattern != null &amp;&amp; constantPattern.size() &gt; dataInput.get().getPatternCount()) {</b>
+<i>149</i>&nbsp;	        	// if there are many more constant patterns than patterns (each pattern can
+<i>150</i>&nbsp;	        	// have a number of constant patters, one for each state) it is less efficient
+<i>151</i>&nbsp;	        	// to just calculate the TreeLikelihood for constant sites than optimising
+<b class="nc"><i>152</i>&nbsp;	        	Log.debug(&quot;switch off constant sites optimisiation: calculating through separate TreeLikelihood category (as in the olden days)&quot;);</b>
+<b class="nc"><i>153</i>&nbsp;	        	invariantCategory = -1;</b>
+<b class="nc"><i>154</i>&nbsp;	        	proportionInvariant = 0;</b>
+<b class="nc"><i>155</i>&nbsp;	        	constantPattern = null;</b>
+<b class="nc"><i>156</i>&nbsp;	        	categoryRates = m_siteModel.getCategoryRates(null);</b>
+<i>157</i>&nbsp;	        }
+<i>158</i>&nbsp;        }        
+<i>159</i>&nbsp;
+<b class="fc"><i>160</i>&nbsp;        this.categoryCount = m_siteModel.getCategoryCount() - (invariantCategory &gt;= 0 ? 1 : 0);</b>
+<b class="fc"><i>161</i>&nbsp;        tipCount = treeInput.get().getLeafNodeCount();</b>
+<i>162</i>&nbsp;
+<b class="fc"><i>163</i>&nbsp;        internalNodeCount = m_nNodeCount - tipCount;</b>
+<i>164</i>&nbsp;
+<b class="fc"><i>165</i>&nbsp;        int compactPartialsCount = tipCount;</b>
+<b class="fc"><i>166</i>&nbsp;        if (m_bUseAmbiguities) {</b>
+<i>167</i>&nbsp;            // if we are using ambiguities then we don&#39;t use tip partials
+<b class="nc"><i>168</i>&nbsp;            compactPartialsCount = 0;</b>
+<i>169</i>&nbsp;        }
+<i>170</i>&nbsp;
+<i>171</i>&nbsp;        // one partials buffer for each tip and two for each internal node (for store restore)
+<b class="fc"><i>172</i>&nbsp;        partialBufferHelper = new BufferIndexHelper(m_nNodeCount, tipCount);</b>
+<i>173</i>&nbsp;
+<i>174</i>&nbsp;        // two eigen buffers for each decomposition for store and restore.
+<b class="fc"><i>175</i>&nbsp;        eigenBufferHelper = new BufferIndexHelper(eigenCount, 0);</b>
+<i>176</i>&nbsp;
+<i>177</i>&nbsp;        // two matrices for each node less the root
+<b class="fc"><i>178</i>&nbsp;        matrixBufferHelper = new BufferIndexHelper(m_nNodeCount, 0);</b>
+<i>179</i>&nbsp;
+<i>180</i>&nbsp;        // one scaling buffer for each internal node plus an extra for the accumulation, then doubled for store/restore
+<b class="fc"><i>181</i>&nbsp;        scaleBufferHelper = new BufferIndexHelper(getScaleBufferCount(), 0);</b>
+<i>182</i>&nbsp;
+<i>183</i>&nbsp;        // Attempt to get the resource order from the System Property
+<b class="fc"><i>184</i>&nbsp;        if (resourceOrder == null) {</b>
+<b class="fc"><i>185</i>&nbsp;            resourceOrder = parseSystemPropertyIntegerArray(RESOURCE_ORDER_PROPERTY);</b>
+<i>186</i>&nbsp;        }
+<b class="fc"><i>187</i>&nbsp;        if (preferredOrder == null) {</b>
+<b class="fc"><i>188</i>&nbsp;            preferredOrder = parseSystemPropertyIntegerArray(PREFERRED_FLAGS_PROPERTY);</b>
+<i>189</i>&nbsp;        }
+<b class="fc"><i>190</i>&nbsp;        if (requiredOrder == null) {</b>
+<b class="fc"><i>191</i>&nbsp;            requiredOrder = parseSystemPropertyIntegerArray(REQUIRED_FLAGS_PROPERTY);</b>
+<i>192</i>&nbsp;        }
+<b class="fc"><i>193</i>&nbsp;        if (scalingOrder == null) {</b>
+<b class="fc"><i>194</i>&nbsp;            scalingOrder = parseSystemPropertyStringArray(SCALING_PROPERTY);</b>
+<i>195</i>&nbsp;        }
+<i>196</i>&nbsp;
+<i>197</i>&nbsp;        // first set the rescaling scheme to use from the parser
+<b class="fc"><i>198</i>&nbsp;        rescalingScheme = PartialsRescalingScheme.DEFAULT;// = rescalingScheme;</b>
+<b class="fc"><i>199</i>&nbsp;        rescalingScheme = DEFAULT_RESCALING_SCHEME;</b>
+<b class="fc"><i>200</i>&nbsp;        int[] resourceList = null;</b>
+<b class="fc"><i>201</i>&nbsp;        long preferenceFlags = 0;</b>
+<b class="fc"><i>202</i>&nbsp;        long requirementFlags = 0;</b>
+<i>203</i>&nbsp;
+<b class="fc"><i>204</i>&nbsp;        if (scalingOrder.size() &gt; 0) {</b>
+<b class="nc"><i>205</i>&nbsp;            this.rescalingScheme = PartialsRescalingScheme.parseFromString(</b>
+<b class="nc"><i>206</i>&nbsp;                    scalingOrder.get(instanceCount % scalingOrder.size()));</b>
+<i>207</i>&nbsp;        }
+<i>208</i>&nbsp;
+<b class="fc"><i>209</i>&nbsp;        if (resourceOrder.size() &gt; 0) {</b>
+<i>210</i>&nbsp;            // added the zero on the end so that a CPU is selected if requested resource fails
+<b class="nc"><i>211</i>&nbsp;            resourceList = new int[]{resourceOrder.get(instanceCount % resourceOrder.size()), 0};</b>
+<b class="nc"><i>212</i>&nbsp;            if (resourceList[0] &gt; 0) {</b>
+<b class="nc"><i>213</i>&nbsp;                preferenceFlags |= BeagleFlag.PROCESSOR_GPU.getMask(); // Add preference weight against CPU</b>
+<i>214</i>&nbsp;            }
+<i>215</i>&nbsp;        }
+<i>216</i>&nbsp;
+<b class="fc"><i>217</i>&nbsp;        if (preferredOrder.size() &gt; 0) {</b>
+<b class="nc"><i>218</i>&nbsp;            preferenceFlags = preferredOrder.get(instanceCount % preferredOrder.size());</b>
+<i>219</i>&nbsp;        }
+<i>220</i>&nbsp;
+<b class="fc"><i>221</i>&nbsp;        if (requiredOrder.size() &gt; 0) {</b>
+<b class="nc"><i>222</i>&nbsp;            requirementFlags = requiredOrder.get(instanceCount % requiredOrder.size());</b>
+<i>223</i>&nbsp;        }
+<i>224</i>&nbsp;
+<b class="fc"><i>225</i>&nbsp;        if (scaling.get().equals(Scaling.always)) {</b>
+<b class="nc"><i>226</i>&nbsp;        	this.rescalingScheme = PartialsRescalingScheme.ALWAYS;</b>
+<i>227</i>&nbsp;        }
+<b class="fc"><i>228</i>&nbsp;        if (scaling.get().equals(Scaling.none)) {</b>
+<b class="nc"><i>229</i>&nbsp;        	this.rescalingScheme = PartialsRescalingScheme.NONE;</b>
+<i>230</i>&nbsp;        }
+<i>231</i>&nbsp;        
+<i>232</i>&nbsp;        // Define default behaviour here
+<b class="fc"><i>233</i>&nbsp;        if (this.rescalingScheme == PartialsRescalingScheme.DEFAULT) {</b>
+<i>234</i>&nbsp;            //if GPU: the default is^H^Hwas dynamic scaling in BEAST, now NONE
+<b class="nc"><i>235</i>&nbsp;            if (resourceList != null &amp;&amp; resourceList[0] &gt; 1) {</b>
+<i>236</i>&nbsp;                //this.rescalingScheme = PartialsRescalingScheme.DYNAMIC;
+<b class="nc"><i>237</i>&nbsp;                this.rescalingScheme = PartialsRescalingScheme.NONE;</b>
+<i>238</i>&nbsp;            } else { // if CPU: just run as fast as possible
+<i>239</i>&nbsp;                //this.rescalingScheme = PartialsRescalingScheme.NONE;
+<i>240</i>&nbsp;                // Dynamic should run as fast as none until first underflow
+<b class="nc"><i>241</i>&nbsp;                this.rescalingScheme = PartialsRescalingScheme.DYNAMIC;</b>
+<i>242</i>&nbsp;            }
+<i>243</i>&nbsp;        }
+<i>244</i>&nbsp;
+<b class="fc"><i>245</i>&nbsp;        if (this.rescalingScheme == PartialsRescalingScheme.AUTO) {</b>
+<b class="nc"><i>246</i>&nbsp;            preferenceFlags |= BeagleFlag.SCALING_AUTO.getMask();</b>
+<b class="nc"><i>247</i>&nbsp;            useAutoScaling = true;</b>
+<i>248</i>&nbsp;        } else {
+<i>249</i>&nbsp;//                preferenceFlags |= BeagleFlag.SCALING_MANUAL.getMask();
+<i>250</i>&nbsp;        }
+<b class="fc"><i>251</i>&nbsp;        String r = System.getProperty(RESCALE_FREQUENCY_PROPERTY);</b>
+<b class="fc"><i>252</i>&nbsp;        if (r != null) {</b>
+<b class="nc"><i>253</i>&nbsp;            rescalingFrequency = Integer.parseInt(r);</b>
+<b class="nc"><i>254</i>&nbsp;            if (rescalingFrequency &lt; 1) {</b>
+<b class="nc"><i>255</i>&nbsp;                rescalingFrequency = RESCALE_FREQUENCY;</b>
+<i>256</i>&nbsp;            }
+<i>257</i>&nbsp;        }
+<i>258</i>&nbsp;
+<b class="fc"><i>259</i>&nbsp;        if (preferenceFlags == 0 &amp;&amp; resourceList == null) { // else determine dataset characteristics</b>
+<b class="fc"><i>260</i>&nbsp;            if (m_nStateCount == 4 &amp;&amp; patternCount &lt; 10000) // TODO determine good cut-off</b>
+<b class="fc"><i>261</i>&nbsp;                preferenceFlags |= BeagleFlag.PROCESSOR_CPU.getMask();</b>
+<i>262</i>&nbsp;        }
+<i>263</i>&nbsp;
+<b class="fc"><i>264</i>&nbsp;        if (substitutionModel.canReturnComplexDiagonalization()) {</b>
+<b class="nc"><i>265</i>&nbsp;            requirementFlags |= BeagleFlag.EIGEN_COMPLEX.getMask();</b>
+<i>266</i>&nbsp;        }
+<i>267</i>&nbsp;
+<b class="fc"><i>268</i>&nbsp;        instanceCount++;</b>
+<i>269</i>&nbsp;
+<i>270</i>&nbsp;        try {
+<b class="fc"><i>271</i>&nbsp;	        beagle = BeagleFactory.loadBeagleInstance(</b>
+<i>272</i>&nbsp;	                tipCount,
+<b class="fc"><i>273</i>&nbsp;	                partialBufferHelper.getBufferCount(),</b>
+<i>274</i>&nbsp;	                compactPartialsCount,
+<i>275</i>&nbsp;	                m_nStateCount,
+<i>276</i>&nbsp;	                patternCount,
+<b class="fc"><i>277</i>&nbsp;	                eigenBufferHelper.getBufferCount(),            // eigenBufferCount</b>
+<b class="fc"><i>278</i>&nbsp;	                matrixBufferHelper.getBufferCount(),</b>
+<i>279</i>&nbsp;	                categoryCount,
+<b class="fc"><i>280</i>&nbsp;	                scaleBufferHelper.getBufferCount(), // Always allocate; they may become necessary</b>
+<i>281</i>&nbsp;	                resourceList,
+<i>282</i>&nbsp;	                preferenceFlags,
+<i>283</i>&nbsp;	                requirementFlags
+<i>284</i>&nbsp;	        );
+<b class="nc"><i>285</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>286</i>&nbsp;        	beagle = null;</b>
+<b class="fc"><i>287</i>&nbsp;        }</b>
+<b class="fc"><i>288</i>&nbsp;        if (beagle == null) {</b>
+<b class="nc"><i>289</i>&nbsp;            return false;</b>
+<i>290</i>&nbsp;        }
+<i>291</i>&nbsp;
+<b class="fc"><i>292</i>&nbsp;        InstanceDetails instanceDetails = beagle.getDetails();</b>
+<b class="fc"><i>293</i>&nbsp;        ResourceDetails resourceDetails = null;</b>
+<i>294</i>&nbsp;
+<b class="fc"><i>295</i>&nbsp;        if (instanceDetails != null) {</b>
+<b class="fc"><i>296</i>&nbsp;            resourceDetails = BeagleFactory.getResourceDetails(instanceDetails.getResourceNumber());</b>
+<b class="fc"><i>297</i>&nbsp;            if (resourceDetails != null) {</b>
+<b class="fc"><i>298</i>&nbsp;                StringBuilder sb = new StringBuilder(&quot;  Using BEAGLE version: &quot; + BeagleInfo.getVersion()</b>
+<i>299</i>&nbsp;                		+ &quot; resource &quot;);
+<b class="fc"><i>300</i>&nbsp;                sb.append(resourceDetails.getNumber()).append(&quot;: &quot;);</b>
+<b class="fc"><i>301</i>&nbsp;                sb.append(resourceDetails.getName()).append(&quot;\n&quot;);</b>
+<b class="fc"><i>302</i>&nbsp;                if (resourceDetails.getDescription() != null) {</b>
+<b class="fc"><i>303</i>&nbsp;                    String[] description = resourceDetails.getDescription().split(&quot;\\|&quot;);</b>
+<b class="fc"><i>304</i>&nbsp;                    for (String desc : description) {</b>
+<b class="fc"><i>305</i>&nbsp;                        if (desc.trim().length() &gt; 0) {</b>
+<b class="nc"><i>306</i>&nbsp;                            sb.append(&quot;    &quot;).append(desc.trim()).append(&quot;\n&quot;);</b>
+<i>307</i>&nbsp;                        }
+<i>308</i>&nbsp;                    }
+<i>309</i>&nbsp;                }
+<b class="fc"><i>310</i>&nbsp;                sb.append(&quot;    with instance flags: &quot;).append(instanceDetails.toString());</b>
+<b class="fc"><i>311</i>&nbsp;                Log.info.println(sb.toString());</b>
+<b class="fc"><i>312</i>&nbsp;            } else {</b>
+<b class="nc"><i>313</i>&nbsp;                Log.warning.println(&quot;  Error retrieving BEAGLE resource for instance: &quot; + instanceDetails.toString());</b>
+<b class="nc"><i>314</i>&nbsp;                beagle = null;</b>
+<b class="nc"><i>315</i>&nbsp;                return false;</b>
+<i>316</i>&nbsp;            }
+<i>317</i>&nbsp;        } else {
+<b class="nc"><i>318</i>&nbsp;        	Log.warning.println(&quot;  No external BEAGLE resources available, or resource list/requirements not met, using Java implementation&quot;);</b>
+<b class="nc"><i>319</i>&nbsp;            beagle = null;</b>
+<b class="nc"><i>320</i>&nbsp;            return false;</b>
+<i>321</i>&nbsp;        }
+<b class="fc"><i>322</i>&nbsp;        Log.warning.println(&quot;  &quot; + (m_bUseAmbiguities ? &quot;Using&quot; : &quot;Ignoring&quot;) + &quot; ambiguities in tree likelihood.&quot;);</b>
+<b class="fc"><i>323</i>&nbsp;        Log.warning.println(&quot;  &quot; + (m_bUseTipLikelihoods ? &quot;Using&quot; : &quot;Ignoring&quot;) + &quot; character uncertainty in tree likelihood.&quot;);</b>
+<b class="fc"><i>324</i>&nbsp;        Log.warning.println(&quot;  With &quot; + patternCount + &quot; unique site patterns.&quot;);</b>
+<i>325</i>&nbsp;
+<i>326</i>&nbsp;        
+<b class="fc"><i>327</i>&nbsp;        Node [] nodes = treeInput.get().getNodesAsArray();</b>
+<b class="fc"><i>328</i>&nbsp;        for (int i = 0; i &lt; tipCount; i++) {</b>
+<b class="fc"><i>329</i>&nbsp;        	int taxon = dataInput.get().getTaxonIndex(nodes[i].getID()); </b>
+<b class="fc"><i>330</i>&nbsp;            if (m_bUseAmbiguities || m_bUseTipLikelihoods) {</b>
+<b class="nc"><i>331</i>&nbsp;                setPartials(beagle, i, taxon);</b>
+<i>332</i>&nbsp;            } else {
+<b class="fc"><i>333</i>&nbsp;                setStates(beagle, i, taxon);</b>
+<i>334</i>&nbsp;            }
+<i>335</i>&nbsp;        }
+<i>336</i>&nbsp;
+<b class="fc"><i>337</i>&nbsp;        if (dataInput.get().isAscertained) {</b>
+<b class="nc"><i>338</i>&nbsp;            ascertainedSitePatterns = true;</b>
+<i>339</i>&nbsp;        }
+<i>340</i>&nbsp;
+<b class="fc"><i>341</i>&nbsp;        double[] patternWeights = new double[patternCount];</b>
+<b class="fc"><i>342</i>&nbsp;        for (int i = 0; i &lt; patternCount; i++) {</b>
+<b class="fc"><i>343</i>&nbsp;            patternWeights[i] = dataInput.get().getPatternWeight(i);</b>
+<i>344</i>&nbsp;        }
+<b class="fc"><i>345</i>&nbsp;        beagle.setPatternWeights(patternWeights);</b>
+<i>346</i>&nbsp;
+<b class="fc"><i>347</i>&nbsp;        if (this.rescalingScheme == PartialsRescalingScheme.AUTO &amp;&amp;</b>
+<i>348</i>&nbsp;                resourceDetails != null &amp;&amp;
+<b class="nc"><i>349</i>&nbsp;                (resourceDetails.getFlags() &amp; BeagleFlag.SCALING_AUTO.getMask()) == 0) {</b>
+<i>350</i>&nbsp;            // If auto scaling in BEAGLE is not supported then do it here
+<b class="nc"><i>351</i>&nbsp;            this.rescalingScheme = PartialsRescalingScheme.DYNAMIC;</b>
+<b class="nc"><i>352</i>&nbsp;            Log.warning.println(&quot;  Auto rescaling not supported in BEAGLE, using : &quot; + this.rescalingScheme.getText());</b>
+<i>353</i>&nbsp;        } else {
+<b class="fc"><i>354</i>&nbsp;        	Log.warning.println(&quot;  Using rescaling scheme : &quot; + this.rescalingScheme.getText());</b>
+<i>355</i>&nbsp;        }
+<i>356</i>&nbsp;
+<b class="fc"><i>357</i>&nbsp;        if (this.rescalingScheme == PartialsRescalingScheme.DYNAMIC) {</b>
+<b class="fc"><i>358</i>&nbsp;            everUnderflowed = false; // If false, BEAST does not rescale until first under-/over-flow.</b>
+<i>359</i>&nbsp;        }
+<i>360</i>&nbsp;
+<b class="fc"><i>361</i>&nbsp;        updateSubstitutionModel = true;</b>
+<b class="fc"><i>362</i>&nbsp;        updateSiteModel = true;</b>
+<i>363</i>&nbsp;        // some subst models (e.g. WAG) never become dirty, so set up subst models right now
+<b class="fc"><i>364</i>&nbsp;        setUpSubstModel();</b>
+<i>365</i>&nbsp;        // set up sitemodel
+<i>366</i>&nbsp;        
+<b class="fc"><i>367</i>&nbsp;        beagle.setCategoryRates(categoryRates);</b>
+<b class="fc"><i>368</i>&nbsp;        currentCategoryRates = categoryRates;</b>
+<b class="fc"><i>369</i>&nbsp;        currentFreqs = new double[m_nStateCount];</b>
+<b class="fc"><i>370</i>&nbsp;        currentCategoryWeights = new double[categoryRates.length];</b>
+<i>371</i>&nbsp;        
+<b class="fc"><i>372</i>&nbsp;        return true;</b>
+<i>373</i>&nbsp;    }
+<i>374</i>&nbsp;
+<i>375</i>&nbsp;    
+<i>376</i>&nbsp;    private static List&lt;Integer&gt; parseSystemPropertyIntegerArray(String propertyName) {
+<b class="fc"><i>377</i>&nbsp;        List&lt;Integer&gt; order = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>378</i>&nbsp;        String r = System.getProperty(propertyName);</b>
+<b class="fc"><i>379</i>&nbsp;        if (r != null) {</b>
+<b class="nc"><i>380</i>&nbsp;            String[] parts = r.split(&quot;,&quot;);</b>
+<b class="nc"><i>381</i>&nbsp;            for (String part : parts) {</b>
+<i>382</i>&nbsp;                try {
+<b class="nc"><i>383</i>&nbsp;                    int n = Integer.parseInt(part.trim());</b>
+<b class="nc"><i>384</i>&nbsp;                    order.add(n);</b>
+<b class="nc"><i>385</i>&nbsp;                } catch (NumberFormatException nfe) {</b>
+<b class="nc"><i>386</i>&nbsp;                	Log.warning.println(&quot;Invalid entry &#39;&quot; + part + &quot;&#39; in &quot; + propertyName);</b>
+<b class="nc"><i>387</i>&nbsp;                }</b>
+<i>388</i>&nbsp;            }
+<i>389</i>&nbsp;        }
+<b class="fc"><i>390</i>&nbsp;        return order;</b>
+<i>391</i>&nbsp;    }
+<i>392</i>&nbsp;
+<i>393</i>&nbsp;    private static List&lt;String&gt; parseSystemPropertyStringArray(String propertyName) {
+<i>394</i>&nbsp;
+<b class="fc"><i>395</i>&nbsp;        List&lt;String&gt; order = new ArrayList&lt;&gt;();</b>
+<i>396</i>&nbsp;
+<b class="fc"><i>397</i>&nbsp;        String r = System.getProperty(propertyName);</b>
+<b class="fc"><i>398</i>&nbsp;        if (r != null) {</b>
+<b class="nc"><i>399</i>&nbsp;            String[] parts = r.split(&quot;,&quot;);</b>
+<b class="nc"><i>400</i>&nbsp;            for (String part : parts) {</b>
+<i>401</i>&nbsp;                try {
+<b class="nc"><i>402</i>&nbsp;                    String s = part.trim();</b>
+<b class="nc"><i>403</i>&nbsp;                    order.add(s);</b>
+<b class="nc"><i>404</i>&nbsp;                } catch (NumberFormatException nfe) {</b>
+<b class="nc"><i>405</i>&nbsp;                	Log.warning.println(&quot;Invalid getEigenDecompositionentry &#39;&quot; + part + &quot;&#39; in &quot; + propertyName);</b>
+<b class="nc"><i>406</i>&nbsp;                }</b>
+<i>407</i>&nbsp;            }
+<i>408</i>&nbsp;        }
+<b class="fc"><i>409</i>&nbsp;        return order;</b>
+<i>410</i>&nbsp;    }
+<i>411</i>&nbsp;    
+<i>412</i>&nbsp;    
+<i>413</i>&nbsp;    protected int getScaleBufferCount() {
+<b class="fc"><i>414</i>&nbsp;        return internalNodeCount + 1;</b>
+<i>415</i>&nbsp;    }
+<i>416</i>&nbsp;
+<i>417</i>&nbsp;    /**
+<i>418</i>&nbsp;     * Sets the partials from a sequence in an alignment.
+<i>419</i>&nbsp;     *
+<i>420</i>&nbsp;     * @param beagle        beagle
+<i>421</i>&nbsp;     * @param nodeIndex     nodeIndex
+<i>422</i>&nbsp;     * @param taxon the taxon
+<i>423</i>&nbsp;     */
+<i>424</i>&nbsp;    protected final void setPartials(Beagle beagle,
+<i>425</i>&nbsp;                                     int nodeIndex, int taxon) {
+<b class="nc"><i>426</i>&nbsp;        Alignment data = dataInput.get();</b>
+<i>427</i>&nbsp;
+<b class="nc"><i>428</i>&nbsp;        double[] partials = new double[patternCount * m_nStateCount * categoryCount];</b>
+<i>429</i>&nbsp;
+<b class="nc"><i>430</i>&nbsp;        int v = 0;</b>
+<b class="nc"><i>431</i>&nbsp;        for (int i = 0; i &lt; patternCount; i++) {</b>
+<i>432</i>&nbsp;
+<b class="nc"><i>433</i>&nbsp;        	double[] tipProbabilities = data.getTipLikelihoods(taxon,i);</b>
+<b class="nc"><i>434</i>&nbsp;            if (tipProbabilities != null) {</b>
+<b class="nc"><i>435</i>&nbsp;            	for (int state = 0; state &lt; m_nStateCount; state++) {</b>
+<b class="nc"><i>436</i>&nbsp;            		partials[v++] = tipProbabilities[state];</b>
+<i>437</i>&nbsp;            	}
+<i>438</i>&nbsp;            }
+<i>439</i>&nbsp;            else {
+<b class="nc"><i>440</i>&nbsp;            	int stateCount = data.getPattern(taxon, i);</b>
+<b class="nc"><i>441</i>&nbsp;                boolean[] stateSet = data.getStateSet(stateCount);</b>
+<b class="nc"><i>442</i>&nbsp;                for (int state = 0; state &lt; m_nStateCount; state++) {</b>
+<b class="nc"><i>443</i>&nbsp;                	 partials[v++] = (stateSet[state] ? 1.0 : 0.0);                </b>
+<i>444</i>&nbsp;                }
+<i>445</i>&nbsp;            }
+<i>446</i>&nbsp;        }
+<i>447</i>&nbsp;
+<i>448</i>&nbsp;        // if there is more than one category then replicate the partials for each
+<b class="nc"><i>449</i>&nbsp;        int n = patternCount * m_nStateCount;</b>
+<b class="nc"><i>450</i>&nbsp;        int k = n;</b>
+<b class="nc"><i>451</i>&nbsp;        for (int i = 1; i &lt; categoryCount; i++) {</b>
+<b class="nc"><i>452</i>&nbsp;            System.arraycopy(partials, 0, partials, k, n);</b>
+<b class="nc"><i>453</i>&nbsp;            k += n;</b>
+<i>454</i>&nbsp;        }
+<i>455</i>&nbsp;
+<b class="nc"><i>456</i>&nbsp;        beagle.setPartials(nodeIndex, partials);</b>
+<b class="nc"><i>457</i>&nbsp;    }</b>
+<i>458</i>&nbsp;
+<i>459</i>&nbsp;    public int getPatternCount() {
+<b class="nc"><i>460</i>&nbsp;        return patternCount;</b>
+<i>461</i>&nbsp;    }
+<i>462</i>&nbsp;
+<i>463</i>&nbsp;    void setUpSubstModel() {
+<i>464</i>&nbsp;        // we are currently assuming a no-category model...
+<i>465</i>&nbsp;        // TODO More efficient to update only the substitution model that changed, instead of all
+<b class="fc"><i>466</i>&nbsp;        for (int i = 0; i &lt; eigenCount; i++) {</b>
+<i>467</i>&nbsp;            //EigenDecomposition ed = m_substitutionModel.getEigenDecomposition(i, 0);
+<b class="fc"><i>468</i>&nbsp;            EigenDecomposition ed = substitutionModel.getEigenDecomposition(null);</b>
+<i>469</i>&nbsp;
+<b class="fc"><i>470</i>&nbsp;            eigenBufferHelper.flipOffset(i);</b>
+<i>471</i>&nbsp;
+<b class="fc"><i>472</i>&nbsp;            beagle.setEigenDecomposition(</b>
+<b class="fc"><i>473</i>&nbsp;                    eigenBufferHelper.getOffsetIndex(i),</b>
+<b class="fc"><i>474</i>&nbsp;                    ed.getEigenVectors(),</b>
+<b class="fc"><i>475</i>&nbsp;                    ed.getInverseEigenVectors(),</b>
+<b class="fc"><i>476</i>&nbsp;                    ed.getEigenValues());</b>
+<i>477</i>&nbsp;        }
+<b class="fc"><i>478</i>&nbsp;    }</b>
+<i>479</i>&nbsp;
+<i>480</i>&nbsp;    /**
+<i>481</i>&nbsp;     * Sets the partials from a sequence in an alignment.
+<i>482</i>&nbsp;     *
+<i>483</i>&nbsp;     * @param beagle        beagle
+<i>484</i>&nbsp;     * @param nodeIndex     nodeIndex
+<i>485</i>&nbsp;     * @param taxon         the taxon
+<i>486</i>&nbsp;     */
+<i>487</i>&nbsp;    protected final void setStates(Beagle beagle,
+<i>488</i>&nbsp;                                   int nodeIndex, int taxon) {
+<b class="fc"><i>489</i>&nbsp;        Alignment data = dataInput.get();</b>
+<i>490</i>&nbsp;        int i;
+<i>491</i>&nbsp;
+<b class="fc"><i>492</i>&nbsp;        int[] states = new int[patternCount];</b>
+<i>493</i>&nbsp;
+<b class="fc"><i>494</i>&nbsp;        for (i = 0; i &lt; patternCount; i++) {</b>
+<b class="fc"><i>495</i>&nbsp;            int state = data.getPattern(taxon, i);</b>
+<b class="fc"><i>496</i>&nbsp;            states[i] = state;</b>
+<i>497</i>&nbsp;        }
+<i>498</i>&nbsp;
+<b class="fc"><i>499</i>&nbsp;        beagle.setTipStates(nodeIndex, states);</b>
+<b class="fc"><i>500</i>&nbsp;    }</b>
+<i>501</i>&nbsp;
+<i>502</i>&nbsp;
+<i>503</i>&nbsp;//    public void setStates(int tipIndex, int[] states) {
+<i>504</i>&nbsp;//        System.err.println(&quot;BTL:setStates&quot;);
+<i>505</i>&nbsp;//        beagle.setTipStates(tipIndex, states);
+<i>506</i>&nbsp;//        makeDirty();
+<i>507</i>&nbsp;//    }
+<i>508</i>&nbsp;//
+<i>509</i>&nbsp;//    public void getStates(int tipIndex, int[] states) {
+<i>510</i>&nbsp;//        System.err.println(&quot;BTL:getStates&quot;);
+<i>511</i>&nbsp;//        beagle.getTipStates(tipIndex, states);
+<i>512</i>&nbsp;//    }
+<i>513</i>&nbsp;
+<i>514</i>&nbsp;
+<i>515</i>&nbsp;    /**
+<i>516</i>&nbsp;     * check state for changed variables and update temp results if necessary *
+<i>517</i>&nbsp;     */
+<i>518</i>&nbsp;    @Override
+<i>519</i>&nbsp;    protected boolean requiresRecalculation() {
+<b class="nc"><i>520</i>&nbsp;        hasDirt = Tree.IS_CLEAN;</b>
+<i>521</i>&nbsp;        
+<b class="nc"><i>522</i>&nbsp;        double[] categoryRates = m_siteModel.getCategoryRates(null);</b>
+<b class="nc"><i>523</i>&nbsp;        if (constantPattern != null) {</b>
+<b class="nc"><i>524</i>&nbsp;            double [] tmp = new double [categoryRates.length - 1];</b>
+<b class="nc"><i>525</i>&nbsp;            for (int k = 0; k &lt; invariantCategory; k++) {</b>
+<b class="nc"><i>526</i>&nbsp;            	tmp[k] = categoryRates[k];</b>
+<i>527</i>&nbsp;            }
+<b class="nc"><i>528</i>&nbsp;            for (int k = invariantCategory + 1; k &lt; categoryRates.length; k++) {</b>
+<b class="nc"><i>529</i>&nbsp;            	tmp[k-1] = categoryRates[k];</b>
+<i>530</i>&nbsp;            }
+<b class="nc"><i>531</i>&nbsp;            categoryRates = tmp;</b>
+<i>532</i>&nbsp;        }
+<b class="nc"><i>533</i>&nbsp;        for (int i = 0; i &lt; categoryRates.length; i++) {</b>
+<b class="nc"><i>534</i>&nbsp;        	if (categoryRates[i] != currentCategoryRates[i]) {</b>
+<b class="nc"><i>535</i>&nbsp;        		updateSiteModel = true;</b>
+<b class="nc"><i>536</i>&nbsp;        		break;</b>
+<i>537</i>&nbsp;        	}
+<i>538</i>&nbsp;        }
+<i>539</i>&nbsp;        //updateSiteModel |= m_siteModel.isDirtyCalculation();
+<i>540</i>&nbsp;
+<b class="nc"><i>541</i>&nbsp;        if (substitutionModel instanceof CalculationNode) {</b>
+<b class="nc"><i>542</i>&nbsp;        	updateSubstitutionModel |= ((CalculationNode) substitutionModel).isDirtyCalculation();</b>
+<i>543</i>&nbsp;        }
+<i>544</i>&nbsp;        
+<b class="nc"><i>545</i>&nbsp;        if (dataInput.get().isDirtyCalculation()) {</b>
+<b class="nc"><i>546</i>&nbsp;            hasDirt = Tree.IS_FILTHY;</b>
+<b class="nc"><i>547</i>&nbsp;            return true;</b>
+<i>548</i>&nbsp;        }
+<b class="nc"><i>549</i>&nbsp;        if (m_siteModel.isDirtyCalculation()) {</b>
+<b class="nc"><i>550</i>&nbsp;            hasDirt = Tree.IS_DIRTY;</b>
+<b class="nc"><i>551</i>&nbsp;            return true;</b>
+<i>552</i>&nbsp;        }
+<b class="nc"><i>553</i>&nbsp;        if (branchRateModel != null &amp;&amp; branchRateModel.isDirtyCalculation()) {</b>
+<i>554</i>&nbsp;            //m_nHasDirt = Tree.IS_FILTHY;
+<b class="nc"><i>555</i>&nbsp;            return true;</b>
+<i>556</i>&nbsp;        }
+<i>557</i>&nbsp;
+<b class="nc"><i>558</i>&nbsp;        return treeInput.get().somethingIsDirty();</b>
+<i>559</i>&nbsp;    }
+<i>560</i>&nbsp;
+<i>561</i>&nbsp;    /**
+<i>562</i>&nbsp;     * Stores the additional state other than model components
+<i>563</i>&nbsp;     */
+<i>564</i>&nbsp;    @Override
+<i>565</i>&nbsp;    public void store() {
+<b class="nc"><i>566</i>&nbsp;        partialBufferHelper.storeState();</b>
+<b class="nc"><i>567</i>&nbsp;        eigenBufferHelper.storeState();</b>
+<b class="nc"><i>568</i>&nbsp;        matrixBufferHelper.storeState();</b>
+<i>569</i>&nbsp;
+<b class="nc"><i>570</i>&nbsp;        if (useScaleFactors || useAutoScaling) { // Only store when actually used</b>
+<b class="nc"><i>571</i>&nbsp;            scaleBufferHelper.storeState();</b>
+<b class="nc"><i>572</i>&nbsp;            System.arraycopy(scaleBufferIndices, 0, storedScaleBufferIndices, 0, scaleBufferIndices.length);</b>
+<i>573</i>&nbsp;//            storedRescalingCount = rescalingCount;
+<i>574</i>&nbsp;        }
+<b class="nc"><i>575</i>&nbsp;        super.store();</b>
+<b class="nc"><i>576</i>&nbsp;        System.arraycopy(m_branchLengths, 0, storedBranchLengths, 0, m_branchLengths.length);</b>
+<b class="nc"><i>577</i>&nbsp;    }</b>
+<i>578</i>&nbsp;
+<i>579</i>&nbsp;    @Override
+<i>580</i>&nbsp;    public void restore() {
+<b class="nc"><i>581</i>&nbsp;  		updateSiteModel = true; // this is required to upload the categoryRates to BEAGLE after the restore</b>
+<i>582</i>&nbsp;        
+<b class="nc"><i>583</i>&nbsp;        partialBufferHelper.restoreState();</b>
+<b class="nc"><i>584</i>&nbsp;        eigenBufferHelper.restoreState();</b>
+<b class="nc"><i>585</i>&nbsp;        matrixBufferHelper.restoreState();</b>
+<i>586</i>&nbsp;
+<b class="nc"><i>587</i>&nbsp;        if (useScaleFactors || useAutoScaling) {</b>
+<b class="nc"><i>588</i>&nbsp;            scaleBufferHelper.restoreState();</b>
+<b class="nc"><i>589</i>&nbsp;            int[] tmp2 = storedScaleBufferIndices;</b>
+<b class="nc"><i>590</i>&nbsp;            storedScaleBufferIndices = scaleBufferIndices;</b>
+<b class="nc"><i>591</i>&nbsp;            scaleBufferIndices = tmp2;</b>
+<i>592</i>&nbsp;//            rescalingCount = storedRescalingCount;
+<i>593</i>&nbsp;        }
+<i>594</i>&nbsp;
+<i>595</i>&nbsp;//        updateRestrictedNodePartials = true;
+<b class="nc"><i>596</i>&nbsp;        super.restore();</b>
+<i>597</i>&nbsp;        //double[] tmp = m_branchLengths;
+<i>598</i>&nbsp;        //m_branchLengths = storedBranchLengths;
+<i>599</i>&nbsp;        //storedBranchLengths = tmp;
+<b class="nc"><i>600</i>&nbsp;    }</b>
+<i>601</i>&nbsp;
+<i>602</i>&nbsp;    // **************************************************************
+<i>603</i>&nbsp;    // Likelihood IMPLEMENTATION
+<i>604</i>&nbsp;    // **************************************************************
+<i>605</i>&nbsp;
+<i>606</i>&nbsp;    /**
+<i>607</i>&nbsp;     * Calculate the log likelihood of the current state.
+<i>608</i>&nbsp;     *
+<i>609</i>&nbsp;     * @return the log likelihood.
+<i>610</i>&nbsp;     */
+<i>611</i>&nbsp;    @Override
+<i>612</i>&nbsp;    public double calculateLogP() {
+<i>613</i>&nbsp;
+<b class="fc"><i>614</i>&nbsp;        if (patternLogLikelihoods == null) {</b>
+<b class="fc"><i>615</i>&nbsp;            patternLogLikelihoods = new double[patternCount];</b>
+<i>616</i>&nbsp;        }
+<i>617</i>&nbsp;
+<b class="fc"><i>618</i>&nbsp;        if (matrixUpdateIndices == null) {</b>
+<b class="fc"><i>619</i>&nbsp;            matrixUpdateIndices = new int[eigenCount][m_nNodeCount];</b>
+<b class="fc"><i>620</i>&nbsp;            branchLengths = new double[eigenCount][m_nNodeCount];</b>
+<b class="fc"><i>621</i>&nbsp;            branchUpdateCount = new int[eigenCount];</b>
+<b class="fc"><i>622</i>&nbsp;            scaleBufferIndices = new int[internalNodeCount];</b>
+<b class="fc"><i>623</i>&nbsp;            storedScaleBufferIndices = new int[internalNodeCount];</b>
+<i>624</i>&nbsp;        }
+<i>625</i>&nbsp;
+<b class="fc"><i>626</i>&nbsp;        if (operations == null) {</b>
+<b class="fc"><i>627</i>&nbsp;            operations = new int[1][internalNodeCount * Beagle.OPERATION_TUPLE_SIZE];</b>
+<b class="fc"><i>628</i>&nbsp;            operationCount = new int[1];</b>
+<i>629</i>&nbsp;        }
+<i>630</i>&nbsp;
+<b class="fc"><i>631</i>&nbsp;        recomputeScaleFactors = false;</b>
+<i>632</i>&nbsp;
+<b class="fc"><i>633</i>&nbsp;        if (this.rescalingScheme == PartialsRescalingScheme.ALWAYS) {</b>
+<b class="nc"><i>634</i>&nbsp;            useScaleFactors = true;</b>
+<b class="nc"><i>635</i>&nbsp;            recomputeScaleFactors = true;</b>
+<b class="fc"><i>636</i>&nbsp;        } else if (this.rescalingScheme == PartialsRescalingScheme.DYNAMIC &amp;&amp; everUnderflowed) {</b>
+<b class="nc"><i>637</i>&nbsp;            useScaleFactors = true;</b>
+<b class="nc"><i>638</i>&nbsp;            if (rescalingCountInner &lt; RESCALE_TIMES) {</b>
+<b class="nc"><i>639</i>&nbsp;                recomputeScaleFactors = true;</b>
+<b class="nc"><i>640</i>&nbsp;                hasDirt = Tree.IS_FILTHY;// makeDirty();</b>
+<i>641</i>&nbsp;//                System.err.println(&quot;Recomputing scale factors&quot;);
+<i>642</i>&nbsp;            }
+<i>643</i>&nbsp;
+<b class="nc"><i>644</i>&nbsp;            rescalingCountInner++;</b>
+<b class="nc"><i>645</i>&nbsp;            rescalingCount++;</b>
+<b class="nc"><i>646</i>&nbsp;            if (rescalingCount &gt; RESCALE_FREQUENCY) {</b>
+<b class="nc"><i>647</i>&nbsp;                rescalingCount = 0;</b>
+<b class="nc"><i>648</i>&nbsp;                rescalingCountInner = 0;</b>
+<i>649</i>&nbsp;            }
+<b class="fc"><i>650</i>&nbsp;        } else if (this.rescalingScheme == PartialsRescalingScheme.DELAYED &amp;&amp; everUnderflowed) {</b>
+<b class="nc"><i>651</i>&nbsp;            useScaleFactors = true;</b>
+<b class="nc"><i>652</i>&nbsp;            recomputeScaleFactors = true;</b>
+<b class="nc"><i>653</i>&nbsp;            hasDirt = Tree.IS_FILTHY;</b>
+<b class="nc"><i>654</i>&nbsp;            rescalingCount++;</b>
+<i>655</i>&nbsp;        }
+<i>656</i>&nbsp;
+<b class="fc"><i>657</i>&nbsp;        for (int i = 0; i &lt; eigenCount; i++) {</b>
+<b class="fc"><i>658</i>&nbsp;            branchUpdateCount[i] = 0;</b>
+<i>659</i>&nbsp;        }
+<b class="fc"><i>660</i>&nbsp;        operationListCount = 0;</b>
+<i>661</i>&nbsp;
+<b class="fc"><i>662</i>&nbsp;        operationCount[0] = 0;</b>
+<i>663</i>&nbsp;
+<b class="fc"><i>664</i>&nbsp;        final Node root = treeInput.get().getRoot();</b>
+<b class="fc"><i>665</i>&nbsp;        traverse(root, null, true);</b>
+<i>666</i>&nbsp;
+<b class="fc"><i>667</i>&nbsp;        if (updateSubstitutionModel) {</b>
+<b class="fc"><i>668</i>&nbsp;            setUpSubstModel();</b>
+<i>669</i>&nbsp;        }
+<i>670</i>&nbsp;
+<b class="fc"><i>671</i>&nbsp;        if (updateSiteModel) {</b>
+<b class="fc"><i>672</i>&nbsp;            double[] categoryRates = m_siteModel.getCategoryRates(null);</b>
+<b class="fc"><i>673</i>&nbsp;            if (constantPattern != null) {</b>
+<b class="nc"><i>674</i>&nbsp;	            double [] tmp = new double [categoryRates.length - 1];</b>
+<b class="nc"><i>675</i>&nbsp;	            for (int k = 0; k &lt; invariantCategory; k++) {</b>
+<b class="nc"><i>676</i>&nbsp;	            	tmp[k] = categoryRates[k];</b>
+<i>677</i>&nbsp;	            }
+<b class="nc"><i>678</i>&nbsp;	            for (int k = invariantCategory + 1; k &lt; categoryRates.length; k++) {</b>
+<b class="nc"><i>679</i>&nbsp;	            	tmp[k-1] = categoryRates[k];</b>
+<i>680</i>&nbsp;	            }
+<b class="nc"><i>681</i>&nbsp;	            categoryRates = tmp;</b>
+<i>682</i>&nbsp;	        }
+<b class="fc"><i>683</i>&nbsp;            for (int i = 0; i &lt; categoryRates.length; i++) {</b>
+<b class="fc"><i>684</i>&nbsp;            	if (categoryRates[i] != currentCategoryRates[i]) {</b>
+<b class="nc"><i>685</i>&nbsp;                    beagle.setCategoryRates(categoryRates);</b>
+<b class="nc"><i>686</i>&nbsp;                    i = categoryRates.length;</b>
+<i>687</i>&nbsp;            	}
+<i>688</i>&nbsp;            }
+<b class="fc"><i>689</i>&nbsp;            currentCategoryRates = categoryRates;</b>
+<i>690</i>&nbsp;        }
+<i>691</i>&nbsp;
+<b class="fc"><i>692</i>&nbsp;        for (int i = 0; i &lt; eigenCount; i++) {</b>
+<b class="fc"><i>693</i>&nbsp;            if (branchUpdateCount[i] &gt; 0) {</b>
+<b class="fc"><i>694</i>&nbsp;                beagle.updateTransitionMatrices(</b>
+<b class="fc"><i>695</i>&nbsp;                        eigenBufferHelper.getOffsetIndex(i),</b>
+<i>696</i>&nbsp;                        matrixUpdateIndices[i],
+<i>697</i>&nbsp;                        null,
+<i>698</i>&nbsp;                        null,
+<i>699</i>&nbsp;                        branchLengths[i],
+<i>700</i>&nbsp;                        branchUpdateCount[i]);
+<i>701</i>&nbsp;            }
+<i>702</i>&nbsp;        }
+<i>703</i>&nbsp;
+<i>704</i>&nbsp;//        if (COUNT_TOTAL_OPERATIONS) {
+<i>705</i>&nbsp;//            for (int i = 0; i &lt; eigenCount; i++) {
+<i>706</i>&nbsp;//                totalMatrixUpdateCount += branchUpdateCount[i];
+<i>707</i>&nbsp;//            }
+<i>708</i>&nbsp;//            
+<i>709</i>&nbsp;//            for (int i = 0; i &lt;= numRestrictedPartials; i++) {
+<i>710</i>&nbsp;//                totalOperationCount += operationCount[i];
+<i>711</i>&nbsp;//            }
+<i>712</i>&nbsp;//        }
+<i>713</i>&nbsp;
+<i>714</i>&nbsp;        double logL;
+<i>715</i>&nbsp;        boolean done;
+<b class="fc"><i>716</i>&nbsp;        boolean firstRescaleAttempt = true;</b>
+<i>717</i>&nbsp;
+<i>718</i>&nbsp;        do {
+<i>719</i>&nbsp;
+<b class="fc"><i>720</i>&nbsp;            beagle.updatePartials(operations[0], operationCount[0], Beagle.NONE);</b>
+<i>721</i>&nbsp;
+<b class="fc"><i>722</i>&nbsp;            int rootIndex = partialBufferHelper.getOffsetIndex(root.getNr());</b>
+<i>723</i>&nbsp;
+<b class="fc"><i>724</i>&nbsp;            double[] categoryWeights = m_siteModel.getCategoryProportions(null);</b>
+<b class="fc"><i>725</i>&nbsp;            if (constantPattern != null) {</b>
+<b class="nc"><i>726</i>&nbsp;	            double [] tmp = new double [categoryWeights.length - 1];</b>
+<b class="nc"><i>727</i>&nbsp;	            for (int k = 0; k &lt; invariantCategory; k++) {</b>
+<b class="nc"><i>728</i>&nbsp;	            	tmp[k] = categoryWeights[k];</b>
+<i>729</i>&nbsp;	            }
+<b class="nc"><i>730</i>&nbsp;	            for (int k = invariantCategory + 1; k &lt; categoryWeights.length; k++) {</b>
+<b class="nc"><i>731</i>&nbsp;	            	tmp[k-1] = categoryWeights[k];</b>
+<i>732</i>&nbsp;	            }
+<b class="nc"><i>733</i>&nbsp;	            categoryWeights = tmp;</b>
+<i>734</i>&nbsp;            }
+<b class="fc"><i>735</i>&nbsp;            double[] frequencies = substitutionModel.getFrequencies();</b>
+<i>736</i>&nbsp;
+<b class="fc"><i>737</i>&nbsp;            int cumulateScaleBufferIndex = Beagle.NONE;</b>
+<b class="fc"><i>738</i>&nbsp;            if (useScaleFactors) {</b>
+<i>739</i>&nbsp;
+<b class="nc"><i>740</i>&nbsp;                if (recomputeScaleFactors) {</b>
+<b class="nc"><i>741</i>&nbsp;                    scaleBufferHelper.flipOffset(internalNodeCount);</b>
+<b class="nc"><i>742</i>&nbsp;                    cumulateScaleBufferIndex = scaleBufferHelper.getOffsetIndex(internalNodeCount);</b>
+<b class="nc"><i>743</i>&nbsp;                    beagle.resetScaleFactors(cumulateScaleBufferIndex);</b>
+<b class="nc"><i>744</i>&nbsp;                    beagle.accumulateScaleFactors(scaleBufferIndices, internalNodeCount, cumulateScaleBufferIndex);</b>
+<i>745</i>&nbsp;                } else {
+<b class="nc"><i>746</i>&nbsp;                    cumulateScaleBufferIndex = scaleBufferHelper.getOffsetIndex(internalNodeCount);</b>
+<i>747</i>&nbsp;                }
+<b class="fc"><i>748</i>&nbsp;            } else if (useAutoScaling) {</b>
+<b class="nc"><i>749</i>&nbsp;                beagle.accumulateScaleFactors(scaleBufferIndices, internalNodeCount, Beagle.NONE);</b>
+<i>750</i>&nbsp;            }
+<i>751</i>&nbsp;
+<i>752</i>&nbsp;            // these could be set only when they change but store/restore would need to be considered
+<i>753</i>&nbsp;            
+<b class="fc"><i>754</i>&nbsp;            for (int i = 0; i &lt; categoryWeights.length; i++) {</b>
+<b class="fc"><i>755</i>&nbsp;            	if (categoryWeights[i] != currentCategoryWeights[i]) {</b>
+<b class="fc"><i>756</i>&nbsp;                    beagle.setCategoryWeights(0, categoryWeights);</b>
+<b class="fc"><i>757</i>&nbsp;            		i = categoryWeights.length;</b>
+<i>758</i>&nbsp;            	}
+<i>759</i>&nbsp;            }
+<b class="fc"><i>760</i>&nbsp;            currentCategoryWeights = categoryWeights;</b>
+<b class="fc"><i>761</i>&nbsp;            for (int i = 0; i &lt; frequencies.length; i++) {</b>
+<b class="fc"><i>762</i>&nbsp;            	if (frequencies[i] != currentFreqs[i]) {</b>
+<b class="fc"><i>763</i>&nbsp;                    beagle.setStateFrequencies(0, frequencies);</b>
+<b class="fc"><i>764</i>&nbsp;            		i = frequencies.length;</b>
+<i>765</i>&nbsp;            	}
+<i>766</i>&nbsp;            }
+<b class="fc"><i>767</i>&nbsp;            currentFreqs = frequencies;</b>
+<i>768</i>&nbsp;
+<b class="fc"><i>769</i>&nbsp;            double[] sumLogLikelihoods = new double[1];</b>
+<i>770</i>&nbsp;
+<b class="fc"><i>771</i>&nbsp;            beagle.calculateRootLogLikelihoods(new int[]{rootIndex}, new int[]{0}, new int[]{0},</b>
+<i>772</i>&nbsp;                    new int[]{cumulateScaleBufferIndex}, 1, sumLogLikelihoods);
+<i>773</i>&nbsp;
+<b class="fc"><i>774</i>&nbsp;            logL = sumLogLikelihoods[0];</b>
+<i>775</i>&nbsp;
+<b class="fc"><i>776</i>&nbsp;            if (ascertainedSitePatterns) {</b>
+<i>777</i>&nbsp;                // Need to correct for ascertainedSitePatterns
+<b class="nc"><i>778</i>&nbsp;                beagle.getSiteLogLikelihoods(patternLogLikelihoods);</b>
+<b class="nc"><i>779</i>&nbsp;                logL = getAscertainmentCorrectedLogLikelihood(dataInput.get(),</b>
+<b class="nc"><i>780</i>&nbsp;                        patternLogLikelihoods, dataInput.get().getWeights(), frequencies);</b>
+<b class="fc"><i>781</i>&nbsp;            } else if (invariantCategory &gt;= 0) {</b>
+<b class="nc"><i>782</i>&nbsp;                beagle.getSiteLogLikelihoods(patternLogLikelihoods);</b>
+<b class="nc"><i>783</i>&nbsp;                int [] patternWeights = dataInput.get().getWeights();</b>
+<b class="nc"><i>784</i>&nbsp;                proportionInvariant = m_siteModel.getProportionInvariant();</b>
+<i>785</i>&nbsp;                
+<i>786</i>&nbsp;                
+<b class="nc"><i>787</i>&nbsp;    	        for (int k : constantPattern) {</b>
+<b class="nc"><i>788</i>&nbsp;    	        	int i = k / m_nStateCount;</b>
+<b class="nc"><i>789</i>&nbsp;    	        	int j = k % m_nStateCount;</b>
+<b class="nc"><i>790</i>&nbsp;    	        	patternLogLikelihoods[i] = (Math.log(Math.exp(patternLogLikelihoods[i]) + proportionInvariant * frequencies[j]));</b>
+<b class="nc"><i>791</i>&nbsp;    	        }</b>
+<i>792</i>&nbsp;        	
+<b class="nc"><i>793</i>&nbsp;	            logL = 0.0;</b>
+<b class="nc"><i>794</i>&nbsp;	            for (int i = 0; i &lt; patternCount; i++) {</b>
+<b class="nc"><i>795</i>&nbsp;	                logL += patternLogLikelihoods[i] * patternWeights[i];</b>
+<i>796</i>&nbsp;	            }
+<i>797</i>&nbsp;            }
+<i>798</i>&nbsp;
+<b class="fc"><i>799</i>&nbsp;            if (Double.isNaN(logL) || Double.isInfinite(logL)) {</b>
+<b class="nc"><i>800</i>&nbsp;                everUnderflowed = true;</b>
+<b class="nc"><i>801</i>&nbsp;                logL = Double.NEGATIVE_INFINITY;</b>
+<i>802</i>&nbsp;
+<b class="nc"><i>803</i>&nbsp;                if (firstRescaleAttempt &amp;&amp; (rescalingScheme == PartialsRescalingScheme.DYNAMIC || rescalingScheme == PartialsRescalingScheme.DELAYED)) {</b>
+<i>804</i>&nbsp;                    // we have had a potential under/over flow so attempt a rescaling                	
+<b class="nc"><i>805</i>&nbsp;                	useScaleFactors = true;</b>
+<b class="nc"><i>806</i>&nbsp;                    recomputeScaleFactors = true;</b>
+<i>807</i>&nbsp;
+<b class="nc"><i>808</i>&nbsp;                    for (int i = 0; i &lt; eigenCount; i++) {</b>
+<b class="nc"><i>809</i>&nbsp;                        branchUpdateCount[i] = 0;</b>
+<i>810</i>&nbsp;                    }
+<i>811</i>&nbsp;
+<b class="nc"><i>812</i>&nbsp;                    operationCount[0] = 0;</b>
+<i>813</i>&nbsp;
+<i>814</i>&nbsp;                    // traverse again but without flipping partials indices as we
+<i>815</i>&nbsp;                    // just want to overwrite the last attempt. We will flip the
+<i>816</i>&nbsp;                    // scale buffer indices though as we are recomputing them.
+<b class="nc"><i>817</i>&nbsp;                    traverse(root, null, false);</b>
+<i>818</i>&nbsp;
+<b class="nc"><i>819</i>&nbsp;                    done = false; // Run through do-while loop again</b>
+<b class="nc"><i>820</i>&nbsp;                    firstRescaleAttempt = false; // Only try to rescale once</b>
+<i>821</i>&nbsp;                } else {
+<i>822</i>&nbsp;                    // we have already tried a rescale, not rescaling or always rescaling
+<i>823</i>&nbsp;                    // so just return the likelihood...
+<b class="nc"><i>824</i>&nbsp;                    done = true;</b>
+<i>825</i>&nbsp;                }
+<i>826</i>&nbsp;            } else {
+<b class="fc"><i>827</i>&nbsp;                done = true; // No under-/over-flow, then done</b>
+<i>828</i>&nbsp;            }
+<i>829</i>&nbsp;
+<b class="fc"><i>830</i>&nbsp;        } while (!done);</b>
+<i>831</i>&nbsp;
+<i>832</i>&nbsp;        // If these are needed...
+<i>833</i>&nbsp;        //beagle.getSiteLogLikelihoods(patternLogLikelihoods);
+<i>834</i>&nbsp;
+<i>835</i>&nbsp;        //********************************************************************
+<i>836</i>&nbsp;        // after traverse all nodes and patterns have been updated --
+<i>837</i>&nbsp;        //so change flags to reflect this.
+<i>838</i>&nbsp;//        for (int i = 0; i &lt; m_nNodeCount; i++) {
+<i>839</i>&nbsp;//            updateNode[i] = false;
+<i>840</i>&nbsp;//        }
+<i>841</i>&nbsp;
+<b class="fc"><i>842</i>&nbsp;        updateSubstitutionModel = false;</b>
+<b class="fc"><i>843</i>&nbsp;        updateSiteModel = false;</b>
+<i>844</i>&nbsp;        //********************************************************************
+<i>845</i>&nbsp;
+<b class="fc"><i>846</i>&nbsp;        logP = logL;</b>
+<b class="fc"><i>847</i>&nbsp;        return logL;</b>
+<i>848</i>&nbsp;    }
+<i>849</i>&nbsp;
+<i>850</i>&nbsp;//    protected void getPartials(int number, double[] partials) {
+<i>851</i>&nbsp;//        int cumulativeBufferIndex = Beagle.NONE;
+<i>852</i>&nbsp;//        /* No need to rescale partials */
+<i>853</i>&nbsp;//        beagle.getPartials(partialBufferHelper.getOffsetIndex(number), cumulativeBufferIndex, partials);
+<i>854</i>&nbsp;//    }
+<i>855</i>&nbsp;
+<i>856</i>&nbsp;    protected void setPartials(int number, double[] partials) {
+<b class="nc"><i>857</i>&nbsp;        beagle.setPartials(partialBufferHelper.getOffsetIndex(number), partials);</b>
+<b class="nc"><i>858</i>&nbsp;    }</b>
+<i>859</i>&nbsp;
+<i>860</i>&nbsp;    private double getAscertainmentCorrectedLogLikelihood(Alignment patternList,
+<i>861</i>&nbsp;                                                          double[] patternLogLikelihoods,
+<i>862</i>&nbsp;                                                          int[] patternWeights,
+<i>863</i>&nbsp;                                                          double [] frequencies) {
+<b class="nc"><i>864</i>&nbsp;    	if (constantPattern != null) {</b>
+<b class="nc"><i>865</i>&nbsp;	        proportionInvariant = m_siteModel.getProportionInvariant();</b>
+<b class="nc"><i>866</i>&nbsp;	        for (int k : constantPattern) {</b>
+<b class="nc"><i>867</i>&nbsp;	        	int i = k / m_nStateCount;</b>
+<b class="nc"><i>868</i>&nbsp;	        	int j = k % m_nStateCount;</b>
+<b class="nc"><i>869</i>&nbsp;	        	patternLogLikelihoods[i] = (Math.log(Math.exp(patternLogLikelihoods[i]) + proportionInvariant * frequencies[j]));</b>
+<b class="nc"><i>870</i>&nbsp;	        }</b>
+<i>871</i>&nbsp;    	}
+<i>872</i>&nbsp;    	
+<b class="nc"><i>873</i>&nbsp;        double logL = 0.0;</b>
+<b class="nc"><i>874</i>&nbsp;        double ascertainmentCorrection = patternList.getAscertainmentCorrection(patternLogLikelihoods);</b>
+<b class="nc"><i>875</i>&nbsp;        for (int i = 0; i &lt; patternCount; i++) {</b>
+<b class="nc"><i>876</i>&nbsp;            logL += (patternLogLikelihoods[i] - ascertainmentCorrection) * patternWeights[i];</b>
+<i>877</i>&nbsp;        }
+<b class="nc"><i>878</i>&nbsp;        return logL;</b>
+<i>879</i>&nbsp;    }
+<i>880</i>&nbsp;
+<i>881</i>&nbsp;    /**
+<i>882</i>&nbsp;     * Traverse the tree calculating partial likelihoods.
+<i>883</i>&nbsp;     *
+<i>884</i>&nbsp;     * @param node           node
+<i>885</i>&nbsp;     * @param operatorNumber operatorNumber
+<i>886</i>&nbsp;     * @param flip           flip
+<i>887</i>&nbsp;     * @return boolean
+<i>888</i>&nbsp;     */
+<i>889</i>&nbsp;    private int traverse(Node node, int[] operatorNumber, boolean flip) {
+<i>890</i>&nbsp;
+<b class="fc"><i>891</i>&nbsp;        int nodeNum = node.getNr();</b>
+<i>892</i>&nbsp;
+<i>893</i>&nbsp;        //Node parent = node.getParent();
+<i>894</i>&nbsp;
+<b class="fc"><i>895</i>&nbsp;        if (operatorNumber != null) {</b>
+<b class="fc"><i>896</i>&nbsp;            operatorNumber[0] = -1;</b>
+<i>897</i>&nbsp;        }
+<i>898</i>&nbsp;
+<i>899</i>&nbsp;        // First update the transition probability matrix(ices) for this branch
+<b class="fc"><i>900</i>&nbsp;        int update = (node.isDirty() | hasDirt);</b>
+<i>901</i>&nbsp;//        if (parent!=null) {
+<i>902</i>&nbsp;//        	update |= parent.isDirty();
+<i>903</i>&nbsp;//        }
+<b class="fc"><i>904</i>&nbsp;        final double branchRate = branchRateModel.getRateForBranch(node);</b>
+<b class="fc"><i>905</i>&nbsp;        final double branchTime = node.getLength() * branchRate;</b>
+<b class="fc"><i>906</i>&nbsp;        if (!node.isRoot() &amp;&amp; (update != Tree.IS_CLEAN || branchTime != m_branchLengths[nodeNum])) {</b>
+<b class="fc"><i>907</i>&nbsp;            m_branchLengths[nodeNum] = branchTime;</b>
+<b class="fc"><i>908</i>&nbsp;            if (branchTime &lt; 0.0) {</b>
+<b class="nc"><i>909</i>&nbsp;                throw new RuntimeException(&quot;Negative branch length: &quot; + branchTime);</b>
+<i>910</i>&nbsp;            }
+<i>911</i>&nbsp;
+<b class="fc"><i>912</i>&nbsp;            if (flip) {</b>
+<i>913</i>&nbsp;                // first flip the matrixBufferHelper
+<b class="fc"><i>914</i>&nbsp;                matrixBufferHelper.flipOffset(nodeNum);</b>
+<i>915</i>&nbsp;            }
+<i>916</i>&nbsp;
+<i>917</i>&nbsp;            // then set which matrix to update
+<b class="fc"><i>918</i>&nbsp;            final int eigenIndex = 0;// = m_substitutionModel.getBranchIndex(node);</b>
+<b class="fc"><i>919</i>&nbsp;            final int updateCount = branchUpdateCount[eigenIndex];</b>
+<b class="fc"><i>920</i>&nbsp;            matrixUpdateIndices[eigenIndex][updateCount] = matrixBufferHelper.getOffsetIndex(nodeNum);</b>
+<i>921</i>&nbsp;
+<i>922</i>&nbsp;//            if (!m_substitutionModel.canReturnDiagonalization()) {
+<i>923</i>&nbsp;//            	m_substitutionModel.getTransitionProbabilities(node, parent.getHeight(), node.getHeight(), branchRate, m_fProbabilities);
+<i>924</i>&nbsp;//            	int matrixIndex = matrixBufferHelper.getOffsetIndex(nodeNum);
+<i>925</i>&nbsp;//            	beagle.setTransitionMatrix(matrixIndex, m_fProbabilities, 1);
+<i>926</i>&nbsp;//            }
+<i>927</i>&nbsp;
+<b class="fc"><i>928</i>&nbsp;            branchLengths[eigenIndex][updateCount] = branchTime;</b>
+<b class="fc"><i>929</i>&nbsp;            branchUpdateCount[eigenIndex]++;</b>
+<i>930</i>&nbsp;
+<b class="fc"><i>931</i>&nbsp;            update |= Tree.IS_DIRTY;</b>
+<i>932</i>&nbsp;        }
+<i>933</i>&nbsp;
+<i>934</i>&nbsp;        // If the node is internal, update the partial likelihoods.
+<b class="fc"><i>935</i>&nbsp;        if (!node.isLeaf()) {</b>
+<i>936</i>&nbsp;
+<i>937</i>&nbsp;            // Traverse down the two child nodes
+<b class="fc"><i>938</i>&nbsp;            Node child1 = node.getLeft();</b>
+<b class="fc"><i>939</i>&nbsp;            final int[] op1 = {-1};</b>
+<b class="fc"><i>940</i>&nbsp;            final int update1 = traverse(child1, op1, flip);</b>
+<i>941</i>&nbsp;
+<b class="fc"><i>942</i>&nbsp;            Node child2 = node.getRight();</b>
+<b class="fc"><i>943</i>&nbsp;            final int[] op2 = {-1};</b>
+<b class="fc"><i>944</i>&nbsp;            final int update2 = traverse(child2, op2, flip);</b>
+<i>945</i>&nbsp;
+<i>946</i>&nbsp;            // If either child node was updated then update this node too
+<b class="fc"><i>947</i>&nbsp;            if (update1 != Tree.IS_CLEAN || update2 != Tree.IS_CLEAN) {</b>
+<i>948</i>&nbsp;
+<b class="fc"><i>949</i>&nbsp;                int x = operationCount[operationListCount] * Beagle.OPERATION_TUPLE_SIZE;</b>
+<i>950</i>&nbsp;
+<b class="fc"><i>951</i>&nbsp;                if (flip) {</b>
+<i>952</i>&nbsp;                    // first flip the partialBufferHelper
+<b class="fc"><i>953</i>&nbsp;                    partialBufferHelper.flipOffset(nodeNum);</b>
+<i>954</i>&nbsp;                }
+<i>955</i>&nbsp;
+<b class="fc"><i>956</i>&nbsp;                final int[] operations = this.operations[operationListCount];</b>
+<i>957</i>&nbsp;
+<b class="fc"><i>958</i>&nbsp;                operations[x] = partialBufferHelper.getOffsetIndex(nodeNum);</b>
+<i>959</i>&nbsp;
+<b class="fc"><i>960</i>&nbsp;                if (useScaleFactors) {</b>
+<i>961</i>&nbsp;                    // get the index of this scaling buffer
+<b class="nc"><i>962</i>&nbsp;                    int n = nodeNum - tipCount;</b>
+<i>963</i>&nbsp;
+<b class="nc"><i>964</i>&nbsp;                    if (recomputeScaleFactors) {</b>
+<i>965</i>&nbsp;                        // flip the indicator: can take either n or (internalNodeCount + 1) - n
+<b class="nc"><i>966</i>&nbsp;                        scaleBufferHelper.flipOffset(n);</b>
+<i>967</i>&nbsp;
+<i>968</i>&nbsp;                        // store the index
+<b class="nc"><i>969</i>&nbsp;                        scaleBufferIndices[n] = scaleBufferHelper.getOffsetIndex(n);</b>
+<i>970</i>&nbsp;
+<b class="nc"><i>971</i>&nbsp;                        operations[x + 1] = scaleBufferIndices[n]; // Write new scaleFactor</b>
+<b class="nc"><i>972</i>&nbsp;                        operations[x + 2] = Beagle.NONE;</b>
+<i>973</i>&nbsp;
+<i>974</i>&nbsp;                    } else {
+<b class="nc"><i>975</i>&nbsp;                        operations[x + 1] = Beagle.NONE;</b>
+<b class="nc"><i>976</i>&nbsp;                        operations[x + 2] = scaleBufferIndices[n]; // Read existing scaleFactor</b>
+<i>977</i>&nbsp;                    }
+<i>978</i>&nbsp;
+<b class="nc"><i>979</i>&nbsp;                } else {</b>
+<i>980</i>&nbsp;
+<b class="fc"><i>981</i>&nbsp;                    if (useAutoScaling) {</b>
+<b class="nc"><i>982</i>&nbsp;                        scaleBufferIndices[nodeNum - tipCount] = partialBufferHelper.getOffsetIndex(nodeNum);</b>
+<i>983</i>&nbsp;                    }
+<b class="fc"><i>984</i>&nbsp;                    operations[x + 1] = Beagle.NONE; // Not using scaleFactors</b>
+<b class="fc"><i>985</i>&nbsp;                    operations[x + 2] = Beagle.NONE;</b>
+<i>986</i>&nbsp;                }
+<i>987</i>&nbsp;
+<b class="fc"><i>988</i>&nbsp;                operations[x + 3] = partialBufferHelper.getOffsetIndex(child1.getNr()); // source node 1</b>
+<b class="fc"><i>989</i>&nbsp;                operations[x + 4] = matrixBufferHelper.getOffsetIndex(child1.getNr()); // source matrix 1</b>
+<b class="fc"><i>990</i>&nbsp;                operations[x + 5] = partialBufferHelper.getOffsetIndex(child2.getNr()); // source node 2</b>
+<b class="fc"><i>991</i>&nbsp;                operations[x + 6] = matrixBufferHelper.getOffsetIndex(child2.getNr()); // source matrix 2</b>
+<i>992</i>&nbsp;
+<b class="fc"><i>993</i>&nbsp;                operationCount[operationListCount]++;</b>
+<i>994</i>&nbsp;
+<b class="fc"><i>995</i>&nbsp;                update |= (update1 | update2);</b>
+<i>996</i>&nbsp;
+<i>997</i>&nbsp;            }
+<i>998</i>&nbsp;        }
+<i>999</i>&nbsp;
+<b class="fc"><i>1000</i>&nbsp;        return update;</b>
+<i>1001</i>&nbsp;
+<i>1002</i>&nbsp;    }
+<i>1003</i>&nbsp;
+<i>1004</i>&nbsp;    // **************************************************************
+<i>1005</i>&nbsp;    // INSTANCE VARIABLES
+<i>1006</i>&nbsp;    // **************************************************************
+<i>1007</i>&nbsp;
+<i>1008</i>&nbsp;    private int eigenCount;
+<i>1009</i>&nbsp;    private int[][] matrixUpdateIndices;
+<i>1010</i>&nbsp;    private double[][] branchLengths;
+<i>1011</i>&nbsp;    private int[] branchUpdateCount;
+<i>1012</i>&nbsp;    private int[] scaleBufferIndices;
+<i>1013</i>&nbsp;    private int[] storedScaleBufferIndices;
+<i>1014</i>&nbsp;
+<i>1015</i>&nbsp;    private int[][] operations;
+<i>1016</i>&nbsp;    private int operationListCount;
+<i>1017</i>&nbsp;    private int[] operationCount;
+<i>1018</i>&nbsp;
+<i>1019</i>&nbsp;    protected BufferIndexHelper partialBufferHelper;
+<i>1020</i>&nbsp;    private /*final*/ BufferIndexHelper eigenBufferHelper;
+<i>1021</i>&nbsp;    protected BufferIndexHelper matrixBufferHelper;
+<i>1022</i>&nbsp;    protected BufferIndexHelper scaleBufferHelper;
+<i>1023</i>&nbsp;
+<i>1024</i>&nbsp;    protected /*final*/ int tipCount;
+<i>1025</i>&nbsp;    protected /*final*/ int internalNodeCount;
+<i>1026</i>&nbsp;    protected /*final*/ int patternCount;
+<i>1027</i>&nbsp;
+<b class="fc"><i>1028</i>&nbsp;    private PartialsRescalingScheme rescalingScheme = DEFAULT_RESCALING_SCHEME;</b>
+<b class="fc"><i>1029</i>&nbsp;    private int rescalingFrequency = RESCALE_FREQUENCY;</b>
+<b class="fc"><i>1030</i>&nbsp;    protected boolean useScaleFactors = false;</b>
+<b class="fc"><i>1031</i>&nbsp;    private boolean useAutoScaling = false;</b>
+<b class="fc"><i>1032</i>&nbsp;    private boolean recomputeScaleFactors = false;</b>
+<b class="fc"><i>1033</i>&nbsp;    private boolean everUnderflowed = false;</b>
+<b class="fc"><i>1034</i>&nbsp;    private int rescalingCount = 0;</b>
+<b class="fc"><i>1035</i>&nbsp;    private int rescalingCountInner = 0;</b>
+<i>1036</i>&nbsp;
+<i>1037</i>&nbsp;    
+<i>1038</i>&nbsp;    /**
+<i>1039</i>&nbsp;     * the number of rate categories
+<i>1040</i>&nbsp;     */
+<i>1041</i>&nbsp;    protected int categoryCount;
+<i>1042</i>&nbsp;
+<i>1043</i>&nbsp;    /**
+<i>1044</i>&nbsp;     * an array used to transfer tip partials
+<i>1045</i>&nbsp;     */
+<i>1046</i>&nbsp;    protected double[] tipPartials;
+<i>1047</i>&nbsp;
+<i>1048</i>&nbsp;    /**
+<i>1049</i>&nbsp;     * the BEAGLE library instance
+<i>1050</i>&nbsp;     */
+<i>1051</i>&nbsp;    protected Beagle beagle;
+<i>1052</i>&nbsp;
+<i>1053</i>&nbsp;    /**
+<i>1054</i>&nbsp;     * Flag to specify that the substitution model has changed
+<i>1055</i>&nbsp;     */
+<i>1056</i>&nbsp;    protected boolean updateSubstitutionModel;
+<i>1057</i>&nbsp;    protected boolean storedUpdateSubstitutionModel;
+<i>1058</i>&nbsp;
+<i>1059</i>&nbsp;    /**
+<i>1060</i>&nbsp;     * Flag to specify that the site model has changed
+<i>1061</i>&nbsp;     */
+<i>1062</i>&nbsp;    protected boolean updateSiteModel;
+<i>1063</i>&nbsp;    protected boolean storedUpdateSiteModel;
+<i>1064</i>&nbsp;
+<i>1065</i>&nbsp;    /**
+<i>1066</i>&nbsp;     * Flag to specify if site patterns are acertained
+<i>1067</i>&nbsp;     */
+<i>1068</i>&nbsp;
+<b class="fc"><i>1069</i>&nbsp;    private boolean ascertainedSitePatterns = false;</b>
+<i>1070</i>&nbsp;
+<i>1071</i>&nbsp;    protected class BufferIndexHelper {
+<i>1072</i>&nbsp;        /**
+<i>1073</i>&nbsp;         * @param maxIndexValue the number of possible input values for the index
+<i>1074</i>&nbsp;         * @param minIndexValue the minimum index value to have the mirrored buffers
+<i>1075</i>&nbsp;         */
+<b class="fc"><i>1076</i>&nbsp;        BufferIndexHelper(int maxIndexValue, int minIndexValue) {</b>
+<b class="fc"><i>1077</i>&nbsp;            this.maxIndexValue = maxIndexValue;</b>
+<b class="fc"><i>1078</i>&nbsp;            this.minIndexValue = minIndexValue;</b>
+<i>1079</i>&nbsp;
+<b class="fc"><i>1080</i>&nbsp;            offsetCount = maxIndexValue - minIndexValue;</b>
+<b class="fc"><i>1081</i>&nbsp;            indexOffsets = new int[offsetCount];</b>
+<b class="fc"><i>1082</i>&nbsp;            storedIndexOffsets = new int[offsetCount];</b>
+<b class="fc"><i>1083</i>&nbsp;        }</b>
+<i>1084</i>&nbsp;
+<i>1085</i>&nbsp;        public int getBufferCount() {
+<b class="fc"><i>1086</i>&nbsp;            return 2 * offsetCount + minIndexValue;</b>
+<i>1087</i>&nbsp;        }
+<i>1088</i>&nbsp;
+<i>1089</i>&nbsp;        void flipOffset(int i) {
+<b class="fc"><i>1090</i>&nbsp;            if (i &gt;= minIndexValue) {</b>
+<b class="fc"><i>1091</i>&nbsp;                indexOffsets[i - minIndexValue] = offsetCount - indexOffsets[i - minIndexValue];</b>
+<i>1092</i>&nbsp;            } // else do nothing
+<b class="fc"><i>1093</i>&nbsp;        }</b>
+<i>1094</i>&nbsp;
+<i>1095</i>&nbsp;        int getOffsetIndex(int i) {
+<b class="fc"><i>1096</i>&nbsp;            if (i &lt; minIndexValue) {</b>
+<b class="fc"><i>1097</i>&nbsp;                return i;</b>
+<i>1098</i>&nbsp;            }
+<b class="fc"><i>1099</i>&nbsp;            return indexOffsets[i - minIndexValue] + i;</b>
+<i>1100</i>&nbsp;        }
+<i>1101</i>&nbsp;
+<i>1102</i>&nbsp;        void getIndices(int[] outIndices) {
+<b class="nc"><i>1103</i>&nbsp;            for (int i = 0; i &lt; maxIndexValue; i++) {</b>
+<b class="nc"><i>1104</i>&nbsp;                outIndices[i] = getOffsetIndex(i);</b>
+<i>1105</i>&nbsp;            }
+<b class="nc"><i>1106</i>&nbsp;        }</b>
+<i>1107</i>&nbsp;
+<i>1108</i>&nbsp;        void storeState() {
+<b class="nc"><i>1109</i>&nbsp;            System.arraycopy(indexOffsets, 0, storedIndexOffsets, 0, indexOffsets.length);</b>
+<i>1110</i>&nbsp;
+<b class="nc"><i>1111</i>&nbsp;        }</b>
+<i>1112</i>&nbsp;
+<i>1113</i>&nbsp;        void restoreState() {
+<b class="nc"><i>1114</i>&nbsp;            int[] tmp = storedIndexOffsets;</b>
+<b class="nc"><i>1115</i>&nbsp;            storedIndexOffsets = indexOffsets;</b>
+<b class="nc"><i>1116</i>&nbsp;            indexOffsets = tmp;</b>
+<b class="nc"><i>1117</i>&nbsp;        }</b>
+<i>1118</i>&nbsp;
+<i>1119</i>&nbsp;        private final int maxIndexValue;
+<i>1120</i>&nbsp;        private final int minIndexValue;
+<i>1121</i>&nbsp;        private final int offsetCount;
+<i>1122</i>&nbsp;
+<i>1123</i>&nbsp;        private int[] indexOffsets;
+<i>1124</i>&nbsp;        private int[] storedIndexOffsets;
+<i>1125</i>&nbsp;
+<i>1126</i>&nbsp;    } // class BufferIndexHelper
+<i>1127</i>&nbsp;
+<b class="fc"><i>1128</i>&nbsp;    public enum PartialsRescalingScheme {</b>
+<b class="fc"><i>1129</i>&nbsp;        DEFAULT(&quot;default&quot;), // whatever our current favourite default is</b>
+<b class="fc"><i>1130</i>&nbsp;        NONE(&quot;none&quot;),       // no scaling</b>
+<b class="fc"><i>1131</i>&nbsp;        DYNAMIC(&quot;dynamic&quot;), // rescale when needed and reuse scaling factors</b>
+<b class="fc"><i>1132</i>&nbsp;        ALWAYS(&quot;always&quot;),   // rescale every node, every site, every time - slow but safe</b>
+<b class="fc"><i>1133</i>&nbsp;        DELAYED(&quot;delayed&quot;), // postpone until first underflow then switch to &#39;always&#39;</b>
+<b class="fc"><i>1134</i>&nbsp;        AUTO(&quot;auto&quot;);       // BEAGLE automatic scaling - currently playing it safe with &#39;always&#39;</b>
+<i>1135</i>&nbsp;//        KICK_ASS(&quot;kickAss&quot;),// should be good, probably still to be discovered
+<i>1136</i>&nbsp;
+<b class="fc"><i>1137</i>&nbsp;        PartialsRescalingScheme(String text) {</b>
+<b class="fc"><i>1138</i>&nbsp;            this.text = text;</b>
+<b class="fc"><i>1139</i>&nbsp;        }</b>
+<i>1140</i>&nbsp;
+<i>1141</i>&nbsp;        public String getText() {
+<b class="fc"><i>1142</i>&nbsp;            return text;</b>
+<i>1143</i>&nbsp;        }
+<i>1144</i>&nbsp;
+<i>1145</i>&nbsp;        private final String text;
+<i>1146</i>&nbsp;
+<i>1147</i>&nbsp;        public static PartialsRescalingScheme parseFromString(String text) {
+<b class="nc"><i>1148</i>&nbsp;            for (PartialsRescalingScheme scheme : PartialsRescalingScheme.values()) {</b>
+<b class="nc"><i>1149</i>&nbsp;                if (scheme.getText().compareToIgnoreCase(text) == 0)</b>
+<b class="nc"><i>1150</i>&nbsp;                    return scheme;</b>
+<i>1151</i>&nbsp;            }
+<b class="nc"><i>1152</i>&nbsp;            return DEFAULT;</b>
+<i>1153</i>&nbsp;        }
+<i>1154</i>&nbsp;    }
+<i>1155</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

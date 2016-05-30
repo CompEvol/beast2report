@@ -1,0 +1,133 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: GenericTreeLikelihood</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.likelihood</a> ]
+</div>
+
+<h1>Coverage Summary for Class: GenericTreeLikelihood (beast.evolution.likelihood)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GenericTreeLikelihood</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (1/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.5%
+  </span>
+  <span class="absValue">
+    (5/ 8)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.likelihood;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import java.util.List;
+<i>5</i>&nbsp;import java.util.Random;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import beast.core.Description;
+<i>8</i>&nbsp;import beast.core.Distribution;
+<i>9</i>&nbsp;import beast.core.Input;
+<i>10</i>&nbsp;import beast.core.Input.Validate;
+<i>11</i>&nbsp;import beast.core.State;
+<i>12</i>&nbsp;import beast.evolution.alignment.Alignment;
+<i>13</i>&nbsp;import beast.evolution.branchratemodel.BranchRateModel;
+<i>14</i>&nbsp;import beast.evolution.sitemodel.SiteModelInterface;
+<i>15</i>&nbsp;import beast.evolution.tree.TreeInterface;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;@Description(&quot;Generic tree likelihood for an alignment given a generic SiteModel, &quot; +
+<i>22</i>&nbsp;		&quot;a beast tree and a branch rate model&quot;)
+<i>23</i>&nbsp;// Use this as base class to define any non-standard TreeLikelihood.
+<i>24</i>&nbsp;// Override Distribution.calculatLogP() to make this class functional.
+<i>25</i>&nbsp;//
+<i>26</i>&nbsp;// TODO: This could contain a generic traverse() method that takes dirty trees in account.
+<i>27</i>&nbsp;//
+<b class="fc"><i>28</i>&nbsp;public class GenericTreeLikelihood extends Distribution {</b>
+<i>29</i>&nbsp;    
+<b class="fc"><i>30</i>&nbsp;    final public Input&lt;Alignment&gt; dataInput = new Input&lt;&gt;(&quot;data&quot;, &quot;sequence data for the beast.tree&quot;, Validate.REQUIRED);</b>
+<i>31</i>&nbsp;
+<b class="fc"><i>32</i>&nbsp;    final public Input&lt;TreeInterface&gt; treeInput = new Input&lt;&gt;(&quot;tree&quot;, &quot;phylogenetic beast.tree with sequence data in the leafs&quot;, Validate.REQUIRED);</b>
+<i>33</i>&nbsp;
+<b class="fc"><i>34</i>&nbsp;    final public Input&lt;SiteModelInterface&gt; siteModelInput = new Input&lt;&gt;(&quot;siteModel&quot;, &quot;site model for leafs in the beast.tree&quot;, Validate.REQUIRED);</b>
+<i>35</i>&nbsp;    
+<b class="fc"><i>36</i>&nbsp;    final public Input&lt;BranchRateModel.Base&gt; branchRateModelInput = new Input&lt;&gt;(&quot;branchRateModel&quot;,</b>
+<i>37</i>&nbsp;            &quot;A model describing the rates on the branches of the beast.tree.&quot;);
+<i>38</i>&nbsp;
+<i>39</i>&nbsp;    
+<i>40</i>&nbsp;    
+<i>41</i>&nbsp;	@Override
+<b class="nc"><i>42</i>&nbsp;	public List&lt;String&gt; getArguments() {return null;}</b>
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;	@Override
+<b class="nc"><i>45</i>&nbsp;	public List&lt;String&gt; getConditions() {return null;}</b>
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;	@Override
+<b class="nc"><i>48</i>&nbsp;	public void sample(State state, Random random) {}</b>
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

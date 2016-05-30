@@ -1,0 +1,751 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: State</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.core</a> ]
+</div>
+
+<h1>Coverage Summary for Class: State (beast.core)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">State</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (4/ 24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    12.1%
+  </span>
+  <span class="absValue">
+    (27/ 223)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">State$Trie</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (3/ 18)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    18.5%
+  </span>
+  <span class="absValue">
+    (5/ 27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    12.4%
+  </span>
+  <span class="absValue">
+    (30/ 241)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;* File State.java
+<i>3</i>&nbsp;*
+<i>4</i>&nbsp;* Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>5</i>&nbsp;*
+<i>6</i>&nbsp;* This file is part of BEAST2.
+<i>7</i>&nbsp;* See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp;* information regarding copyright ownership and licensing.
+<i>9</i>&nbsp;*
+<i>10</i>&nbsp;* BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp;* it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp;* published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp;* of the License, or (at your option) any later version.
+<i>14</i>&nbsp;*
+<i>15</i>&nbsp;*  BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp;*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp;*  GNU Lesser General Public License for more details.
+<i>19</i>&nbsp;*
+<i>20</i>&nbsp;* You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp;* License along with BEAST; if not, write to the
+<i>22</i>&nbsp;* Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp;* Boston, MA  02110-1301  USA
+<i>24</i>&nbsp;*/
+<i>25</i>&nbsp;package beast.core;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;import java.io.ByteArrayInputStream;
+<i>29</i>&nbsp;import java.io.File;
+<i>30</i>&nbsp;import java.io.IOException;
+<i>31</i>&nbsp;import java.io.PrintStream;
+<i>32</i>&nbsp;import java.nio.file.Files;
+<i>33</i>&nbsp;import java.util.ArrayList;
+<i>34</i>&nbsp;import java.util.HashMap;
+<i>35</i>&nbsp;import java.util.List;
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;import javax.xml.parsers.DocumentBuilderFactory;
+<i>38</i>&nbsp;import javax.xml.parsers.ParserConfigurationException;
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;import org.w3c.dom.Document;
+<i>41</i>&nbsp;import org.w3c.dom.Node;
+<i>42</i>&nbsp;import org.w3c.dom.NodeList;
+<i>43</i>&nbsp;import org.xml.sax.SAXException;
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;import beast.core.util.Log;
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;@Description(&quot;The state represents the current point in the state space, and &quot; +
+<i>51</i>&nbsp;        &quot;maintains values of a set of StateNodes, such as parameters and trees. &quot; +
+<i>52</i>&nbsp;        &quot;Furthermore, the state manages which parts of the model need to be stored/restored &quot; +
+<i>53</i>&nbsp;        &quot;and notified that recalculation is appropriate.&quot;)
+<b class="fc"><i>54</i>&nbsp;public class State extends BEASTObject {</b>
+<i>55</i>&nbsp;
+<b class="fc"><i>56</i>&nbsp;    public final Input&lt;List&lt;StateNode&gt;&gt; stateNodeInput =</b>
+<i>57</i>&nbsp;            new Input&lt;&gt;(&quot;stateNode&quot;, &quot;anything that is part of the state&quot;, new ArrayList&lt;&gt;());
+<b class="fc"><i>58</i>&nbsp;    final public Input&lt;Integer&gt; m_storeEvery =</b>
+<i>59</i>&nbsp;            new Input&lt;&gt;(&quot;storeEvery&quot;, &quot;store the state to disk every X number of samples so that we can &quot; +
+<b class="fc"><i>60</i>&nbsp;                    &quot;resume computation later on if the process failed half-way.&quot;, -1);</b>
+<i>61</i>&nbsp;//    public Input&lt;Boolean&gt; m_checkPoint =
+<i>62</i>&nbsp;//            new Input&lt;&gt;(&quot;checkpoint&quot;, &quot;keep saved states (every X samples).&quot;, false);
+<i>63</i>&nbsp;
+<i>64</i>&nbsp;    /**
+<i>65</i>&nbsp;     * The components of the state, for instance tree &amp; parameters.
+<i>66</i>&nbsp;     * This represents the current state, but a copy is kept so that when
+<i>67</i>&nbsp;     * an operation is applied to the State but the proposal is not accepted,
+<i>68</i>&nbsp;     * the state can be restored. This is currently implemented by having
+<i>69</i>&nbsp;     * Operators call getEditableStateNode() at which point the requested
+<i>70</i>&nbsp;     * StateNode is copied.
+<i>71</i>&nbsp;     * Access through getNrStatNodes() and getStateNode(.).
+<i>72</i>&nbsp;     */
+<i>73</i>&nbsp;    protected StateNode[] stateNode;
+<i>74</i>&nbsp;
+<i>75</i>&nbsp;    /**
+<i>76</i>&nbsp;     * number of state nodes *
+<i>77</i>&nbsp;     */
+<i>78</i>&nbsp;    private int nrOfStateNodes;
+<i>79</i>&nbsp;
+<i>80</i>&nbsp;    public int getNrOfStateNodes() {
+<b class="nc"><i>81</i>&nbsp;        return nrOfStateNodes;</b>
+<i>82</i>&nbsp;    }
+<i>83</i>&nbsp;
+<i>84</i>&nbsp;    /**
+<i>85</i>&nbsp;     * pointers to memory allocated to stateNodes and storedStateNodes *
+<i>86</i>&nbsp;     */
+<i>87</i>&nbsp;    private StateNode[] stateNodeMem;
+<i>88</i>&nbsp;
+<i>89</i>&nbsp;    /**
+<i>90</i>&nbsp;     * File name used for storing the state, either periodically or at the end of an MCMC chain
+<i>91</i>&nbsp;     * so that the chain can be resumed.
+<i>92</i>&nbsp;     */
+<b class="fc"><i>93</i>&nbsp;    private String stateFileName = &quot;state.backup.xml&quot;;</b>
+<i>94</i>&nbsp;
+<i>95</i>&nbsp;
+<i>96</i>&nbsp;    /** The following members are involved in calculating the set of
+<i>97</i>&nbsp;     * CalculatioNodes that need to be notified when an operation
+<i>98</i>&nbsp;     * has been applied to the State. The Calculation nodes are then
+<i>99</i>&nbsp;     * store/restore/accepted/check dirtiness in partial order.
+<i>100</i>&nbsp;     */
+<i>101</i>&nbsp;
+<i>102</i>&nbsp;    /**
+<i>103</i>&nbsp;     * Maps a BEASTObject to a list of Outputs.
+<i>104</i>&nbsp;     * This map only contains those plug-ins that have a path to the posterior *
+<i>105</i>&nbsp;     */
+<i>106</i>&nbsp;    private HashMap&lt;BEASTInterface, List&lt;BEASTInterface&gt;&gt; outputMap;
+<i>107</i>&nbsp;
+<i>108</i>&nbsp;    /**
+<i>109</i>&nbsp;     * Same as m_outputMap, but only for StateNodes indexed by the StateNode number
+<i>110</i>&nbsp;     * We need this since the StateNode changes regularly, so unlike the output map
+<i>111</i>&nbsp;     * for BEASTObjects cannot be accessed by the current StateNode as key.
+<i>112</i>&nbsp;     */
+<i>113</i>&nbsp;    private List&lt;CalculationNode&gt;[] stateNodeOutputs;
+<i>114</i>&nbsp;
+<i>115</i>&nbsp;    /**
+<i>116</i>&nbsp;     * Code that represents configuration of StateNodes that have changed
+<i>117</i>&nbsp;     * during an operation.
+<i>118</i>&nbsp;     * &lt;p/&gt;
+<i>119</i>&nbsp;     * Every time an operation requests a StateNode, an entry is added to changeStateNodes
+<i>120</i>&nbsp;     * changeStateNodes records how many StateNodes are changed.
+<i>121</i>&nbsp;     * The code is reset when the state is stored, and every time a StateNode
+<i>122</i>&nbsp;     * is requested by an operator, changeStateNodes is updated.
+<i>123</i>&nbsp;     */
+<i>124</i>&nbsp;    private int[] changeStateNodes;
+<i>125</i>&nbsp;    private int nrOfChangedStateNodes;
+<i>126</i>&nbsp;
+<i>127</i>&nbsp;    /**
+<i>128</i>&nbsp;     * Maps the changed states node code to
+<i>129</i>&nbsp;     * the set of calculation nodes that is potentially affected by an operation *
+<i>130</i>&nbsp;     */
+<i>131</i>&nbsp;    Trie trie;
+<i>132</i>&nbsp;
+<i>133</i>&nbsp;    /**
+<i>134</i>&nbsp;     * class for quickly finding which calculation nodes need to be updated
+<i>135</i>&nbsp;     * due to state-node changes
+<i>136</i>&nbsp;     */
+<b class="fc"><i>137</i>&nbsp;    class Trie {</b>
+<i>138</i>&nbsp;        List&lt;CalculationNode&gt; list;
+<i>139</i>&nbsp;        final Trie[] children;
+<i>140</i>&nbsp;
+<b class="fc"><i>141</i>&nbsp;        Trie() {</b>
+<b class="fc"><i>142</i>&nbsp;            children = new Trie[stateNode.length];</b>
+<b class="fc"><i>143</i>&nbsp;        }</b>
+<i>144</i>&nbsp;
+<i>145</i>&nbsp;        /**
+<i>146</i>&nbsp;         * get entry from Trie, return null if no entry is present yet *
+<i>147</i>&nbsp;         * @param pos
+<i>148</i>&nbsp;         */
+<i>149</i>&nbsp;        List&lt;CalculationNode&gt; get(final int pos) {
+<b class="nc"><i>150</i>&nbsp;            if (pos == 0) {</b>
+<b class="nc"><i>151</i>&nbsp;                return list;</b>
+<i>152</i>&nbsp;            }
+<b class="nc"><i>153</i>&nbsp;            final Trie child = children[changeStateNodes[pos - 1]];</b>
+<b class="nc"><i>154</i>&nbsp;            if (child == null) {</b>
+<b class="nc"><i>155</i>&nbsp;                return null;</b>
+<i>156</i>&nbsp;            }
+<b class="nc"><i>157</i>&nbsp;            return child.get(pos - 1);</b>
+<i>158</i>&nbsp;        }
+<i>159</i>&nbsp;
+<i>160</i>&nbsp;        /**
+<i>161</i>&nbsp;         * set entry int Trie, create new entries if no entry is present yet *
+<i>162</i>&nbsp;         */
+<i>163</i>&nbsp;        void set(final List&lt;CalculationNode&gt; list, final int pos) {
+<b class="nc"><i>164</i>&nbsp;            if (pos == 0) {</b>
+<b class="nc"><i>165</i>&nbsp;                this.list = list;</b>
+<b class="nc"><i>166</i>&nbsp;                return;</b>
+<i>167</i>&nbsp;            }
+<b class="nc"><i>168</i>&nbsp;            Trie child = children[changeStateNodes[pos - 1]];</b>
+<b class="nc"><i>169</i>&nbsp;            if (child == null) {</b>
+<b class="nc"><i>170</i>&nbsp;                child = new Trie();</b>
+<b class="nc"><i>171</i>&nbsp;                children[changeStateNodes[pos - 1]] = child;</b>
+<i>172</i>&nbsp;            }
+<b class="nc"><i>173</i>&nbsp;            child.set(list, pos - 1);</b>
+<b class="nc"><i>174</i>&nbsp;        }</b>
+<i>175</i>&nbsp;    }
+<i>176</i>&nbsp;
+<i>177</i>&nbsp;
+<i>178</i>&nbsp;    @Override
+<i>179</i>&nbsp;    public void initAndValidate() {
+<b class="fc"><i>180</i>&nbsp;    }</b>
+<i>181</i>&nbsp;
+<i>182</i>&nbsp;    public void initialise() {
+<b class="fc"><i>183</i>&nbsp;        stateNode = stateNodeInput.get().toArray(new StateNode[0]);</b>
+<i>184</i>&nbsp;
+<b class="fc"><i>185</i>&nbsp;        for (int i = 0; i &lt; stateNode.length; i++) {</b>
+<b class="fc"><i>186</i>&nbsp;            stateNode[i].index = i;</b>
+<i>187</i>&nbsp;        }
+<i>188</i>&nbsp;        // make itself known
+<b class="fc"><i>189</i>&nbsp;        for (StateNode state : stateNode) {</b>
+<b class="fc"><i>190</i>&nbsp;            state.state = this;</b>
+<i>191</i>&nbsp;        }
+<i>192</i>&nbsp;
+<b class="fc"><i>193</i>&nbsp;        nrOfStateNodes = stateNode.length;</b>
+<i>194</i>&nbsp;        // allocate memory for StateNodes and a copy.
+<b class="fc"><i>195</i>&nbsp;        stateNodeMem = new StateNode[nrOfStateNodes * 2];</b>
+<b class="fc"><i>196</i>&nbsp;        for (int i = 0; i &lt; nrOfStateNodes; i++) {</b>
+<b class="fc"><i>197</i>&nbsp;            stateNodeMem[i] = stateNode[i];</b>
+<b class="fc"><i>198</i>&nbsp;            stateNodeMem[nrOfStateNodes + i] = stateNodeMem[i].copy();</b>
+<i>199</i>&nbsp;        }
+<i>200</i>&nbsp;
+<i>201</i>&nbsp;        // set up data structure for encoding which StateNodes change by an operation
+<b class="fc"><i>202</i>&nbsp;        changeStateNodes = new int[stateNode.length];</b>
+<i>203</i>&nbsp;        //Arrays.fill(changeStateNodes, -1);
+<b class="fc"><i>204</i>&nbsp;        nrOfChangedStateNodes = 0;</b>
+<b class="fc"><i>205</i>&nbsp;        trie = new Trie();</b>
+<i>206</i>&nbsp;        // add the empty list for the case none of the StateNodes have changed
+<b class="fc"><i>207</i>&nbsp;        trie.list = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>208</i>&nbsp;    } // initAndValidate</b>
+<i>209</i>&nbsp;
+<i>210</i>&nbsp;
+<i>211</i>&nbsp;    /**
+<i>212</i>&nbsp;     * return currently valid state node. This is typically called from a
+<i>213</i>&nbsp;     * CalculationNode for inspecting the value of a StateNode, not for
+<i>214</i>&nbsp;     * changing it. To change a StateNode, say from an Operator,
+<i>215</i>&nbsp;     * getEditableStateNode() should be called. *
+<i>216</i>&nbsp;     */
+<i>217</i>&nbsp;    public StateNode getStateNode(final int _id) {
+<b class="nc"><i>218</i>&nbsp;        return stateNode[_id];</b>
+<i>219</i>&nbsp;    }
+<i>220</i>&nbsp;
+<i>221</i>&nbsp;    /**
+<i>222</i>&nbsp;     * Return StateNode that can be changed, but later restored
+<i>223</i>&nbsp;     * if necessary. If there is no copy stored already, a copy is
+<i>224</i>&nbsp;     * made first, and the StateNode is marked as being dirty.
+<i>225</i>&nbsp;     * &lt;p/&gt;
+<i>226</i>&nbsp;     * NB This should only be called from an Operator that wants to
+<i>227</i>&nbsp;     * change the particular StateNode through the Input.get(Operator)
+<i>228</i>&nbsp;     * method on the input associated with this StateNode.
+<i>229</i>&nbsp;     */
+<i>230</i>&nbsp;    protected StateNode getEditableStateNode(int _id, Operator operator) {
+<b class="fc"><i>231</i>&nbsp;        for (int i = 0; i &lt; nrOfChangedStateNodes; i++) {</b>
+<b class="fc"><i>232</i>&nbsp;            if (changeStateNodes[i] == _id) {</b>
+<b class="fc"><i>233</i>&nbsp;                return stateNode[_id];</b>
+<i>234</i>&nbsp;            }
+<i>235</i>&nbsp;        }
+<b class="fc"><i>236</i>&nbsp;        changeStateNodes[nrOfChangedStateNodes++] = _id;</b>
+<b class="fc"><i>237</i>&nbsp;        return stateNode[_id];</b>
+<i>238</i>&nbsp;    }
+<i>239</i>&nbsp;
+<i>240</i>&nbsp;    /**
+<i>241</i>&nbsp;     * Store a State before applying an operation proposal to the state.
+<i>242</i>&nbsp;     * This copies the state for possible later restoration
+<i>243</i>&nbsp;     * but does not affect any inputs, which are all still connected
+<i>244</i>&nbsp;     * to the original StateNodes
+<i>245</i>&nbsp;     * &lt;p/&gt;
+<i>246</i>&nbsp;     * Also, store the state to disk for resumption of analysis later on.
+<i>247</i>&nbsp;     *
+<i>248</i>&nbsp;     * @param sample chain state number
+<i>249</i>&nbsp;     * @return  true if stored  to disk
+<i>250</i>&nbsp;     */
+<i>251</i>&nbsp;    public void store(final int sample) {
+<i>252</i>&nbsp;        //Arrays.fill(changeStateNodes, -1);
+<b class="nc"><i>253</i>&nbsp;        nrOfChangedStateNodes = 0;</b>
+<b class="nc"><i>254</i>&nbsp;    }</b>
+<i>255</i>&nbsp;
+<i>256</i>&nbsp;    /**
+<i>257</i>&nbsp;     * Restore a State after rejecting the operation proposal.
+<i>258</i>&nbsp;     * This assigns the state to the stored state.
+<i>259</i>&nbsp;     * NB this does not affect any Inputs connected to any stateNode. *
+<i>260</i>&nbsp;     */
+<i>261</i>&nbsp;    public void restore() {
+<b class="nc"><i>262</i>&nbsp;        for (int i = 0; i &lt; nrOfChangedStateNodes; i++) {</b>
+<b class="nc"><i>263</i>&nbsp;            stateNode[changeStateNodes[i]].restore();</b>
+<i>264</i>&nbsp;        }
+<b class="nc"><i>265</i>&nbsp;    }</b>
+<i>266</i>&nbsp;
+<i>267</i>&nbsp;    /**
+<i>268</i>&nbsp;     * Visit all calculation nodes in partial order determined by the BEASTObject-input relations
+<i>269</i>&nbsp;     * (i.e. if A is input of B then A &lt; B). There are 4 operations that can be propagated this
+<i>270</i>&nbsp;     * way:
+<i>271</i>&nbsp;     * &lt;p/&gt;
+<i>272</i>&nbsp;     * store() makes sure all calculation nodes store their internal state
+<i>273</i>&nbsp;     * &lt;p/&gt;
+<i>274</i>&nbsp;     * checkDirtiness() makes all calculation nodes check whether they give a different answer
+<i>275</i>&nbsp;     * when interrogated by one of its outputs
+<i>276</i>&nbsp;     * &lt;p/&gt;
+<i>277</i>&nbsp;     * accept() allows all calculation nodes to mark themselves as being clean without further
+<i>278</i>&nbsp;     * calculation
+<i>279</i>&nbsp;     * &lt;p/&gt;
+<i>280</i>&nbsp;     * restore() if a proposed state is not accepted, all calculation nodes need to restore
+<i>281</i>&nbsp;     * themselves
+<i>282</i>&nbsp;     */
+<i>283</i>&nbsp;    public void storeCalculationNodes() {
+<b class="nc"><i>284</i>&nbsp;        final List&lt;CalculationNode&gt; currentSetOfCalculationNodes = getCurrentCalculationNodes();</b>
+<b class="nc"><i>285</i>&nbsp;        for (final CalculationNode calculationNode : currentSetOfCalculationNodes) {</b>
+<b class="nc"><i>286</i>&nbsp;            calculationNode.store();</b>
+<b class="nc"><i>287</i>&nbsp;        }</b>
+<b class="nc"><i>288</i>&nbsp;    }</b>
+<i>289</i>&nbsp;
+<i>290</i>&nbsp;    public void checkCalculationNodesDirtiness() {
+<b class="nc"><i>291</i>&nbsp;        final List&lt;CalculationNode&gt; currentSetOfCalculationNodes = getCurrentCalculationNodes();</b>
+<b class="nc"><i>292</i>&nbsp;        for (final CalculationNode calculationNode : currentSetOfCalculationNodes) {</b>
+<b class="nc"><i>293</i>&nbsp;            calculationNode.checkDirtiness();</b>
+<b class="nc"><i>294</i>&nbsp;        }</b>
+<b class="nc"><i>295</i>&nbsp;    }</b>
+<i>296</i>&nbsp;
+<i>297</i>&nbsp;    public void restoreCalculationNodes() {
+<b class="nc"><i>298</i>&nbsp;        final List&lt;CalculationNode&gt; currentSetOfCalculationNodes = getCurrentCalculationNodes();</b>
+<b class="nc"><i>299</i>&nbsp;        for (final CalculationNode calculationNode : currentSetOfCalculationNodes) {</b>
+<b class="nc"><i>300</i>&nbsp;            calculationNode.restore();</b>
+<b class="nc"><i>301</i>&nbsp;        }</b>
+<b class="nc"><i>302</i>&nbsp;    }</b>
+<i>303</i>&nbsp;
+<i>304</i>&nbsp;    public void acceptCalculationNodes() {
+<b class="nc"><i>305</i>&nbsp;        final List&lt;CalculationNode&gt; currentSetOfCalculationNodes = getCurrentCalculationNodes();</b>
+<b class="nc"><i>306</i>&nbsp;        for (final CalculationNode calculationNode : currentSetOfCalculationNodes) {</b>
+<b class="nc"><i>307</i>&nbsp;            calculationNode.accept();</b>
+<b class="nc"><i>308</i>&nbsp;        }</b>
+<b class="nc"><i>309</i>&nbsp;    }</b>
+<i>310</i>&nbsp;
+<i>311</i>&nbsp;    /**
+<i>312</i>&nbsp;     * set name of state file, used when storing/restoring the state to disk *
+<i>313</i>&nbsp;     */
+<i>314</i>&nbsp;    public void setStateFileName(final String fileName) {
+<b class="nc"><i>315</i>&nbsp;        if (fileName != null) {</b>
+<b class="nc"><i>316</i>&nbsp;            stateFileName = fileName;</b>
+<i>317</i>&nbsp;        }
+<b class="nc"><i>318</i>&nbsp;    }</b>
+<i>319</i>&nbsp;
+<i>320</i>&nbsp;    /**
+<i>321</i>&nbsp;     * Print state to file. This is called either periodically or at the end
+<i>322</i>&nbsp;     * of an MCMC chain, so that the state can be resumed later on.
+<i>323</i>&nbsp;     *
+<i>324</i>&nbsp;     * @param sample TODO
+<i>325</i>&nbsp;     */
+<i>326</i>&nbsp;    public void storeToFile(final int sample) {
+<i>327</i>&nbsp;        try {
+<b class="nc"><i>328</i>&nbsp;            PrintStream out = new PrintStream(stateFileName + &quot;.new&quot;);</b>
+<b class="nc"><i>329</i>&nbsp;            out.print(toXML(sample));</b>
+<i>330</i>&nbsp;            //out.print(new XMLProducer().toXML(this));
+<b class="nc"><i>331</i>&nbsp;            out.close();</b>
+<b class="nc"><i>332</i>&nbsp;            File newStateFile = new File(stateFileName + &quot;.new&quot;);</b>
+<b class="nc"><i>333</i>&nbsp;            File oldStateFile = new File(stateFileName);</b>
+<b class="nc"><i>334</i>&nbsp;            oldStateFile.delete();</b>
+<i>335</i>&nbsp;            // newStateFile.renameTo(oldStateFile); -- unstable under windows
+<b class="nc"><i>336</i>&nbsp;            Files.move(newStateFile.toPath(), oldStateFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);</b>
+<b class="nc"><i>337</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>338</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>339</i>&nbsp;        }</b>
+<b class="nc"><i>340</i>&nbsp;    }</b>
+<i>341</i>&nbsp;
+<i>342</i>&nbsp;    /**
+<i>343</i>&nbsp;     * convert state to XML string,
+<i>344</i>&nbsp;     * The state can be reconstructed using the fromXML() method
+<i>345</i>&nbsp;     *
+<i>346</i>&nbsp;     * @param sample TODO*
+<i>347</i>&nbsp;     */
+<i>348</i>&nbsp;    public String toXML(final int sample) {
+<b class="nc"><i>349</i>&nbsp;        final StringBuilder buf = new StringBuilder();</b>
+<b class="nc"><i>350</i>&nbsp;        buf.append(&quot;&lt;itsabeastystatewerein version=&#39;2.0&#39; sample=&#39;&quot;).append(sample).append(&quot;&#39;&gt;\n&quot;);</b>
+<b class="nc"><i>351</i>&nbsp;        for (final StateNode node : stateNode) {</b>
+<b class="nc"><i>352</i>&nbsp;            buf.append(node.toXML());</b>
+<i>353</i>&nbsp;        }
+<b class="nc"><i>354</i>&nbsp;        buf.append(&quot;&lt;/itsabeastystatewerein&gt;\n&quot;);</b>
+<b class="nc"><i>355</i>&nbsp;        return buf.toString();</b>
+<i>356</i>&nbsp;    }
+<i>357</i>&nbsp;
+<i>358</i>&nbsp;    /**
+<i>359</i>&nbsp;     * Restore state from an XML fragment *
+<i>360</i>&nbsp;     */
+<i>361</i>&nbsp;    public void fromXML(final String xml) {
+<i>362</i>&nbsp;        try {
+<b class="nc"><i>363</i>&nbsp;            final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();</b>
+<b class="nc"><i>364</i>&nbsp;            final Document doc = factory.newDocumentBuilder().parse(new ByteArrayInputStream(xml.getBytes()));</b>
+<b class="nc"><i>365</i>&nbsp;            doc.normalize();</b>
+<b class="nc"><i>366</i>&nbsp;            final NodeList nodes = doc.getElementsByTagName(&quot;*&quot;);</b>
+<b class="nc"><i>367</i>&nbsp;            final Node topNode = nodes.item(0);</b>
+<b class="nc"><i>368</i>&nbsp;            final NodeList children = topNode.getChildNodes();</b>
+<b class="nc"><i>369</i>&nbsp;            for (int childIndex = 0; childIndex &lt; children.getLength(); childIndex++) {</b>
+<b class="nc"><i>370</i>&nbsp;                final Node child = children.item(childIndex);</b>
+<b class="nc"><i>371</i>&nbsp;                if (child.getNodeType() == Node.ELEMENT_NODE) {</b>
+<b class="nc"><i>372</i>&nbsp;                    final String id = child.getAttributes().getNamedItem(&quot;id&quot;).getNodeValue();</b>
+<b class="nc"><i>373</i>&nbsp;                    int stateNodeIndex = 0;</b>
+<b class="nc"><i>374</i>&nbsp;                    while (!stateNode[stateNodeIndex].getID().equals(id)) {</b>
+<b class="nc"><i>375</i>&nbsp;                        stateNodeIndex++;</b>
+<i>376</i>&nbsp;                    }
+<b class="nc"><i>377</i>&nbsp;                    final StateNode stateNode2 = stateNode[stateNodeIndex].copy();</b>
+<b class="nc"><i>378</i>&nbsp;                    stateNode2.fromXML(child);</b>
+<b class="nc"><i>379</i>&nbsp;                    stateNode[stateNodeIndex].assignFromFragile(stateNode2);</b>
+<i>380</i>&nbsp;                }
+<i>381</i>&nbsp;            }
+<b class="nc"><i>382</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>383</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>384</i>&nbsp;            System.exit(1);</b>
+<b class="nc"><i>385</i>&nbsp;        }</b>
+<b class="nc"><i>386</i>&nbsp;    }</b>
+<i>387</i>&nbsp;
+<i>388</i>&nbsp;    /**
+<i>389</i>&nbsp;     * restore a state from file for resuming an MCMC chain 
+<i>390</i>&nbsp;     * @throws ParserConfigurationException 
+<i>391</i>&nbsp;     * @throws IOException 
+<i>392</i>&nbsp;     * @throws SAXException *
+<i>393</i>&nbsp;     */
+<i>394</i>&nbsp;    public void restoreFromFile() throws SAXException, IOException, ParserConfigurationException  {
+<b class="nc"><i>395</i>&nbsp;        Log.info.println(&quot;Restoring from file&quot;);</b>
+<b class="nc"><i>396</i>&nbsp;        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();</b>
+<b class="nc"><i>397</i>&nbsp;        Document doc = factory.newDocumentBuilder().parse(new File(stateFileName));</b>
+<b class="nc"><i>398</i>&nbsp;        doc.normalize();</b>
+<b class="nc"><i>399</i>&nbsp;        final NodeList nodes = doc.getElementsByTagName(&quot;*&quot;);</b>
+<b class="nc"><i>400</i>&nbsp;        final Node topNode = nodes.item(0);</b>
+<b class="nc"><i>401</i>&nbsp;        final NodeList children = topNode.getChildNodes();</b>
+<b class="nc"><i>402</i>&nbsp;        for (int childIndex = 0; childIndex &lt; children.getLength(); childIndex++) {</b>
+<b class="nc"><i>403</i>&nbsp;            final Node child = children.item(childIndex);</b>
+<b class="nc"><i>404</i>&nbsp;            if (child.getNodeType() == Node.ELEMENT_NODE) {</b>
+<b class="nc"><i>405</i>&nbsp;                final String id = child.getAttributes().getNamedItem(&quot;id&quot;).getNodeValue();</b>
+<b class="nc"><i>406</i>&nbsp;                int stateNodeIndex = 0;</b>
+<i>407</i>&nbsp;
+<i>408</i>&nbsp;                // An init node without ID - should not bring the house down, does it?
+<i>409</i>&nbsp;                // I have not checked if the state is restored correctly or not (JH)
+<b class="nc"><i>410</i>&nbsp;                while (stateNode[stateNodeIndex].getID() != null &amp;&amp;</b>
+<b class="nc"><i>411</i>&nbsp;                        !stateNode[stateNodeIndex].getID().equals(id)) {</b>
+<b class="nc"><i>412</i>&nbsp;                    stateNodeIndex++;</b>
+<b class="nc"><i>413</i>&nbsp;                    if (stateNodeIndex &gt;= stateNode.length) {</b>
+<b class="nc"><i>414</i>&nbsp;                    	Log.warning.println(&quot;Cannot restore statenode id&quot;);</b>
+<b class="nc"><i>415</i>&nbsp;                    	break;</b>
+<i>416</i>&nbsp;                    }
+<i>417</i>&nbsp;                }
+<b class="nc"><i>418</i>&nbsp;                if (stateNodeIndex &lt; stateNode.length) {</b>
+<b class="nc"><i>419</i>&nbsp;	                final StateNode stateNode2 = stateNode[stateNodeIndex].copy();</b>
+<b class="nc"><i>420</i>&nbsp;	                stateNode2.fromXML(child);</b>
+<b class="nc"><i>421</i>&nbsp;	                stateNode[stateNodeIndex].assignFromFragile(stateNode2);</b>
+<i>422</i>&nbsp;                }
+<i>423</i>&nbsp;            }
+<i>424</i>&nbsp;        }
+<b class="nc"><i>425</i>&nbsp;    }</b>
+<i>426</i>&nbsp;
+<i>427</i>&nbsp;    @Override
+<i>428</i>&nbsp;    public String toString() {
+<b class="nc"><i>429</i>&nbsp;        if (stateNode == null) {</b>
+<b class="nc"><i>430</i>&nbsp;            return &quot;&quot;;</b>
+<i>431</i>&nbsp;        }
+<b class="nc"><i>432</i>&nbsp;        final StringBuilder buf = new StringBuilder();</b>
+<b class="nc"><i>433</i>&nbsp;        for (final StateNode node : stateNode) {</b>
+<b class="nc"><i>434</i>&nbsp;            buf.append(node.toString());</b>
+<b class="nc"><i>435</i>&nbsp;            buf.append(&quot;\n&quot;);</b>
+<i>436</i>&nbsp;        }
+<b class="nc"><i>437</i>&nbsp;        return buf.toString();</b>
+<i>438</i>&nbsp;    }
+<i>439</i>&nbsp;
+<i>440</i>&nbsp;
+<i>441</i>&nbsp;    /**
+<i>442</i>&nbsp;     * Set dirtiness to all StateNode, this means that
+<i>443</i>&nbsp;     * apart from marking all StateNode.someThingIsDirty as isDirty
+<i>444</i>&nbsp;     * parameters mark all their dimension as isDirty and
+<i>445</i>&nbsp;     * trees mark all their nodes as isDirty.
+<i>446</i>&nbsp;     */
+<i>447</i>&nbsp;    public void setEverythingDirty(final boolean isDirty) {
+<b class="nc"><i>448</i>&nbsp;        for (final StateNode node : stateNode) {</b>
+<b class="nc"><i>449</i>&nbsp;            node.setEverythingDirty(isDirty);</b>
+<i>450</i>&nbsp;        }
+<i>451</i>&nbsp;
+<b class="nc"><i>452</i>&nbsp;        if (isDirty) {</b>
+<i>453</i>&nbsp;            // happens only during debugging and start of MCMC chain
+<b class="nc"><i>454</i>&nbsp;            for (int i = 0; i &lt; stateNode.length; i++) {</b>
+<b class="nc"><i>455</i>&nbsp;                changeStateNodes[i] = i;</b>
+<i>456</i>&nbsp;            }
+<b class="nc"><i>457</i>&nbsp;            nrOfChangedStateNodes = stateNode.length;</b>
+<i>458</i>&nbsp;        }
+<b class="nc"><i>459</i>&nbsp;    }</b>
+<i>460</i>&nbsp;
+<i>461</i>&nbsp;    /**
+<i>462</i>&nbsp;     * Sets the posterior, needed to calculate paths of CalculationNode
+<i>463</i>&nbsp;     * that need store/restore/requireCalculation checks.
+<i>464</i>&nbsp;     * As a side effect, outputs for every beastObject in the model are calculated.
+<i>465</i>&nbsp;     * NB the output map only contains outputs on a path to the posterior BEASTObject!
+<i>466</i>&nbsp;     */
+<i>467</i>&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+<i>468</i>&nbsp;    public void setPosterior(BEASTObject posterior) {
+<i>469</i>&nbsp;        // first, calculate output map that maps BEASTObjects on a path
+<i>470</i>&nbsp;        // to the posterior to the list of output BEASTObjects. Strictly
+<i>471</i>&nbsp;        // speaking, this is a bit of overkill, since only
+<i>472</i>&nbsp;        // CalculationNodes need to be taken in account, but for
+<i>473</i>&nbsp;        // debugging purposes (developer forgot to derive from CalculationNode)
+<i>474</i>&nbsp;        // we keep track of the lot.
+<b class="nc"><i>475</i>&nbsp;        outputMap = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>476</i>&nbsp;        outputMap.put(posterior, new ArrayList&lt;&gt;());</b>
+<b class="nc"><i>477</i>&nbsp;        boolean progress = true;</b>
+<b class="nc"><i>478</i>&nbsp;        List&lt;BEASTInterface&gt; beastObjects = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>479</i>&nbsp;        beastObjects.add(posterior);</b>
+<b class="nc"><i>480</i>&nbsp;        while (progress) {</b>
+<b class="nc"><i>481</i>&nbsp;            progress = false;</b>
+<i>482</i>&nbsp;            // loop over plug-ins, till no more plug-ins can be added
+<i>483</i>&nbsp;            // efficiency is no issue here
+<b class="nc"><i>484</i>&nbsp;            for (int i = 0; i &lt; beastObjects.size(); i++) {</b>
+<b class="nc"><i>485</i>&nbsp;            	BEASTInterface beastObject = beastObjects.get(i);</b>
+<i>486</i>&nbsp;                try {
+<b class="nc"><i>487</i>&nbsp;                    for (BEASTInterface inputBEASTObject : beastObject.listActiveBEASTObjects()) {</b>
+<b class="nc"><i>488</i>&nbsp;                        if (!outputMap.containsKey(inputBEASTObject)) {</b>
+<b class="nc"><i>489</i>&nbsp;                            outputMap.put(inputBEASTObject, new ArrayList&lt;&gt;());</b>
+<b class="nc"><i>490</i>&nbsp;                            beastObjects.add(inputBEASTObject);</b>
+<b class="nc"><i>491</i>&nbsp;                            progress = true;</b>
+<i>492</i>&nbsp;                        }
+<b class="nc"><i>493</i>&nbsp;                        if (!outputMap.get(inputBEASTObject).contains(beastObject)) {</b>
+<b class="nc"><i>494</i>&nbsp;                            outputMap.get(inputBEASTObject).add(beastObject);</b>
+<b class="nc"><i>495</i>&nbsp;                            progress = true;</b>
+<i>496</i>&nbsp;                        }
+<b class="nc"><i>497</i>&nbsp;                    }</b>
+<b class="nc"><i>498</i>&nbsp;                } catch (Exception e) {</b>
+<b class="nc"><i>499</i>&nbsp;                    e.printStackTrace();</b>
+<b class="nc"><i>500</i>&nbsp;                }</b>
+<i>501</i>&nbsp;            }
+<i>502</i>&nbsp;        }
+<i>503</i>&nbsp;        // Set of array of StateNode outputs. Since the StateNodes have a potential
+<i>504</i>&nbsp;        // to be changing objects (when store/restore is applied) it is necessary
+<i>505</i>&nbsp;        // to use another method to find the outputs, an array in this case.
+<b class="nc"><i>506</i>&nbsp;        stateNodeOutputs = new List[stateNode.length];</b>
+<b class="nc"><i>507</i>&nbsp;        for (int i = 0; i &lt; stateNode.length; i++) {</b>
+<b class="nc"><i>508</i>&nbsp;            stateNodeOutputs[i] = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>509</i>&nbsp;            if (outputMap.containsKey(stateNode[i])) {</b>
+<b class="nc"><i>510</i>&nbsp;                for (BEASTInterface beastObject : outputMap.get(stateNode[i])) {</b>
+<b class="nc"><i>511</i>&nbsp;                    if (beastObject instanceof CalculationNode) {</b>
+<b class="nc"><i>512</i>&nbsp;                        stateNodeOutputs[i].add((CalculationNode) beastObject);</b>
+<i>513</i>&nbsp;                    } else {
+<b class="nc"><i>514</i>&nbsp;                        throw new RuntimeException(&quot;DEVELOPER ERROR: output of StateNode (&quot; + stateNode[i].getID() + &quot;) should be a CalculationNode, but &quot; + beastObject.getClass().getName() + &quot; is not.&quot;);</b>
+<i>515</i>&nbsp;                    }
+<b class="nc"><i>516</i>&nbsp;                }</b>
+<i>517</i>&nbsp;            } else {
+<b class="nc"><i>518</i>&nbsp;                Log.warning.println(&quot;\nWARNING: StateNode (&quot; + stateNode[i].getID() + &quot;) found that has no effect on posterior!\n&quot;);</b>
+<i>519</i>&nbsp;            }
+<i>520</i>&nbsp;        }
+<b class="nc"><i>521</i>&nbsp;    } // setPosterior</b>
+<i>522</i>&nbsp;
+<i>523</i>&nbsp;    /**
+<i>524</i>&nbsp;     * return current set of calculation nodes based on the set of StateNodes that have changed *
+<i>525</i>&nbsp;     */
+<i>526</i>&nbsp;    private List&lt;CalculationNode&gt; getCurrentCalculationNodes() {
+<b class="nc"><i>527</i>&nbsp;        List&lt;CalculationNode&gt; calcNodes = trie.get(nrOfChangedStateNodes);</b>
+<b class="nc"><i>528</i>&nbsp;        if (calcNodes != null) {</b>
+<i>529</i>&nbsp;            // the list is pre-calculated
+<b class="nc"><i>530</i>&nbsp;            return calcNodes;</b>
+<i>531</i>&nbsp;        }
+<i>532</i>&nbsp;        // we need to calculate the list of CalculationNodes now
+<i>533</i>&nbsp;        try {
+<b class="nc"><i>534</i>&nbsp;            calcNodes = calculateCalcNodePath();</b>
+<b class="nc"><i>535</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>536</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>537</i>&nbsp;            System.exit(1);</b>
+<b class="nc"><i>538</i>&nbsp;        }</b>
+<i>539</i>&nbsp;
+<b class="nc"><i>540</i>&nbsp;        trie.set(calcNodes, nrOfChangedStateNodes);</b>
+<i>541</i>&nbsp;
+<i>542</i>&nbsp;//    	System.err.print(Arrays.toString(changeStateNodes) + &quot;:&quot;);
+<i>543</i>&nbsp;//    	for (CalculationNode node : calcNodes) {
+<i>544</i>&nbsp;//    		Log.warning.print(node.m_sID + &quot; &quot;);
+<i>545</i>&nbsp;//    	}
+<i>546</i>&nbsp;//    	System.err.println();
+<i>547</i>&nbsp;
+<b class="nc"><i>548</i>&nbsp;        return calcNodes;</b>
+<i>549</i>&nbsp;    } // getCurrentCalculationNodes
+<i>550</i>&nbsp;
+<i>551</i>&nbsp;
+<i>552</i>&nbsp;    /**
+<i>553</i>&nbsp;     * Collect all CalculationNodes on a path from any StateNode that is changed (as
+<i>554</i>&nbsp;     * indicated by m_changedStateNodeCode) to the posterior. Return the list in
+<i>555</i>&nbsp;     * partial order as determined by the BEASTObjects input relations.
+<i>556</i>&nbsp;     * @throws IllegalAccessException 
+<i>557</i>&nbsp;     * @throws IllegalArgumentException 
+<i>558</i>&nbsp;     */
+<i>559</i>&nbsp;    private List&lt;CalculationNode&gt; calculateCalcNodePath() throws IllegalArgumentException, IllegalAccessException {
+<b class="nc"><i>560</i>&nbsp;        final List&lt;CalculationNode&gt; calcNodes = new ArrayList&lt;&gt;();</b>
+<i>561</i>&nbsp;//    	for (int i = 0; i &lt; stateNode.length; i++) {
+<i>562</i>&nbsp;//    		if (m_changedStateNodeCode.get(i)) {
+<b class="nc"><i>563</i>&nbsp;        for (int k = 0; k &lt; nrOfChangedStateNodes; k++) {</b>
+<b class="nc"><i>564</i>&nbsp;            int i = changeStateNodes[k];</b>
+<i>565</i>&nbsp;            // go grab the path to the Runnable
+<i>566</i>&nbsp;            // first the outputs of the StateNodes that is changed
+<b class="nc"><i>567</i>&nbsp;            boolean progress = false;</b>
+<b class="nc"><i>568</i>&nbsp;            for (CalculationNode node : stateNodeOutputs[i]) {</b>
+<b class="nc"><i>569</i>&nbsp;                if (!calcNodes.contains(node)) {</b>
+<b class="nc"><i>570</i>&nbsp;                    calcNodes.add(node);</b>
+<b class="nc"><i>571</i>&nbsp;                    progress = true;</b>
+<i>572</i>&nbsp;                }
+<b class="nc"><i>573</i>&nbsp;            }</b>
+<i>574</i>&nbsp;            // next the path following the outputs
+<b class="nc"><i>575</i>&nbsp;            while (progress) {</b>
+<b class="nc"><i>576</i>&nbsp;                progress = false;</b>
+<i>577</i>&nbsp;                // loop over beastObjects till no more beastObjects can be added
+<i>578</i>&nbsp;                // efficiency is no issue here, assuming the graph remains 
+<i>579</i>&nbsp;                // constant
+<b class="nc"><i>580</i>&nbsp;                for (int calcNodeIndex = 0; calcNodeIndex &lt; calcNodes.size(); calcNodeIndex++) {</b>
+<b class="nc"><i>581</i>&nbsp;                    CalculationNode node = calcNodes.get(calcNodeIndex);</b>
+<b class="nc"><i>582</i>&nbsp;                    for (BEASTInterface output : outputMap.get(node)) {</b>
+<b class="nc"><i>583</i>&nbsp;                        if (output instanceof CalculationNode) {</b>
+<b class="nc"><i>584</i>&nbsp;                            final CalculationNode calcNode = (CalculationNode) output;</b>
+<b class="nc"><i>585</i>&nbsp;                            if (!calcNodes.contains(calcNode)) {</b>
+<b class="nc"><i>586</i>&nbsp;                                calcNodes.add(calcNode);</b>
+<b class="nc"><i>587</i>&nbsp;                                progress = true;</b>
+<i>588</i>&nbsp;                            }
+<b class="nc"><i>589</i>&nbsp;                        } else {</b>
+<b class="nc"><i>590</i>&nbsp;                            throw new RuntimeException(&quot;DEVELOPER ERROR: found a&quot;</b>
+<i>591</i>&nbsp;                                    + &quot; non-CalculatioNode (&quot;
+<b class="nc"><i>592</i>&nbsp;                                    +output.getClass().getName()</b>
+<i>593</i>&nbsp;                                    +&quot;) on path between StateNode and Runnable&quot;);
+<i>594</i>&nbsp;                        }
+<b class="nc"><i>595</i>&nbsp;                    }</b>
+<i>596</i>&nbsp;                }
+<i>597</i>&nbsp;            }
+<i>598</i>&nbsp;//    		}
+<i>599</i>&nbsp;        }
+<i>600</i>&nbsp;
+<i>601</i>&nbsp;        // put calc nodes in partial order
+<b class="nc"><i>602</i>&nbsp;        for (int i = 0; i &lt; calcNodes.size(); i++) {</b>
+<b class="nc"><i>603</i>&nbsp;            CalculationNode node = calcNodes.get(i);</b>
+<b class="nc"><i>604</i>&nbsp;            List&lt;BEASTInterface&gt; inputList = node.listActiveBEASTObjects();</b>
+<b class="nc"><i>605</i>&nbsp;            for (int j = calcNodes.size() - 1; j &gt; i; j--) {</b>
+<b class="nc"><i>606</i>&nbsp;                if (inputList.contains(calcNodes.get(j))) {</b>
+<i>607</i>&nbsp;                    // swap
+<b class="nc"><i>608</i>&nbsp;                    final CalculationNode node2 = calcNodes.get(j);</b>
+<b class="nc"><i>609</i>&nbsp;                    calcNodes.set(j, node);</b>
+<b class="nc"><i>610</i>&nbsp;                    calcNodes.set(i, node2);</b>
+<b class="nc"><i>611</i>&nbsp;                    j = 0;</b>
+<b class="nc"><i>612</i>&nbsp;                    i--;</b>
+<i>613</i>&nbsp;                }
+<i>614</i>&nbsp;            }
+<i>615</i>&nbsp;        }
+<i>616</i>&nbsp;
+<b class="nc"><i>617</i>&nbsp;        return calcNodes;</b>
+<i>618</i>&nbsp;    } // calculateCalcNodePath
+<i>619</i>&nbsp;
+<i>620</i>&nbsp;
+<i>621</i>&nbsp;    public double robustlyCalcPosterior(final Distribution posterior) {
+<b class="nc"><i>622</i>&nbsp;        store(-1);</b>
+<b class="nc"><i>623</i>&nbsp;        setEverythingDirty(true);</b>
+<i>624</i>&nbsp;        //state.storeCalculationNodes();
+<b class="nc"><i>625</i>&nbsp;        checkCalculationNodesDirtiness();</b>
+<b class="nc"><i>626</i>&nbsp;        final double logLikelihood = posterior.calculateLogP();</b>
+<b class="nc"><i>627</i>&nbsp;        setEverythingDirty(false);</b>
+<b class="nc"><i>628</i>&nbsp;        acceptCalculationNodes();</b>
+<b class="nc"><i>629</i>&nbsp;        return logLikelihood;</b>
+<i>630</i>&nbsp;    }
+<i>631</i>&nbsp;
+<i>632</i>&nbsp;	public double robustlyCalcNonStochasticPosterior(Distribution posterior)  {
+<b class="nc"><i>633</i>&nbsp;        store(-1);</b>
+<b class="nc"><i>634</i>&nbsp;        setEverythingDirty(true);</b>
+<b class="nc"><i>635</i>&nbsp;        storeCalculationNodes();</b>
+<b class="nc"><i>636</i>&nbsp;        checkCalculationNodesDirtiness();</b>
+<b class="nc"><i>637</i>&nbsp;        final double logLikelihood = posterior.getNonStochasticLogP();</b>
+<b class="nc"><i>638</i>&nbsp;        setEverythingDirty(false);</b>
+<b class="nc"><i>639</i>&nbsp;        acceptCalculationNodes();</b>
+<b class="nc"><i>640</i>&nbsp;        return logLikelihood;</b>
+<i>641</i>&nbsp;	}
+<i>642</i>&nbsp;} // class State
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

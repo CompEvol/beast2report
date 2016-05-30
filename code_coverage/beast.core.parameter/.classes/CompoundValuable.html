@@ -1,0 +1,187 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: CompoundValuable</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.core.parameter</a> ]
+</div>
+
+<h1>Coverage Summary for Class: CompoundValuable (beast.core.parameter)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CompoundValuable</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 33)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.core.parameter;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.util.ArrayList;
+<i>4</i>&nbsp;import java.util.List;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;import beast.core.BEASTObject;
+<i>7</i>&nbsp;import beast.core.CalculationNode;
+<i>8</i>&nbsp;import beast.core.Description;
+<i>9</i>&nbsp;import beast.core.Function;
+<i>10</i>&nbsp;import beast.core.Input;
+<i>11</i>&nbsp;import beast.core.Input.Validate;
+<i>12</i>&nbsp;import beast.core.StateNode;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;@Description(&quot;Summarizes a set of valuables so that for example a rate matrix can be &quot; +
+<i>17</i>&nbsp;        &quot;specified that uses a parameter in various places in the matrix.&quot;)
+<b class="nc"><i>18</i>&nbsp;public class CompoundValuable extends CalculationNode implements Function {</b>
+<b class="nc"><i>19</i>&nbsp;    final public Input&lt;List&lt;BEASTObject&gt;&gt; m_values = new Input&lt;&gt;(&quot;var&quot;, &quot;reference to a valuable&quot;,</b>
+<i>20</i>&nbsp;            new ArrayList&lt;&gt;(), Validate.REQUIRED, Function.class);
+<i>21</i>&nbsp;
+<b class="nc"><i>22</i>&nbsp;    boolean m_bRecompute = true;</b>
+<i>23</i>&nbsp;    /**
+<i>24</i>&nbsp;     * contains values of the inputs *
+<i>25</i>&nbsp;     */
+<i>26</i>&nbsp;    double[] m_fValues;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;    @Override
+<i>29</i>&nbsp;    public void initAndValidate() {
+<i>30</i>&nbsp;        // determine dimension
+<b class="nc"><i>31</i>&nbsp;        int dimension = 0;</b>
+<b class="nc"><i>32</i>&nbsp;        for (BEASTObject beastObject : m_values.get()) {</b>
+<b class="nc"><i>33</i>&nbsp;            if (!(beastObject instanceof Function)) {</b>
+<b class="nc"><i>34</i>&nbsp;                throw new IllegalArgumentException(&quot;Input does not implement Valuable&quot;);</b>
+<i>35</i>&nbsp;            }
+<b class="nc"><i>36</i>&nbsp;            dimension += ((Function) beastObject).getDimension();</b>
+<b class="nc"><i>37</i>&nbsp;        }</b>
+<b class="nc"><i>38</i>&nbsp;        m_fValues = new double[dimension];</b>
+<i>39</i>&nbsp;    }
+<i>40</i>&nbsp;
+<i>41</i>&nbsp;    /**
+<i>42</i>&nbsp;     * Valuable implementation follows *
+<i>43</i>&nbsp;     */
+<i>44</i>&nbsp;    @Override
+<i>45</i>&nbsp;    public int getDimension() {
+<b class="nc"><i>46</i>&nbsp;        return m_fValues.length;</b>
+<i>47</i>&nbsp;    }
+<i>48</i>&nbsp;
+<i>49</i>&nbsp;    @Override
+<i>50</i>&nbsp;    public double getArrayValue() {
+<b class="nc"><i>51</i>&nbsp;        if (m_bRecompute) {</b>
+<b class="nc"><i>52</i>&nbsp;            recompute();</b>
+<i>53</i>&nbsp;        }
+<b class="nc"><i>54</i>&nbsp;        return m_fValues[0];</b>
+<i>55</i>&nbsp;    }
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;    @Override
+<i>58</i>&nbsp;    public double getArrayValue(int dim) {
+<b class="nc"><i>59</i>&nbsp;        if (m_bRecompute) {</b>
+<b class="nc"><i>60</i>&nbsp;            recompute();</b>
+<i>61</i>&nbsp;        }
+<b class="nc"><i>62</i>&nbsp;        return m_fValues[dim];</b>
+<i>63</i>&nbsp;    }
+<i>64</i>&nbsp;
+<i>65</i>&nbsp;    /**
+<i>66</i>&nbsp;     * collect values of the compounds into an array *
+<i>67</i>&nbsp;     */
+<i>68</i>&nbsp;    private void recompute() {
+<b class="nc"><i>69</i>&nbsp;        int k = 0;</b>
+<b class="nc"><i>70</i>&nbsp;        for (BEASTObject beastObject : m_values.get()) {</b>
+<b class="nc"><i>71</i>&nbsp;            Function valuable = (Function) beastObject;</b>
+<b class="nc"><i>72</i>&nbsp;            if (beastObject instanceof StateNode) {</b>
+<b class="nc"><i>73</i>&nbsp;                valuable = ((StateNode) beastObject).getCurrent();</b>
+<i>74</i>&nbsp;            }
+<b class="nc"><i>75</i>&nbsp;            int dimension = valuable.getDimension();</b>
+<b class="nc"><i>76</i>&nbsp;            for (int i = 0; i &lt; dimension; i++) {</b>
+<b class="nc"><i>77</i>&nbsp;                m_fValues[k++] = valuable.getArrayValue(i);</b>
+<i>78</i>&nbsp;            }
+<b class="nc"><i>79</i>&nbsp;        }</b>
+<b class="nc"><i>80</i>&nbsp;        m_bRecompute = false;</b>
+<i>81</i>&nbsp;    }
+<i>82</i>&nbsp;
+<i>83</i>&nbsp;    /**
+<i>84</i>&nbsp;     * CalculationNode methods *
+<i>85</i>&nbsp;     */
+<i>86</i>&nbsp;    @Override
+<i>87</i>&nbsp;    public void store() {
+<b class="nc"><i>88</i>&nbsp;        m_bRecompute = true;</b>
+<b class="nc"><i>89</i>&nbsp;        super.store();</b>
+<i>90</i>&nbsp;    }
+<i>91</i>&nbsp;
+<i>92</i>&nbsp;    @Override
+<i>93</i>&nbsp;    public void restore() {
+<b class="nc"><i>94</i>&nbsp;        m_bRecompute = true;</b>
+<b class="nc"><i>95</i>&nbsp;        super.restore();</b>
+<i>96</i>&nbsp;    }
+<i>97</i>&nbsp;
+<i>98</i>&nbsp;    @Override
+<i>99</i>&nbsp;    public boolean requiresRecalculation() {
+<b class="nc"><i>100</i>&nbsp;        m_bRecompute = true;</b>
+<b class="nc"><i>101</i>&nbsp;        return true;</b>
+<i>102</i>&nbsp;    }
+<i>103</i>&nbsp;
+<i>104</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

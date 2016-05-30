@@ -1,0 +1,194 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: EpochSubstitutionModel</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.substitutionmodel</a> ]
+</div>
+
+<h1>Coverage Summary for Class: EpochSubstitutionModel (beast.evolution.substitutionmodel)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EpochSubstitutionModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 42)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.substitutionmodel;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.util.ArrayList;
+<i>4</i>&nbsp;import java.util.List;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;import beast.core.Description;
+<i>7</i>&nbsp;import beast.core.Input;
+<i>8</i>&nbsp;import beast.core.Input.Validate;
+<i>9</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>10</i>&nbsp;import beast.evolution.datatype.DataType;
+<i>11</i>&nbsp;import beast.evolution.substitutionmodel.EigenDecomposition;
+<i>12</i>&nbsp;import beast.evolution.substitutionmodel.SubstitutionModel;
+<i>13</i>&nbsp;import beast.evolution.substitutionmodel.SubstitutionModel.Base;
+<i>14</i>&nbsp;import beast.evolution.tree.Node;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;@Description(&quot;A substitution model that can change at various threshold dates.&quot;)
+<b class="nc"><i>19</i>&nbsp;public class EpochSubstitutionModel extends Base {</b>
+<b class="nc"><i>20</i>&nbsp;	public Input&lt;List&lt;SubstitutionModel&gt;&gt; m_models = new Input&lt;List&lt;SubstitutionModel&gt;&gt;(&quot;model&quot;,&quot;substitution models that apply for certain time intervals&quot;, new ArrayList&lt;SubstitutionModel&gt;());</b>
+<b class="nc"><i>21</i>&nbsp;	public Input&lt;RealParameter&gt; m_epochDates = new Input&lt;RealParameter&gt;(&quot;epochDates&quot;,&quot;list of threshold dates. &quot; +</b>
+<i>22</i>&nbsp;			&quot;The list indicates the dates at which substitution models are switched.&quot;, Validate.REQUIRED);
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;	/** shadows m_models **/
+<i>25</i>&nbsp;	SubstitutionModel [] m_substitutionModels;
+<i>26</i>&nbsp;	
+<i>27</i>&nbsp;	@Override
+<i>28</i>&nbsp;	public void initAndValidate() {
+<b class="nc"><i>29</i>&nbsp;    	super.initAndValidate();</b>
+<b class="nc"><i>30</i>&nbsp;		m_substitutionModels = new SubstitutionModel[m_models.get().size()];</b>
+<b class="nc"><i>31</i>&nbsp;		int i = 0;</b>
+<b class="nc"><i>32</i>&nbsp;		for (SubstitutionModel model : m_models.get()) {</b>
+<b class="nc"><i>33</i>&nbsp;			m_substitutionModels[i++] = model;</b>
+<b class="nc"><i>34</i>&nbsp;		}</b>
+<i>35</i>&nbsp;		// ensure the number of epoch dates is one less than the nr of models
+<b class="nc"><i>36</i>&nbsp;		if (m_substitutionModels.length != m_epochDates.get().getDimension()+1) {</b>
+<b class="nc"><i>37</i>&nbsp;			throw new IllegalArgumentException(&quot;The number of epoch dates should be one less than the number of substitution models&quot;);</b>
+<i>38</i>&nbsp;		}
+<i>39</i>&nbsp;	}
+<i>40</i>&nbsp;	
+<i>41</i>&nbsp;	@Override
+<i>42</i>&nbsp;	public void getTransitionProbabilities(Node node, double fStartTime, double fEndTime, double fRate, double[] matrix) {
+<i>43</i>&nbsp;		/** threshold dates **/
+<b class="nc"><i>44</i>&nbsp;		Double [] fEpochDates = m_epochDates.get().getValues();</b>
+<i>45</i>&nbsp;		/** find start substitution model **/
+<b class="nc"><i>46</i>&nbsp;		int iStart = fEpochDates.length ;</b>
+<b class="nc"><i>47</i>&nbsp;		while (iStart &gt; 0 &amp;&amp; fEpochDates[iStart- 1] &gt; fStartTime) {</b>
+<b class="nc"><i>48</i>&nbsp;			iStart--;</b>
+<i>49</i>&nbsp;		}
+<b class="nc"><i>50</i>&nbsp;		if (iStart == 0 || fEpochDates[iStart- 1] &lt;= fEndTime) {</b>
+<i>51</i>&nbsp;			// start and end time fall in a single epoch
+<b class="nc"><i>52</i>&nbsp;			m_substitutionModels[iStart].getTransitionProbabilities(node, fStartTime, fEndTime, fRate, matrix);</b>
+<i>53</i>&nbsp;			return;
+<i>54</i>&nbsp;		}
+<i>55</i>&nbsp;		
+<b class="nc"><i>56</i>&nbsp;		double [] tmp = new double[matrix.length];</b>
+<b class="nc"><i>57</i>&nbsp;		m_substitutionModels[iStart].getTransitionProbabilities(node, fStartTime, fEpochDates[iStart-1], fRate, matrix);</b>
+<b class="nc"><i>58</i>&nbsp;		int iEnd = iStart - 1;</b>
+<b class="nc"><i>59</i>&nbsp;		int nStates = (int) (Math.sqrt(matrix.length)+0.1);</b>
+<i>60</i>&nbsp;		
+<b class="nc"><i>61</i>&nbsp;		while (iEnd &gt; 0 &amp;&amp; fEpochDates[iEnd- 1] &gt; fEndTime) {</b>
+<i>62</i>&nbsp;			// work through epochs that are completely overlapped by the time interval 
+<b class="nc"><i>63</i>&nbsp;			m_substitutionModels[iEnd].getTransitionProbabilities(node, fEpochDates[iEnd], fEpochDates[iEnd-1], fRate, tmp);</b>
+<i>64</i>&nbsp;			// matrix multiplication
+<b class="nc"><i>65</i>&nbsp;			multiply(matrix, tmp, nStates);</b>
+<b class="nc"><i>66</i>&nbsp;			iEnd--;</b>
+<i>67</i>&nbsp;		}
+<i>68</i>&nbsp;
+<i>69</i>&nbsp;		// process last bit of the branch
+<b class="nc"><i>70</i>&nbsp;		m_substitutionModels[iEnd].getTransitionProbabilities(node, fEpochDates[iEnd], fEndTime, fRate, tmp);</b>
+<i>71</i>&nbsp;		// matrix multiplication
+<b class="nc"><i>72</i>&nbsp;		multiply(matrix, tmp, nStates);</b>
+<i>73</i>&nbsp;	}
+<i>74</i>&nbsp;
+<i>75</i>&nbsp;	
+<i>76</i>&nbsp;	/** matrix multiplication A = A times B **/
+<i>77</i>&nbsp;	void multiply(double [] A, double [] B, int n){
+<b class="nc"><i>78</i>&nbsp;		double [] C = new double[A.length];</b>
+<i>79</i>&nbsp;
+<b class="nc"><i>80</i>&nbsp;		double[] Bcolj = new double[n];</b>
+<b class="nc"><i>81</i>&nbsp;	    for (int j = 0; j &lt; n; j++) {</b>
+<b class="nc"><i>82</i>&nbsp;	      for (int k = 0; k &lt; n; k++) {</b>
+<b class="nc"><i>83</i>&nbsp;	        Bcolj[k] = B[k*n+j];</b>
+<i>84</i>&nbsp;	      }
+<b class="nc"><i>85</i>&nbsp;	      for (int i = 0; i &lt; n; i++) {</b>
+<b class="nc"><i>86</i>&nbsp;	        double s = 0;</b>
+<b class="nc"><i>87</i>&nbsp;	        for (int k = 0; k &lt; n; k++) {</b>
+<b class="nc"><i>88</i>&nbsp;	          s += A[i * n +k]*Bcolj[k];</b>
+<i>89</i>&nbsp;	        }
+<b class="nc"><i>90</i>&nbsp;	        C[i*n+j] = s;</b>
+<i>91</i>&nbsp;	      }
+<i>92</i>&nbsp;	    }
+<b class="nc"><i>93</i>&nbsp;	    System.arraycopy(C, 0, A, 0, C.length);</b>
+<i>94</i>&nbsp;	}
+<i>95</i>&nbsp;		
+<i>96</i>&nbsp;		
+<i>97</i>&nbsp;	@Override
+<i>98</i>&nbsp;	public EigenDecomposition getEigenDecomposition(Node node) {
+<i>99</i>&nbsp;		// cannot return EigenDecomposition for this substitution model
+<b class="nc"><i>100</i>&nbsp;		return null;</b>
+<i>101</i>&nbsp;	}
+<i>102</i>&nbsp;
+<i>103</i>&nbsp;
+<i>104</i>&nbsp;	@Override
+<i>105</i>&nbsp;	public boolean canHandleDataType(DataType dataType) {
+<b class="nc"><i>106</i>&nbsp;		if (m_substitutionModels != null) {</b>
+<b class="nc"><i>107</i>&nbsp;			return m_substitutionModels[0].canHandleDataType(dataType);</b>
+<i>108</i>&nbsp;		}
+<b class="nc"><i>109</i>&nbsp;		return true;</b>
+<i>110</i>&nbsp;	}
+<i>111</i>&nbsp;} // class EpochSubstitutionModel
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

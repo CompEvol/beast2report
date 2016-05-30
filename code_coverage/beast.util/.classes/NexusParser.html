@@ -1,0 +1,1301 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: NexusParser</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.util</a> ]
+</div>
+
+<h1>Coverage Summary for Class: NexusParser (beast.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NexusParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    77.3%
+  </span>
+  <span class="absValue">
+    (17/ 22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    59.5%
+  </span>
+  <span class="absValue">
+    (388/ 652)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.util;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.io.BufferedReader;
+<i>4</i>&nbsp;import java.io.File;
+<i>5</i>&nbsp;import java.io.FileReader;
+<i>6</i>&nbsp;import java.io.IOException;
+<i>7</i>&nbsp;import java.io.Reader;
+<i>8</i>&nbsp;import java.util.ArrayList;
+<i>9</i>&nbsp;import java.util.Arrays;
+<i>10</i>&nbsp;import java.util.Collections;
+<i>11</i>&nbsp;import java.util.HashMap;
+<i>12</i>&nbsp;import java.util.HashSet;
+<i>13</i>&nbsp;import java.util.List;
+<i>14</i>&nbsp;import java.util.Map;
+<i>15</i>&nbsp;import java.util.Set;
+<i>16</i>&nbsp;import java.util.SortedSet;
+<i>17</i>&nbsp;import java.util.TreeSet;
+<i>18</i>&nbsp;import java.util.regex.Matcher;
+<i>19</i>&nbsp;import java.util.regex.Pattern;
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;import beast.core.BEASTInterface;
+<i>22</i>&nbsp;import beast.core.util.Log;
+<i>23</i>&nbsp;import beast.evolution.alignment.Alignment;
+<i>24</i>&nbsp;import beast.evolution.alignment.FilteredAlignment;
+<i>25</i>&nbsp;import beast.evolution.alignment.Sequence;
+<i>26</i>&nbsp;import beast.evolution.alignment.Taxon;
+<i>27</i>&nbsp;import beast.evolution.alignment.TaxonSet;
+<i>28</i>&nbsp;import beast.evolution.datatype.DataType;
+<i>29</i>&nbsp;import beast.evolution.datatype.StandardData;
+<i>30</i>&nbsp;import beast.evolution.datatype.UserDataType;
+<i>31</i>&nbsp;import beast.evolution.tree.TraitSet;
+<i>32</i>&nbsp;import beast.evolution.tree.Tree;
+<i>33</i>&nbsp;import beast.math.distributions.Exponential;
+<i>34</i>&nbsp;import beast.math.distributions.Gamma;
+<i>35</i>&nbsp;import beast.math.distributions.LogNormalDistributionModel;
+<i>36</i>&nbsp;import beast.math.distributions.MRCAPrior;
+<i>37</i>&nbsp;import beast.math.distributions.Normal;
+<i>38</i>&nbsp;import beast.math.distributions.ParametricDistribution;
+<i>39</i>&nbsp;import beast.math.distributions.Uniform;
+<i>40</i>&nbsp;
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;/**
+<i>43</i>&nbsp; * parses nexus file and grabs alignment and calibration from the file *
+<i>44</i>&nbsp; */
+<b class="fc"><i>45</i>&nbsp;public class NexusParser {</b>
+<i>46</i>&nbsp;    /**
+<i>47</i>&nbsp;     * keep track of nexus file line number, to report when the file does not parse *
+<i>48</i>&nbsp;     */
+<i>49</i>&nbsp;    int lineNr;
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;    /**
+<i>52</i>&nbsp;     * Beast II objects reconstructed from the file*
+<i>53</i>&nbsp;     */
+<i>54</i>&nbsp;    public Alignment m_alignment;
+<b class="fc"><i>55</i>&nbsp;    public List&lt;Alignment&gt; filteredAlignments = new ArrayList&lt;&gt;();</b>
+<i>56</i>&nbsp;    public TraitSet traitSet;
+<i>57</i>&nbsp;    public List&lt;MRCAPrior&gt; calibrations;
+<i>58</i>&nbsp;
+<i>59</i>&nbsp;    public List&lt;String&gt; taxa;
+<b class="fc"><i>60</i>&nbsp;    List&lt;Taxon&gt; taxonList = new ArrayList&lt;&gt;();</b>
+<i>61</i>&nbsp;    public List&lt;Tree&gt; trees;
+<i>62</i>&nbsp;
+<i>63</i>&nbsp;    static Set&lt;String&gt; g_sequenceIDs;
+<i>64</i>&nbsp;
+<b class="fc"><i>65</i>&nbsp;    public Map&lt;String, String&gt; translationMap = null;</b>
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;    static {
+<b class="fc"><i>68</i>&nbsp;        g_sequenceIDs = new HashSet&lt;&gt;();</b>
+<b class="fc"><i>69</i>&nbsp;    }</b>
+<i>70</i>&nbsp;
+<b class="fc"><i>71</i>&nbsp;    public List&lt;TaxonSet&gt; taxonsets = new ArrayList&lt;&gt;();</b>
+<i>72</i>&nbsp;
+<b class="fc"><i>73</i>&nbsp;    private List&lt;NexusParserListener&gt; listeners = new ArrayList&lt;&gt;();</b>
+<i>74</i>&nbsp;
+<i>75</i>&nbsp;    /**
+<i>76</i>&nbsp;     * Adds a listener for client classes that want to monitor progress of the parsing.
+<i>77</i>&nbsp;     * @param listener
+<i>78</i>&nbsp;     */
+<i>79</i>&nbsp;    public void addListener(final NexusParserListener listener) {
+<b class="nc"><i>80</i>&nbsp;        listeners.add(listener);</b>
+<b class="nc"><i>81</i>&nbsp;    }</b>
+<i>82</i>&nbsp;
+<i>83</i>&nbsp;    /**
+<i>84</i>&nbsp;     * Try to parse BEAST 2 objects from the given file
+<i>85</i>&nbsp;     *
+<i>86</i>&nbsp;     * @param file the file to parse.
+<i>87</i>&nbsp;     */
+<i>88</i>&nbsp;    public void parseFile(final File file) throws IOException {
+<b class="fc"><i>89</i>&nbsp;        final String fileName = file.getName().replaceAll(&quot;.*[\\/\\\\]&quot;, &quot;&quot;).replaceAll(&quot;\\..*&quot;, &quot;&quot;);</b>
+<i>90</i>&nbsp;
+<b class="fc"><i>91</i>&nbsp;        parseFile(fileName, new FileReader(file));</b>
+<b class="fc"><i>92</i>&nbsp;    }</b>
+<i>93</i>&nbsp;
+<i>94</i>&nbsp;    /**
+<i>95</i>&nbsp;     * try to reconstruct Beast II objects from the given reader
+<i>96</i>&nbsp;     *
+<i>97</i>&nbsp;     * @param id     a name to give to the parsed results
+<i>98</i>&nbsp;     * @param reader a reader to parse from
+<i>99</i>&nbsp;     * TODO: RRB: throws IOException now instead of just Exception. 
+<i>100</i>&nbsp;     * java.text.ParseException seems more appropriate, but requires keeping track of the position in the file, which is non-trivial 
+<i>101</i>&nbsp;     */
+<i>102</i>&nbsp;    public void parseFile(final String id, final Reader reader) throws IOException {
+<b class="fc"><i>103</i>&nbsp;        lineNr = 0;</b>
+<i>104</i>&nbsp;        final BufferedReader fin;
+<b class="fc"><i>105</i>&nbsp;        if (reader instanceof BufferedReader) {</b>
+<b class="nc"><i>106</i>&nbsp;            fin = (BufferedReader) reader;</b>
+<i>107</i>&nbsp;        } else {
+<b class="fc"><i>108</i>&nbsp;            fin = new BufferedReader(reader);</b>
+<i>109</i>&nbsp;        }
+<i>110</i>&nbsp;        try {
+<b class="fc"><i>111</i>&nbsp;            while (fin.ready()) {</b>
+<b class="fc"><i>112</i>&nbsp;                final String str = nextLine(fin);</b>
+<b class="fc"><i>113</i>&nbsp;                if (str == null) {</b>
+<b class="fc"><i>114</i>&nbsp;                    processSets();</b>
+<b class="fc"><i>115</i>&nbsp;                    return;</b>
+<i>116</i>&nbsp;                }
+<b class="fc"><i>117</i>&nbsp;                final String lower = str.toLowerCase();</b>
+<b class="fc"><i>118</i>&nbsp;                if (lower.matches(&quot;^\\s*begin\\s+data;\\s*$&quot;) || lower.matches(&quot;^\\s*begin\\s+characters;\\s*$&quot;)) {</b>
+<b class="fc"><i>119</i>&nbsp;                    m_alignment = parseDataBlock(fin);</b>
+<b class="fc"><i>120</i>&nbsp;                    m_alignment.setID(id);</b>
+<b class="fc"><i>121</i>&nbsp;                } else if (lower.matches(&quot;^\\s*begin\\s+calibration;\\s*$&quot;)) {</b>
+<b class="fc"><i>122</i>&nbsp;                    traitSet = parseCalibrationsBlock(fin);</b>
+<b class="fc"><i>123</i>&nbsp;                } else if (lower.matches(&quot;^\\s*begin\\s+assumptions;\\s*$&quot;) ||</b>
+<b class="fc"><i>124</i>&nbsp;                        lower.matches(&quot;^\\s*begin\\s+sets;\\s*$&quot;) ||</b>
+<b class="fc"><i>125</i>&nbsp;                        lower.matches(&quot;^\\s*begin\\s+mrbayes;\\s*$&quot;)) {</b>
+<b class="fc"><i>126</i>&nbsp;                    parseAssumptionsBlock(fin);</b>
+<b class="fc"><i>127</i>&nbsp;                } else if (lower.matches(&quot;^\\s*begin\\s+taxa;\\s*$&quot;)) {</b>
+<b class="fc"><i>128</i>&nbsp;                    parseTaxaBlock(fin);</b>
+<b class="fc"><i>129</i>&nbsp;                } else if (lower.matches(&quot;^\\s*begin\\s+trees;\\s*$&quot;)) {</b>
+<b class="fc"><i>130</i>&nbsp;                    parseTreesBlock(fin);</b>
+<i>131</i>&nbsp;                }
+<b class="fc"><i>132</i>&nbsp;            }</b>
+<b class="fc"><i>133</i>&nbsp;            processSets();</b>
+<b class="nc"><i>134</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>135</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>136</i>&nbsp;            throw new IOException(&quot;Around line &quot; + lineNr + &quot;\n&quot; + e.getMessage());</b>
+<b class="fc"><i>137</i>&nbsp;        }</b>
+<b class="fc"><i>138</i>&nbsp;    } // parseFile</b>
+<i>139</i>&nbsp;
+<i>140</i>&nbsp;	private void parseTreesBlock(final BufferedReader fin) throws IOException {
+<b class="fc"><i>141</i>&nbsp;        trees = new ArrayList&lt;&gt;();</b>
+<i>142</i>&nbsp;        // read to first non-empty line within trees block
+<b class="fc"><i>143</i>&nbsp;        String str = fin.readLine().trim();</b>
+<b class="fc"><i>144</i>&nbsp;        while (str.equals(&quot;&quot;)) {</b>
+<b class="nc"><i>145</i>&nbsp;            str = fin.readLine().trim();</b>
+<i>146</i>&nbsp;        }
+<i>147</i>&nbsp;
+<b class="fc"><i>148</i>&nbsp;        int origin = -1;</b>
+<i>149</i>&nbsp;
+<i>150</i>&nbsp;        // if first non-empty line is &quot;translate&quot; then parse translate block
+<b class="fc"><i>151</i>&nbsp;        if (str.toLowerCase().contains(&quot;translate&quot;)) {</b>
+<b class="fc"><i>152</i>&nbsp;            translationMap = parseTranslateBlock(fin);</b>
+<b class="fc"><i>153</i>&nbsp;            origin = getIndexedTranslationMapOrigin(translationMap);</b>
+<b class="fc"><i>154</i>&nbsp;            if (origin != -1) {</b>
+<b class="fc"><i>155</i>&nbsp;                taxa = getIndexedTranslationMap(translationMap, origin);</b>
+<i>156</i>&nbsp;            }
+<i>157</i>&nbsp;        }
+<i>158</i>&nbsp;
+<i>159</i>&nbsp;        // read trees
+<b class="fc"><i>160</i>&nbsp;        while (str != null) {</b>
+<b class="fc"><i>161</i>&nbsp;            if (str.toLowerCase().startsWith(&quot;tree &quot;)) {</b>
+<b class="fc"><i>162</i>&nbsp;                final int i = str.indexOf(&#39;(&#39;);</b>
+<b class="fc"><i>163</i>&nbsp;                if (i &gt; 0) {</b>
+<b class="fc"><i>164</i>&nbsp;                    str = str.substring(i);</b>
+<i>165</i>&nbsp;                }
+<i>166</i>&nbsp;                TreeParser treeParser;
+<i>167</i>&nbsp;
+<b class="fc"><i>168</i>&nbsp;                if (origin != -1) {</b>
+<b class="fc"><i>169</i>&nbsp;                    treeParser = new TreeParser(taxa, str, origin, false);</b>
+<i>170</i>&nbsp;                } else {
+<i>171</i>&nbsp;                    try {
+<b class="nc"><i>172</i>&nbsp;                        treeParser = new TreeParser(taxa, str, 0, false);</b>
+<b class="nc"><i>173</i>&nbsp;                    } catch (ArrayIndexOutOfBoundsException e) {</b>
+<b class="nc"><i>174</i>&nbsp;                        treeParser = new TreeParser(taxa, str, 1, false);</b>
+<b class="nc"><i>175</i>&nbsp;                    }</b>
+<i>176</i>&nbsp;                }
+<i>177</i>&nbsp;//                catch (NullPointerException e) {
+<i>178</i>&nbsp;//                    treeParser = new TreeParser(m_taxa, str, 1);
+<i>179</i>&nbsp;//                }
+<i>180</i>&nbsp;
+<b class="fc"><i>181</i>&nbsp;                for (final NexusParserListener listener : listeners) {</b>
+<b class="nc"><i>182</i>&nbsp;                    listener.treeParsed(trees.size(), treeParser);</b>
+<b class="nc"><i>183</i>&nbsp;                }</b>
+<i>184</i>&nbsp;
+<b class="fc"><i>185</i>&nbsp;                if (translationMap != null) treeParser.translateLeafIds(translationMap);</b>
+<i>186</i>&nbsp;
+<b class="fc"><i>187</i>&nbsp;                trees.add(treeParser);</b>
+<i>188</i>&nbsp;
+<i>189</i>&nbsp;//				Node tree = treeParser.getRoot();
+<i>190</i>&nbsp;//				tree.sort();
+<i>191</i>&nbsp;//				tree.labelInternalNodes(nrOfLabels);
+<i>192</i>&nbsp;            }
+<b class="fc"><i>193</i>&nbsp;            str = fin.readLine();</b>
+<b class="fc"><i>194</i>&nbsp;            if (str != null) str = str.trim();</b>
+<i>195</i>&nbsp;        }
+<b class="fc"><i>196</i>&nbsp;    }</b>
+<i>197</i>&nbsp;
+<i>198</i>&nbsp;    private List&lt;String&gt; getIndexedTranslationMap(final Map&lt;String, String&gt; translationMap, final int origin) {
+<i>199</i>&nbsp;
+<b class="fc"><i>200</i>&nbsp;        Log.info.println(&quot;translation map size = &quot; + translationMap.size());</b>
+<i>201</i>&nbsp;
+<b class="fc"><i>202</i>&nbsp;        final String[] taxa = new String[translationMap.size()];</b>
+<i>203</i>&nbsp;
+<b class="fc"><i>204</i>&nbsp;        for (final String key : translationMap.keySet()) {</b>
+<b class="fc"><i>205</i>&nbsp;            taxa[Integer.parseInt(key) - origin] = translationMap.get(key);</b>
+<b class="fc"><i>206</i>&nbsp;        }</b>
+<b class="fc"><i>207</i>&nbsp;        return Arrays.asList(taxa);</b>
+<i>208</i>&nbsp;    }
+<i>209</i>&nbsp;
+<i>210</i>&nbsp;    /**
+<i>211</i>&nbsp;     * @param translationMap
+<i>212</i>&nbsp;     * @return minimum key value if keys are a contiguous set of integers starting from zero or one, -1 otherwise
+<i>213</i>&nbsp;     */
+<i>214</i>&nbsp;    private int getIndexedTranslationMapOrigin(final Map&lt;String, String&gt; translationMap) {
+<i>215</i>&nbsp;
+<b class="fc"><i>216</i>&nbsp;        final SortedSet&lt;Integer&gt; indices = new TreeSet&lt;&gt;();</b>
+<i>217</i>&nbsp;
+<b class="fc"><i>218</i>&nbsp;        int count = 0;</b>
+<b class="fc"><i>219</i>&nbsp;        for (final String key : translationMap.keySet()) {</b>
+<b class="fc"><i>220</i>&nbsp;            final int index = Integer.parseInt(key);</b>
+<b class="fc"><i>221</i>&nbsp;            indices.add(index);</b>
+<b class="fc"><i>222</i>&nbsp;            count += 1;</b>
+<b class="fc"><i>223</i>&nbsp;        }</b>
+<b class="fc"><i>224</i>&nbsp;        if ((indices.last() - indices.first() == count - 1) &amp;&amp; (indices.first() == 0 || indices.first() == 1)) {</b>
+<b class="fc"><i>225</i>&nbsp;            return indices.first();</b>
+<i>226</i>&nbsp;        }
+<b class="nc"><i>227</i>&nbsp;        return -1;</b>
+<i>228</i>&nbsp;    }
+<i>229</i>&nbsp;
+<i>230</i>&nbsp;    /**
+<i>231</i>&nbsp;     * @param reader a reader
+<i>232</i>&nbsp;     * @return a map of taxa translations, keys are generally integer node number starting from 1
+<i>233</i>&nbsp;     *         whereas values are generally descriptive strings.
+<i>234</i>&nbsp;     * @throws IOException
+<i>235</i>&nbsp;     */
+<i>236</i>&nbsp;    private Map&lt;String, String&gt; parseTranslateBlock(final BufferedReader reader) throws IOException {
+<i>237</i>&nbsp;
+<b class="fc"><i>238</i>&nbsp;        final Map&lt;String, String&gt; translationMap = new HashMap&lt;&gt;();</b>
+<i>239</i>&nbsp;
+<b class="fc"><i>240</i>&nbsp;        String line = reader.readLine();</b>
+<b class="fc"><i>241</i>&nbsp;        final StringBuilder translateBlock = new StringBuilder();</b>
+<b class="fc"><i>242</i>&nbsp;        while (line != null &amp;&amp; !line.trim().toLowerCase().equals(&quot;;&quot;)) {</b>
+<b class="fc"><i>243</i>&nbsp;            translateBlock.append(line.trim());</b>
+<b class="fc"><i>244</i>&nbsp;            line = reader.readLine();</b>
+<i>245</i>&nbsp;        }
+<b class="fc"><i>246</i>&nbsp;        final String[] taxaTranslations = translateBlock.toString().split(&quot;,&quot;);</b>
+<b class="fc"><i>247</i>&nbsp;        for (final String taxaTranslation : taxaTranslations) {</b>
+<b class="fc"><i>248</i>&nbsp;            final String[] translation = taxaTranslation.split(&quot;[\t ]+&quot;);</b>
+<b class="fc"><i>249</i>&nbsp;            if (translation.length == 2) {</b>
+<b class="fc"><i>250</i>&nbsp;                translationMap.put(translation[0], translation[1]);</b>
+<i>251</i>&nbsp;//                Log.info.println(translation[0] + &quot; -&gt; &quot; + translation[1]);
+<i>252</i>&nbsp;            } else {
+<b class="nc"><i>253</i>&nbsp;                Log.warning.println(&quot;Ignoring translation:&quot; + Arrays.toString(translation));</b>
+<i>254</i>&nbsp;            }
+<i>255</i>&nbsp;        }
+<b class="fc"><i>256</i>&nbsp;        return translationMap;</b>
+<i>257</i>&nbsp;    }
+<i>258</i>&nbsp;
+<i>259</i>&nbsp;    private void parseTaxaBlock(final BufferedReader fin) throws IOException {
+<b class="fc"><i>260</i>&nbsp;        taxa = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>261</i>&nbsp;        int expectedTaxonCount = -1;</b>
+<i>262</i>&nbsp;        String str;
+<i>263</i>&nbsp;        do {
+<b class="fc"><i>264</i>&nbsp;            str = nextLine(fin);</b>
+<b class="fc"><i>265</i>&nbsp;            if (str.toLowerCase().matches(&quot;\\s*dimensions\\s.*&quot;)) {</b>
+<b class="fc"><i>266</i>&nbsp;                str = str.substring(str.toLowerCase().indexOf(&quot;ntax=&quot;) + 5);</b>
+<b class="fc"><i>267</i>&nbsp;                str = str.replaceAll(&quot;;&quot;, &quot;&quot;);</b>
+<b class="fc"><i>268</i>&nbsp;                expectedTaxonCount = Integer.parseInt(str.trim());</b>
+<b class="fc"><i>269</i>&nbsp;            } else if (str.toLowerCase().trim().equals(&quot;taxlabels&quot;)) {</b>
+<i>270</i>&nbsp;                do {
+<b class="fc"><i>271</i>&nbsp;                    str = nextLine(fin);</b>
+<b class="fc"><i>272</i>&nbsp;                    str = str.replaceAll(&quot;;&quot;, &quot;&quot;);</b>
+<b class="fc"><i>273</i>&nbsp;                    str = str.trim();</b>
+<b class="fc"><i>274</i>&nbsp;                    if (str.length() &gt; 0 &amp;&amp; !str.toLowerCase().equals(&quot;end&quot;)) {</b>
+<b class="fc"><i>275</i>&nbsp;                    	String [] strs = str.split(&quot;\\s+&quot;);</b>
+<b class="fc"><i>276</i>&nbsp;                    	for (int i = 0; i &lt; strs.length; i++) {</b>
+<b class="fc"><i>277</i>&nbsp;                        	String taxon = strs[i];</b>
+<b class="fc"><i>278</i>&nbsp;                            if (taxon.charAt(0) == &#39;\&#39;&#39; || taxon.charAt(0) == &#39;\&quot;&#39;) {</b>
+<b class="nc"><i>279</i>&nbsp;                            	while (i &lt; strs.length &amp;&amp; taxon.charAt(0) != taxon.charAt(taxon.length() - 1)) {</b>
+<b class="nc"><i>280</i>&nbsp;                            		i++;</b>
+<b class="nc"><i>281</i>&nbsp;                            		if (i == strs.length) {</b>
+<b class="nc"><i>282</i>&nbsp;                            			throw new IOException(&quot;Unclosed quote starting with &quot; + taxon);</b>
+<i>283</i>&nbsp;                            		}
+<b class="nc"><i>284</i>&nbsp;                            		taxon += &quot; &quot; + strs[i];</b>
+<i>285</i>&nbsp;                            	}
+<b class="nc"><i>286</i>&nbsp;                            	taxon = taxon.substring(1, taxon.length() - 1);</b>
+<i>287</i>&nbsp;                            }
+<b class="fc"><i>288</i>&nbsp;                            taxa.add(taxon);</b>
+<b class="fc"><i>289</i>&nbsp;                            taxonList.add(new Taxon(taxon));</b>
+<i>290</i>&nbsp;                    	}
+<i>291</i>&nbsp;                    }
+<b class="fc"><i>292</i>&nbsp;                } while (!str.toLowerCase().replaceAll(&quot;;&quot;, &quot;&quot;).equals(&quot;end&quot;));</b>
+<i>293</i>&nbsp;            }
+<b class="fc"><i>294</i>&nbsp;        } while (!str.toLowerCase().replaceAll(&quot;;&quot;, &quot;&quot;).equals(&quot;end&quot;));</b>
+<b class="fc"><i>295</i>&nbsp;        if (expectedTaxonCount &gt;= 0 &amp;&amp; taxa.size() != expectedTaxonCount) {</b>
+<b class="nc"><i>296</i>&nbsp;            throw new IOException(&quot;Number of taxa (&quot; + taxa.size() + &quot;) is not equal to &#39;dimension&#39; &quot; +</b>
+<i>297</i>&nbsp;            		&quot;field (&quot; + expectedTaxonCount + &quot;) specified in &#39;taxa&#39; block&quot;);
+<i>298</i>&nbsp;        }
+<b class="fc"><i>299</i>&nbsp;    }</b>
+<i>300</i>&nbsp;
+<i>301</i>&nbsp;    /**
+<i>302</i>&nbsp;     * parse calibrations block and create TraitSet *
+<i>303</i>&nbsp;     */
+<i>304</i>&nbsp;    TraitSet parseCalibrationsBlock(final BufferedReader fin) throws IOException {
+<b class="fc"><i>305</i>&nbsp;        final TraitSet traitSet = new TraitSet();</b>
+<b class="fc"><i>306</i>&nbsp;        traitSet.traitNameInput.setValue(&quot;date&quot;, traitSet);</b>
+<i>307</i>&nbsp;        String str;
+<i>308</i>&nbsp;        do {
+<b class="fc"><i>309</i>&nbsp;            str = nextLine(fin);</b>
+<b class="fc"><i>310</i>&nbsp;            if (str.toLowerCase().contains(&quot;options&quot;)) {</b>
+<b class="fc"><i>311</i>&nbsp;                String scale = getAttValue(&quot;scale&quot;, str);</b>
+<b class="fc"><i>312</i>&nbsp;                if (scale.endsWith(&quot;s&quot;)) {</b>
+<b class="fc"><i>313</i>&nbsp;                    scale = scale.substring(0, scale.length() - 1);</b>
+<i>314</i>&nbsp;                }
+<b class="fc"><i>315</i>&nbsp;                traitSet.unitsInput.setValue(scale, traitSet);</b>
+<i>316</i>&nbsp;            }
+<b class="fc"><i>317</i>&nbsp;        } while (str.toLowerCase().contains(&quot;tipcalibration&quot;));</b>
+<i>318</i>&nbsp;
+<b class="fc"><i>319</i>&nbsp;        String text = &quot;&quot;;</b>
+<i>320</i>&nbsp;        while (true) {
+<b class="fc"><i>321</i>&nbsp;            str = nextLine(fin);</b>
+<b class="fc"><i>322</i>&nbsp;            if (str.contains(&quot;;&quot;)) {</b>
+<b class="fc"><i>323</i>&nbsp;                break;</b>
+<i>324</i>&nbsp;            }
+<b class="fc"><i>325</i>&nbsp;            text += str;</b>
+<i>326</i>&nbsp;        }
+<b class="fc"><i>327</i>&nbsp;        final String[] strs = text.split(&quot;,&quot;);</b>
+<b class="fc"><i>328</i>&nbsp;        text = &quot;&quot;;</b>
+<b class="fc"><i>329</i>&nbsp;        for (final String str2 : strs) {</b>
+<b class="fc"><i>330</i>&nbsp;            final String[] parts = str2.split(&quot;:&quot;);</b>
+<b class="fc"><i>331</i>&nbsp;            final String date = parts[0].replaceAll(&quot;.*=\\s*&quot;, &quot;&quot;);</b>
+<b class="fc"><i>332</i>&nbsp;            final String[] taxa = parts[1].split(&quot;\\s+&quot;);</b>
+<b class="fc"><i>333</i>&nbsp;            for (final String taxon : taxa) {</b>
+<b class="fc"><i>334</i>&nbsp;                if (!taxon.matches(&quot;^\\s*$&quot;)) {</b>
+<b class="fc"><i>335</i>&nbsp;                    text += taxon + &quot;=&quot; + date + &quot;,\n&quot;;</b>
+<i>336</i>&nbsp;                }
+<i>337</i>&nbsp;            }
+<i>338</i>&nbsp;        }
+<b class="fc"><i>339</i>&nbsp;        text = text.substring(0, text.length() - 2);</b>
+<b class="fc"><i>340</i>&nbsp;        traitSet.traitsInput.setValue(text, traitSet);</b>
+<b class="fc"><i>341</i>&nbsp;        final TaxonSet taxa = new TaxonSet();</b>
+<b class="fc"><i>342</i>&nbsp;        taxa.initByName(&quot;alignment&quot;, m_alignment);</b>
+<b class="fc"><i>343</i>&nbsp;        traitSet.taxaInput.setValue(taxa, traitSet);</b>
+<i>344</i>&nbsp;
+<b class="fc"><i>345</i>&nbsp;        traitSet.initAndValidate();</b>
+<b class="fc"><i>346</i>&nbsp;        return traitSet;</b>
+<i>347</i>&nbsp;    } // parseCalibrations
+<i>348</i>&nbsp;
+<i>349</i>&nbsp;
+<i>350</i>&nbsp;    /**
+<i>351</i>&nbsp;     * parse data block and create Alignment *
+<i>352</i>&nbsp;     */
+<i>353</i>&nbsp;    public Alignment parseDataBlock(final BufferedReader fin) throws IOException {
+<i>354</i>&nbsp;
+<b class="fc"><i>355</i>&nbsp;        final Alignment alignment = new Alignment();</b>
+<i>356</i>&nbsp;
+<i>357</i>&nbsp;        String str;
+<b class="fc"><i>358</i>&nbsp;        int taxonCount = -1;</b>
+<b class="fc"><i>359</i>&nbsp;        int charCount = -1;</b>
+<b class="fc"><i>360</i>&nbsp;        int totalCount = 4;</b>
+<b class="fc"><i>361</i>&nbsp;        String missing = &quot;?&quot;;</b>
+<b class="fc"><i>362</i>&nbsp;        String gap = &quot;-&quot;;</b>
+<i>363</i>&nbsp;        // indicates character matches the one in the first sequence
+<b class="fc"><i>364</i>&nbsp;        String matchChar = null;</b>
+<i>365</i>&nbsp;        do {
+<b class="fc"><i>366</i>&nbsp;            str = nextLine(fin);</b>
+<i>367</i>&nbsp;
+<i>368</i>&nbsp;            //dimensions ntax=12 nchar=898;
+<b class="fc"><i>369</i>&nbsp;            if (str.toLowerCase().contains(&quot;dimensions&quot;)) {</b>
+<b class="fc"><i>370</i>&nbsp;                while (str.indexOf(&#39;;&#39;) &lt; 0) {</b>
+<b class="nc"><i>371</i>&nbsp;                    str += nextLine(fin);</b>
+<i>372</i>&nbsp;                }
+<b class="fc"><i>373</i>&nbsp;                str = str.replace(&quot;;&quot;, &quot; &quot;);</b>
+<i>374</i>&nbsp;
+<b class="fc"><i>375</i>&nbsp;                final String character = getAttValue(&quot;nchar&quot;, str);</b>
+<b class="fc"><i>376</i>&nbsp;                if (character == null) {</b>
+<b class="nc"><i>377</i>&nbsp;                    throw new IOException(&quot;nchar attribute expected (e.g. &#39;dimensions char=123&#39;) expected, not &quot; + str);</b>
+<i>378</i>&nbsp;                }
+<b class="fc"><i>379</i>&nbsp;                charCount = Integer.parseInt(character);</b>
+<b class="fc"><i>380</i>&nbsp;                final String taxa = getAttValue(&quot;ntax&quot;, str);</b>
+<b class="fc"><i>381</i>&nbsp;                if (taxa != null) {</b>
+<b class="fc"><i>382</i>&nbsp;                    taxonCount = Integer.parseInt(taxa);</b>
+<i>383</i>&nbsp;                }
+<b class="fc"><i>384</i>&nbsp;            } else if (str.toLowerCase().contains(&quot;format&quot;)) {</b>
+<b class="fc"><i>385</i>&nbsp;                while (str.indexOf(&#39;;&#39;) &lt; 0) {</b>
+<b class="fc"><i>386</i>&nbsp;                    str += nextLine(fin);</b>
+<i>387</i>&nbsp;                }
+<b class="fc"><i>388</i>&nbsp;                str = str.replace(&quot;;&quot;, &quot; &quot;);</b>
+<i>389</i>&nbsp;
+<i>390</i>&nbsp;                //format datatype=dna interleave=no gap=-;
+<b class="fc"><i>391</i>&nbsp;                final String dataTypeName = getAttValue(&quot;datatype&quot;, str);</b>
+<i>392</i>&nbsp;                final String symbols;
+<b class="fc"><i>393</i>&nbsp;                if (getAttValue(&quot;symbols&quot;, str) == null) {</b>
+<b class="fc"><i>394</i>&nbsp;                    symbols = getAttValue(&quot;symbols&quot;, str);</b>
+<i>395</i>&nbsp;                } else {
+<b class="fc"><i>396</i>&nbsp;                    symbols = getAttValue(&quot;symbols&quot;, str).replaceAll(&quot;\\s&quot;, &quot;&quot;);</b>
+<i>397</i>&nbsp;                }
+<b class="fc"><i>398</i>&nbsp;                if (dataTypeName == null) {</b>
+<b class="fc"><i>399</i>&nbsp;                    Log.warning.println(&quot;Warning: expected datatype (e.g. something like &#39;format datatype=dna;&#39;) not &#39;&quot; + str + &quot;&#39; Assuming integer dataType&quot;);</b>
+<b class="fc"><i>400</i>&nbsp;                    alignment.dataTypeInput.setValue(&quot;integer&quot;, alignment);</b>
+<b class="fc"><i>401</i>&nbsp;                    if (symbols != null &amp;&amp; (symbols.equals(&quot;01&quot;) || symbols.equals(&quot;012&quot;))) {</b>
+<b class="fc"><i>402</i>&nbsp;                        totalCount = symbols.length();</b>
+<i>403</i>&nbsp;                    }
+<b class="fc"><i>404</i>&nbsp;                } else if (dataTypeName.toLowerCase().equals(&quot;rna&quot;) || dataTypeName.toLowerCase().equals(&quot;dna&quot;) || dataTypeName.toLowerCase().equals(&quot;nucleotide&quot;)) {</b>
+<b class="fc"><i>405</i>&nbsp;                    alignment.dataTypeInput.setValue(&quot;nucleotide&quot;, alignment);</b>
+<b class="fc"><i>406</i>&nbsp;                    totalCount = 4;</b>
+<b class="fc"><i>407</i>&nbsp;                } else if (dataTypeName.toLowerCase().equals(&quot;aminoacid&quot;) || dataTypeName.toLowerCase().equals(&quot;protein&quot;)) {</b>
+<b class="fc"><i>408</i>&nbsp;                    alignment.dataTypeInput.setValue(&quot;aminoacid&quot;, alignment);</b>
+<b class="fc"><i>409</i>&nbsp;                    totalCount = 20;</b>
+<b class="fc"><i>410</i>&nbsp;                } else if (dataTypeName.toLowerCase().equals(&quot;standard&quot;)) {</b>
+<b class="fc"><i>411</i>&nbsp;                    alignment.dataTypeInput.setValue(&quot;standard&quot;, alignment);</b>
+<b class="fc"><i>412</i>&nbsp;                    totalCount = symbols.length();</b>
+<i>413</i>&nbsp;//                    if (symbols == null || symbols.equals(&quot;01&quot;)) {
+<i>414</i>&nbsp;//                        alignment.dataTypeInput.setValue(&quot;binary&quot;, alignment);
+<i>415</i>&nbsp;//                        totalCount = 2;
+<i>416</i>&nbsp;//                    }  else {
+<i>417</i>&nbsp;//                        alignment.dataTypeInput.setValue(&quot;standard&quot;, alignment);
+<i>418</i>&nbsp;//                        totalCount = symbols.length();
+<i>419</i>&nbsp;//                    }
+<b class="nc"><i>420</i>&nbsp;                } else if (dataTypeName.toLowerCase().equals(&quot;binary&quot;)) {</b>
+<b class="nc"><i>421</i>&nbsp;                    alignment.dataTypeInput.setValue(&quot;binary&quot;, alignment);</b>
+<b class="nc"><i>422</i>&nbsp;                    totalCount = 2;</b>
+<i>423</i>&nbsp;                } else {
+<b class="nc"><i>424</i>&nbsp;                    alignment.dataTypeInput.setValue(&quot;integer&quot;, alignment);</b>
+<b class="nc"><i>425</i>&nbsp;                    if (symbols != null &amp;&amp; (symbols.equals(&quot;01&quot;) || symbols.equals(&quot;012&quot;))) {</b>
+<b class="nc"><i>426</i>&nbsp;                        totalCount = symbols.length();</b>
+<i>427</i>&nbsp;                    }
+<i>428</i>&nbsp;                }
+<b class="fc"><i>429</i>&nbsp;                final String missingChar = getAttValue(&quot;missing&quot;, str);</b>
+<b class="fc"><i>430</i>&nbsp;                if (missingChar != null) {</b>
+<b class="fc"><i>431</i>&nbsp;                    missing = missingChar;</b>
+<i>432</i>&nbsp;                }
+<b class="fc"><i>433</i>&nbsp;                final String gapChar = getAttValue(&quot;gap&quot;, str);</b>
+<b class="fc"><i>434</i>&nbsp;                if (gapChar != null) {</b>
+<b class="fc"><i>435</i>&nbsp;                    gap = gapChar;</b>
+<i>436</i>&nbsp;                }
+<b class="fc"><i>437</i>&nbsp;                matchChar = getAttValue(&quot;matchchar&quot;, str);</b>
+<i>438</i>&nbsp;            }
+<b class="fc"><i>439</i>&nbsp;        } while (!str.trim().toLowerCase().startsWith(&quot;matrix&quot;) &amp;&amp; !str.toLowerCase().contains(&quot;charstatelabels&quot;));</b>
+<i>440</i>&nbsp;
+<b class="fc"><i>441</i>&nbsp;        if (alignment.dataTypeInput.get().equals(&quot;standard&quot;)) {</b>
+<b class="fc"><i>442</i>&nbsp;        	StandardData type = new StandardData();</b>
+<b class="fc"><i>443</i>&nbsp;            type.setInputValue(&quot;nrOfStates&quot;, totalCount);</b>
+<b class="fc"><i>444</i>&nbsp;        	type.initAndValidate();</b>
+<b class="fc"><i>445</i>&nbsp;            alignment.setInputValue(&quot;userDataType&quot;, type);</b>
+<i>446</i>&nbsp;        }
+<i>447</i>&nbsp;
+<i>448</i>&nbsp;        //reading CHARSTATELABELS block
+<b class="fc"><i>449</i>&nbsp;        if (str.toLowerCase().contains(&quot;charstatelabels&quot;)) {</b>
+<b class="nc"><i>450</i>&nbsp;            if (!alignment.dataTypeInput.get().equals(&quot;standard&quot;)) {</b>
+<b class="nc"><i>451</i>&nbsp;                throw new IllegalArgumentException(&quot;If CHARSTATELABELS block is specified then DATATYPE has to be Standard&quot;);</b>
+<i>452</i>&nbsp;            }
+<b class="nc"><i>453</i>&nbsp;            StandardData standardDataType = (StandardData)alignment.userDataTypeInput.get();</b>
+<b class="nc"><i>454</i>&nbsp;            int[] maxNumberOfStates = new int[] {0};</b>
+<b class="nc"><i>455</i>&nbsp;            ArrayList&lt;String&gt; tokens = readInCharstatelablesTokens(fin);</b>
+<b class="nc"><i>456</i>&nbsp;            ArrayList&lt;UserDataType&gt; charDescriptions = processCharstatelabelsTokens(tokens, maxNumberOfStates);</b>
+<i>457</i>&nbsp;
+<i>458</i>&nbsp;//            while (true) {
+<i>459</i>&nbsp;//                str = nextLine(fin);
+<i>460</i>&nbsp;//                if (str.contains(&quot;;&quot;)) {
+<i>461</i>&nbsp;//                    break;
+<i>462</i>&nbsp;//                }
+<i>463</i>&nbsp;//                String[] strSplit = str.split(&quot;/&quot;);
+<i>464</i>&nbsp;//                ArrayList&lt;String&gt; states = new ArrayList&lt;&gt;();
+<i>465</i>&nbsp;//
+<i>466</i>&nbsp;//                if (strSplit.length &lt; 2) {
+<i>467</i>&nbsp;//                    charDescriptions.add(new UserDataType(strSplit[0], states));
+<i>468</i>&nbsp;//                    continue;
+<i>469</i>&nbsp;//                }
+<i>470</i>&nbsp;//
+<i>471</i>&nbsp;//                String stateStr = strSplit[1];
+<i>472</i>&nbsp;//
+<i>473</i>&nbsp;//                //add a comma at the end of the string if the last non-whitespace character is not a comma or all the
+<i>474</i>&nbsp;//                // characters are whitespaces in the string. Also remove whitespaces at the end of the string.
+<i>475</i>&nbsp;//                for (int i=stateStr.length()-1; i&gt;=0; i--) {
+<i>476</i>&nbsp;//                    if (!Character.isWhitespace(stateStr.charAt(i))) {
+<i>477</i>&nbsp;//                        if (stateStr.charAt(i-1) != &#39;,&#39;) {
+<i>478</i>&nbsp;//                            stateStr = stateStr.substring(0, i)+&quot;,&quot;;
+<i>479</i>&nbsp;//                            break;
+<i>480</i>&nbsp;//                        }
+<i>481</i>&nbsp;//                    }
+<i>482</i>&nbsp;//                    if (i==0) {
+<i>483</i>&nbsp;//                        stateStr = stateStr.substring(0, i)+&quot;,&quot;;
+<i>484</i>&nbsp;//                    }
+<i>485</i>&nbsp;//                }
+<i>486</i>&nbsp;//                if (stateStr.isEmpty()) {
+<i>487</i>&nbsp;//                    stateStr = stateStr+&quot;,&quot;;
+<i>488</i>&nbsp;//                }
+<i>489</i>&nbsp;//
+<i>490</i>&nbsp;//                final int WAITING=0, WORD=1, PHRASE_IN_QUOTES=2;
+<i>491</i>&nbsp;//                int mode =WAITING; //0 waiting for non-space letter, 1 reading a word; 2 reading a phrase in quotes
+<i>492</i>&nbsp;//                int begin =0, end;
+<i>493</i>&nbsp;//
+<i>494</i>&nbsp;//                for (int i=0; i&lt; stateStr.length(); i++) {
+<i>495</i>&nbsp;//                    switch (mode) {
+<i>496</i>&nbsp;//                        case WAITING:
+<i>497</i>&nbsp;//                            while (stateStr.charAt(i) == &#39; &#39;) {
+<i>498</i>&nbsp;//                                i++;
+<i>499</i>&nbsp;//                            }
+<i>500</i>&nbsp;//                            mode = stateStr.charAt(i) == &#39;\&#39;&#39; ? PHRASE_IN_QUOTES : WORD;
+<i>501</i>&nbsp;//                            begin = i;
+<i>502</i>&nbsp;//                            break;
+<i>503</i>&nbsp;//                        case WORD:
+<i>504</i>&nbsp;//                            end = stateStr.indexOf(&quot; &quot;, begin) != -1 ? stateStr.indexOf(&quot; &quot;, begin) : stateStr.indexOf(&quot;,&quot;, begin);
+<i>505</i>&nbsp;//                            states.add(stateStr.substring(begin, end));
+<i>506</i>&nbsp;//                            i=end;
+<i>507</i>&nbsp;//                            mode = WAITING;
+<i>508</i>&nbsp;//                            break;
+<i>509</i>&nbsp;//                        case PHRASE_IN_QUOTES:
+<i>510</i>&nbsp;//                            end = begin;
+<i>511</i>&nbsp;//                            do {
+<i>512</i>&nbsp;//                                end = stateStr.indexOf(&quot;&#39;&quot;, end+2);
+<i>513</i>&nbsp;//                            } while (stateStr.charAt(end+1) == &#39;\&#39;&#39; || end == -1);
+<i>514</i>&nbsp;//                            if (end == -1) {
+<i>515</i>&nbsp;//                                Log.info.println(&quot;Incorrect description in charstatelabels. Single quote found in line &quot;);
+<i>516</i>&nbsp;//                            }
+<i>517</i>&nbsp;//                            end++;
+<i>518</i>&nbsp;//                            states.add(stateStr.substring(begin, end));
+<i>519</i>&nbsp;//                            i=end;
+<i>520</i>&nbsp;//                            mode=WAITING;
+<i>521</i>&nbsp;//                            break;
+<i>522</i>&nbsp;//                        default:
+<i>523</i>&nbsp;//                            break;
+<i>524</i>&nbsp;//                    }
+<i>525</i>&nbsp;//                }
+<i>526</i>&nbsp;//                // oldTODO make strSplit[0] look nicer (remove whitespaces and may be numbers at the beginning)
+<i>527</i>&nbsp;//                charDescriptions.add(new UserDataType(strSplit[0], states));
+<i>528</i>&nbsp;//                maxNumberOfStates = Math.max(maxNumberOfStates, states.size());
+<i>529</i>&nbsp;//            }
+<b class="nc"><i>530</i>&nbsp;            standardDataType.setInputValue(&quot;charstatelabels&quot;, charDescriptions);</b>
+<b class="nc"><i>531</i>&nbsp;            standardDataType.setInputValue(&quot;nrOfStates&quot;, Math.max(maxNumberOfStates[0], totalCount));</b>
+<b class="nc"><i>532</i>&nbsp;            standardDataType.initAndValidate();</b>
+<b class="nc"><i>533</i>&nbsp;            for (UserDataType dataType : standardDataType.charStateLabelsInput.get()) {</b>
+<b class="nc"><i>534</i>&nbsp;            	dataType.initAndValidate();</b>
+<b class="nc"><i>535</i>&nbsp;            }</b>
+<i>536</i>&nbsp;        }
+<i>537</i>&nbsp;
+<i>538</i>&nbsp;        //skipping before MATRIX block
+<b class="fc"><i>539</i>&nbsp;        while (!str.toLowerCase().contains((&quot;matrix&quot;))) {</b>
+<b class="nc"><i>540</i>&nbsp;            str = nextLine(fin);</b>
+<i>541</i>&nbsp;        }
+<i>542</i>&nbsp;
+<i>543</i>&nbsp;        // read character data
+<i>544</i>&nbsp;        // Use string builder for efficiency
+<b class="fc"><i>545</i>&nbsp;        final Map&lt;String, StringBuilder&gt; seqMap = new HashMap&lt;&gt;();</b>
+<b class="fc"><i>546</i>&nbsp;        final List&lt;String&gt; taxa = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>547</i>&nbsp;        String prevTaxon = null;</b>
+<b class="fc"><i>548</i>&nbsp;        int seqLen = 0;</b>
+<i>549</i>&nbsp;        while (true) {
+<b class="fc"><i>550</i>&nbsp;            str = nextLine(fin);</b>
+<b class="fc"><i>551</i>&nbsp;            if (str.contains(&quot;;&quot;)) {</b>
+<b class="fc"><i>552</i>&nbsp;                break;</b>
+<i>553</i>&nbsp;            }
+<i>554</i>&nbsp;
+<b class="fc"><i>555</i>&nbsp;            int start = 0, end;</b>
+<i>556</i>&nbsp;            final String taxon;
+<b class="fc"><i>557</i>&nbsp;            while (Character.isWhitespace(str.charAt(start))) {</b>
+<b class="fc"><i>558</i>&nbsp;                start++;</b>
+<i>559</i>&nbsp;            }
+<b class="fc"><i>560</i>&nbsp;            if (str.charAt(start) == &#39;\&#39;&#39; || str.charAt(start) == &#39;\&quot;&#39;) {</b>
+<b class="fc"><i>561</i>&nbsp;                final char c = str.charAt(start);</b>
+<b class="fc"><i>562</i>&nbsp;                start++;</b>
+<b class="fc"><i>563</i>&nbsp;                end = start;</b>
+<b class="fc"><i>564</i>&nbsp;                while (str.charAt(end) != c) {</b>
+<b class="fc"><i>565</i>&nbsp;                    end++;</b>
+<i>566</i>&nbsp;                }
+<b class="fc"><i>567</i>&nbsp;                taxon = str.substring(start, end);</b>
+<b class="fc"><i>568</i>&nbsp;                seqLen = 0;</b>
+<b class="fc"><i>569</i>&nbsp;                end++;</b>
+<b class="fc"><i>570</i>&nbsp;            } else {</b>
+<b class="fc"><i>571</i>&nbsp;                end = start;</b>
+<b class="fc"><i>572</i>&nbsp;                while (end &lt; str.length() &amp;&amp; !Character.isWhitespace(str.charAt(end))) {</b>
+<b class="fc"><i>573</i>&nbsp;                    end++;</b>
+<i>574</i>&nbsp;                }
+<b class="fc"><i>575</i>&nbsp;                if (end &lt; str.length()) {</b>
+<b class="fc"><i>576</i>&nbsp;                    taxon = str.substring(start, end);</b>
+<b class="fc"><i>577</i>&nbsp;                    seqLen = 0;</b>
+<b class="fc"><i>578</i>&nbsp;                } else if ((prevTaxon == null || seqLen == charCount) &amp;&amp; end == str.length()) {</b>
+<b class="fc"><i>579</i>&nbsp;                    taxon = str.substring(start, end);</b>
+<b class="fc"><i>580</i>&nbsp;                    seqLen = 0;</b>
+<i>581</i>&nbsp;                } else {
+<b class="fc"><i>582</i>&nbsp;                    taxon = prevTaxon;</b>
+<b class="fc"><i>583</i>&nbsp;                    if (taxon == null) {</b>
+<b class="nc"><i>584</i>&nbsp;                        throw new IOException(&quot;Could not recognise taxon&quot;);</b>
+<i>585</i>&nbsp;                    }
+<b class="fc"><i>586</i>&nbsp;                    end = start;</b>
+<i>587</i>&nbsp;                }
+<i>588</i>&nbsp;            }
+<b class="fc"><i>589</i>&nbsp;            prevTaxon = taxon;</b>
+<b class="fc"><i>590</i>&nbsp;            final String data = str.substring(end);</b>
+<b class="fc"><i>591</i>&nbsp;            for (int k = 0; k &lt; data.length(); k++) {</b>
+<b class="fc"><i>592</i>&nbsp;            	if (!Character.isWhitespace(data.charAt(k))) {</b>
+<b class="fc"><i>593</i>&nbsp;            		seqLen++;</b>
+<i>594</i>&nbsp;            	}
+<i>595</i>&nbsp;            }
+<i>596</i>&nbsp;            // Do this once outside loop- save on multiple regex compilations
+<i>597</i>&nbsp;            //data = data.replaceAll(&quot;\\s&quot;, &quot;&quot;);
+<i>598</i>&nbsp;
+<i>599</i>&nbsp;//			String [] strs = str.split(&quot;\\s+&quot;);
+<i>600</i>&nbsp;//			String taxon = strs[0];
+<i>601</i>&nbsp;//			for (int k = 1; k &lt; strs.length - 1; k++) {
+<i>602</i>&nbsp;//				taxon += strs[k];
+<i>603</i>&nbsp;//			}
+<i>604</i>&nbsp;//			taxon = taxon.replaceAll(&quot;&#39;&quot;, &quot;&quot;);
+<i>605</i>&nbsp;//			Log.warning.println(taxon);
+<i>606</i>&nbsp;//			String data = strs[strs.length - 1];
+<i>607</i>&nbsp;
+<b class="fc"><i>608</i>&nbsp;            if (seqMap.containsKey(taxon)) {</b>
+<b class="fc"><i>609</i>&nbsp;                seqMap.put(taxon, seqMap.get(taxon).append(data));</b>
+<i>610</i>&nbsp;            } else {
+<b class="fc"><i>611</i>&nbsp;                seqMap.put(taxon, new StringBuilder(data));</b>
+<b class="fc"><i>612</i>&nbsp;                taxa.add(taxon);</b>
+<i>613</i>&nbsp;            }
+<b class="fc"><i>614</i>&nbsp;        }</b>
+<b class="fc"><i>615</i>&nbsp;        if (taxonCount &gt; 0 &amp;&amp; taxa.size() &gt; taxonCount) {</b>
+<b class="nc"><i>616</i>&nbsp;            throw new IOException(&quot;Wrong number of taxa. Perhaps a typo in one of the taxa: &quot; + taxa);</b>
+<i>617</i>&nbsp;        }
+<i>618</i>&nbsp;
+<b class="fc"><i>619</i>&nbsp;        HashSet&lt;String&gt; sortedAmbiguities = new HashSet&lt;&gt;();</b>
+<b class="fc"><i>620</i>&nbsp;        for (final String taxon : taxa) {</b>
+<b class="fc"><i>621</i>&nbsp;        	taxonList.add(new Taxon(taxon));</b>
+<b class="fc"><i>622</i>&nbsp;            final StringBuilder bsData = seqMap.get(taxon);</b>
+<b class="fc"><i>623</i>&nbsp;            String data = bsData.toString().replaceAll(&quot;\\s&quot;, &quot;&quot;);</b>
+<b class="fc"><i>624</i>&nbsp;            seqMap.put(taxon, new StringBuilder(data));</b>
+<i>625</i>&nbsp;
+<i>626</i>&nbsp;            //collect all ambiguities in the sequence
+<b class="fc"><i>627</i>&nbsp;            List&lt;String&gt; ambiguities = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>628</i>&nbsp;            Matcher m = Pattern.compile(&quot;\\{(.*?)\\}&quot;).matcher(data);</b>
+<b class="fc"><i>629</i>&nbsp;            while (m.find()) {</b>
+<b class="fc"><i>630</i>&nbsp;                int mLength = m.group().length();</b>
+<b class="fc"><i>631</i>&nbsp;                ambiguities.add(m.group().substring(1, mLength-1));</b>
+<b class="fc"><i>632</i>&nbsp;            }</b>
+<i>633</i>&nbsp;
+<i>634</i>&nbsp;            //sort elements of ambiguity sets
+<b class="fc"><i>635</i>&nbsp;            String data_without_ambiguities = data.replaceAll(&quot;\\{(.*?)\\}&quot;, &quot;?&quot;);</b>
+<b class="fc"><i>636</i>&nbsp;            for (String amb : ambiguities) {</b>
+<b class="fc"><i>637</i>&nbsp;                List&lt;Integer&gt; ambInt = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>638</i>&nbsp;                for (int i=0; i&lt;amb.length(); i++) {</b>
+<b class="fc"><i>639</i>&nbsp;                	char c = amb.charAt(i);</b>
+<b class="fc"><i>640</i>&nbsp;                	if (c &gt;= &#39;0&#39; &amp;&amp; c &lt;= &#39;9&#39;) {</b>
+<b class="nc"><i>641</i>&nbsp;                		ambInt.add(Integer.parseInt(amb.charAt(i) + &quot;&quot;));</b>
+<i>642</i>&nbsp;                	} else {
+<i>643</i>&nbsp;                		// ignore
+<b class="fc"><i>644</i>&nbsp;                		if (data != data_without_ambiguities) {</b>
+<b class="fc"><i>645</i>&nbsp;                			Log.warning.println(&quot;Ambiguity found in &quot; + taxon + &quot; that is treated as missing value&quot;);</b>
+<i>646</i>&nbsp;                		}
+<b class="fc"><i>647</i>&nbsp;                		data = data_without_ambiguities; </b>
+<i>648</i>&nbsp;                	}
+<i>649</i>&nbsp;                }
+<b class="fc"><i>650</i>&nbsp;                Collections.sort(ambInt);</b>
+<b class="fc"><i>651</i>&nbsp;                String ambStr = &quot;&quot;;</b>
+<b class="fc"><i>652</i>&nbsp;                for (int i=0; i&lt;ambInt.size(); i++) {</b>
+<b class="nc"><i>653</i>&nbsp;                    ambStr += Integer.toString(ambInt.get(i));</b>
+<i>654</i>&nbsp;                }
+<b class="fc"><i>655</i>&nbsp;                sortedAmbiguities.add(ambStr);</b>
+<b class="fc"><i>656</i>&nbsp;            }</b>
+<i>657</i>&nbsp;
+<i>658</i>&nbsp;            //check the length of the sequence (treat ambiguity sets as single characters)
+<b class="fc"><i>659</i>&nbsp;            if (data_without_ambiguities.length() != charCount) {</b>
+<b class="nc"><i>660</i>&nbsp;                throw new IOException(str + &quot;\nExpected sequence of length &quot; + charCount + &quot; instead of &quot; + data.length() + &quot; for taxon &quot; + taxon);</b>
+<i>661</i>&nbsp;            }
+<i>662</i>&nbsp;
+<i>663</i>&nbsp;            // map to standard missing and gap chars
+<b class="fc"><i>664</i>&nbsp;            data = data.replace(missing.charAt(0), DataType.MISSING_CHAR);</b>
+<b class="fc"><i>665</i>&nbsp;            data = data.replace(gap.charAt(0), DataType.GAP_CHAR);</b>
+<i>666</i>&nbsp;
+<i>667</i>&nbsp;            // resolve matching char, if any
+<b class="fc"><i>668</i>&nbsp;            if (matchChar != null &amp;&amp; data.contains(matchChar)) {</b>
+<b class="fc"><i>669</i>&nbsp;                final char cMatchChar = matchChar.charAt(0);</b>
+<b class="fc"><i>670</i>&nbsp;                final String baseData = seqMap.get(taxa.get(0)).toString();</b>
+<b class="fc"><i>671</i>&nbsp;                for (int i = 0; i &lt; data.length(); i++) {</b>
+<b class="fc"><i>672</i>&nbsp;                    if (data.charAt(i) == cMatchChar) {</b>
+<b class="fc"><i>673</i>&nbsp;                        final char cReplaceChar = baseData.charAt(i);</b>
+<b class="fc"><i>674</i>&nbsp;                        data = data.substring(0, i) + cReplaceChar + (i + 1 &lt; data.length() ? data.substring(i + 1) : &quot;&quot;);</b>
+<i>675</i>&nbsp;                    }
+<i>676</i>&nbsp;                }
+<i>677</i>&nbsp;            }
+<i>678</i>&nbsp;
+<i>679</i>&nbsp;            // Using Alignment as Map gives problems when producing XML: 
+<i>680</i>&nbsp;            // Sequence names are used as attribute names, producing very readable XML
+<i>681</i>&nbsp;            // However, since attribute names cannot start with a number or contain
+<i>682</i>&nbsp;            // special characters (like &quot;:&quot; or &quot;]&quot;) but sequence names do contain them
+<i>683</i>&nbsp;            // on occasion, it is more robust to create a Sequence object for each 
+<i>684</i>&nbsp;            // sequence where the taxon name is stored as an XML attribute values
+<i>685</i>&nbsp;            // that do not have the attribute name restrictions.
+<i>686</i>&nbsp;//            if (alignment.dataTypeInput.get().equals(&quot;nucleotide&quot;) || 
+<i>687</i>&nbsp;//            	alignment.dataTypeInput.get().equals(&quot;binary&quot;)  ||
+<i>688</i>&nbsp;//            	alignment.dataTypeInput.get().equals(&quot;aminoacid&quot;) ) {
+<i>689</i>&nbsp;//            	alignment.setInputValue(taxon, data);
+<i>690</i>&nbsp;//            } else {
+<b class="fc"><i>691</i>&nbsp;	            final Sequence sequence = new Sequence();</b>
+<b class="fc"><i>692</i>&nbsp;	            sequence.init(totalCount, taxon, data);</b>
+<b class="fc"><i>693</i>&nbsp;	            sequence.setID(generateSequenceID(taxon));</b>
+<b class="fc"><i>694</i>&nbsp;	            alignment.sequenceInput.setValue(sequence, alignment);</b>
+<i>695</i>&nbsp;//            }
+<b class="fc"><i>696</i>&nbsp;        }</b>
+<i>697</i>&nbsp;
+<i>698</i>&nbsp;
+<b class="fc"><i>699</i>&nbsp;        if (alignment.dataTypeInput.get().equals(&quot;standard&quot;)) {</b>
+<i>700</i>&nbsp;            //convert sortedAmbiguities to a whitespace separated string of ambiguities
+<b class="fc"><i>701</i>&nbsp;            String ambiguitiesStr = &quot;&quot;;</b>
+<b class="fc"><i>702</i>&nbsp;            for (String amb: sortedAmbiguities) {</b>
+<b class="nc"><i>703</i>&nbsp;                ambiguitiesStr += amb + &quot; &quot;;</b>
+<b class="nc"><i>704</i>&nbsp;            }</b>
+<b class="fc"><i>705</i>&nbsp;            if (ambiguitiesStr.length() &gt; 0) {</b>
+<b class="nc"><i>706</i>&nbsp;            	ambiguitiesStr = ambiguitiesStr.substring(0, ambiguitiesStr.length()-1);</b>
+<i>707</i>&nbsp;            }
+<b class="fc"><i>708</i>&nbsp;            alignment.userDataTypeInput.get().initByName(&quot;ambiguities&quot;, ambiguitiesStr);</b>
+<i>709</i>&nbsp;        }
+<i>710</i>&nbsp;
+<b class="fc"><i>711</i>&nbsp;        alignment.initAndValidate();</b>
+<b class="fc"><i>712</i>&nbsp;        if (taxonCount &gt; 0 &amp;&amp; taxonCount != alignment.getTaxonCount()) {</b>
+<b class="nc"><i>713</i>&nbsp;            throw new IOException(&quot;dimensions block says there are &quot; + taxonCount + &quot; taxa, but there were &quot; + alignment.getTaxonCount() + &quot; taxa found&quot;);</b>
+<i>714</i>&nbsp;        }
+<b class="fc"><i>715</i>&nbsp;        return alignment;</b>
+<i>716</i>&nbsp;    } // parseDataBlock
+<i>717</i>&nbsp;
+<i>718</i>&nbsp;
+<i>719</i>&nbsp;    /**
+<i>720</i>&nbsp;     * parse assumptions block
+<i>721</i>&nbsp;     * begin assumptions;
+<i>722</i>&nbsp;     * charset firsthalf = 1-449;
+<i>723</i>&nbsp;     * charset secondhalf = 450-898;
+<i>724</i>&nbsp;     * charset third = 1-457\3 662-896\3;
+<i>725</i>&nbsp;     * end;
+<i>726</i>&nbsp;     * 
+<i>727</i>&nbsp;     * begin assumptions;
+<i>728</i>&nbsp;     * wtset MySoapWeights (VECTOR) = 13 13 13 50 50 88 8
+<i>729</i>&nbsp;     * end;
+<i>730</i>&nbsp;     * 
+<i>731</i>&nbsp;     */
+<i>732</i>&nbsp;    void parseAssumptionsBlock(final BufferedReader fin) throws IOException {
+<i>733</i>&nbsp;        String str;
+<i>734</i>&nbsp;        do {
+<b class="fc"><i>735</i>&nbsp;            str = nextLine(fin);</b>
+<b class="fc"><i>736</i>&nbsp;            if (str.toLowerCase().matches(&quot;\\s*charset\\s.*&quot;)) {</b>
+<i>737</i>&nbsp;            	// remove text in brackets (as TreeBase files are wont to contain)
+<b class="fc"><i>738</i>&nbsp;                str = str.replaceAll(&quot;\\(.*\\)&quot;, &quot;&quot;);</b>
+<i>739</i>&nbsp;                // clean up spaces
+<b class="fc"><i>740</i>&nbsp;                str = str.replaceAll(&quot;^\\s+&quot;, &quot;&quot;);</b>
+<b class="fc"><i>741</i>&nbsp;                str = str.replaceAll(&quot;\\s*-\\s*&quot;, &quot;-&quot;);</b>
+<b class="fc"><i>742</i>&nbsp;                str = str.replaceAll(&quot;\\s*\\\\\\s*&quot;, &quot;\\\\&quot;);</b>
+<b class="fc"><i>743</i>&nbsp;                str = str.replaceAll(&quot;\\s*;&quot;, &quot;&quot;);</b>
+<b class="fc"><i>744</i>&nbsp;                final String[] strs = str.trim().split(&quot;\\s+&quot;);</b>
+<b class="fc"><i>745</i>&nbsp;                final String id = strs[1];</b>
+<b class="fc"><i>746</i>&nbsp;                String rangeString = &quot;&quot;;</b>
+<b class="fc"><i>747</i>&nbsp;                for (int i = 3; i &lt; strs.length; i++) {</b>
+<b class="fc"><i>748</i>&nbsp;                    rangeString += strs[i] + &quot; &quot;;</b>
+<i>749</i>&nbsp;                }
+<b class="fc"><i>750</i>&nbsp;                rangeString = rangeString.trim().replace(&#39; &#39;, &#39;,&#39;);</b>
+<b class="fc"><i>751</i>&nbsp;                final FilteredAlignment alignment = new FilteredAlignment();</b>
+<b class="fc"><i>752</i>&nbsp;                alignment.setID(id);</b>
+<b class="fc"><i>753</i>&nbsp;                alignment.alignmentInput.setValue(m_alignment, alignment);</b>
+<b class="fc"><i>754</i>&nbsp;                alignment.filterInput.setValue(rangeString, alignment);</b>
+<b class="fc"><i>755</i>&nbsp;                alignment.initAndValidate();</b>
+<b class="fc"><i>756</i>&nbsp;                filteredAlignments.add(alignment);</b>
+<b class="fc"><i>757</i>&nbsp;            } else if (str.toLowerCase().matches(&quot;\\s*wtset\\s.*&quot;)) {</b>
+<b class="fc"><i>758</i>&nbsp;            	String [] strs = str.split(&quot;=&quot;);</b>
+<b class="fc"><i>759</i>&nbsp;            	if (strs.length &gt; 1) {</b>
+<b class="fc"><i>760</i>&nbsp;            		str = strs[strs.length - 1].trim();</b>
+<b class="fc"><i>761</i>&nbsp;            		strs = str.split(&quot;\\s+&quot;);</b>
+<b class="fc"><i>762</i>&nbsp;            		int [] weights = new int[strs.length];</b>
+<b class="fc"><i>763</i>&nbsp;            		for (int i = 0; i&lt; strs.length; i++) {</b>
+<b class="fc"><i>764</i>&nbsp;            			weights[i] = Integer.parseInt(strs[i]);</b>
+<i>765</i>&nbsp;            		}
+<b class="fc"><i>766</i>&nbsp;            		if (m_alignment != null) {</b>
+<b class="fc"><i>767</i>&nbsp;            			if (weights.length != m_alignment.getSiteCount()) {</b>
+<b class="nc"><i>768</i>&nbsp;            				throw new RuntimeException(&quot;Number of weights (&quot; + weights.length+ &quot;) &quot; +</b>
+<b class="nc"><i>769</i>&nbsp;            						&quot;does not match number of sites in alignment(&quot; + m_alignment.getSiteCount()+ &quot;)&quot;);</b>
+<i>770</i>&nbsp;            			}
+<b class="fc"><i>771</i>&nbsp;            			StringBuilder weightStr = new StringBuilder();</b>
+<b class="fc"><i>772</i>&nbsp;            			for (String str2 : strs) {</b>
+<b class="fc"><i>773</i>&nbsp;            				weightStr.append(str2);</b>
+<b class="fc"><i>774</i>&nbsp;            				weightStr.append(&#39;,&#39;);</b>
+<i>775</i>&nbsp;            			}
+<b class="fc"><i>776</i>&nbsp;            			weightStr.delete(weightStr.length() - 1, weightStr.length());</b>
+<b class="fc"><i>777</i>&nbsp;            			m_alignment.siteWeightsInput.setValue(weightStr.toString(), m_alignment);</b>
+<b class="fc"><i>778</i>&nbsp;            			m_alignment.initAndValidate();</b>
+<b class="fc"><i>779</i>&nbsp;            		} else {</b>
+<b class="nc"><i>780</i>&nbsp;            			Log.warning.println(&quot;WTSET was specified before alignment. WTSET is ignored.&quot;);</b>
+<i>781</i>&nbsp;            		}
+<i>782</i>&nbsp;            	}
+<b class="fc"><i>783</i>&nbsp;            } else if (str.toLowerCase().matches(&quot;\\s*taxset\\s.*&quot;)) {</b>
+<b class="fc"><i>784</i>&nbsp;            	String [] strs = str.split(&quot;=&quot;);</b>
+<b class="fc"><i>785</i>&nbsp;            	if (strs.length &gt; 1) {</b>
+<b class="fc"><i>786</i>&nbsp;            		String str0 = strs[0].trim();</b>
+<b class="fc"><i>787</i>&nbsp;            		String [] strs2 = str0.split(&quot;\\s+&quot;);</b>
+<b class="fc"><i>788</i>&nbsp;            		if (strs2.length != 2) {</b>
+<b class="nc"><i>789</i>&nbsp;            			throw new RuntimeException(&quot;expected &#39;taxset &lt;name&gt; = ...;&#39; but did not get two words before the = sign: &quot; + str);</b>
+<i>790</i>&nbsp;            		}
+<b class="fc"><i>791</i>&nbsp;            		String taxonSetName = strs2[1];</b>
+<b class="fc"><i>792</i>&nbsp;            		str0 = strs[strs.length - 1].trim();</b>
+<b class="fc"><i>793</i>&nbsp;            		if (!str0.endsWith(&quot;;&quot;)) {</b>
+<b class="nc"><i>794</i>&nbsp;            			Log.warning.println(&quot;expected &#39;taxset &lt;name&gt; = ...;&#39; semi-colin is missing: &quot; + str + &quot;\n&quot;</b>
+<i>795</i>&nbsp;            					+ &quot;Taxa from following lines may be missing.&quot;);
+<i>796</i>&nbsp;            		}
+<b class="fc"><i>797</i>&nbsp;            		str0 = str0.replaceAll(&quot;;&quot;, &quot;&quot;);</b>
+<b class="fc"><i>798</i>&nbsp;            		String [] taxonNames = str0.split(&quot;\\s+&quot;);</b>
+<b class="fc"><i>799</i>&nbsp;            		TaxonSet taxonset = new TaxonSet();</b>
+<b class="fc"><i>800</i>&nbsp;            		for (String taxon : taxonNames) {</b>
+<b class="fc"><i>801</i>&nbsp;            			taxonset.taxonsetInput.get().add(new Taxon(taxon.replaceAll(&quot;&#39;\&quot;&quot;, &quot;&quot;)));</b>
+<i>802</i>&nbsp;            		}
+<b class="fc"><i>803</i>&nbsp;            		taxonset.setID(taxonSetName.replaceAll(&quot;&#39;\&quot;&quot;, &quot;&quot;));</b>
+<b class="fc"><i>804</i>&nbsp;            		taxonsets.add(taxonset);</b>
+<i>805</i>&nbsp;            	}
+<b class="fc"><i>806</i>&nbsp;            } else if (str.toLowerCase().matches(&quot;^\\s*calibrate\\s.*&quot;)) {</b>
+<i>807</i>&nbsp;            	// define calibration represented by an MRCAPRior, 
+<i>808</i>&nbsp;            	// taxon sets need to be specified earlier, but can also be a single taxon
+<i>809</i>&nbsp;            	// e.g.
+<i>810</i>&nbsp;            	// begin mrbayes;
+<i>811</i>&nbsp;            	// calibrate germanic = normal(1000,50)
+<i>812</i>&nbsp;            	// calibrate hittite = normal(3450,100)
+<i>813</i>&nbsp;            	// calibrate english = fixed(0)
+<i>814</i>&nbsp;            	// end;
+<b class="nc"><i>815</i>&nbsp;            	String [] strs = str.split(&quot;=&quot;);</b>
+<b class="nc"><i>816</i>&nbsp;            	if (strs.length &gt; 1) {</b>
+<b class="nc"><i>817</i>&nbsp;            		String str0 = strs[0].trim();</b>
+<b class="nc"><i>818</i>&nbsp;            		String [] strs2 = str0.split(&quot;\\s+&quot;);</b>
+<b class="nc"><i>819</i>&nbsp;            		if (strs2.length != 2) {</b>
+<b class="nc"><i>820</i>&nbsp;            			throw new RuntimeException(&quot;expected &#39;calibrate &lt;name&gt; = ...&#39; but did not get two words before the = sign: &quot; + str);</b>
+<i>821</i>&nbsp;            		}
+<i>822</i>&nbsp;            		// first, get the taxon
+<b class="nc"><i>823</i>&nbsp;            		String taxonSetName = strs2[1].replaceAll(&quot;&#39;\&quot;&quot;, &quot;&quot;);</b>
+<b class="nc"><i>824</i>&nbsp;            		TaxonSet taxonset = null;</b>
+<b class="nc"><i>825</i>&nbsp;            		for (Taxon t : taxonsets) {</b>
+<b class="nc"><i>826</i>&nbsp;            			if (t.getID().equals(taxonSetName) &amp;&amp; t instanceof TaxonSet) {</b>
+<b class="nc"><i>827</i>&nbsp;            				taxonset = (TaxonSet) t;</b>
+<i>828</i>&nbsp;            			}
+<b class="nc"><i>829</i>&nbsp;            		}</b>
+<b class="nc"><i>830</i>&nbsp;            		if (taxonset == null) {</b>
+<i>831</i>&nbsp;            			// perhaps it is a singleton
+<b class="nc"><i>832</i>&nbsp;            			for (Taxon t : taxonList) {</b>
+<b class="nc"><i>833</i>&nbsp;            				if (t.getID().equals(taxonSetName)) {</b>
+<b class="nc"><i>834</i>&nbsp;            					taxonset = new TaxonSet();</b>
+<b class="nc"><i>835</i>&nbsp;            					taxonset.setID(t.getID() + &quot;.leaf&quot;);</b>
+<b class="nc"><i>836</i>&nbsp;            					taxonset.taxonsetInput.setValue(t, taxonset);</b>
+<i>837</i>&nbsp;            				}
+<b class="nc"><i>838</i>&nbsp;            			}</b>
+<i>839</i>&nbsp;            		}
+<b class="nc"><i>840</i>&nbsp;            		if (taxonset == null) {</b>
+<b class="nc"><i>841</i>&nbsp;            			throw new RuntimeException(&quot;Could not find taxon/taxonset &quot; + taxonSetName + &quot; in calibration: &quot; + str);</b>
+<i>842</i>&nbsp;            		}
+<i>843</i>&nbsp;            		
+<i>844</i>&nbsp;            		// next get the calibration
+<b class="nc"><i>845</i>&nbsp;            		str0 = strs[strs.length - 1].trim();</b>
+<b class="nc"><i>846</i>&nbsp;            		String [] strs3 = str0.split(&quot;[\\(,\\)]&quot;);</b>
+<b class="nc"><i>847</i>&nbsp;            		ParametricDistribution distr  = null;</b>
+<b class="nc"><i>848</i>&nbsp;            		switch (strs3[0]) {</b>
+<i>849</i>&nbsp;            		case &quot;normal&quot;:
+<b class="nc"><i>850</i>&nbsp;            			distr = new Normal();</b>
+<b class="nc"><i>851</i>&nbsp;            			distr.initByName(&quot;mean&quot;, strs3[1], &quot;sigma&quot;, strs3[2]);</b>
+<b class="nc"><i>852</i>&nbsp;            			distr.setID(&quot;Normal.0&quot;);</b>
+<b class="nc"><i>853</i>&nbsp;            			break;</b>
+<i>854</i>&nbsp;            		case &quot;uniform&quot;:
+<b class="nc"><i>855</i>&nbsp;            			distr = new Uniform();</b>
+<b class="nc"><i>856</i>&nbsp;            			distr.initByName(&quot;lower&quot;, strs3[1], &quot;upper&quot;, strs3[2]);</b>
+<b class="nc"><i>857</i>&nbsp;            			distr.setID(&quot;Uniform.0&quot;);</b>
+<b class="nc"><i>858</i>&nbsp;            			break;</b>
+<i>859</i>&nbsp;            		case &quot;fixed&quot;:
+<i>860</i>&nbsp;            			// uniform with lower == upper
+<b class="nc"><i>861</i>&nbsp;            			distr = new Uniform();</b>
+<b class="nc"><i>862</i>&nbsp;            			distr.initByName(&quot;lower&quot;, strs3[1], &quot;upper&quot;, strs3[1]);</b>
+<b class="nc"><i>863</i>&nbsp;            			distr.setID(&quot;Uniform.0&quot;);</b>
+<b class="nc"><i>864</i>&nbsp;            			break;</b>
+<i>865</i>&nbsp;            		case &quot;offsetlognormal&quot;:
+<b class="nc"><i>866</i>&nbsp;            			distr = new LogNormalDistributionModel();</b>
+<b class="nc"><i>867</i>&nbsp;            			distr.initByName(&quot;offset&quot;, strs3[1], &quot;M&quot;, strs3[2], &quot;S&quot;, strs3[3], &quot;meanInRealSpace&quot;, true);</b>
+<b class="nc"><i>868</i>&nbsp;            			distr.setID(&quot;LogNormal.0&quot;);</b>
+<b class="nc"><i>869</i>&nbsp;            			break;</b>
+<i>870</i>&nbsp;            		case &quot;lognormal&quot;:
+<b class="nc"><i>871</i>&nbsp;            			distr = new LogNormalDistributionModel();</b>
+<b class="nc"><i>872</i>&nbsp;            			distr.initByName(&quot;M&quot;, strs3[1], &quot;S&quot;, strs3[2], &quot;meanInRealSpace&quot;, true);</b>
+<b class="nc"><i>873</i>&nbsp;            			distr.setID(&quot;LogNormal.0&quot;);</b>
+<b class="nc"><i>874</i>&nbsp;            			break;</b>
+<i>875</i>&nbsp;            		case &quot;offsetexponential&quot;:
+<b class="nc"><i>876</i>&nbsp;            			distr = new Exponential();</b>
+<b class="nc"><i>877</i>&nbsp;            			distr.initByName(&quot;offset&quot;, strs3[1], &quot;mean&quot;, strs3[2]);</b>
+<b class="nc"><i>878</i>&nbsp;            			distr.setID(&quot;Exponential.0&quot;);</b>
+<b class="nc"><i>879</i>&nbsp;            			break;</b>
+<i>880</i>&nbsp;            		case &quot;gamma&quot;:
+<b class="nc"><i>881</i>&nbsp;            			distr = new Gamma();</b>
+<b class="nc"><i>882</i>&nbsp;            			distr.initByName(&quot;alpha&quot;, strs3[1], &quot;beta&quot;, strs3[2]);</b>
+<b class="nc"><i>883</i>&nbsp;            			distr.setID(&quot;Gamma.0&quot;);</b>
+<b class="nc"><i>884</i>&nbsp;            			break;</b>
+<i>885</i>&nbsp;            		case &quot;offsetgamma&quot;:
+<b class="nc"><i>886</i>&nbsp;            			distr = new Gamma();</b>
+<b class="nc"><i>887</i>&nbsp;            			distr.initByName(&quot;offset&quot;, strs3[1], &quot;alpha&quot;, strs3[2], &quot;beta&quot;, strs3[3]);</b>
+<b class="nc"><i>888</i>&nbsp;            			distr.setID(&quot;Gamma.0&quot;);</b>
+<b class="nc"><i>889</i>&nbsp;            			break;</b>
+<i>890</i>&nbsp;            		default:
+<b class="nc"><i>891</i>&nbsp;            			throw new RuntimeException(&quot;Unknwon distribution &quot;+ strs3[0] +&quot;in calibration: &quot; + str);</b>
+<i>892</i>&nbsp;            		}
+<b class="nc"><i>893</i>&nbsp;            		MRCAPrior prior = new MRCAPrior();</b>
+<b class="nc"><i>894</i>&nbsp;            		prior.isMonophyleticInput.setValue(true, prior);</b>
+<b class="nc"><i>895</i>&nbsp;            		prior.distInput.setValue(distr, prior);</b>
+<b class="nc"><i>896</i>&nbsp;            		prior.taxonsetInput.setValue(taxonset, prior);</b>
+<b class="nc"><i>897</i>&nbsp;            		prior.setID(taxonset.getID() + &quot;.prior&quot;);</b>
+<i>898</i>&nbsp;            		// should set Tree before initialising, but we do not know the tree yet...
+<b class="nc"><i>899</i>&nbsp;            		if (calibrations == null) {</b>
+<b class="nc"><i>900</i>&nbsp;            			calibrations = new ArrayList&lt;&gt;();</b>
+<i>901</i>&nbsp;            		}
+<b class="nc"><i>902</i>&nbsp;            		calibrations.add(prior);</b>
+<i>903</i>&nbsp;            	}
+<i>904</i>&nbsp;            }
+<i>905</i>&nbsp;
+<i>906</i>&nbsp;
+<b class="fc"><i>907</i>&nbsp;        } while (!str.toLowerCase().contains(&quot;end;&quot;));</b>
+<b class="fc"><i>908</i>&nbsp;    }</b>
+<i>909</i>&nbsp;
+<i>910</i>&nbsp;    
+<i>911</i>&nbsp;    private void processSets() {
+<i>912</i>&nbsp;    	// create monophyletic MRCAPrior for each taxon set that 
+<i>913</i>&nbsp;    	// does not already have a calibration associated with it
+<b class="fc"><i>914</i>&nbsp;    	for (TaxonSet taxonset : taxonsets) {</b>
+<b class="fc"><i>915</i>&nbsp;    		boolean found = false;</b>
+<b class="fc"><i>916</i>&nbsp;    		for (BEASTInterface o : taxonset.getOutputs()) {</b>
+<b class="nc"><i>917</i>&nbsp;    			if (o instanceof MRCAPrior) {</b>
+<b class="nc"><i>918</i>&nbsp;    				found = true;</b>
+<b class="nc"><i>919</i>&nbsp;    				break;</b>
+<i>920</i>&nbsp;    			}
+<b class="nc"><i>921</i>&nbsp;    		}</b>
+<b class="fc"><i>922</i>&nbsp;    		if (!found) {</b>
+<b class="fc"><i>923</i>&nbsp;        		MRCAPrior prior = new MRCAPrior();</b>
+<b class="fc"><i>924</i>&nbsp;        		prior.isMonophyleticInput.setValue(true, prior);</b>
+<b class="fc"><i>925</i>&nbsp;        		prior.taxonsetInput.setValue(taxonset, prior);</b>
+<b class="fc"><i>926</i>&nbsp;        		prior.setID(taxonset.getID() + &quot;.prior&quot;);</b>
+<i>927</i>&nbsp;        		// should set Tree before initialising, but we do not know the tree yet...
+<b class="fc"><i>928</i>&nbsp;        		if (calibrations == null) {</b>
+<b class="fc"><i>929</i>&nbsp;        			calibrations = new ArrayList&lt;&gt;();</b>
+<i>930</i>&nbsp;        		}
+<b class="fc"><i>931</i>&nbsp;        		calibrations.add(prior);</b>
+<i>932</i>&nbsp;    		}
+<b class="fc"><i>933</i>&nbsp;    	}</b>
+<b class="fc"><i>934</i>&nbsp;	}</b>
+<i>935</i>&nbsp;
+<i>936</i>&nbsp;
+<i>937</i>&nbsp;    /**
+<i>938</i>&nbsp;     * parse sets block
+<i>939</i>&nbsp;     * BEGIN Sets;
+<i>940</i>&nbsp;     * TAXSET &#39;con&#39; = &#39;con_SL_Gert2&#39; &#39;con_SL_Tran6&#39; &#39;con_SL_Tran7&#39; &#39;con_SL_Gert6&#39;;
+<i>941</i>&nbsp;     * TAXSET &#39;spa&#39; = &#39;spa_138a_Cerb&#39; &#39;spa_JB_Eyre1&#39; &#39;spa_JB_Eyre2&#39;;
+<i>942</i>&nbsp;     * END; [Sets]
+<i>943</i>&nbsp;     */
+<i>944</i>&nbsp;    void parseSetsBlock(final BufferedReader fin) throws IOException {
+<i>945</i>&nbsp;        String str;
+<i>946</i>&nbsp;        do {
+<b class="nc"><i>947</i>&nbsp;            str = nextLine(fin);</b>
+<b class="nc"><i>948</i>&nbsp;            if (str.toLowerCase().matches(&quot;\\s*taxset\\s.*&quot;)) {</b>
+<b class="nc"><i>949</i>&nbsp;            	String [] strs = str.split(&quot;=&quot;);</b>
+<b class="nc"><i>950</i>&nbsp;            	if (strs.length &gt; 1) {</b>
+<b class="nc"><i>951</i>&nbsp;            		String str0 = strs[0].trim();</b>
+<b class="nc"><i>952</i>&nbsp;            		String [] strs2 = str0.split(&quot;\\s+&quot;);</b>
+<b class="nc"><i>953</i>&nbsp;            		if (strs2.length != 2) {</b>
+<b class="nc"><i>954</i>&nbsp;            			throw new RuntimeException(&quot;expected &#39;taxset &lt;name&gt; = ...;&#39; but did not get two words before the = sign: &quot; + str);</b>
+<i>955</i>&nbsp;            		}
+<b class="nc"><i>956</i>&nbsp;            		String taxonSetName = strs2[1];</b>
+<b class="nc"><i>957</i>&nbsp;            		str0 = strs[strs.length - 1].trim();</b>
+<b class="nc"><i>958</i>&nbsp;            		if (!str0.endsWith(&quot;;&quot;)) {</b>
+<b class="nc"><i>959</i>&nbsp;            			Log.warning.println(&quot;expected &#39;taxset &lt;name&gt; = ...;&#39; semi-colin is missing: &quot; + str + &quot;\n&quot;</b>
+<i>960</i>&nbsp;            					+ &quot;Taxa from following lines may be missing.&quot;);
+<i>961</i>&nbsp;            		}
+<b class="nc"><i>962</i>&nbsp;            		str0 = str0.replaceAll(&quot;;&quot;, &quot;&quot;);</b>
+<b class="nc"><i>963</i>&nbsp;            		String [] taxonNames = str0.split(&quot;\\s+&quot;);</b>
+<b class="nc"><i>964</i>&nbsp;            		TaxonSet taxonset = new TaxonSet();</b>
+<b class="nc"><i>965</i>&nbsp;            		for (String taxon : taxonNames) {</b>
+<b class="nc"><i>966</i>&nbsp;            			taxonset.taxonsetInput.get().add(new Taxon(taxon.replaceAll(&quot;&#39;\&quot;&quot;, &quot;&quot;)));</b>
+<i>967</i>&nbsp;            		}
+<b class="nc"><i>968</i>&nbsp;            		taxonset.setID(taxonSetName.replaceAll(&quot;&#39;\&quot;&quot;, &quot;&quot;));</b>
+<b class="nc"><i>969</i>&nbsp;            		taxonsets.add(taxonset);</b>
+<i>970</i>&nbsp;            	}
+<i>971</i>&nbsp;            }
+<b class="nc"><i>972</i>&nbsp;        } while (!str.toLowerCase().contains(&quot;end;&quot;));</b>
+<b class="nc"><i>973</i>&nbsp;    }</b>
+<i>974</i>&nbsp;
+<i>975</i>&nbsp;    public static String generateSequenceID(final String taxon) {
+<b class="fc"><i>976</i>&nbsp;        String id = &quot;seq_&quot; + taxon;</b>
+<b class="fc"><i>977</i>&nbsp;        int i = 0;</b>
+<b class="fc"><i>978</i>&nbsp;        while (g_sequenceIDs.contains(id + (i &gt; 0 ? i : &quot;&quot;))) {</b>
+<b class="fc"><i>979</i>&nbsp;            i++;</b>
+<i>980</i>&nbsp;        }
+<b class="fc"><i>981</i>&nbsp;        id = id + (i &gt; 0 ? i : &quot;&quot;);</b>
+<b class="fc"><i>982</i>&nbsp;        g_sequenceIDs.add(id);</b>
+<b class="fc"><i>983</i>&nbsp;        return id;</b>
+<i>984</i>&nbsp;    }
+<i>985</i>&nbsp;
+<i>986</i>&nbsp;    /**
+<i>987</i>&nbsp;     * read line from nexus file *
+<i>988</i>&nbsp;     */
+<i>989</i>&nbsp;    String readLine(final BufferedReader fin) throws IOException {
+<b class="fc"><i>990</i>&nbsp;        if (!fin.ready()) {</b>
+<b class="fc"><i>991</i>&nbsp;            return null;</b>
+<i>992</i>&nbsp;        }
+<b class="fc"><i>993</i>&nbsp;        lineNr++;</b>
+<b class="fc"><i>994</i>&nbsp;        return fin.readLine();</b>
+<i>995</i>&nbsp;    }
+<i>996</i>&nbsp;
+<i>997</i>&nbsp;    /**
+<i>998</i>&nbsp;     * read next line from nexus file that is not a comment and not empty *
+<i>999</i>&nbsp;     */
+<i>1000</i>&nbsp;    String nextLine(final BufferedReader fin) throws IOException {
+<b class="fc"><i>1001</i>&nbsp;        String str = readLine(fin);</b>
+<b class="fc"><i>1002</i>&nbsp;        if (str == null) {</b>
+<b class="fc"><i>1003</i>&nbsp;            return null;</b>
+<i>1004</i>&nbsp;        }
+<b class="fc"><i>1005</i>&nbsp;        if (str.contains(&quot;[&quot;)) {</b>
+<b class="fc"><i>1006</i>&nbsp;            final int start = str.indexOf(&#39;[&#39;);</b>
+<b class="fc"><i>1007</i>&nbsp;            int end = str.indexOf(&#39;]&#39;, start);</b>
+<b class="fc"><i>1008</i>&nbsp;            while (end &lt; 0) {</b>
+<b class="fc"><i>1009</i>&nbsp;                str += readLine(fin);</b>
+<b class="fc"><i>1010</i>&nbsp;                end = str.indexOf(&#39;]&#39;, start);</b>
+<i>1011</i>&nbsp;            }
+<b class="fc"><i>1012</i>&nbsp;            str = str.substring(0, start) + str.substring(end + 1);</b>
+<b class="fc"><i>1013</i>&nbsp;            if (str.matches(&quot;^\\s*$&quot;)) {</b>
+<b class="fc"><i>1014</i>&nbsp;                return nextLine(fin);</b>
+<i>1015</i>&nbsp;            }
+<i>1016</i>&nbsp;        }
+<b class="fc"><i>1017</i>&nbsp;        if (str.matches(&quot;^\\s*$&quot;)) {</b>
+<b class="fc"><i>1018</i>&nbsp;            return nextLine(fin);</b>
+<i>1019</i>&nbsp;        }
+<b class="fc"><i>1020</i>&nbsp;        return str;</b>
+<i>1021</i>&nbsp;    }
+<i>1022</i>&nbsp;
+<i>1023</i>&nbsp;    /**
+<i>1024</i>&nbsp;     * return attribute value as a string *
+<i>1025</i>&nbsp;     */
+<i>1026</i>&nbsp;    String getAttValue(final String attribute, final String str) {
+<b class="fc"><i>1027</i>&nbsp;        final Pattern pattern = Pattern.compile(&quot;.*&quot; + attribute + &quot;\\s*=\\s*([^\\s;]+).*&quot;);</b>
+<b class="fc"><i>1028</i>&nbsp;        final Matcher matcher = pattern.matcher(str.toLowerCase());</b>
+<b class="fc"><i>1029</i>&nbsp;        if (!matcher.find()) {</b>
+<b class="fc"><i>1030</i>&nbsp;            return null;</b>
+<i>1031</i>&nbsp;        }
+<b class="fc"><i>1032</i>&nbsp;        String att = matcher.group(1);</b>
+<b class="fc"><i>1033</i>&nbsp;        if (att.startsWith(&quot;\&quot;&quot;) &amp;&amp; att.endsWith(&quot;\&quot;&quot;)) {</b>
+<b class="fc"><i>1034</i>&nbsp;            final int start = matcher.start(1);</b>
+<b class="fc"><i>1035</i>&nbsp;            att = str.substring(start + 1, str.indexOf(&#39;&quot;&#39;, start + 1));</b>
+<i>1036</i>&nbsp;        }
+<b class="fc"><i>1037</i>&nbsp;        return att;</b>
+<i>1038</i>&nbsp;    }
+<i>1039</i>&nbsp;
+<i>1040</i>&nbsp;    private ArrayList&lt;String&gt; readInCharstatelablesTokens(final BufferedReader fin) throws IOException {
+<i>1041</i>&nbsp;
+<b class="nc"><i>1042</i>&nbsp;        ArrayList&lt;String&gt; tokens = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>1043</i>&nbsp;        String token=&quot;&quot;;</b>
+<b class="nc"><i>1044</i>&nbsp;        final int READING=0, OPENQUOTE=1, WAITING=2;</b>
+<b class="nc"><i>1045</i>&nbsp;        int mode = WAITING;</b>
+<b class="nc"><i>1046</i>&nbsp;        int numberOfQuotes=0;</b>
+<b class="nc"><i>1047</i>&nbsp;        boolean endOfBlock=false;</b>
+<i>1048</i>&nbsp;        String str;
+<i>1049</i>&nbsp;
+<b class="nc"><i>1050</i>&nbsp;        while (!endOfBlock) {</b>
+<b class="nc"><i>1051</i>&nbsp;            str = nextLine(fin);</b>
+<i>1052</i>&nbsp;            Character nextChar;
+<b class="nc"><i>1053</i>&nbsp;            for (int i=0; i&lt; str.length(); i++) {</b>
+<b class="nc"><i>1054</i>&nbsp;                nextChar=str.charAt(i);</b>
+<b class="nc"><i>1055</i>&nbsp;                switch (mode) {</b>
+<i>1056</i>&nbsp;                    case WAITING:
+<b class="nc"><i>1057</i>&nbsp;                        if (!Character.isWhitespace(nextChar)) {</b>
+<b class="nc"><i>1058</i>&nbsp;                            if (nextChar == &#39;\&#39;&#39;) {</b>
+<b class="nc"><i>1059</i>&nbsp;                                mode=OPENQUOTE;</b>
+<b class="nc"><i>1060</i>&nbsp;                            } else if (nextChar == &#39;/&#39; || nextChar == &#39;,&#39;) {</b>
+<b class="nc"><i>1061</i>&nbsp;                                tokens.add(nextChar.toString());</b>
+<b class="nc"><i>1062</i>&nbsp;                                token=&quot;&quot;;</b>
+<b class="nc"><i>1063</i>&nbsp;                            } else if (nextChar == &#39;;&#39;) {</b>
+<b class="nc"><i>1064</i>&nbsp;                                endOfBlock = true;</b>
+<i>1065</i>&nbsp;                            } else {
+<b class="nc"><i>1066</i>&nbsp;                                token=token+nextChar;</b>
+<b class="nc"><i>1067</i>&nbsp;                                mode=READING;</b>
+<i>1068</i>&nbsp;                            }
+<i>1069</i>&nbsp;                        }
+<i>1070</i>&nbsp;                        break;
+<i>1071</i>&nbsp;                    case READING:
+<b class="nc"><i>1072</i>&nbsp;                        if (nextChar == &#39;\&#39;&#39;) {</b>
+<b class="nc"><i>1073</i>&nbsp;                            tokens.add(token);</b>
+<b class="nc"><i>1074</i>&nbsp;                            token=&quot;&quot;;</b>
+<b class="nc"><i>1075</i>&nbsp;                            mode=OPENQUOTE;</b>
+<b class="nc"><i>1076</i>&nbsp;                        } else if (nextChar == &#39;/&#39; || nextChar == &#39;,&#39;) {</b>
+<b class="nc"><i>1077</i>&nbsp;                            tokens.add(token);</b>
+<b class="nc"><i>1078</i>&nbsp;                            tokens.add(nextChar.toString());</b>
+<b class="nc"><i>1079</i>&nbsp;                            token=&quot;&quot;;</b>
+<b class="nc"><i>1080</i>&nbsp;                            mode=WAITING;</b>
+<b class="nc"><i>1081</i>&nbsp;                        } else if (nextChar == &#39;;&#39;) {</b>
+<b class="nc"><i>1082</i>&nbsp;                            tokens.add(token);</b>
+<b class="nc"><i>1083</i>&nbsp;                            endOfBlock = true;</b>
+<b class="nc"><i>1084</i>&nbsp;                        } else if (Character.isWhitespace(nextChar)) {</b>
+<b class="nc"><i>1085</i>&nbsp;                            tokens.add(token);</b>
+<b class="nc"><i>1086</i>&nbsp;                            token=&quot;&quot;;</b>
+<b class="nc"><i>1087</i>&nbsp;                            mode=WAITING;</b>
+<i>1088</i>&nbsp;                        } else {
+<b class="nc"><i>1089</i>&nbsp;                            token=token+nextChar;</b>
+<i>1090</i>&nbsp;                        }
+<b class="nc"><i>1091</i>&nbsp;                        break;</b>
+<i>1092</i>&nbsp;                    case OPENQUOTE:
+<b class="nc"><i>1093</i>&nbsp;                        if (nextChar == &#39;\&#39;&#39;) {</b>
+<b class="nc"><i>1094</i>&nbsp;                            numberOfQuotes++;</b>
+<i>1095</i>&nbsp;                        } else {
+<b class="nc"><i>1096</i>&nbsp;                            if (numberOfQuotes % 2 == 0) {</b>
+<b class="nc"><i>1097</i>&nbsp;                                for (int ind=0; ind&lt; numberOfQuotes/2; ind++) {</b>
+<b class="nc"><i>1098</i>&nbsp;                                    token=token+&quot;&#39;&quot;;</b>
+<i>1099</i>&nbsp;                                }
+<b class="nc"><i>1100</i>&nbsp;                                token=token+nextChar;</b>
+<i>1101</i>&nbsp;                            } else {
+<b class="nc"><i>1102</i>&nbsp;                                for (int ind=0; ind&lt; numberOfQuotes/2; ind++) {</b>
+<b class="nc"><i>1103</i>&nbsp;                                    token=token+&quot;&#39;&quot;;</b>
+<i>1104</i>&nbsp;                                }
+<b class="nc"><i>1105</i>&nbsp;                                tokens.add(token);</b>
+<b class="nc"><i>1106</i>&nbsp;                                token=&quot;&quot;;</b>
+<b class="nc"><i>1107</i>&nbsp;                                if (nextChar == &#39;/&#39; || nextChar == &#39;,&#39;) {</b>
+<b class="nc"><i>1108</i>&nbsp;                                    tokens.add(nextChar.toString());</b>
+<b class="nc"><i>1109</i>&nbsp;                                    mode=WAITING;</b>
+<b class="nc"><i>1110</i>&nbsp;                                } else if (nextChar == &#39;;&#39;) {</b>
+<b class="nc"><i>1111</i>&nbsp;                                    endOfBlock = true;</b>
+<b class="nc"><i>1112</i>&nbsp;                                } else if (Character.isWhitespace(nextChar)) {</b>
+<b class="nc"><i>1113</i>&nbsp;                                    mode=WAITING;</b>
+<i>1114</i>&nbsp;                                } else {
+<b class="nc"><i>1115</i>&nbsp;                                    token=token+nextChar;</b>
+<b class="nc"><i>1116</i>&nbsp;                                    mode=READING;</b>
+<i>1117</i>&nbsp;                                }
+<i>1118</i>&nbsp;                            }
+<b class="nc"><i>1119</i>&nbsp;                            numberOfQuotes=0;</b>
+<i>1120</i>&nbsp;                        }
+<b class="nc"><i>1121</i>&nbsp;                        break;</b>
+<i>1122</i>&nbsp;                    default:
+<i>1123</i>&nbsp;                        break;
+<i>1124</i>&nbsp;                }
+<i>1125</i>&nbsp;            }
+<i>1126</i>&nbsp;        }
+<i>1127</i>&nbsp;
+<b class="nc"><i>1128</i>&nbsp;        if (!tokens.get(tokens.size()-1).equals(&quot;,&quot;)) {</b>
+<b class="nc"><i>1129</i>&nbsp;            tokens.add(&quot;,&quot;);</b>
+<i>1130</i>&nbsp;        }
+<i>1131</i>&nbsp;
+<b class="nc"><i>1132</i>&nbsp;        return tokens;</b>
+<i>1133</i>&nbsp;    }
+<i>1134</i>&nbsp;
+<i>1135</i>&nbsp;    private ArrayList&lt;UserDataType&gt; processCharstatelabelsTokens(ArrayList&lt;String&gt; tokens, int[] maxNumberOfStates) throws IOException {
+<i>1136</i>&nbsp;
+<b class="nc"><i>1137</i>&nbsp;        ArrayList&lt;UserDataType&gt; charDescriptions = new ArrayList&lt;&gt;();</b>
+<i>1138</i>&nbsp;
+<b class="nc"><i>1139</i>&nbsp;        final int CHAR_NR=0, CHAR_NAME=1, STATES=2;</b>
+<b class="nc"><i>1140</i>&nbsp;        int mode = CHAR_NR;</b>
+<b class="nc"><i>1141</i>&nbsp;        int charNumber = -1;</b>
+<b class="nc"><i>1142</i>&nbsp;        String charName = &quot;&quot;;</b>
+<b class="nc"><i>1143</i>&nbsp;        ArrayList&lt;String&gt; states = new ArrayList&lt;&gt;();</b>
+<i>1144</i>&nbsp;
+<b class="nc"><i>1145</i>&nbsp;        for (String token:tokens) {</b>
+<b class="nc"><i>1146</i>&nbsp;            switch (mode) {</b>
+<i>1147</i>&nbsp;                case CHAR_NR:
+<b class="nc"><i>1148</i>&nbsp;                    charNumber = Integer.parseInt(token);</b>
+<b class="nc"><i>1149</i>&nbsp;                    mode = CHAR_NAME;</b>
+<b class="nc"><i>1150</i>&nbsp;                    break;</b>
+<i>1151</i>&nbsp;                case CHAR_NAME:
+<b class="nc"><i>1152</i>&nbsp;                    if (token.equals(&quot;/&quot;)) {</b>
+<b class="nc"><i>1153</i>&nbsp;                        mode = STATES;</b>
+<b class="nc"><i>1154</i>&nbsp;                    } else if (token.equals(&quot;,&quot;)) {</b>
+<b class="nc"><i>1155</i>&nbsp;                        if (charNumber &gt; charDescriptions.size()+1) {</b>
+<b class="nc"><i>1156</i>&nbsp;                            throw new IOException(&quot;Character descriptions should go in the ascending order and there &quot; +</b>
+<i>1157</i>&nbsp;                                    &quot;should not be any description missing.&quot;);
+<i>1158</i>&nbsp;                        }
+<b class="nc"><i>1159</i>&nbsp;                        charDescriptions.add(new UserDataType(charName, states));</b>
+<b class="nc"><i>1160</i>&nbsp;                        maxNumberOfStates[0] = Math.max(maxNumberOfStates[0], states.size());</b>
+<b class="nc"><i>1161</i>&nbsp;                        charNumber = -1;</b>
+<b class="nc"><i>1162</i>&nbsp;                        charName = &quot;&quot;;</b>
+<b class="nc"><i>1163</i>&nbsp;                        states = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>1164</i>&nbsp;                        mode = CHAR_NR;</b>
+<i>1165</i>&nbsp;                    } else {
+<b class="nc"><i>1166</i>&nbsp;                        charName = token;</b>
+<i>1167</i>&nbsp;                    }
+<b class="nc"><i>1168</i>&nbsp;                    break;</b>
+<i>1169</i>&nbsp;                case STATES:
+<b class="nc"><i>1170</i>&nbsp;                    if (token.equals(&quot;,&quot;)) {</b>
+<b class="nc"><i>1171</i>&nbsp;                        if (charNumber &gt; charDescriptions.size()+1) {</b>
+<b class="nc"><i>1172</i>&nbsp;                            throw new IOException(&quot;Character descriptions should go in the ascending order and there &quot; +</b>
+<i>1173</i>&nbsp;                                    &quot;should not be any description missing.&quot;);
+<i>1174</i>&nbsp;                        }
+<b class="nc"><i>1175</i>&nbsp;                        charDescriptions.add(new UserDataType(charName, states));</b>
+<b class="nc"><i>1176</i>&nbsp;                        maxNumberOfStates[0] = Math.max(maxNumberOfStates[0], states.size());</b>
+<b class="nc"><i>1177</i>&nbsp;                        charNumber = -1;</b>
+<b class="nc"><i>1178</i>&nbsp;                        charName = &quot;&quot;;</b>
+<b class="nc"><i>1179</i>&nbsp;                        states = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>1180</i>&nbsp;                        mode = CHAR_NR;</b>
+<i>1181</i>&nbsp;                    } else {
+<b class="nc"><i>1182</i>&nbsp;                        states.add(token);</b>
+<i>1183</i>&nbsp;                    }
+<i>1184</i>&nbsp;                default:
+<i>1185</i>&nbsp;                    break;
+<i>1186</i>&nbsp;            }
+<b class="nc"><i>1187</i>&nbsp;        }</b>
+<i>1188</i>&nbsp;
+<b class="nc"><i>1189</i>&nbsp;        return charDescriptions;</b>
+<i>1190</i>&nbsp;
+<i>1191</i>&nbsp;    }
+<i>1192</i>&nbsp;
+<i>1193</i>&nbsp;    public static void main(final String[] args) {
+<i>1194</i>&nbsp;        try {
+<b class="nc"><i>1195</i>&nbsp;            final NexusParser parser = new NexusParser();</b>
+<b class="nc"><i>1196</i>&nbsp;            parser.parseFile(new File(args[0]));</b>
+<b class="nc"><i>1197</i>&nbsp;            if (parser.taxa != null) {</b>
+<b class="nc"><i>1198</i>&nbsp;                System.out.println(parser.taxa.size() + &quot; taxa&quot;);</b>
+<b class="nc"><i>1199</i>&nbsp;                System.out.println(Arrays.toString(parser.taxa.toArray(new String[parser.taxa.size()])));</b>
+<i>1200</i>&nbsp;            }
+<b class="nc"><i>1201</i>&nbsp;            if (parser.trees != null) {</b>
+<b class="nc"><i>1202</i>&nbsp;                System.out.println(parser.trees.size() + &quot; trees&quot;);</b>
+<i>1203</i>&nbsp;            }
+<b class="nc"><i>1204</i>&nbsp;            if (parser.m_alignment != null) {</b>
+<b class="nc"><i>1205</i>&nbsp;                final String xml = new XMLProducer().toXML(parser.m_alignment);</b>
+<b class="nc"><i>1206</i>&nbsp;                System.out.println(xml);</b>
+<i>1207</i>&nbsp;            }
+<b class="nc"><i>1208</i>&nbsp;            if (parser.traitSet != null) {</b>
+<b class="nc"><i>1209</i>&nbsp;                final String xml = new XMLProducer().toXML(parser.traitSet);</b>
+<b class="nc"><i>1210</i>&nbsp;                System.out.println(xml);</b>
+<i>1211</i>&nbsp;            }
+<b class="nc"><i>1212</i>&nbsp;        } catch (Exception e) {</b>
+<i>1213</i>&nbsp;            // TODO Auto-generated catch block
+<b class="nc"><i>1214</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>1215</i>&nbsp;        }</b>
+<b class="nc"><i>1216</i>&nbsp;    } // main</b>
+<i>1217</i>&nbsp;
+<i>1218</i>&nbsp;} // class NexusParser
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

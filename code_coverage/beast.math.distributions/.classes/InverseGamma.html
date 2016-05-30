@@ -1,0 +1,212 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: InverseGamma</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.math.distributions</a> ]
+</div>
+
+<h1>Coverage Summary for Class: InverseGamma (beast.math.distributions)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InverseGamma</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 18)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">InverseGamma$InverseGammaImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 14)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 32)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.math.distributions;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import org.apache.commons.math.MathException;
+<i>5</i>&nbsp;import org.apache.commons.math.distribution.ContinuousDistribution;
+<i>6</i>&nbsp;import org.apache.commons.math.distribution.Distribution;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import beast.core.Description;
+<i>9</i>&nbsp;import beast.core.Input;
+<i>10</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;@Description(&quot;Inverse Gamma distribution, used as prior.    for x&gt;0  f(x; alpha, beta) = \frac{beta^alpha}{Gamma(alpha)} (1/x)^{alpha + 1}exp(-beta/x) &quot; +
+<i>15</i>&nbsp;        &quot;If the input x is a multidimensional parameter, each of the dimensions is considered as a &quot; +
+<i>16</i>&nbsp;        &quot;separate independent component.&quot;)
+<b class="nc"><i>17</i>&nbsp;public class InverseGamma extends ParametricDistribution {</b>
+<b class="nc"><i>18</i>&nbsp;    final public Input&lt;RealParameter&gt; alphaInput = new Input&lt;&gt;(&quot;alpha&quot;, &quot;shape parameter, defaults to 2&quot;);</b>
+<b class="nc"><i>19</i>&nbsp;    final public Input&lt;RealParameter&gt; betaInput = new Input&lt;&gt;(&quot;beta&quot;, &quot;scale parameter, defaults to 2&quot;);</b>
+<i>20</i>&nbsp;
+<b class="nc"><i>21</i>&nbsp;    InverseGammaImpl dist = new InverseGammaImpl(2, 2);</b>
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;    @Override
+<i>24</i>&nbsp;    public void initAndValidate() {
+<b class="nc"><i>25</i>&nbsp;        refresh();</b>
+<b class="nc"><i>26</i>&nbsp;    }</b>
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;    /**
+<i>29</i>&nbsp;     * ensure internal state is up to date *
+<i>30</i>&nbsp;     */
+<i>31</i>&nbsp;    void refresh() {
+<i>32</i>&nbsp;        double alpha;
+<i>33</i>&nbsp;        double beta;
+<b class="nc"><i>34</i>&nbsp;        if (alphaInput.get() == null) {</b>
+<b class="nc"><i>35</i>&nbsp;            alpha = 2;</b>
+<i>36</i>&nbsp;        } else {
+<b class="nc"><i>37</i>&nbsp;            alpha = alphaInput.get().getValue();</b>
+<i>38</i>&nbsp;        }
+<b class="nc"><i>39</i>&nbsp;        if (betaInput.get() == null) {</b>
+<b class="nc"><i>40</i>&nbsp;            beta = 2;</b>
+<i>41</i>&nbsp;        } else {
+<b class="nc"><i>42</i>&nbsp;            beta = betaInput.get().getValue();</b>
+<i>43</i>&nbsp;        }
+<b class="nc"><i>44</i>&nbsp;        dist.setAlphaBeta(alpha, beta);</b>
+<b class="nc"><i>45</i>&nbsp;    }</b>
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;    @Override
+<i>48</i>&nbsp;    public Distribution getDistribution() {
+<b class="nc"><i>49</i>&nbsp;        refresh();</b>
+<b class="nc"><i>50</i>&nbsp;        return dist;</b>
+<i>51</i>&nbsp;    }
+<i>52</i>&nbsp;
+<b class="nc"><i>53</i>&nbsp;    class InverseGammaImpl implements ContinuousDistribution {</b>
+<i>54</i>&nbsp;        double m_fAlpha;
+<i>55</i>&nbsp;        double m_fBeta;
+<i>56</i>&nbsp;        // log of the constant beta^alpha/Gamma(alpha)
+<i>57</i>&nbsp;        double C;
+<i>58</i>&nbsp;
+<b class="nc"><i>59</i>&nbsp;        InverseGammaImpl(double alpha, double beta) {</b>
+<b class="nc"><i>60</i>&nbsp;            setAlphaBeta(alpha, beta);</b>
+<b class="nc"><i>61</i>&nbsp;        }</b>
+<i>62</i>&nbsp;
+<i>63</i>&nbsp;        void setAlphaBeta(double alpha, double beta) {
+<b class="nc"><i>64</i>&nbsp;            m_fAlpha = alpha;</b>
+<b class="nc"><i>65</i>&nbsp;            m_fBeta = beta;</b>
+<b class="nc"><i>66</i>&nbsp;            C = m_fAlpha * Math.log(m_fBeta) - org.apache.commons.math.special.Gamma.logGamma(m_fAlpha);</b>
+<b class="nc"><i>67</i>&nbsp;        }</b>
+<i>68</i>&nbsp;
+<i>69</i>&nbsp;        @Override
+<i>70</i>&nbsp;        public double cumulativeProbability(double x) throws MathException {
+<b class="nc"><i>71</i>&nbsp;            throw new MathException(&quot;Not implemented yet&quot;);</b>
+<i>72</i>&nbsp;        }
+<i>73</i>&nbsp;
+<i>74</i>&nbsp;        @Override
+<i>75</i>&nbsp;        public double cumulativeProbability(double x0, double x1) throws MathException {
+<b class="nc"><i>76</i>&nbsp;            throw new MathException(&quot;Not implemented yet&quot;);</b>
+<i>77</i>&nbsp;        }
+<i>78</i>&nbsp;
+<i>79</i>&nbsp;        @Override
+<i>80</i>&nbsp;        public double inverseCumulativeProbability(double p) throws MathException {
+<b class="nc"><i>81</i>&nbsp;            throw new MathException(&quot;Not implemented yet&quot;);</b>
+<i>82</i>&nbsp;        }
+<i>83</i>&nbsp;
+<i>84</i>&nbsp;        @Override
+<i>85</i>&nbsp;        public double density(double x) {
+<b class="nc"><i>86</i>&nbsp;            double logP = logDensity(x);</b>
+<b class="nc"><i>87</i>&nbsp;            return Math.exp(logP);</b>
+<i>88</i>&nbsp;        }
+<i>89</i>&nbsp;
+<i>90</i>&nbsp;        @Override
+<i>91</i>&nbsp;        public double logDensity(double x) {
+<b class="nc"><i>92</i>&nbsp;            double logP = -(m_fAlpha + 1.0) * Math.log(x) - (m_fBeta / x) + C;</b>
+<b class="nc"><i>93</i>&nbsp;            return logP;</b>
+<i>94</i>&nbsp;        }
+<i>95</i>&nbsp;    } // class OneOnXImpl
+<i>96</i>&nbsp;
+<i>97</i>&nbsp;
+<i>98</i>&nbsp;    @Override
+<i>99</i>&nbsp;    public double getMean() {
+<b class="nc"><i>100</i>&nbsp;    	return betaInput.get().getValue() / (alphaInput.get().getValue() - 1.0);</b>
+<i>101</i>&nbsp;    }
+<i>102</i>&nbsp;    
+<i>103</i>&nbsp;} // class InverseGamma
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

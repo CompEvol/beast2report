@@ -1,0 +1,243 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: CauchyPlusConstant</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.tree.coalescent</a> ]
+</div>
+
+<h1>Coverage Summary for Class: CauchyPlusConstant (beast.evolution.tree.coalescent)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CauchyPlusConstant</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 41)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp; * Copyright (C) 2012 Tim Vaughan &lt;tgvaughan@gmail.com&gt;
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; * This program is free software: you can redistribute it and/or modify
+<i>5</i>&nbsp; * it under the terms of the GNU General Public License as published by
+<i>6</i>&nbsp; * the Free Software Foundation, either version 3 of the License, or
+<i>7</i>&nbsp; * (at your option) any later version.
+<i>8</i>&nbsp; *
+<i>9</i>&nbsp; * This program is distributed in the hope that it will be useful,
+<i>10</i>&nbsp; * but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>11</i>&nbsp; * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>12</i>&nbsp; * GNU General Public License for more details.
+<i>13</i>&nbsp; *
+<i>14</i>&nbsp; * You should have received a copy of the GNU General Public License
+<i>15</i>&nbsp; * along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+<i>16</i>&nbsp; */
+<i>17</i>&nbsp;package beast.evolution.tree.coalescent;
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;import java.util.ArrayList;
+<i>20</i>&nbsp;import java.util.Collections;
+<i>21</i>&nbsp;import java.util.List;
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;import beast.core.Description;
+<i>24</i>&nbsp;import beast.core.Input;
+<i>25</i>&nbsp;import beast.core.Input.Validate;
+<i>26</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>27</i>&nbsp;import beast.evolution.tree.coalescent.PopulationFunction;
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;/**
+<i>31</i>&nbsp; * @author Tim Vaughan &lt;tgvaughan@gmail.com&gt;
+<i>32</i>&nbsp; */
+<i>33</i>&nbsp;@Description(&quot;Population model of the form A/(B*(t-t0)^2 + 1) + C.&quot;)
+<b class="nc"><i>34</i>&nbsp;public class CauchyPlusConstant extends PopulationFunction.Abstract {</b>
+<i>35</i>&nbsp;    
+<b class="nc"><i>36</i>&nbsp;    public Input&lt;RealParameter&gt; AInput = new Input&lt;RealParameter&gt;(</b>
+<i>37</i>&nbsp;            &quot;A&quot;, &quot;Magnitude of Cauchy distribution.&quot;, Validate.REQUIRED);
+<b class="nc"><i>38</i>&nbsp;    public Input&lt;RealParameter&gt; BInput = new Input&lt;RealParameter&gt;(</b>
+<i>39</i>&nbsp;            &quot;B&quot;, &quot;Width of Cauchy distribution.&quot;, Validate.REQUIRED);
+<b class="nc"><i>40</i>&nbsp;    public Input&lt;RealParameter&gt; t0Input = new Input&lt;RealParameter&gt;(</b>
+<i>41</i>&nbsp;            &quot;t0&quot;, &quot;Centre of Cauchy distribution.&quot;, Validate.REQUIRED);
+<b class="nc"><i>42</i>&nbsp;    public Input&lt;RealParameter&gt; CInput = new Input&lt;RealParameter&gt;(</b>
+<i>43</i>&nbsp;            &quot;C&quot;, &quot;Constant population offset value.&quot;, Validate.REQUIRED);
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;    /**
+<i>46</i>&nbsp;     * Required initAndValidate method.
+<i>47</i>&nbsp;     */
+<i>48</i>&nbsp;    @Override
+<i>49</i>&nbsp;    public void initAndValidate() { }
+<i>50</i>&nbsp;    
+<i>51</i>&nbsp;        /**
+<i>52</i>&nbsp;     * Retrieve list of population model parameter IDs.
+<i>53</i>&nbsp;     * 
+<i>54</i>&nbsp;     * @return List of IDs.
+<i>55</i>&nbsp;     */
+<i>56</i>&nbsp;    @Override
+<i>57</i>&nbsp;    public List&lt;String&gt; getParameterIds() {
+<b class="nc"><i>58</i>&nbsp;        List&lt;String&gt; idList = new ArrayList&lt;String&gt;();</b>
+<b class="nc"><i>59</i>&nbsp;        idList.add(AInput.get().getID());</b>
+<b class="nc"><i>60</i>&nbsp;        idList.add(BInput.get().getID());</b>
+<b class="nc"><i>61</i>&nbsp;        idList.add(t0Input.get().getID());</b>
+<b class="nc"><i>62</i>&nbsp;        idList.add(CInput.get().getID());</b>
+<i>63</i>&nbsp;        
+<b class="nc"><i>64</i>&nbsp;        return Collections.unmodifiableList(idList);</b>
+<i>65</i>&nbsp;    }
+<i>66</i>&nbsp;    
+<i>67</i>&nbsp;    /**
+<i>68</i>&nbsp;     * Retrieve population size at time t.
+<i>69</i>&nbsp;     * 
+<i>70</i>&nbsp;     * @param t
+<i>71</i>&nbsp;     * @return Population size.
+<i>72</i>&nbsp;     */
+<i>73</i>&nbsp;    @Override
+<i>74</i>&nbsp;    public double getPopSize(double t) {
+<i>75</i>&nbsp;        
+<b class="nc"><i>76</i>&nbsp;        double A = AInput.get().getValue();</b>
+<b class="nc"><i>77</i>&nbsp;        double B = BInput.get().getValue();</b>
+<b class="nc"><i>78</i>&nbsp;        double t0 = t0Input.get().getValue();</b>
+<b class="nc"><i>79</i>&nbsp;        double C = CInput.get().getValue();</b>
+<i>80</i>&nbsp;
+<b class="nc"><i>81</i>&nbsp;        return A/(B*Math.pow(t-t0, 2.0)+1.0) + C;</b>
+<i>82</i>&nbsp;    }
+<i>83</i>&nbsp;
+<i>84</i>&nbsp;    /**
+<i>85</i>&nbsp;     * Calculate and return result of integral \int_0^t 1/N(s)ds.
+<i>86</i>&nbsp;     * 
+<i>87</i>&nbsp;     * @param t
+<i>88</i>&nbsp;     * @return Result of integral.
+<i>89</i>&nbsp;     */
+<i>90</i>&nbsp;    @Override
+<i>91</i>&nbsp;    public double getIntensity(double t) {
+<i>92</i>&nbsp;        
+<b class="nc"><i>93</i>&nbsp;        double A = AInput.get().getValue();</b>
+<b class="nc"><i>94</i>&nbsp;        double B = BInput.get().getValue();</b>
+<b class="nc"><i>95</i>&nbsp;        double t0 = t0Input.get().getValue();</b>
+<b class="nc"><i>96</i>&nbsp;        double C = CInput.get().getValue();</b>
+<i>97</i>&nbsp;        
+<b class="nc"><i>98</i>&nbsp;        if (B==0) {</b>
+<b class="nc"><i>99</i>&nbsp;            return t/(A+C);</b>
+<i>100</i>&nbsp;        }
+<i>101</i>&nbsp;        
+<b class="nc"><i>102</i>&nbsp;        if (C==0) {</b>
+<b class="nc"><i>103</i>&nbsp;            return (t-B*Math.pow(t0-t,3)/3.0)/A</b>
+<b class="nc"><i>104</i>&nbsp;                    + B*Math.pow(t0,3)/3.0/A;</b>
+<i>105</i>&nbsp;        }        
+<i>106</i>&nbsp;
+<b class="nc"><i>107</i>&nbsp;        return -A*Math.atan(t0*Math.sqrt(B*C/(A + C)))/Math.sqrt(B*Math.pow(C,3)*(A + C))</b>
+<b class="nc"><i>108</i>&nbsp;                + A*Math.atan(Math.sqrt(B*C/(A + C))*(-t + t0))/Math.sqrt(B*Math.pow(C,3)*(A + C))</b>
+<i>109</i>&nbsp;                + t0/C - (-t + t0)/C;
+<i>110</i>&nbsp;    }
+<i>111</i>&nbsp;    
+<i>112</i>&nbsp;    /**
+<i>113</i>&nbsp;     * Calculate and return result of integral \int_t_1^t 2/N(s)ds.  This method
+<i>114</i>&nbsp;     * is slightly more accurate than simply using getIntensity(t2)-getIntensity(t1).
+<i>115</i>&nbsp;     * 
+<i>116</i>&nbsp;     * @param t1
+<i>117</i>&nbsp;     * @param t2
+<i>118</i>&nbsp;     * @return Result of integral.
+<i>119</i>&nbsp;     */
+<i>120</i>&nbsp;    @Override
+<i>121</i>&nbsp;    public double getIntegral(double t1, double t2) {
+<i>122</i>&nbsp;        
+<b class="nc"><i>123</i>&nbsp;        double A = AInput.get().getValue();</b>
+<b class="nc"><i>124</i>&nbsp;        double B = BInput.get().getValue();</b>
+<b class="nc"><i>125</i>&nbsp;        double t0 = t0Input.get().getValue();</b>
+<b class="nc"><i>126</i>&nbsp;        double C = CInput.get().getValue();</b>
+<i>127</i>&nbsp;        
+<b class="nc"><i>128</i>&nbsp;        if (B==0) {</b>
+<b class="nc"><i>129</i>&nbsp;            return (t2-t1)/(A+C);</b>
+<i>130</i>&nbsp;        }
+<i>131</i>&nbsp;        
+<b class="nc"><i>132</i>&nbsp;        if (C==0) {</b>
+<b class="nc"><i>133</i>&nbsp;            return (t2-B*Math.pow(t0-t2,3)/3.0)/A</b>
+<b class="nc"><i>134</i>&nbsp;                    -(t1-B*Math.pow(t0-t1,3)/3.0)/A;</b>
+<i>135</i>&nbsp;        }
+<i>136</i>&nbsp;        
+<b class="nc"><i>137</i>&nbsp;        double I = (A/Math.sqrt(B*Math.pow(C,3)*(A+C)))</b>
+<b class="nc"><i>138</i>&nbsp;                *(Math.atan(Math.sqrt(B*C/(A+C))*(t0-t2))</b>
+<b class="nc"><i>139</i>&nbsp;                -Math.atan(Math.sqrt(B*C/(A+C))*(t0-t1)))</b>
+<i>140</i>&nbsp;                + (t2-t1)/C;
+<i>141</i>&nbsp;        
+<i>142</i>&nbsp;        /* DEBUG:
+<i>143</i>&nbsp;        double Iold = getIntensity(t2)-getIntensity(t1);
+<i>144</i>&nbsp;        System.out.println(
+<i>145</i>&nbsp;                &quot;I=&quot;+I
+<i>146</i>&nbsp;                +&quot;, Iold=&quot;+Iold
+<i>147</i>&nbsp;                +&quot;, dI=&quot;+String.valueOf(I-Iold)
+<i>148</i>&nbsp;                +&quot;, t1=&quot;+t1+&quot;, t2=&quot;+t2);
+<i>149</i>&nbsp;        */
+<i>150</i>&nbsp;        
+<b class="nc"><i>151</i>&nbsp;        return I;</b>
+<i>152</i>&nbsp;    }
+<i>153</i>&nbsp;    
+<i>154</i>&nbsp;
+<i>155</i>&nbsp;    @Override
+<i>156</i>&nbsp;    public double getInverseIntensity(double d) {
+<b class="nc"><i>157</i>&nbsp;        throw new UnsupportedOperationException(&quot;Not supported yet.&quot;);</b>
+<i>158</i>&nbsp;    }
+<i>159</i>&nbsp;    
+<i>160</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,140 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Prior</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.core</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Prior (beast.core)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Prior</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 22)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.core;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.util.HashSet;
+<i>4</i>&nbsp;import java.util.List;
+<i>5</i>&nbsp;import java.util.Set;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import beast.core.util.CompoundDistribution;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;@Description(&quot;Represents a list of prior distribution over a StateNode, &quot; +
+<i>10</i>&nbsp;		&quot;each potentially conditioned on one or more other StateNodes. &quot; +
+<i>11</i>&nbsp;		&quot;The class checks that no StateNode has more than one prior defined &quot; +
+<i>12</i>&nbsp;		&quot;for it.&quot;)
+<b class="nc"><i>13</i>&nbsp;public class Prior extends CompoundDistribution {</b>
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;	@Override
+<i>16</i>&nbsp;    public void initAndValidate() {
+<i>17</i>&nbsp;        // Check no StateNode has two priors defined for it
+<i>18</i>&nbsp;		// first, find all state nodes that have any references
+<b class="nc"><i>19</i>&nbsp;		List&lt;Distribution&gt; priors = pDistributions.get();</b>
+<b class="nc"><i>20</i>&nbsp;		int nPriors = priors.size();</b>
+<b class="nc"><i>21</i>&nbsp;		Set&lt;StateNode&gt; [] stateNodesPerPrior = new HashSet[nPriors];</b>
+<b class="nc"><i>22</i>&nbsp;		int k = 0;</b>
+<b class="nc"><i>23</i>&nbsp;		for (Distribution distribution : priors) {</b>
+<b class="nc"><i>24</i>&nbsp;			stateNodesPerPrior[k] = new HashSet&lt;StateNode&gt;();</b>
+<b class="nc"><i>25</i>&nbsp;			collectStateNodes(distribution, stateNodesPerPrior[k]);</b>
+<i>26</i>&nbsp;			// sanity check
+<b class="nc"><i>27</i>&nbsp;			if (stateNodesPerPrior[k].size() == 0) {</b>
+<b class="nc"><i>28</i>&nbsp;				throw new IllegalArgumentException(&quot;Prior (id=&quot; + priors.get(k).getID() + &quot;) does not cover any StateNode. &quot; +</b>
+<i>29</i>&nbsp;						&quot;This indicates the model is not valid.&quot;);
+<i>30</i>&nbsp;			}
+<b class="nc"><i>31</i>&nbsp;		}</b>
+<i>32</i>&nbsp;		
+<i>33</i>&nbsp;		// second, determine whether state nodes can be partitioned
+<i>34</i>&nbsp;		// For every prior, at least one extra StateNode needs to be considered
+<b class="nc"><i>35</i>&nbsp;		Set&lt;StateNode&gt; stateNodes = new HashSet&lt;StateNode&gt;();</b>
+<b class="nc"><i>36</i>&nbsp;		stateNodes.addAll(stateNodesPerPrior[0]);</b>
+<b class="nc"><i>37</i>&nbsp;		for (k = 1; k &lt; nPriors; k++) {</b>
+<b class="nc"><i>38</i>&nbsp;			if (stateNodes.containsAll(stateNodesPerPrior[k])) {</b>
+<b class="nc"><i>39</i>&nbsp;				throw new IllegalArgumentException(&quot;Prior (id=&quot; + priors.get(k).getID() + &quot;) does not cover a StateNode exclusively. &quot; +</b>
+<i>40</i>&nbsp;						&quot;This indicates the model is not valid.&quot;);
+<i>41</i>&nbsp;			}
+<b class="nc"><i>42</i>&nbsp;			stateNodes.addAll(stateNodesPerPrior[k]);</b>
+<i>43</i>&nbsp;		}
+<i>44</i>&nbsp;		
+<i>45</i>&nbsp;    } // initAndValidate
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;	void collectStateNodes(BEASTInterface plugin, Set&lt;StateNode&gt; stateNodes) {
+<b class="nc"><i>48</i>&nbsp;		for (BEASTInterface o : plugin.listActiveBEASTObjects()) {</b>
+<b class="nc"><i>49</i>&nbsp;			if (o instanceof StateNode) {</b>
+<b class="nc"><i>50</i>&nbsp;				stateNodes.add((StateNode) o);</b>
+<i>51</i>&nbsp;			} else {
+<b class="nc"><i>52</i>&nbsp;				collectStateNodes(o, stateNodes);</b>
+<i>53</i>&nbsp;			}
+<b class="nc"><i>54</i>&nbsp;		}</b>
+<i>55</i>&nbsp;	} // collectStateNodes
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

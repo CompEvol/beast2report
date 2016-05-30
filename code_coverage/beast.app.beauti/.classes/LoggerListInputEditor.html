@@ -1,0 +1,143 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: LoggerListInputEditor</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.beauti</a> ]
+</div>
+
+<h1>Coverage Summary for Class: LoggerListInputEditor (beast.app.beauti)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LoggerListInputEditor</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (17/ 17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.beauti;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.awt.Dimension;
+<i>4</i>&nbsp;import java.util.List;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;import javax.swing.JTextField;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import beast.app.draw.InputEditor;
+<i>9</i>&nbsp;import beast.app.draw.ListInputEditor;
+<i>10</i>&nbsp;import beast.app.draw.StringInputEditor;
+<i>11</i>&nbsp;import beast.core.BEASTInterface;
+<i>12</i>&nbsp;import beast.core.Input;
+<i>13</i>&nbsp;import beast.core.Logger;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;public class LoggerListInputEditor extends ListInputEditor {
+<i>18</i>&nbsp;    private static final long serialVersionUID = 1L;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;	public LoggerListInputEditor(BeautiDoc doc) {
+<b class="fc"><i>21</i>&nbsp;		super(doc);</b>
+<b class="fc"><i>22</i>&nbsp;	}</b>
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;    @Override
+<i>25</i>&nbsp;    public Class&lt;?&gt; type() {
+<b class="fc"><i>26</i>&nbsp;        return List.class;</b>
+<i>27</i>&nbsp;    }
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;    @Override
+<i>30</i>&nbsp;    public Class&lt;?&gt; baseType() {
+<b class="fc"><i>31</i>&nbsp;        return Logger.class;</b>
+<i>32</i>&nbsp;    }
+<i>33</i>&nbsp;    
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;    @Override
+<i>36</i>&nbsp;    public void init(Input&lt;?&gt; input, BEASTInterface beastObject, int itemNr, ExpandOption isExpandOption, boolean addButtons) {
+<b class="fc"><i>37</i>&nbsp;    	super.init(input, beastObject, itemNr, isExpandOption, addButtons);</b>
+<b class="fc"><i>38</i>&nbsp;    }</b>
+<i>39</i>&nbsp;    
+<i>40</i>&nbsp;    @Override
+<i>41</i>&nbsp;    protected void addSingleItem(BEASTInterface beastObject) {
+<b class="fc"><i>42</i>&nbsp;    	currentLogger = (Logger) beastObject;</b>
+<b class="fc"><i>43</i>&nbsp;    	super.addSingleItem(beastObject);</b>
+<b class="fc"><i>44</i>&nbsp;    }</b>
+<i>45</i>&nbsp;    
+<i>46</i>&nbsp;    public InputEditor createFileNameEditor() {
+<b class="fc"><i>47</i>&nbsp;        final Input&lt;?&gt; input = currentLogger.fileNameInput;</b>
+<b class="fc"><i>48</i>&nbsp;        StringInputEditor fileNameEditor = new StringInputEditor(doc);</b>
+<b class="fc"><i>49</i>&nbsp;        fileNameEditor.init(input, currentLogger, -1, ExpandOption.FALSE, true);</b>
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;        // ensure file name entry has larger size than the standard size
+<b class="fc"><i>52</i>&nbsp;        JTextField fileNameEntry = fileNameEditor.getEntry();</b>
+<b class="fc"><i>53</i>&nbsp;        Dimension size = new Dimension(400, fileNameEntry.getPreferredSize().height);</b>
+<b class="fc"><i>54</i>&nbsp;        fileNameEntry.setMinimumSize(size);</b>
+<b class="fc"><i>55</i>&nbsp;        fileNameEntry.setPreferredSize(size);</b>
+<b class="fc"><i>56</i>&nbsp;        return fileNameEditor;</b>
+<i>57</i>&nbsp;    }
+<i>58</i>&nbsp;    
+<i>59</i>&nbsp;    Logger currentLogger;
+<i>60</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,554 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: ExperimentalTreeLikelihood</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.likelihood</a> ]
+</div>
+
+<h1>Coverage Summary for Class: ExperimentalTreeLikelihood (beast.evolution.likelihood)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExperimentalTreeLikelihood</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 188)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;* File TreeLikelihood.java
+<i>3</i>&nbsp;*
+<i>4</i>&nbsp;* Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>5</i>&nbsp;*
+<i>6</i>&nbsp;* This file is part of BEAST2.
+<i>7</i>&nbsp;* See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp;* information regarding copyright ownership and licensing.
+<i>9</i>&nbsp;*
+<i>10</i>&nbsp;* BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp;* it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp;* published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp;* of the License, or (at your option) any later version.
+<i>14</i>&nbsp;*
+<i>15</i>&nbsp;*  BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp;*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp;*  GNU Lesser General Public License for more details.
+<i>19</i>&nbsp;*
+<i>20</i>&nbsp;* You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp;* License along with BEAST; if not, write to the
+<i>22</i>&nbsp;* Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp;* Boston, MA  02110-1301  USA
+<i>24</i>&nbsp;*/
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;package beast.evolution.likelihood;
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;import java.util.ArrayList;
+<i>32</i>&nbsp;import java.util.Arrays;
+<i>33</i>&nbsp;import java.util.Collections;
+<i>34</i>&nbsp;import java.util.List;
+<i>35</i>&nbsp;import java.util.Random;
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;import beast.core.Description;
+<i>38</i>&nbsp;import beast.core.Distribution;
+<i>39</i>&nbsp;import beast.core.Input;
+<i>40</i>&nbsp;import beast.core.State;
+<i>41</i>&nbsp;import beast.core.Input.Validate;
+<i>42</i>&nbsp;import beast.core.util.Log;
+<i>43</i>&nbsp;import beast.evolution.alignment.Alignment;
+<i>44</i>&nbsp;import beast.evolution.alignment.AscertainedAlignment;
+<i>45</i>&nbsp;import beast.evolution.branchratemodel.BranchRateModel;
+<i>46</i>&nbsp;import beast.evolution.branchratemodel.StrictClockModel;
+<i>47</i>&nbsp;import beast.evolution.sitemodel.SiteModel;
+<i>48</i>&nbsp;import beast.evolution.substitutionmodel.SubstitutionModel;
+<i>49</i>&nbsp;import beast.evolution.tree.Node;
+<i>50</i>&nbsp;import beast.evolution.tree.Tree;
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;@Description(&quot;Calculates the likelihood of sequence data on a beast.tree given a site and substitution model using &quot; +
+<i>54</i>&nbsp;		&quot;a variant of the &#39;peeling algorithm&#39;. For details, see&quot; +
+<i>55</i>&nbsp;		&quot;Felsenstein, Joseph (1981). Evolutionary trees from DNA sequences: a maximum likelihood approach. J Mol Evol 17 (6): 368-376.&quot;)
+<b class="nc"><i>56</i>&nbsp;public class ExperimentalTreeLikelihood extends Distribution {</b>
+<i>57</i>&nbsp;
+<b class="nc"><i>58</i>&nbsp;    public Input&lt;Alignment&gt; m_data = new Input&lt;Alignment&gt;(&quot;data&quot;, &quot;sequence data for the beast.tree&quot;, Validate.REQUIRED);</b>
+<b class="nc"><i>59</i>&nbsp;    public Input&lt;Tree&gt; m_tree = new Input&lt;Tree&gt;(&quot;tree&quot;, &quot;phylogenetic beast.tree with sequence data in the leafs&quot;, Validate.REQUIRED);</b>
+<b class="nc"><i>60</i>&nbsp;    public Input&lt;SiteModel.Base&gt; m_pSiteModel = new Input&lt;SiteModel.Base&gt;(&quot;siteModel&quot;, &quot;site model for leafs in the beast.tree&quot;, Validate.REQUIRED);</b>
+<b class="nc"><i>61</i>&nbsp;    public Input&lt;BranchRateModel.Base&gt; m_pBranchRateModel = new Input&lt;BranchRateModel.Base&gt;(&quot;branchRateModel&quot;,</b>
+<i>62</i>&nbsp;            &quot;A model describing the rates on the branches of the beast.tree.&quot;);
+<b class="nc"><i>63</i>&nbsp;    public Input&lt;Boolean&gt; m_useAmbiguities = new Input&lt;Boolean&gt;(&quot;useAmbiguities&quot;, &quot;flag to indicate leafs that sites containing ambigue states should be handled instead of ignored (the default)&quot;, false);</b>
+<i>64</i>&nbsp;
+<i>65</i>&nbsp;    /** calculation engine **/
+<i>66</i>&nbsp;    ExperimentalLikelihoodCore m_likelihoodCore;
+<i>67</i>&nbsp;    
+<i>68</i>&nbsp;    /** Plugin associated with inputs. Since none of the inputs are StateNodes, it
+<i>69</i>&nbsp;     * is safe to link to them only once, during initAndValidate.
+<i>70</i>&nbsp;     */
+<i>71</i>&nbsp;    SubstitutionModel m_substitutionModel;
+<i>72</i>&nbsp;    protected SiteModel.Base m_siteModel;
+<i>73</i>&nbsp;    BranchRateModel.Base m_branchRateModel;
+<i>74</i>&nbsp;
+<i>75</i>&nbsp;    /** flag to indicate the 
+<i>76</i>&nbsp;    // when CLEAN=0, nothing needs to be recalculated for the node
+<i>77</i>&nbsp;    // when DIRTY=1 indicates a node partial needs to be recalculated
+<i>78</i>&nbsp;    // when FILTHY=2 indicates the indices for the node need to be recalculated
+<i>79</i>&nbsp;    // (often not necessary while node partial recalculation is required)
+<i>80</i>&nbsp;     */
+<i>81</i>&nbsp;    int m_nHasDirt;
+<i>82</i>&nbsp;
+<i>83</i>&nbsp;    /** Lengths of the branches in the tree associated with each of the nodes
+<i>84</i>&nbsp;     * in the tree through their node  numbers. By comparing whether the 
+<i>85</i>&nbsp;     * current branch length differs from stored branch lengths, it is tested
+<i>86</i>&nbsp;     * whether a node is dirty and needs to be recomputed (there may be other
+<i>87</i>&nbsp;     * reasons as well...).
+<i>88</i>&nbsp;     * These lengths take branch rate models in account.
+<i>89</i>&nbsp;     */
+<i>90</i>&nbsp;    double [] m_branchLengths;
+<i>91</i>&nbsp;    double [] m_StoredBranchLengths;
+<i>92</i>&nbsp;    
+<i>93</i>&nbsp;    /** memory allocation for likelihoods for each of the patterns **/
+<i>94</i>&nbsp;    double[] m_fPatternLogLikelihoods;
+<i>95</i>&nbsp;    /** memory allocation for the root partials **/
+<i>96</i>&nbsp;    double[] m_fRootPartials;
+<i>97</i>&nbsp;    /** memory allocation for probability tables obtained from the SiteModel **/
+<i>98</i>&nbsp;    double[] m_fProbabilities;
+<i>99</i>&nbsp;
+<i>100</i>&nbsp;    int m_nMatrixSize;
+<i>101</i>&nbsp;    
+<i>102</i>&nbsp;    /** flag to indicate ascertainment correction should be applied **/
+<b class="nc"><i>103</i>&nbsp;    boolean m_bAscertainedSitePatterns = false;</b>
+<i>104</i>&nbsp;
+<i>105</i>&nbsp;    /** dealing with proportion of site being invariant **/
+<b class="nc"><i>106</i>&nbsp;    double m_fProportionInvariant = 0;</b>
+<b class="nc"><i>107</i>&nbsp;    List&lt;Integer&gt; m_iConstantPattern = null;</b>
+<i>108</i>&nbsp;    
+<i>109</i>&nbsp;    @Override
+<i>110</i>&nbsp;    public void initAndValidate() {
+<i>111</i>&nbsp;    	// sanity check: alignment should have same #taxa as tree
+<b class="nc"><i>112</i>&nbsp;    	if (m_data.get().getNrTaxa() != m_tree.get().getLeafNodeCount()) {</b>
+<b class="nc"><i>113</i>&nbsp;    		throw new IllegalArgumentException(&quot;The number of nodes in the tree does not match the number of sequences&quot;);</b>
+<i>114</i>&nbsp;    	}
+<i>115</i>&nbsp;    	
+<b class="nc"><i>116</i>&nbsp;        int nNodeCount = m_tree.get().getNodeCount();</b>
+<b class="nc"><i>117</i>&nbsp;        m_siteModel = m_pSiteModel.get();</b>
+<b class="nc"><i>118</i>&nbsp;        m_siteModel.setDataType(m_data.get().getDataType());</b>
+<b class="nc"><i>119</i>&nbsp;        m_substitutionModel = m_siteModel.substModelInput.get();</b>
+<i>120</i>&nbsp;
+<b class="nc"><i>121</i>&nbsp;        if (m_pBranchRateModel.get() != null) {</b>
+<b class="nc"><i>122</i>&nbsp;        	m_branchRateModel = m_pBranchRateModel.get();</b>
+<i>123</i>&nbsp;        } else {
+<b class="nc"><i>124</i>&nbsp;            m_branchRateModel = new StrictClockModel();</b>
+<i>125</i>&nbsp;        }
+<b class="nc"><i>126</i>&nbsp;    	m_branchLengths = new double[nNodeCount];</b>
+<b class="nc"><i>127</i>&nbsp;    	m_StoredBranchLengths = new double[nNodeCount];</b>
+<i>128</i>&nbsp;    	
+<b class="nc"><i>129</i>&nbsp;        int nStateCount = m_data.get().getMaxStateCount();</b>
+<b class="nc"><i>130</i>&nbsp;        if (nStateCount == 4) {</b>
+<i>131</i>&nbsp;        	//m_likelihoodCore = new BeerLikelihoodCore4();
+<i>132</i>&nbsp;        	//m_likelihoodCore = new BeerLikelihoodCoreCnG4();
+<b class="nc"><i>133</i>&nbsp;        	m_likelihoodCore = new BeerLikelihoodCoreCnG(4);</b>
+<i>134</i>&nbsp;            //m_likelihoodCore = new BeerLikelihoodCoreJava4();
+<i>135</i>&nbsp;        	//m_likelihoodCore = new BeerLikelihoodCoreNative(4);
+<b class="nc"><i>136</i>&nbsp;            m_likelihoodCore = new BeerLikelihoodCoreSimple4();</b>
+<i>137</i>&nbsp;        	//m_likelihoodCore = new BeerLikelihoodCoreCached4();
+<i>138</i>&nbsp;        } else {
+<i>139</i>&nbsp;            //m_likelihoodCore = new BeerLikelihoodCore(nStateCount);
+<b class="nc"><i>140</i>&nbsp;            m_likelihoodCore = new BeerLikelihoodCoreCnG(nStateCount);</b>
+<b class="nc"><i>141</i>&nbsp;            m_likelihoodCore = new BeerLikelihoodCoreSimple(nStateCount);</b>
+<i>142</i>&nbsp;            //m_likelihoodCore = new BeerLikelihoodCoreJava(nStateCount);
+<i>143</i>&nbsp;        }
+<b class="nc"><i>144</i>&nbsp;    	m_likelihoodCore = new BeerLikelihoodCoreCnG(4);</b>
+<i>145</i>&nbsp;        //m_likelihoodCore = new BeerLikelihoodCoreSimpleNative(nStateCount);
+<i>146</i>&nbsp;        //m_likelihoodCore = new BeerLikelihoodCoreSimpleGPU(nStateCount);
+<b class="nc"><i>147</i>&nbsp;        Log.info.println(&quot;TreeLikelihood uses &quot; + m_likelihoodCore.getClass().getName());</b>
+<b class="nc"><i>148</i>&nbsp;        int nPatterns = m_data.get().getPatternCount();</b>
+<b class="nc"><i>149</i>&nbsp;        initCore(nNodeCount, nPatterns, nStateCount);</b>
+<i>150</i>&nbsp;        
+<b class="nc"><i>151</i>&nbsp;        m_fPatternLogLikelihoods = new double[nPatterns];</b>
+<b class="nc"><i>152</i>&nbsp;        m_fRootPartials = new double[nPatterns * nStateCount];</b>
+<b class="nc"><i>153</i>&nbsp;        m_nMatrixSize = (nStateCount +1)* (nStateCount+1);</b>
+<b class="nc"><i>154</i>&nbsp;        m_fProbabilities = new double[(nStateCount +1)* (nStateCount+1)];</b>
+<b class="nc"><i>155</i>&nbsp;        Arrays.fill(m_fProbabilities, 1.0);</b>
+<i>156</i>&nbsp;
+<b class="nc"><i>157</i>&nbsp;        if (m_data.get() instanceof AscertainedAlignment) {</b>
+<b class="nc"><i>158</i>&nbsp;            m_bAscertainedSitePatterns = true;</b>
+<i>159</i>&nbsp;        }
+<i>160</i>&nbsp;    }
+<i>161</i>&nbsp;
+<i>162</i>&nbsp;
+<i>163</i>&nbsp;	/** Determine indices of m_fRootProbabilities that need to be updates
+<i>164</i>&nbsp;	// due to sites being invariant. If none of the sites are invariant,
+<i>165</i>&nbsp;	// the &#39;site invariant&#39; category does not contribute anything to the
+<i>166</i>&nbsp;	// root probability. If the site IS invariant for a certain character,
+<i>167</i>&nbsp;	// taking ambiguities in account, there is a contribution of 1 from
+<i>168</i>&nbsp;	// the &#39;site invariant&#39; category.
+<i>169</i>&nbsp;	 **/
+<i>170</i>&nbsp;    int [] calcConstantPatternIndices(int nPatterns, int nStateCount) {
+<b class="nc"><i>171</i>&nbsp;		m_iConstantPattern = new ArrayList&lt;Integer&gt;();</b>
+<b class="nc"><i>172</i>&nbsp;		for (int i = 0; i &lt; nPatterns; i++) {</b>
+<b class="nc"><i>173</i>&nbsp;			int [] pattern = m_data.get().getPattern(i);</b>
+<b class="nc"><i>174</i>&nbsp;			boolean [] bIsInvariant = new boolean[nStateCount];</b>
+<b class="nc"><i>175</i>&nbsp;			Arrays.fill(bIsInvariant, true);</b>
+<b class="nc"><i>176</i>&nbsp;			for (int j = 0; j &lt; pattern.length; j++) {</b>
+<b class="nc"><i>177</i>&nbsp;				int state = pattern[j];</b>
+<b class="nc"><i>178</i>&nbsp;				boolean [] bStateSet = m_data.get().getStateSet(state);</b>
+<b class="nc"><i>179</i>&nbsp;				if (m_useAmbiguities.get() || !m_data.get().getDataType().isAmbiguousState(state)) {</b>
+<b class="nc"><i>180</i>&nbsp;	    			for (int k = 0; k &lt; nStateCount; k++) {</b>
+<b class="nc"><i>181</i>&nbsp;	    				bIsInvariant[k] &amp;= bStateSet[k];</b>
+<i>182</i>&nbsp;	    			}
+<i>183</i>&nbsp;				}
+<i>184</i>&nbsp;			}
+<b class="nc"><i>185</i>&nbsp;				for (int k = 0; k &lt; nStateCount; k++) {</b>
+<b class="nc"><i>186</i>&nbsp;				if (bIsInvariant[k]) {</b>
+<b class="nc"><i>187</i>&nbsp;	    			m_iConstantPattern.add(i * nStateCount + k);    					</b>
+<i>188</i>&nbsp;				}
+<i>189</i>&nbsp;			}
+<i>190</i>&nbsp;		}
+<i>191</i>&nbsp;		
+<b class="nc"><i>192</i>&nbsp;    	int [] iConstantPattern = new int[m_iConstantPattern.size()];</b>
+<b class="nc"><i>193</i>&nbsp;        for (int i = 0; i &lt; m_iConstantPattern.size(); i++) {</b>
+<b class="nc"><i>194</i>&nbsp;        	iConstantPattern[i]= m_iConstantPattern.get(i);</b>
+<i>195</i>&nbsp;        }
+<b class="nc"><i>196</i>&nbsp;        return iConstantPattern;</b>
+<i>197</i>&nbsp;    }
+<i>198</i>&nbsp;    
+<i>199</i>&nbsp;    void initCore(int nNodeCount, int nPatterns, int nStateCount) {
+<b class="nc"><i>200</i>&nbsp;        m_likelihoodCore.initialize(</b>
+<i>201</i>&nbsp;                nNodeCount,
+<b class="nc"><i>202</i>&nbsp;                m_data.get().getPatternCount(),</b>
+<b class="nc"><i>203</i>&nbsp;                m_siteModel.getCategoryCount(),</b>
+<b class="nc"><i>204</i>&nbsp;                true, m_useAmbiguities.get()</b>
+<i>205</i>&nbsp;        );
+<i>206</i>&nbsp;
+<b class="nc"><i>207</i>&nbsp;        int extNodeCount = nNodeCount / 2 + 1;</b>
+<b class="nc"><i>208</i>&nbsp;        int intNodeCount = nNodeCount / 2;</b>
+<i>209</i>&nbsp;
+<b class="nc"><i>210</i>&nbsp;        if (m_useAmbiguities.get()) {</b>
+<b class="nc"><i>211</i>&nbsp;        	setPartials(m_tree.get().getRoot(), m_data.get().getPatternCount());</b>
+<i>212</i>&nbsp;        } else {
+<b class="nc"><i>213</i>&nbsp;        	setStates(m_tree.get().getRoot(), m_data.get().getPatternCount());</b>
+<i>214</i>&nbsp;        }
+<b class="nc"><i>215</i>&nbsp;        m_nHasDirt = Tree.IS_FILTHY;</b>
+<b class="nc"><i>216</i>&nbsp;        for (int i = 0; i &lt; intNodeCount; i++) {</b>
+<b class="nc"><i>217</i>&nbsp;            m_likelihoodCore.createNodePartials(extNodeCount + i);</b>
+<i>218</i>&nbsp;        }
+<i>219</i>&nbsp;        
+<b class="nc"><i>220</i>&nbsp;        m_fProportionInvariant = m_siteModel.getProportionInvariant();</b>
+<b class="nc"><i>221</i>&nbsp;        if (m_fProportionInvariant &gt; 0 &amp;&amp; m_siteModel.hasPropInvariantCategory == false) {</b>
+<b class="nc"><i>222</i>&nbsp;        	int [] iConstantPattern = calcConstantPatternIndices(nPatterns, nStateCount);</b>
+<b class="nc"><i>223</i>&nbsp;            m_likelihoodCore.setProportionInvariant(m_fProportionInvariant, iConstantPattern);</b>
+<i>224</i>&nbsp;        }
+<b class="nc"><i>225</i>&nbsp;        m_likelihoodCore.setPatternWeights(m_data.get().getWeights());</b>
+<i>226</i>&nbsp;    }
+<i>227</i>&nbsp;    
+<i>228</i>&nbsp;    /**
+<i>229</i>&nbsp;     * This method samples the sequences based on the tree and site model.
+<i>230</i>&nbsp;     */
+<i>231</i>&nbsp;    public void sample(State state, Random random) {
+<b class="nc"><i>232</i>&nbsp;        throw new UnsupportedOperationException(&quot;Can&#39;t sample a fixed alignment!&quot;);</b>
+<i>233</i>&nbsp;    }
+<i>234</i>&nbsp;
+<i>235</i>&nbsp;    /** set leaf states in likelihood core **/
+<i>236</i>&nbsp;    void setStates(Node node, int patternCount) {
+<b class="nc"><i>237</i>&nbsp;        if (node.isLeaf()) {</b>
+<i>238</i>&nbsp;            int i;
+<b class="nc"><i>239</i>&nbsp;            int[] states = new int[patternCount];</b>
+<b class="nc"><i>240</i>&nbsp;            int iTaxon = m_data.get().getTaxonIndex(node.getID());</b>
+<b class="nc"><i>241</i>&nbsp;            for (i = 0; i &lt; patternCount; i++) {</b>
+<b class="nc"><i>242</i>&nbsp;                states[i] = m_data.get().getPattern(iTaxon, i);</b>
+<i>243</i>&nbsp;            }
+<b class="nc"><i>244</i>&nbsp;            m_likelihoodCore.setNodeStates(node.getNr(), states);</b>
+<i>245</i>&nbsp;
+<b class="nc"><i>246</i>&nbsp;        } else {</b>
+<b class="nc"><i>247</i>&nbsp;            setStates(node.getLeft(), patternCount);</b>
+<b class="nc"><i>248</i>&nbsp;            setStates(node.getRight(), patternCount);</b>
+<i>249</i>&nbsp;        }
+<i>250</i>&nbsp;    }
+<i>251</i>&nbsp;
+<i>252</i>&nbsp;    /** set leaf partials in likelihood core **/
+<i>253</i>&nbsp;    void setPartials(Node node, int patternCount) {
+<b class="nc"><i>254</i>&nbsp;        if (node.isLeaf()) {</b>
+<b class="nc"><i>255</i>&nbsp;        	Alignment data = m_data.get();</b>
+<b class="nc"><i>256</i>&nbsp;        	int nStates = data.getDataType().getStateCount();</b>
+<b class="nc"><i>257</i>&nbsp;            double[] partials = new double[patternCount * nStates];</b>
+<i>258</i>&nbsp;
+<b class="nc"><i>259</i>&nbsp;            int k = 0;</b>
+<b class="nc"><i>260</i>&nbsp;            int iTaxon = m_data.get().getTaxonIndex(node.getID());</b>
+<b class="nc"><i>261</i>&nbsp;            for (int iPattern = 0; iPattern &lt; patternCount; iPattern++) {</b>
+<b class="nc"><i>262</i>&nbsp;            	int nState = data.getPattern(iTaxon, iPattern);</b>
+<b class="nc"><i>263</i>&nbsp;            	boolean [] stateSet = data.getStateSet(nState);</b>
+<b class="nc"><i>264</i>&nbsp;        		for (int iState = 0; iState &lt; nStates; iState++) {</b>
+<b class="nc"><i>265</i>&nbsp;        			partials[k++] = (stateSet[iState] ? 1.0 : 0.0);</b>
+<i>266</i>&nbsp;            	}
+<i>267</i>&nbsp;            }
+<b class="nc"><i>268</i>&nbsp;            m_likelihoodCore.setNodePartials(node.getNr(), partials);</b>
+<i>269</i>&nbsp;
+<b class="nc"><i>270</i>&nbsp;        } else {</b>
+<b class="nc"><i>271</i>&nbsp;        	setPartials(node.getLeft(), patternCount);</b>
+<b class="nc"><i>272</i>&nbsp;        	setPartials(node.getRight(), patternCount);</b>
+<i>273</i>&nbsp;        }
+<i>274</i>&nbsp;    }
+<i>275</i>&nbsp;    
+<i>276</i>&nbsp;    /**
+<i>277</i>&nbsp;     * Calculate the log likelihood of the current state.
+<i>278</i>&nbsp;     * @return the log likelihood.
+<i>279</i>&nbsp;     */
+<b class="nc"><i>280</i>&nbsp;    double m_fScale = 1.01;</b>
+<b class="nc"><i>281</i>&nbsp;    int m_nScale = 0;</b>
+<b class="nc"><i>282</i>&nbsp;    int X = 100;</b>
+<i>283</i>&nbsp;    @Override
+<i>284</i>&nbsp;    public double calculateLogP() {
+<b class="nc"><i>285</i>&nbsp;        Tree tree = m_tree.get();</b>
+<i>286</i>&nbsp;
+<b class="nc"><i>287</i>&nbsp;       	traverse(tree.getRoot());</b>
+<b class="nc"><i>288</i>&nbsp;        calcLogP();</b>
+<i>289</i>&nbsp;        
+<b class="nc"><i>290</i>&nbsp;        m_nScale++;</b>
+<b class="nc"><i>291</i>&nbsp;        if (logP &gt; 0 || (m_likelihoodCore.getUseScaling() &amp;&amp; m_nScale &gt; X)) {</b>
+<b class="nc"><i>292</i>&nbsp;            System.err.println(&quot;Switch off scaling&quot;);</b>
+<b class="nc"><i>293</i>&nbsp;            m_likelihoodCore.setUseScaling(1.0);</b>
+<b class="nc"><i>294</i>&nbsp;            m_likelihoodCore.unstore();</b>
+<b class="nc"><i>295</i>&nbsp;            m_nHasDirt = Tree.IS_FILTHY;</b>
+<b class="nc"><i>296</i>&nbsp;            X *= 2;</b>
+<b class="nc"><i>297</i>&nbsp;           	traverse(tree.getRoot());</b>
+<b class="nc"><i>298</i>&nbsp;            calcLogP();</b>
+<b class="nc"><i>299</i>&nbsp;            return logP;</b>
+<b class="nc"><i>300</i>&nbsp;        } else if (logP == Double.NEGATIVE_INFINITY &amp;&amp; m_fScale &lt; 10) { // &amp;&amp; !m_likelihoodCore.getUseScaling()) {</b>
+<b class="nc"><i>301</i>&nbsp;        	m_nScale = 0;</b>
+<b class="nc"><i>302</i>&nbsp;        	m_fScale *= 1.01;</b>
+<b class="nc"><i>303</i>&nbsp;            System.err.println(&quot;Turning on scaling to prevent numeric instability &quot; + m_fScale);</b>
+<b class="nc"><i>304</i>&nbsp;            m_likelihoodCore.setUseScaling(m_fScale);</b>
+<b class="nc"><i>305</i>&nbsp;            m_likelihoodCore.unstore();</b>
+<b class="nc"><i>306</i>&nbsp;            m_nHasDirt = Tree.IS_FILTHY;</b>
+<b class="nc"><i>307</i>&nbsp;           	traverse(tree.getRoot());</b>
+<b class="nc"><i>308</i>&nbsp;            calcLogP();</b>
+<b class="nc"><i>309</i>&nbsp;            return logP;</b>
+<i>310</i>&nbsp;        }
+<b class="nc"><i>311</i>&nbsp;        return logP;</b>
+<i>312</i>&nbsp;    }
+<i>313</i>&nbsp;
+<i>314</i>&nbsp;    private void calcLogP() {
+<i>315</i>&nbsp;        //m_likelihoodCore.getPatternLogLikelihoods(m_fPatternLogLikelihoods);
+<b class="nc"><i>316</i>&nbsp;        if (m_bAscertainedSitePatterns) {</b>
+<b class="nc"><i>317</i>&nbsp;            logP = 0.0;</b>
+<b class="nc"><i>318</i>&nbsp;            m_likelihoodCore.getPatternLogLikelihoods(m_fPatternLogLikelihoods);</b>
+<b class="nc"><i>319</i>&nbsp;            double ascertainmentCorrection = ((AscertainedAlignment)m_data.get()).getAscertainmentCorrection(m_fPatternLogLikelihoods);</b>
+<b class="nc"><i>320</i>&nbsp;            for (int i = 0; i &lt; m_data.get().getPatternCount(); i++) {</b>
+<b class="nc"><i>321</i>&nbsp;            	logP += (m_fPatternLogLikelihoods[i] - ascertainmentCorrection) * m_data.get().getPatternWeight(i);</b>
+<i>322</i>&nbsp;            }
+<i>323</i>&nbsp;//        } else {
+<i>324</i>&nbsp;//	        for (int i = 0; i &lt; m_data.get().getPatternCount(); i++) {
+<i>325</i>&nbsp;//	            logP += m_fPatternLogLikelihoods[i] * m_data.get().getPatternWeight(i);
+<i>326</i>&nbsp;//	        }
+<i>327</i>&nbsp;        }
+<i>328</i>&nbsp;    }
+<i>329</i>&nbsp;
+<i>330</i>&nbsp;    /* Assumes there IS a branch rate model as opposed to traverse() */
+<i>331</i>&nbsp;    int traverse(Node node) {
+<i>332</i>&nbsp;
+<b class="nc"><i>333</i>&nbsp;        int update = (node.isDirty()| m_nHasDirt);</b>
+<i>334</i>&nbsp;
+<b class="nc"><i>335</i>&nbsp;        int iNode = node.getNr();</b>
+<i>336</i>&nbsp;
+<b class="nc"><i>337</i>&nbsp;        double branchRate = m_branchRateModel.getRateForBranch(node);</b>
+<b class="nc"><i>338</i>&nbsp;        double branchTime = node.getLength() * branchRate;</b>
+<b class="nc"><i>339</i>&nbsp;        m_branchLengths[iNode] = branchTime;</b>
+<i>340</i>&nbsp;
+<i>341</i>&nbsp;        // First update the transition probability matrix(ices) for this branch
+<b class="nc"><i>342</i>&nbsp;        if (!node.isRoot() &amp;&amp; (update != Tree.IS_CLEAN || branchTime != m_StoredBranchLengths[iNode])) {</b>
+<b class="nc"><i>343</i>&nbsp;            Node parent = node.getParent();</b>
+<b class="nc"><i>344</i>&nbsp;            m_likelihoodCore.setNodeMatrixForUpdate(iNode);</b>
+<b class="nc"><i>345</i>&nbsp;            for (int i = 0; i &lt; m_siteModel.getCategoryCount(); i++) {</b>
+<b class="nc"><i>346</i>&nbsp;                double jointBranchRate = m_siteModel.getRateForCategory(i, node) * branchRate;</b>
+<b class="nc"><i>347</i>&nbsp;            	m_substitutionModel.getTransitionProbabilities(node, parent.getHeight(), node.getHeight(), jointBranchRate, m_fProbabilities);</b>
+<b class="nc"><i>348</i>&nbsp;                m_likelihoodCore.setNodeMatrix(iNode, i, m_fProbabilities);</b>
+<i>349</i>&nbsp;            }
+<b class="nc"><i>350</i>&nbsp;            update |= Tree.IS_DIRTY;</b>
+<i>351</i>&nbsp;        }
+<i>352</i>&nbsp;
+<i>353</i>&nbsp;        // If the node is internal, update the partial likelihoods.
+<b class="nc"><i>354</i>&nbsp;        if (!node.isLeaf()) {</b>
+<i>355</i>&nbsp;
+<i>356</i>&nbsp;            // Traverse down the two child nodes
+<b class="nc"><i>357</i>&nbsp;            Node child1 = node.getLeft(); //Two children</b>
+<b class="nc"><i>358</i>&nbsp;            int update1 = traverse(child1);</b>
+<i>359</i>&nbsp;
+<b class="nc"><i>360</i>&nbsp;            Node child2 = node.getRight();</b>
+<b class="nc"><i>361</i>&nbsp;            int update2 = traverse(child2);</b>
+<i>362</i>&nbsp;
+<i>363</i>&nbsp;            // If either child node was updated then update this node too
+<b class="nc"><i>364</i>&nbsp;            if (update1 != Tree.IS_CLEAN || update2 != Tree.IS_CLEAN) {</b>
+<i>365</i>&nbsp;
+<b class="nc"><i>366</i>&nbsp;                int childNum1 = child1.getNr();</b>
+<b class="nc"><i>367</i>&nbsp;                int childNum2 = child2.getNr();</b>
+<i>368</i>&nbsp;
+<b class="nc"><i>369</i>&nbsp;                m_likelihoodCore.setNodePartialsForUpdate(iNode);</b>
+<b class="nc"><i>370</i>&nbsp;                update |= (update1|update2);</b>
+<b class="nc"><i>371</i>&nbsp;                if (update &gt;= Tree.IS_FILTHY) {</b>
+<b class="nc"><i>372</i>&nbsp;                    m_likelihoodCore.setNodeStatesForUpdate(iNode);</b>
+<i>373</i>&nbsp;                }
+<i>374</i>&nbsp;
+<b class="nc"><i>375</i>&nbsp;                if (m_siteModel.integrateAcrossCategories()) {</b>
+<b class="nc"><i>376</i>&nbsp;                    m_likelihoodCore.calculatePartials(childNum1, childNum2, iNode);</b>
+<i>377</i>&nbsp;                } else {
+<b class="nc"><i>378</i>&nbsp;                    throw new RuntimeException(&quot;Error TreeLikelihood 201: Site categories not supported&quot;);</b>
+<i>379</i>&nbsp;                    //m_pLikelihoodCore-&gt;calculatePartials(childNum1, childNum2, nodeNum, siteCategories);
+<i>380</i>&nbsp;                }
+<i>381</i>&nbsp;
+<b class="nc"><i>382</i>&nbsp;                if (node.isRoot()) {</b>
+<i>383</i>&nbsp;                    // No parent this is the root of the beast.tree -
+<i>384</i>&nbsp;                    // calculate the pattern likelihoods
+<b class="nc"><i>385</i>&nbsp;                    double[] fFrequencies = //m_pFreqs.get().</b>
+<b class="nc"><i>386</i>&nbsp;                            m_substitutionModel.getFrequencies();</b>
+<i>387</i>&nbsp;
+<b class="nc"><i>388</i>&nbsp;                    double[] fProportions = m_siteModel.getCategoryProportions(node);</b>
+<i>389</i>&nbsp;//                    
+<i>390</i>&nbsp;//                    
+<i>391</i>&nbsp;//                    m_likelihoodCore.integratePartials(node.getNr(), fProportions, m_fRootPartials);
+<i>392</i>&nbsp;//
+<i>393</i>&nbsp;//                    if (m_iConstantPattern != null &amp;&amp; !SiteModel.g_bUseOriginal) {
+<i>394</i>&nbsp;//                    	// some portion of sites is invariant, so adjust root partials for this
+<i>395</i>&nbsp;//                    	for (int i : m_iConstantPattern) {
+<i>396</i>&nbsp;//                			m_fRootPartials[i] += m_fProportianInvariant;
+<i>397</i>&nbsp;//                    	}
+<i>398</i>&nbsp;//                    }
+<i>399</i>&nbsp;//
+<i>400</i>&nbsp;//                    m_likelihoodCore.calculateLogLikelihoods(m_fRootPartials, fFrequencies, m_fPatternLogLikelihoods);
+<i>401</i>&nbsp;                    
+<b class="nc"><i>402</i>&nbsp;                    logP = m_likelihoodCore.calcLogP(iNode, fProportions, fFrequencies);</b>
+<i>403</i>&nbsp;                }
+<i>404</i>&nbsp;
+<i>405</i>&nbsp;            }
+<i>406</i>&nbsp;        }
+<b class="nc"><i>407</i>&nbsp;        return update;</b>
+<i>408</i>&nbsp;    } // traverseWithBRM
+<i>409</i>&nbsp;
+<i>410</i>&nbsp;    /** CalculationNode methods **/
+<i>411</i>&nbsp;
+<i>412</i>&nbsp;    /**
+<i>413</i>&nbsp;     * check state for changed variables and update temp results if necessary *
+<i>414</i>&nbsp;     */
+<i>415</i>&nbsp;    @Override
+<i>416</i>&nbsp;    protected boolean requiresRecalculation() {
+<b class="nc"><i>417</i>&nbsp;        m_nHasDirt = Tree.IS_CLEAN;</b>
+<i>418</i>&nbsp;
+<b class="nc"><i>419</i>&nbsp;        if (m_branchRateModel != null &amp;&amp; m_branchRateModel.isDirtyCalculation()) {</b>
+<b class="nc"><i>420</i>&nbsp;            m_nHasDirt = Tree.IS_FILTHY;</b>
+<b class="nc"><i>421</i>&nbsp;            return true;</b>
+<i>422</i>&nbsp;        }
+<b class="nc"><i>423</i>&nbsp;        if (m_data.get().isDirtyCalculation()) {</b>
+<b class="nc"><i>424</i>&nbsp;            m_nHasDirt = Tree.IS_FILTHY;</b>
+<b class="nc"><i>425</i>&nbsp;            return true;</b>
+<i>426</i>&nbsp;        }
+<b class="nc"><i>427</i>&nbsp;        if (m_siteModel.isDirtyCalculation()) {</b>
+<b class="nc"><i>428</i>&nbsp;            m_nHasDirt = Tree.IS_DIRTY;</b>
+<b class="nc"><i>429</i>&nbsp;            return true;</b>
+<i>430</i>&nbsp;        }
+<b class="nc"><i>431</i>&nbsp;        return m_tree.get().somethingIsDirty();</b>
+<i>432</i>&nbsp;    }
+<i>433</i>&nbsp;
+<i>434</i>&nbsp;    @Override
+<i>435</i>&nbsp;    public void store() {
+<b class="nc"><i>436</i>&nbsp;    	if (m_likelihoodCore != null) {</b>
+<b class="nc"><i>437</i>&nbsp;    		m_likelihoodCore.store();</b>
+<i>438</i>&nbsp;    	}
+<b class="nc"><i>439</i>&nbsp;        super.store();</b>
+<b class="nc"><i>440</i>&nbsp;        System.arraycopy(m_branchLengths, 0, m_StoredBranchLengths, 0, m_branchLengths.length);</b>
+<i>441</i>&nbsp;    }
+<i>442</i>&nbsp;
+<i>443</i>&nbsp;    @Override
+<i>444</i>&nbsp;    public void restore() {
+<b class="nc"><i>445</i>&nbsp;    	if (m_likelihoodCore != null) {</b>
+<b class="nc"><i>446</i>&nbsp;    		m_likelihoodCore.restore();</b>
+<i>447</i>&nbsp;    	}
+<b class="nc"><i>448</i>&nbsp;        super.restore();</b>
+<b class="nc"><i>449</i>&nbsp;        double [] tmp = m_branchLengths;</b>
+<b class="nc"><i>450</i>&nbsp;        m_branchLengths = m_StoredBranchLengths;</b>
+<b class="nc"><i>451</i>&nbsp;        m_StoredBranchLengths = tmp;</b>
+<i>452</i>&nbsp;    }
+<i>453</i>&nbsp;        
+<i>454</i>&nbsp;    /**
+<i>455</i>&nbsp;     * @return a list of unique ids for the state nodes that form the argument
+<i>456</i>&nbsp;     */
+<i>457</i>&nbsp;    public List&lt;String&gt; getArguments() {
+<b class="nc"><i>458</i>&nbsp;        return Collections.singletonList(m_data.get().getID());</b>
+<i>459</i>&nbsp;    }
+<i>460</i>&nbsp;
+<i>461</i>&nbsp;    /**
+<i>462</i>&nbsp;     * @return a list of unique ids for the state nodes that make up the conditions
+<i>463</i>&nbsp;     */
+<i>464</i>&nbsp;    public List&lt;String&gt; getConditions() {
+<b class="nc"><i>465</i>&nbsp;        return m_siteModel.getConditions();</b>
+<i>466</i>&nbsp;    }
+<i>467</i>&nbsp;
+<i>468</i>&nbsp;    public void finalize() {
+<b class="nc"><i>469</i>&nbsp;    	try {m_likelihoodCore.finalize();} catch (Throwable e) {}</b>
+<i>470</i>&nbsp;    }
+<i>471</i>&nbsp;} // class TreeLikelihood
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,332 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: SliceOperator</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.operators</a> ]
+</div>
+
+<h1>Coverage Summary for Class: SliceOperator (beast.evolution.operators)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SliceOperator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 93)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.operators;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.text.DecimalFormat;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import beast.core.Description;
+<i>6</i>&nbsp;import beast.core.Distribution;
+<i>7</i>&nbsp;import beast.core.Input;
+<i>8</i>&nbsp;import beast.core.Input.Validate;
+<i>9</i>&nbsp;import beast.core.Operator;
+<i>10</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>11</i>&nbsp;import beast.core.util.Evaluator;
+<i>12</i>&nbsp;import beast.core.util.Log;
+<i>13</i>&nbsp;import beast.util.Randomizer;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;
+<b class="nc"><i>18</i>&nbsp;@Description(&quot;A random walk operator that selects a random dimension of the real parameter and perturbs the value a &quot; +</b>
+<i>19</i>&nbsp;        &quot;random amount within +/- windowSize.&quot;)
+<b class="nc"><i>20</i>&nbsp;public class SliceOperator extends Operator {</b>
+<b class="nc"><i>21</i>&nbsp;    final public Input&lt;RealParameter&gt; parameterInput =</b>
+<i>22</i>&nbsp;            new Input&lt;&gt;(&quot;parameter&quot;, &quot;the parameter to operate a random walk on.&quot;, Validate.REQUIRED);
+<b class="nc"><i>23</i>&nbsp;    final public Input&lt;Double&gt; windowSizeInput =</b>
+<i>24</i>&nbsp;            new Input&lt;&gt;(&quot;windowSize&quot;, &quot;the size of the step for finding the slice boundaries&quot;, Input.Validate.REQUIRED);
+<b class="nc"><i>25</i>&nbsp;    final public Input&lt;Distribution&gt; sliceDensityInput =</b>
+<i>26</i>&nbsp;            new Input&lt;&gt;(&quot;sliceDensity&quot;, &quot;The density to sample from using slice sampling.&quot;, Input.Validate.REQUIRED);
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;    Double totalDelta;
+<i>29</i>&nbsp;    int totalNumber;
+<i>30</i>&nbsp;    int n_learning_iterations;
+<i>31</i>&nbsp;    double W;
+<i>32</i>&nbsp;
+<b class="nc"><i>33</i>&nbsp;    double windowSize = 1;</b>
+<i>34</i>&nbsp;    Distribution sliceDensity;
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;    @Override
+<i>37</i>&nbsp;	public void initAndValidate() {
+<b class="nc"><i>38</i>&nbsp;        totalDelta = 0.0;</b>
+<b class="nc"><i>39</i>&nbsp;        totalNumber = 0;</b>
+<b class="nc"><i>40</i>&nbsp;        n_learning_iterations = 100;</b>
+<b class="nc"><i>41</i>&nbsp;        W = 0.0;</b>
+<b class="nc"><i>42</i>&nbsp;        windowSize = windowSizeInput.get();</b>
+<b class="nc"><i>43</i>&nbsp;        sliceDensity = sliceDensityInput.get();</b>
+<i>44</i>&nbsp;    }
+<i>45</i>&nbsp;
+<i>46</i>&nbsp;    boolean in_range(RealParameter X, double x) {
+<b class="nc"><i>47</i>&nbsp;        return (X.getLower() &lt; x &amp;&amp; x &lt; X.getUpper());</b>
+<i>48</i>&nbsp;    }
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;    boolean below_lower_bound(RealParameter X, double x) {
+<b class="nc"><i>51</i>&nbsp;        return (x &lt; X.getLower());</b>
+<i>52</i>&nbsp;    }
+<i>53</i>&nbsp;
+<i>54</i>&nbsp;    boolean above_upper_bound(RealParameter X, double x) {
+<b class="nc"><i>55</i>&nbsp;        return (x &gt; X.getUpper());</b>
+<i>56</i>&nbsp;    }
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;    @Override
+<i>59</i>&nbsp;	public Distribution getEvaluatorDistribution() {
+<b class="nc"><i>60</i>&nbsp;        return sliceDensity;</b>
+<i>61</i>&nbsp;    }
+<i>62</i>&nbsp;
+<i>63</i>&nbsp;    Double evaluate(Evaluator E) {
+<b class="nc"><i>64</i>&nbsp;        return E.evaluate();</b>
+<i>65</i>&nbsp;    }
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;    Double evaluate(Evaluator E, RealParameter X, double x) {
+<b class="nc"><i>68</i>&nbsp;        X.setValue(0, x);</b>
+<b class="nc"><i>69</i>&nbsp;        return evaluate(E);</b>
+<i>70</i>&nbsp;    }
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;    Double[] find_slice_boundaries_stepping_out(Evaluator E, RealParameter X, double logy, double w, int m) {
+<b class="nc"><i>73</i>&nbsp;        double x0 = X.getValue(0);</b>
+<i>74</i>&nbsp;
+<b class="nc"><i>75</i>&nbsp;        assert in_range(X, x0);</b>
+<i>76</i>&nbsp;
+<b class="nc"><i>77</i>&nbsp;        double u = Randomizer.nextDouble() * w;</b>
+<b class="nc"><i>78</i>&nbsp;        Double L = x0 - u;</b>
+<b class="nc"><i>79</i>&nbsp;        Double R = x0 + (w - u);</b>
+<i>80</i>&nbsp;
+<i>81</i>&nbsp;        // Expand the interval until its ends are outside the slice, or until
+<i>82</i>&nbsp;        // the limit on steps is reached.
+<i>83</i>&nbsp;
+<b class="nc"><i>84</i>&nbsp;        if (m &gt; 1) {</b>
+<b class="nc"><i>85</i>&nbsp;            int J = (int) Math.floor(Randomizer.nextDouble() * m);</b>
+<b class="nc"><i>86</i>&nbsp;            int K = (m - 1) - J;</b>
+<i>87</i>&nbsp;
+<b class="nc"><i>88</i>&nbsp;            while (J &gt; 0 &amp;&amp; (!below_lower_bound(X, L)) &amp;&amp; evaluate(E, X, L) &gt; logy) {</b>
+<b class="nc"><i>89</i>&nbsp;                L -= w;</b>
+<b class="nc"><i>90</i>&nbsp;                J--;</b>
+<i>91</i>&nbsp;            }
+<i>92</i>&nbsp;
+<b class="nc"><i>93</i>&nbsp;            while (K &gt; 0 &amp;&amp; (!above_upper_bound(X, R)) &amp;&amp; evaluate(E, X, R) &gt; logy) {</b>
+<b class="nc"><i>94</i>&nbsp;                R += w;</b>
+<b class="nc"><i>95</i>&nbsp;                K--;</b>
+<i>96</i>&nbsp;            }
+<b class="nc"><i>97</i>&nbsp;        } else {</b>
+<b class="nc"><i>98</i>&nbsp;            while ((!below_lower_bound(X, L)) &amp;&amp; evaluate(E, X, L) &gt; logy)</b>
+<b class="nc"><i>99</i>&nbsp;                L -= w;</b>
+<i>100</i>&nbsp;
+<b class="nc"><i>101</i>&nbsp;            while ((!above_upper_bound(X, R)) &amp;&amp; evaluate(E, X, R) &gt; logy)</b>
+<b class="nc"><i>102</i>&nbsp;                R += w;</b>
+<i>103</i>&nbsp;        }
+<i>104</i>&nbsp;
+<i>105</i>&nbsp;        // Shrink interval to lower and upper bounds.
+<i>106</i>&nbsp;
+<b class="nc"><i>107</i>&nbsp;        if (below_lower_bound(X, L))</b>
+<b class="nc"><i>108</i>&nbsp;            L = X.getLower();</b>
+<b class="nc"><i>109</i>&nbsp;        if (above_upper_bound(X, R))</b>
+<b class="nc"><i>110</i>&nbsp;            R = X.getUpper();</b>
+<i>111</i>&nbsp;
+<b class="nc"><i>112</i>&nbsp;        assert L &lt; R;</b>
+<i>113</i>&nbsp;
+<b class="nc"><i>114</i>&nbsp;        Double[] range = {L, R};</b>
+<b class="nc"><i>115</i>&nbsp;        return range;</b>
+<i>116</i>&nbsp;    }
+<i>117</i>&nbsp;
+<i>118</i>&nbsp;    // Does this x0 really need to be the original point?
+<i>119</i>&nbsp;    // I think it just serves to let you know which way the interval gets shrunk...
+<i>120</i>&nbsp;
+<i>121</i>&nbsp;    double search_interval(Evaluator E, double x0, RealParameter X, Double L, Double R, double logy) {
+<i>122</i>&nbsp;        //	assert evaluate(E,x0) &gt; evaluate(E,L) &amp;&amp; evaluate(E,x0) &gt; evaluate(E,R);
+<i>123</i>&nbsp;
+<b class="nc"><i>124</i>&nbsp;        assert evaluate(E, X, x0) &gt;= logy;</b>
+<b class="nc"><i>125</i>&nbsp;        assert L &lt; R;</b>
+<b class="nc"><i>126</i>&nbsp;        assert L &lt;= x0 &amp;&amp; x0 &lt;= R;</b>
+<i>127</i>&nbsp;
+<b class="nc"><i>128</i>&nbsp;        double L0 = L, R0 = R;</b>
+<i>129</i>&nbsp;
+<b class="nc"><i>130</i>&nbsp;        double gx0 = evaluate(E, X, x0);</b>
+<b class="nc"><i>131</i>&nbsp;        assert logy &lt; gx0;</b>
+<i>132</i>&nbsp;
+<b class="nc"><i>133</i>&nbsp;        double x1 = x0;</b>
+<b class="nc"><i>134</i>&nbsp;        for (int i = 0; i &lt; 200; i++) {</b>
+<b class="nc"><i>135</i>&nbsp;            x1 = L + Randomizer.nextDouble() * (R - L);</b>
+<b class="nc"><i>136</i>&nbsp;            double gx1 = evaluate(E, X, x1);</b>
+<i>137</i>&nbsp;
+<i>138</i>&nbsp;            //	    System.err.println(&quot;    L0 = &quot; + L0 + &quot;   x0 = &quot; + x0 + &quot;   R0 = &quot; + R0 + &quot;   gx0 = &quot; + gx0);
+<i>139</i>&nbsp;            //	    System.err.println(&quot;    L  = &quot; + L  + &quot;   x1 = &quot; + x1 + &quot;   R  = &quot; + R0 + &quot;   gx1 = &quot; + gx1);
+<i>140</i>&nbsp;            //	    System.err.println(&quot;    logy  = &quot; + logy);
+<i>141</i>&nbsp;
+<b class="nc"><i>142</i>&nbsp;            if (gx1 &gt;= logy) return x1;</b>
+<i>143</i>&nbsp;
+<b class="nc"><i>144</i>&nbsp;            if (x1 &gt; x0)</b>
+<b class="nc"><i>145</i>&nbsp;                R = x1;</b>
+<i>146</i>&nbsp;            else
+<b class="nc"><i>147</i>&nbsp;                L = x1;</b>
+<i>148</i>&nbsp;        }
+<b class="nc"><i>149</i>&nbsp;        Log.warning.println(&quot;Warning!  Is size of the interval really ZERO?&quot;);</b>
+<i>150</i>&nbsp;        //	double logy_x0 = evaluate(E,X,x0);
+<b class="nc"><i>151</i>&nbsp;        Log.warning.println(&quot;    L0 = &quot; + L0 + &quot;   x0 = &quot; + x0 + &quot;   R0 = &quot; + R0 + &quot;   gx0 = &quot; + gx0);</b>
+<b class="nc"><i>152</i>&nbsp;        Log.warning.println(&quot;    L  = &quot; + L + &quot;   x1 = &quot; + x1 + &quot;   R  = &quot; + R0 + &quot;   gx1 = &quot; + evaluate(E));</b>
+<i>153</i>&nbsp;
+<b class="nc"><i>154</i>&nbsp;        return x0;</b>
+<i>155</i>&nbsp;    }
+<i>156</i>&nbsp;
+<i>157</i>&nbsp;
+<i>158</i>&nbsp;    @Override
+<i>159</i>&nbsp;    public double proposal() {
+<b class="nc"><i>160</i>&nbsp;        return 0;</b>
+<i>161</i>&nbsp;    }
+<i>162</i>&nbsp;
+<i>163</i>&nbsp;    /**
+<i>164</i>&nbsp;     * override this for proposals,
+<i>165</i>&nbsp;     * returns log of hastingRatio, or Double.NEGATIVE_INFINITY if proposal should not be accepted *
+<i>166</i>&nbsp;     */
+<i>167</i>&nbsp;    @Override
+<i>168</i>&nbsp;    public double proposal(Evaluator E) {
+<i>169</i>&nbsp;
+<b class="nc"><i>170</i>&nbsp;        int m = 100;</b>
+<i>171</i>&nbsp;
+<b class="nc"><i>172</i>&nbsp;        RealParameter X = parameterInput.get();</b>
+<i>173</i>&nbsp;
+<i>174</i>&nbsp;        // Find the density at the current point
+<b class="nc"><i>175</i>&nbsp;        Double gx0 = evaluate(E);</b>
+<i>176</i>&nbsp;
+<i>177</i>&nbsp;        //	System.err.println(&quot;gx0 = &quot; + gx0);
+<i>178</i>&nbsp;        // Get the 1st element
+<b class="nc"><i>179</i>&nbsp;        Double x0 = X.getValue(0);</b>
+<i>180</i>&nbsp;        //	System.err.println(&quot;x0 = &quot; + x0);
+<i>181</i>&nbsp;
+<i>182</i>&nbsp;        // Determine the slice level, in log terms.
+<b class="nc"><i>183</i>&nbsp;        double logy = gx0 - Randomizer.nextExponential(1);</b>
+<i>184</i>&nbsp;
+<i>185</i>&nbsp;        // Find the initial interval to sample from.
+<b class="nc"><i>186</i>&nbsp;        Double[] range = find_slice_boundaries_stepping_out(E, X, logy, windowSize, m);</b>
+<b class="nc"><i>187</i>&nbsp;        Double L = range[0];</b>
+<b class="nc"><i>188</i>&nbsp;        Double R = range[1];</b>
+<i>189</i>&nbsp;
+<i>190</i>&nbsp;        // Sample from the interval, shrinking it on each rejection
+<b class="nc"><i>191</i>&nbsp;        double x_new = search_interval(E, x0, X, L, R, logy);</b>
+<b class="nc"><i>192</i>&nbsp;        X.setValue(x_new);</b>
+<i>193</i>&nbsp;
+<b class="nc"><i>194</i>&nbsp;        if (n_learning_iterations &gt; 0) {</b>
+<b class="nc"><i>195</i>&nbsp;            n_learning_iterations--;</b>
+<i>196</i>&nbsp;
+<b class="nc"><i>197</i>&nbsp;            totalDelta += Math.abs(x_new - x0);</b>
+<b class="nc"><i>198</i>&nbsp;            totalNumber++;</b>
+<i>199</i>&nbsp;
+<b class="nc"><i>200</i>&nbsp;            double W_predicted = totalDelta / totalNumber * 4.0;</b>
+<b class="nc"><i>201</i>&nbsp;            if (totalNumber &gt; 3) {</b>
+<b class="nc"><i>202</i>&nbsp;                W = 0.95 * W + 0.05 * W_predicted;</b>
+<b class="nc"><i>203</i>&nbsp;                windowSize = W;</b>
+<i>204</i>&nbsp;            }
+<i>205</i>&nbsp;            //	    System.err.println(&quot;W = &quot; + W);
+<i>206</i>&nbsp;        }
+<i>207</i>&nbsp;
+<b class="nc"><i>208</i>&nbsp;        return Double.POSITIVE_INFINITY;</b>
+<i>209</i>&nbsp;    }
+<i>210</i>&nbsp;
+<i>211</i>&nbsp;
+<i>212</i>&nbsp;    @Override
+<i>213</i>&nbsp;    public double getCoercableParameterValue() {
+<b class="nc"><i>214</i>&nbsp;        return windowSize;</b>
+<i>215</i>&nbsp;    }
+<i>216</i>&nbsp;
+<i>217</i>&nbsp;    @Override
+<i>218</i>&nbsp;    public void setCoercableParameterValue(double value) {
+<b class="nc"><i>219</i>&nbsp;        windowSize = value;</b>
+<i>220</i>&nbsp;    }
+<i>221</i>&nbsp;
+<i>222</i>&nbsp;    /**
+<i>223</i>&nbsp;     * called after every invocation of this operator to see whether
+<i>224</i>&nbsp;     * a parameter can be optimised for better acceptance hence faster
+<i>225</i>&nbsp;     * mixing
+<i>226</i>&nbsp;     *
+<i>227</i>&nbsp;     * @param logAlpha difference in posterior between previous state &amp; proposed state + hasting ratio
+<i>228</i>&nbsp;     */
+<i>229</i>&nbsp;    @Override
+<i>230</i>&nbsp;    public void optimize(double logAlpha) {
+<i>231</i>&nbsp;        // must be overridden by operator implementation to have an effect
+<b class="nc"><i>232</i>&nbsp;        double delta = calcDelta(logAlpha);</b>
+<i>233</i>&nbsp;
+<b class="nc"><i>234</i>&nbsp;        delta += Math.log(windowSize);</b>
+<b class="nc"><i>235</i>&nbsp;        windowSize = Math.exp(delta);</b>
+<i>236</i>&nbsp;    }
+<i>237</i>&nbsp;
+<i>238</i>&nbsp;    @Override
+<i>239</i>&nbsp;    public final String getPerformanceSuggestion() {
+<i>240</i>&nbsp;        // new scale factor
+<b class="nc"><i>241</i>&nbsp;        double newWindowSize = totalDelta / totalNumber * 4;</b>
+<i>242</i>&nbsp;
+<b class="nc"><i>243</i>&nbsp;        if (newWindowSize / windowSize &lt; 0.8 || newWindowSize / windowSize &gt; 1.2) {</b>
+<b class="nc"><i>244</i>&nbsp;            DecimalFormat formatter = new DecimalFormat(&quot;#.###&quot;);</b>
+<b class="nc"><i>245</i>&nbsp;            return &quot;Try setting window size to about &quot; + formatter.format(newWindowSize);</b>
+<i>246</i>&nbsp;        } else
+<b class="nc"><i>247</i>&nbsp;            return &quot;&quot;;</b>
+<i>248</i>&nbsp;    }
+<i>249</i>&nbsp;} // class IntRandomWalkOperator
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

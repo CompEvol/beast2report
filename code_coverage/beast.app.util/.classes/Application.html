@@ -1,0 +1,201 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Application</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.util</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Application (beast.app.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">Application</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.util;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import java.util.ArrayList;
+<i>5</i>&nbsp;import java.util.List;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import org.json.JSONObject;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;import beast.core.BEASTObject;
+<i>10</i>&nbsp;import beast.core.Description;
+<i>11</i>&nbsp;import beast.core.Input;
+<i>12</i>&nbsp;import beast.core.util.Log;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;@Description(&quot;BEAST application that handles argument parsing by introspection &quot;
+<i>15</i>&nbsp;		+ &quot;using Inputs declared in the class.&quot;)
+<i>16</i>&nbsp;public class Application {
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;	BEASTObject myBeastObject;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;	public Application(BEASTObject myBeastObject) {
+<i>21</i>&nbsp;		this.myBeastObject = myBeastObject;
+<i>22</i>&nbsp;	}
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;	/** default input used for argument parsing **/
+<i>25</i>&nbsp;	protected Input&lt;?&gt; defaultInput = null;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;	/**
+<i>28</i>&nbsp;	 * Arguments of the form -name value are processed by finding Inputs with
+<i>29</i>&nbsp;	 * matching name and setting their value.
+<i>30</i>&nbsp;	 * 
+<i>31</i>&nbsp;	 * If the input is a boolean that needs to be set to true, the &#39;value&#39; a
+<i>32</i>&nbsp;	 * argument can be omitted.
+<i>33</i>&nbsp;	 * 
+<i>34</i>&nbsp;	 * The last argument is assigned to the defaultInput.
+<i>35</i>&nbsp;	 * **/
+<i>36</i>&nbsp;	public void parseArgs(String[] args, boolean sloppy) throws Exception {
+<i>37</i>&nbsp;		List&lt;Input&lt;?&gt;&gt; inputs = myBeastObject.listInputs();
+<i>38</i>&nbsp;		for (Input&lt;?&gt; input : inputs) {
+<i>39</i>&nbsp;			input.determineClass(this);
+<i>40</i>&nbsp;		}
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;		for (int i = 0; i &lt; args.length; i++) {
+<i>43</i>&nbsp;			String arg = args[i];
+<i>44</i>&nbsp;			boolean done = false;
+<i>45</i>&nbsp;			if (arg.startsWith(&quot;-&quot;)) {
+<i>46</i>&nbsp;				String name = arg.substring(1);
+<i>47</i>&nbsp;				String value = (i &lt; args.length - 1 ? args[i + 1] : null);
+<i>48</i>&nbsp;				for (Input&lt;?&gt; input : inputs) {
+<i>49</i>&nbsp;					if (input.getName().equals(name)) {
+<i>50</i>&nbsp;						try {
+<i>51</i>&nbsp;							if (input.getType() == Boolean.class) {
+<i>52</i>&nbsp;								if (value != null
+<i>53</i>&nbsp;										&amp;&amp; (value.toLowerCase().equals(&quot;true&quot;) || value
+<i>54</i>&nbsp;												.toLowerCase().equals(&quot;false&quot;))) {
+<i>55</i>&nbsp;									input.setValue(value, null);
+<i>56</i>&nbsp;									i++;
+<i>57</i>&nbsp;								} else {
+<i>58</i>&nbsp;									input.setValue(Boolean.TRUE, null);
+<i>59</i>&nbsp;								}
+<i>60</i>&nbsp;							} else {
+<i>61</i>&nbsp;								input.setValue(value, myBeastObject);
+<i>62</i>&nbsp;								i++;
+<i>63</i>&nbsp;							}
+<i>64</i>&nbsp;						} catch (Exception e) {
+<i>65</i>&nbsp;							throw new Exception(&quot;Problem parsing arguments:\n&quot;
+<i>66</i>&nbsp;									+ e.getMessage());
+<i>67</i>&nbsp;						}
+<i>68</i>&nbsp;						done = true;
+<i>69</i>&nbsp;						break;
+<i>70</i>&nbsp;					}
+<i>71</i>&nbsp;				}
+<i>72</i>&nbsp;				if (name.equals(&quot;help&quot;)) {
+<i>73</i>&nbsp;					throw new Exception(&quot;&quot;); // calling app should call getUsage()
+<i>74</i>&nbsp;				}
+<i>75</i>&nbsp;			} else {
+<i>76</i>&nbsp;				if (i == args.length - 1) {
+<i>77</i>&nbsp;					defaultInput.setValue(arg, null);
+<i>78</i>&nbsp;					done = true;
+<i>79</i>&nbsp;				}
+<i>80</i>&nbsp;			}
+<i>81</i>&nbsp;			if (!done) {
+<i>82</i>&nbsp;				if (sloppy) {
+<i>83</i>&nbsp;					Log.info.println(&quot;Unknown argument: &quot; + args[i]
+<i>84</i>&nbsp;							+ &quot; ignored.&quot;);
+<i>85</i>&nbsp;					i++;
+<i>86</i>&nbsp;				} else {
+<i>87</i>&nbsp;					throw new Exception(&quot;Unknown argument: &quot; + args[i] + &quot;\n&quot;);
+<i>88</i>&nbsp;							//+ getUsage());
+<i>89</i>&nbsp;				}
+<i>90</i>&nbsp;			}
+<i>91</i>&nbsp;		}
+<i>92</i>&nbsp;
+<i>93</i>&nbsp;	}
+<i>94</i>&nbsp;
+<i>95</i>&nbsp;	protected void parseArgs(JSONObject args) throws Exception {
+<i>96</i>&nbsp;		List&lt;String&gt; argList = new ArrayList&lt;&gt;();
+<i>97</i>&nbsp;		for (String key : args.keySet()) {
+<i>98</i>&nbsp;			argList.add(&quot;-&quot; + key.trim());
+<i>99</i>&nbsp;			argList.add(args.get(key).toString().trim());
+<i>100</i>&nbsp;		}
+<i>101</i>&nbsp;		parseArgs(argList.toArray(new String[] {}), true);
+<i>102</i>&nbsp;	}
+<i>103</i>&nbsp;
+<i>104</i>&nbsp;	public String getUsage() {
+<i>105</i>&nbsp;		StringBuffer buf = new StringBuffer();
+<i>106</i>&nbsp;		try {
+<i>107</i>&nbsp;			List&lt;Input&lt;?&gt;&gt; inputs = myBeastObject.listInputs();
+<i>108</i>&nbsp;			buf.append(&quot;Usage: &quot; + myBeastObject.getClass().getName() + &quot;\n&quot;);
+<i>109</i>&nbsp;			for (Input&lt;?&gt; input : inputs) {
+<i>110</i>&nbsp;				buf.append(&quot;-&quot; + input.getName() + &quot; &quot;);
+<i>111</i>&nbsp;				try {
+<i>112</i>&nbsp;					Class&lt;?&gt; typeClass = input.getType();
+<i>113</i>&nbsp;					if (typeClass == null) {
+<i>114</i>&nbsp;						input.determineClass(myBeastObject);
+<i>115</i>&nbsp;					}
+<i>116</i>&nbsp;					buf.append(input.getValueTipText());
+<i>117</i>&nbsp;				} catch (Exception e) {
+<i>118</i>&nbsp;					// ignore
+<i>119</i>&nbsp;				}
+<i>120</i>&nbsp;				buf.append(&quot;\t&quot; + input.getTipText() + &quot;\n&quot;);
+<i>121</i>&nbsp;			}
+<i>122</i>&nbsp;		} catch (Exception e) {
+<i>123</i>&nbsp;			e.printStackTrace();
+<i>124</i>&nbsp;		}
+<i>125</i>&nbsp;		buf.append(&quot;-help\t show arguments&quot;);
+<i>126</i>&nbsp;		return buf.toString();
+<i>127</i>&nbsp;	}
+<i>128</i>&nbsp;
+<i>129</i>&nbsp;	// placeholder, so that the main method compiles
+<i>130</i>&nbsp;	public void run() throws Exception {
+<i>131</i>&nbsp;		myBeastObject.initAndValidate();
+<i>132</i>&nbsp;	};
+<i>133</i>&nbsp;
+<i>134</i>&nbsp;	// template for implementing a main for an application
+<i>135</i>&nbsp;	// the first argument is interpreted as class name of a BEASTObject
+<i>136</i>&nbsp;	public static void main(final String[] args) throws Exception {
+<i>137</i>&nbsp;		Application main = null;
+<i>138</i>&nbsp;		try {
+<i>139</i>&nbsp;			BEASTObject myBeastObject = (BEASTObject) Class.forName(args[0])
+<i>140</i>&nbsp;					.newInstance();
+<i>141</i>&nbsp;			main = new Application(myBeastObject);
+<i>142</i>&nbsp;			String[] args2 = new String[args.length - 1];
+<i>143</i>&nbsp;			System.arraycopy(args, 1, args2, 0, args2.length);
+<i>144</i>&nbsp;			main.parseArgs(args2, false);
+<i>145</i>&nbsp;			main.run();
+<i>146</i>&nbsp;		} catch (Exception e) {
+<i>147</i>&nbsp;			System.out.println(&quot;Error:&quot; + e.getMessage());
+<i>148</i>&nbsp;			if (main != null) {
+<i>149</i>&nbsp;				System.out.println(main.getUsage());
+<i>150</i>&nbsp;			}
+<i>151</i>&nbsp;		}
+<i>152</i>&nbsp;	}
+<i>153</i>&nbsp;
+<i>154</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

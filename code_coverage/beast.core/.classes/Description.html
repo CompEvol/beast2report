@@ -1,0 +1,108 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Description</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.core</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Description (beast.core)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">Description</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;* File Description.java
+<i>3</i>&nbsp;*
+<i>4</i>&nbsp;* Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>5</i>&nbsp;*
+<i>6</i>&nbsp;* This file is part of BEAST2.
+<i>7</i>&nbsp;* See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp;* information regarding copyright ownership and licensing.
+<i>9</i>&nbsp;*
+<i>10</i>&nbsp;* BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp;* it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp;* published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp;* of the License, or (at your option) any later version.
+<i>14</i>&nbsp;*
+<i>15</i>&nbsp;*  BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp;*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp;*  GNU Lesser General Public License for more details.
+<i>19</i>&nbsp;*
+<i>20</i>&nbsp;* You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp;* License along with BEAST; if not, write to the
+<i>22</i>&nbsp;* Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp;* Boston, MA  02110-1301  USA
+<i>24</i>&nbsp;*/
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;package beast.core;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;import java.lang.annotation.ElementType;
+<i>29</i>&nbsp;import java.lang.annotation.Retention;
+<i>30</i>&nbsp;import java.lang.annotation.RetentionPolicy;
+<i>31</i>&nbsp;import java.lang.annotation.Target;
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;/**
+<i>34</i>&nbsp; * This is an annotation that can be used to both
+<i>35</i>&nbsp; * + document a class at the top of the code and
+<i>36</i>&nbsp; * + create user documentation for XML Beast files.
+<i>37</i>&nbsp; * &lt;p/&gt;
+<i>38</i>&nbsp; * The idea is to add @Description(&quot;bla bla bla&quot;)
+<i>39</i>&nbsp; * just before class declarations of plug-ins. Applications
+<i>40</i>&nbsp; * like DocMaker then can pick it up through introspection.
+<i>41</i>&nbsp; * &lt;p/&gt;
+<i>42</i>&nbsp; * To indicate that the description applies to all derived
+<i>43</i>&nbsp; * classes, the isInheritable flag is set true by default.
+<i>44</i>&nbsp; * This does not always apply, for instance when the description
+<i>45</i>&nbsp; * contains text like &quot;Should not be used directly, but by
+<i>46</i>&nbsp; * implementations&quot;.
+<i>47</i>&nbsp; */
+<i>48</i>&nbsp;@Target({ElementType.TYPE})
+<i>49</i>&nbsp;@Retention(RetentionPolicy.RUNTIME)
+<i>50</i>&nbsp;public @interface Description {
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;    /**
+<i>53</i>&nbsp;     * @return the description of the class
+<i>54</i>&nbsp;     */
+<i>55</i>&nbsp;    String value();
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;    /**
+<i>58</i>&nbsp;     * @return true to indicate this description applies to all its inherited classes as well, false otherwise
+<i>59</i>&nbsp;     */
+<i>60</i>&nbsp;    boolean isInheritable() default true;
+<i>61</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

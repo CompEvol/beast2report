@@ -1,0 +1,438 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: FilteredAlignment</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.alignment</a> ]
+</div>
+
+<h1>Coverage Summary for Class: FilteredAlignment (beast.evolution.alignment)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FilteredAlignment</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (7/ 8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.8%
+  </span>
+  <span class="absValue">
+    (167/ 188)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.alignment;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import java.util.ArrayList;
+<i>5</i>&nbsp;import java.util.Arrays;
+<i>6</i>&nbsp;import java.util.List;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import beast.core.Description;
+<i>9</i>&nbsp;import beast.core.Input;
+<i>10</i>&nbsp;import beast.core.Input.Validate;
+<i>11</i>&nbsp;import beast.core.parameter.IntegerParameter;
+<i>12</i>&nbsp;import beast.core.util.Log;
+<i>13</i>&nbsp;import beast.evolution.datatype.DataType;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;@Description(&quot;Alignment based on a filter operation on another alignment&quot;)
+<i>18</i>&nbsp;public class FilteredAlignment extends Alignment {
+<b class="fc"><i>19</i>&nbsp;    final public Input&lt;String&gt; filterInput = new Input&lt;&gt;(&quot;filter&quot;, &quot;specifies which of the sites in the input alignment should be selected &quot; +</b>
+<i>20</i>&nbsp;            &quot;First site is 1.&quot; +
+<i>21</i>&nbsp;            &quot;Filter specs are comma separated, either a singleton, a range [from]-[to] or iteration [from]:[to]:[step]; &quot; +
+<i>22</i>&nbsp;            &quot;1-100 defines a range, &quot; +
+<i>23</i>&nbsp;            &quot;1-100\3 or 1:100:3 defines every third in range 1-100, &quot; +
+<i>24</i>&nbsp;            &quot;1::3,2::3 removes every third site. &quot; +
+<i>25</i>&nbsp;            &quot;Default for range [1]-[last site], default for iterator [1]:[last site]:[1]&quot;, Validate.REQUIRED);
+<b class="fc"><i>26</i>&nbsp;    final public Input&lt;Alignment&gt; alignmentInput = new Input&lt;&gt;(&quot;data&quot;, &quot;alignment to be filtered&quot;, Validate.REQUIRED);</b>
+<b class="fc"><i>27</i>&nbsp;    final public Input&lt;IntegerParameter&gt; constantSiteWeightsInput = new Input&lt;&gt;(&quot;constantSiteWeights&quot;, &quot;if specified, constant &quot; +</b>
+<i>28</i>&nbsp;    		&quot;sites will be added with weights specified by the input. The dimension and order of weights must match the datatype. &quot; +
+<i>29</i>&nbsp;    		&quot;For example for nucleotide data, a 4 dimensional &quot; +
+<i>30</i>&nbsp;    		&quot;parameter with weights for A, C, G and T respectively need to be specified.&quot;);
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;    // these triples specify a range for(i=From; i &lt;= To; i += Step)
+<i>33</i>&nbsp;    int[] from;
+<i>34</i>&nbsp;    int[] to;
+<i>35</i>&nbsp;    int[] step;
+<i>36</i>&nbsp;    /**
+<i>37</i>&nbsp;     * list of indices filtered from input alignment *
+<i>38</i>&nbsp;     */
+<i>39</i>&nbsp;    int[] filter;
+<i>40</i>&nbsp;    
+<b class="fc"><i>41</i>&nbsp;    boolean convertDataType = false;</b>
+<i>42</i>&nbsp;
+<b class="fc"><i>43</i>&nbsp;    public FilteredAlignment() {</b>
+<b class="fc"><i>44</i>&nbsp;        sequenceInput.setRule(Validate.OPTIONAL);</b>
+<i>45</i>&nbsp;        // it does not make sense to set weights on sites, since they can be scrambled by the filter
+<b class="fc"><i>46</i>&nbsp;        siteWeightsInput.setRule(Validate.FORBIDDEN);</b>
+<b class="fc"><i>47</i>&nbsp;    }</b>
+<i>48</i>&nbsp;
+<i>49</i>&nbsp;    @Override
+<i>50</i>&nbsp;    public void initAndValidate() {
+<b class="fc"><i>51</i>&nbsp;        parseFilterSpec();</b>
+<b class="fc"><i>52</i>&nbsp;        calcFilter();</b>
+<b class="fc"><i>53</i>&nbsp;        Alignment data = alignmentInput.get();</b>
+<b class="fc"><i>54</i>&nbsp;        m_dataType = data.m_dataType;</b>
+<i>55</i>&nbsp;        // see if this filter changes data type
+<b class="fc"><i>56</i>&nbsp;        if (userDataTypeInput.get() != null) {</b>
+<b class="nc"><i>57</i>&nbsp;            m_dataType = userDataTypeInput.get();</b>
+<b class="nc"><i>58</i>&nbsp;            convertDataType = true;</b>
+<i>59</i>&nbsp;        }
+<i>60</i>&nbsp;
+<b class="fc"><i>61</i>&nbsp;        if (constantSiteWeightsInput.get() != null) {</b>
+<b class="fc"><i>62</i>&nbsp;        	if (constantSiteWeightsInput.get().getDimension() != m_dataType.getStateCount()) {</b>
+<b class="fc"><i>63</i>&nbsp;        		throw new IllegalArgumentException(&quot;constantSiteWeights should be of the same dimension as the datatype &quot; +</b>
+<b class="fc"><i>64</i>&nbsp;        				&quot;(&quot; + constantSiteWeightsInput.get().getDimension() + &quot;!=&quot;+ m_dataType.getStateCount() +&quot;)&quot;);</b>
+<i>65</i>&nbsp;        	}
+<i>66</i>&nbsp;    	}
+<i>67</i>&nbsp;        
+<b class="fc"><i>68</i>&nbsp;   		counts = data.getCounts();</b>
+<b class="fc"><i>69</i>&nbsp;        taxaNames = data.taxaNames;</b>
+<b class="fc"><i>70</i>&nbsp;        stateCounts = data.stateCounts;</b>
+<b class="fc"><i>71</i>&nbsp;        if (convertDataType &amp;&amp; m_dataType.getStateCount() &gt; 0) {</b>
+<b class="nc"><i>72</i>&nbsp;        	for (int i = 0; i &lt; stateCounts.size(); i++) {</b>
+<b class="nc"><i>73</i>&nbsp;                stateCounts.set(i, m_dataType.getStateCount());</b>
+<i>74</i>&nbsp;        	}
+<i>75</i>&nbsp;        }
+<i>76</i>&nbsp;
+<b class="fc"><i>77</i>&nbsp;        if (alignmentInput.get().siteWeightsInput.get() != null) {</b>
+<b class="fc"><i>78</i>&nbsp;    		String str = alignmentInput.get().siteWeightsInput.get().trim();</b>
+<b class="fc"><i>79</i>&nbsp;    		String [] strs = str.split(&quot;,&quot;);</b>
+<b class="fc"><i>80</i>&nbsp;    		siteWeights = new int[strs.length];</b>
+<b class="fc"><i>81</i>&nbsp;    		for (int i = 0; i&lt; strs.length; i++) {</b>
+<b class="fc"><i>82</i>&nbsp;    			siteWeights[i] = Integer.parseInt(strs[i].trim());</b>
+<i>83</i>&nbsp;    		}    		
+<i>84</i>&nbsp;        }
+<i>85</i>&nbsp;
+<b class="fc"><i>86</i>&nbsp;        calcPatterns();</b>
+<b class="fc"><i>87</i>&nbsp;        setupAscertainment();</b>
+<b class="fc"><i>88</i>&nbsp;    }</b>
+<i>89</i>&nbsp;
+<i>90</i>&nbsp;    private void parseFilterSpec() {
+<i>91</i>&nbsp;        // parse filter specification
+<b class="fc"><i>92</i>&nbsp;        String filterString = filterInput.get();</b>
+<b class="fc"><i>93</i>&nbsp;        String[] filters = filterString.split(&quot;,&quot;);</b>
+<b class="fc"><i>94</i>&nbsp;        from = new int[filters.length];</b>
+<b class="fc"><i>95</i>&nbsp;        to = new int[filters.length];</b>
+<b class="fc"><i>96</i>&nbsp;        step = new int[filters.length];</b>
+<b class="fc"><i>97</i>&nbsp;        for (int i = 0; i &lt; filters.length; i++) {</b>
+<b class="fc"><i>98</i>&nbsp;            filterString = &quot; &quot; + filters[i] + &quot; &quot;;</b>
+<b class="fc"><i>99</i>&nbsp;            if (filterString.matches(&quot;.*-.*&quot;)) {</b>
+<i>100</i>&nbsp;                // range, e.g. 1-100/3
+<b class="fc"><i>101</i>&nbsp;                if (filterString.indexOf(&#39;\\&#39;) &gt;= 0) {</b>
+<b class="nc"><i>102</i>&nbsp;                	String str2 = filterString.substring(filterString.indexOf(&#39;\\&#39;) + 1); </b>
+<b class="nc"><i>103</i>&nbsp;                	step[i] = parseInt(str2, 1);</b>
+<b class="nc"><i>104</i>&nbsp;                	filterString = filterString.substring(0, filterString.indexOf(&#39;\\&#39;));</b>
+<b class="nc"><i>105</i>&nbsp;                } else {</b>
+<b class="fc"><i>106</i>&nbsp;                	step[i] = 1;</b>
+<i>107</i>&nbsp;                }
+<b class="fc"><i>108</i>&nbsp;                String[] strs = filterString.split(&quot;-&quot;);</b>
+<b class="fc"><i>109</i>&nbsp;                from[i] = parseInt(strs[0], 1) - 1;</b>
+<b class="fc"><i>110</i>&nbsp;                to[i] = parseInt(strs[1], alignmentInput.get().getSiteCount()) - 1;</b>
+<b class="fc"><i>111</i>&nbsp;            } else if (filterString.matches(&quot;.*:.*:.+&quot;)) {</b>
+<i>112</i>&nbsp;                // iterator, e.g. 1:100:3
+<b class="fc"><i>113</i>&nbsp;                String[] strs = filterString.split(&quot;:&quot;);</b>
+<b class="fc"><i>114</i>&nbsp;                from[i] = parseInt(strs[0], 1) - 1;</b>
+<b class="fc"><i>115</i>&nbsp;                to[i] = parseInt(strs[1], alignmentInput.get().getSiteCount()) - 1;</b>
+<b class="fc"><i>116</i>&nbsp;                step[i] = parseInt(strs[2], 1);</b>
+<b class="fc"><i>117</i>&nbsp;            } else if (filterString.trim().matches(&quot;[0-9]*&quot;)) {</b>
+<b class="fc"><i>118</i>&nbsp;                from[i] = parseInt(filterString.trim(), 1) - 1;</b>
+<b class="fc"><i>119</i>&nbsp;                to[i] = from[i];</b>
+<b class="fc"><i>120</i>&nbsp;            	step[i] = 1;</b>
+<i>121</i>&nbsp;            } else {
+<b class="nc"><i>122</i>&nbsp;                throw new IllegalArgumentException(&quot;Don&#39;t know how to parse filter &quot; + filterString);</b>
+<i>123</i>&nbsp;            }
+<i>124</i>&nbsp;        }
+<b class="fc"><i>125</i>&nbsp;    }</b>
+<i>126</i>&nbsp;
+<i>127</i>&nbsp;    int parseInt(String str, int defaultValue) {
+<b class="fc"><i>128</i>&nbsp;        str = str.replaceAll(&quot;\\s+&quot;, &quot;&quot;);</b>
+<i>129</i>&nbsp;        try {
+<b class="fc"><i>130</i>&nbsp;            return Integer.parseInt(str);</b>
+<b class="fc"><i>131</i>&nbsp;        } catch (Exception e) {</b>
+<b class="fc"><i>132</i>&nbsp;            return defaultValue;</b>
+<i>133</i>&nbsp;        }
+<i>134</i>&nbsp;    }
+<i>135</i>&nbsp;
+<i>136</i>&nbsp;    private void calcFilter() {
+<b class="fc"><i>137</i>&nbsp;        boolean[] isUsed = new boolean[alignmentInput.get().getSiteCount()];</b>
+<b class="fc"><i>138</i>&nbsp;        for (int i = 0; i &lt; to.length; i++) {</b>
+<b class="fc"><i>139</i>&nbsp;            for (int k = from[i]; k &lt;= to[i]; k += step[i]) {</b>
+<b class="fc"><i>140</i>&nbsp;                isUsed[k] = true;</b>
+<i>141</i>&nbsp;            }
+<i>142</i>&nbsp;        }
+<i>143</i>&nbsp;        // count
+<b class="fc"><i>144</i>&nbsp;        int k = 0;</b>
+<b class="fc"><i>145</i>&nbsp;        for (int i = 0; i &lt; isUsed.length; i++) {</b>
+<b class="fc"><i>146</i>&nbsp;            if (isUsed[i]) {</b>
+<b class="fc"><i>147</i>&nbsp;                k++;</b>
+<i>148</i>&nbsp;            }
+<i>149</i>&nbsp;        }
+<i>150</i>&nbsp;        // set up index set
+<b class="fc"><i>151</i>&nbsp;        filter = new int[k];</b>
+<b class="fc"><i>152</i>&nbsp;        k = 0;</b>
+<b class="fc"><i>153</i>&nbsp;        for (int i = 0; i &lt; isUsed.length; i++) {</b>
+<b class="fc"><i>154</i>&nbsp;            if (isUsed[i]) {</b>
+<b class="fc"><i>155</i>&nbsp;                filter[k++] = i;</b>
+<i>156</i>&nbsp;            }
+<i>157</i>&nbsp;        }
+<b class="fc"><i>158</i>&nbsp;    }</b>
+<i>159</i>&nbsp;
+<i>160</i>&nbsp;    
+<i>161</i>&nbsp;    @Override
+<i>162</i>&nbsp;    public List&lt;List&lt;Integer&gt;&gt; getCounts() {
+<b class="fc"><i>163</i>&nbsp;    	if (counts == null) {</b>
+<b class="fc"><i>164</i>&nbsp;			counts = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>165</i>&nbsp;			for (int j = 0; j &lt; sitePatterns[0].length; j++) {</b>
+<b class="fc"><i>166</i>&nbsp;				counts.add(new ArrayList&lt;&gt;());</b>
+<i>167</i>&nbsp;			}
+<b class="fc"><i>168</i>&nbsp;			for (int i = 0; i &lt; getSiteCount(); i++) {</b>
+<b class="fc"><i>169</i>&nbsp;				int [] sites = getPattern(getPatternIndex(i));</b>
+<b class="fc"><i>170</i>&nbsp;    			for (int j = 0; j &lt; getTaxonCount(); j++) {</b>
+<b class="fc"><i>171</i>&nbsp;    				counts.get(j).add(sites[j]);</b>
+<i>172</i>&nbsp;    			}
+<i>173</i>&nbsp;			}
+<i>174</i>&nbsp;    	}
+<b class="fc"><i>175</i>&nbsp;    	return counts;</b>
+<i>176</i>&nbsp;    }
+<i>177</i>&nbsp;    
+<i>178</i>&nbsp;    @Override
+<i>179</i>&nbsp;    protected void calcPatterns() {
+<b class="fc"><i>180</i>&nbsp;        int nrOfTaxa = counts.size();</b>
+<b class="fc"><i>181</i>&nbsp;        int nrOfSites = filter.length;</b>
+<i>182</i>&nbsp;        
+<b class="fc"><i>183</i>&nbsp;        DataType baseType = alignmentInput.get().m_dataType;</b>
+<i>184</i>&nbsp;        
+<i>185</i>&nbsp;        
+<i>186</i>&nbsp;        
+<i>187</i>&nbsp;        // convert data to transposed int array
+<b class="fc"><i>188</i>&nbsp;        int[][] data = new int[nrOfSites][nrOfTaxa];</b>
+<b class="fc"><i>189</i>&nbsp;        for (int i = 0; i &lt; nrOfTaxa; i++) {</b>
+<b class="fc"><i>190</i>&nbsp;            List&lt;Integer&gt; sites = counts.get(i);</b>
+<b class="fc"><i>191</i>&nbsp;            for (int j = 0; j &lt; nrOfSites; j++) {</b>
+<b class="fc"><i>192</i>&nbsp;                data[j][i] = sites.get(filter[j]);</b>
+<b class="fc"><i>193</i>&nbsp;                if (convertDataType) {</b>
+<i>194</i>&nbsp;                	try {
+<b class="nc"><i>195</i>&nbsp;                		String code = baseType.getCode(data[j][i]);</b>
+<b class="nc"><i>196</i>&nbsp;						data[j][i] = m_dataType.string2state(code).get(0);</b>
+<b class="nc"><i>197</i>&nbsp;                	} catch (Exception e) {</b>
+<b class="nc"><i>198</i>&nbsp;                		e.printStackTrace();</b>
+<b class="nc"><i>199</i>&nbsp;                	}</b>
+<i>200</i>&nbsp;                }
+<i>201</i>&nbsp;            }
+<i>202</i>&nbsp;        }
+<i>203</i>&nbsp;        
+<i>204</i>&nbsp;        // add constant sites, if specified
+<b class="fc"><i>205</i>&nbsp;        if (constantSiteWeightsInput.get() != null) {</b>
+<b class="fc"><i>206</i>&nbsp;        	int dim = constantSiteWeightsInput.get().getDimension();</b>
+<i>207</i>&nbsp;        	// add constant patterns
+<b class="fc"><i>208</i>&nbsp;        	int [][] data2 = new int[nrOfSites + dim][];</b>
+<b class="fc"><i>209</i>&nbsp;            System.arraycopy(data, 0, data2, 0, nrOfSites);</b>
+<b class="fc"><i>210</i>&nbsp;        	for (int i = 0; i &lt; dim; i++) {</b>
+<b class="fc"><i>211</i>&nbsp;        		data2[nrOfSites + i] = new int[nrOfTaxa];</b>
+<b class="fc"><i>212</i>&nbsp;        		for (int j = 0; j &lt; nrOfTaxa; j++) {</b>
+<b class="fc"><i>213</i>&nbsp;        			data2[nrOfSites+ i][j] = i;</b>
+<i>214</i>&nbsp;				}
+<i>215</i>&nbsp;        	}
+<b class="fc"><i>216</i>&nbsp;        	data = data2;</b>
+<b class="fc"><i>217</i>&nbsp;        	nrOfSites += dim; </b>
+<i>218</i>&nbsp;        }
+<i>219</i>&nbsp;        
+<i>220</i>&nbsp;        // sort data
+<b class="fc"><i>221</i>&nbsp;        SiteComparator comparator = new SiteComparator();</b>
+<b class="fc"><i>222</i>&nbsp;        Arrays.sort(data, comparator);</b>
+<i>223</i>&nbsp;
+<i>224</i>&nbsp;        // count patterns in sorted data
+<b class="fc"><i>225</i>&nbsp;        int[] weights = new int[nrOfSites];</b>
+<b class="fc"><i>226</i>&nbsp;        int nrOfPatterns = 1;</b>
+<b class="fc"><i>227</i>&nbsp;        if (nrOfSites &gt; 0) {</b>
+<b class="fc"><i>228</i>&nbsp;	        weights[0] = 1;</b>
+<b class="fc"><i>229</i>&nbsp;	        for (int i = 1; i &lt; nrOfSites; i++) {</b>
+<b class="fc"><i>230</i>&nbsp;	            if (comparator.compare(data[i - 1], data[i]) != 0) {</b>
+<b class="fc"><i>231</i>&nbsp;	                nrOfPatterns++;</b>
+<b class="fc"><i>232</i>&nbsp;	                data[nrOfPatterns - 1] = data[i];</b>
+<i>233</i>&nbsp;	            }
+<b class="fc"><i>234</i>&nbsp;	            weights[nrOfPatterns - 1]++;</b>
+<i>235</i>&nbsp;	        }
+<i>236</i>&nbsp;        } else {
+<b class="nc"><i>237</i>&nbsp;            nrOfPatterns = 0;</b>
+<i>238</i>&nbsp;        }
+<i>239</i>&nbsp;        
+<i>240</i>&nbsp;        // addjust weight of invariant sites, if stripInvariantSitesInput i sspecified
+<b class="fc"><i>241</i>&nbsp;        if (stripInvariantSitesInput.get()) {</b>
+<i>242</i>&nbsp;            // don&#39;t add patterns that are invariant, e.g. all gaps
+<b class="fc"><i>243</i>&nbsp;            Log.info.print(&quot;Stripping invariant sites&quot;);</b>
+<b class="fc"><i>244</i>&nbsp;            int removedSites = 0;</b>
+<i>245</i>&nbsp;            
+<b class="fc"><i>246</i>&nbsp;        	for (int i = 0; i &lt; nrOfPatterns; i++) {</b>
+<b class="fc"><i>247</i>&nbsp;        		boolean isContant = true;</b>
+<b class="fc"><i>248</i>&nbsp;        		for (int j = 1; j &lt; nrOfTaxa; j++) {</b>
+<b class="fc"><i>249</i>&nbsp;        			if (data[i][j] != data[i][0]) {</b>
+<b class="fc"><i>250</i>&nbsp;        				isContant = false;</b>
+<b class="fc"><i>251</i>&nbsp;        				break;</b>
+<i>252</i>&nbsp;        			}
+<i>253</i>&nbsp;        		}
+<i>254</i>&nbsp;        		// if this is a constant site, and it is not an ambiguous site
+<b class="fc"><i>255</i>&nbsp;        		if (isContant) {</b>
+<b class="fc"><i>256</i>&nbsp;        			Log.warning.print(&quot; &lt;&quot; + data[i][0] + &quot;&gt; &quot;);</b>
+<b class="fc"><i>257</i>&nbsp;                   	removedSites += weights[i]; </b>
+<b class="fc"><i>258</i>&nbsp;            		weights[i] = 0;</b>
+<i>259</i>&nbsp;        		}
+<i>260</i>&nbsp;        	}
+<b class="fc"><i>261</i>&nbsp;        	Log.warning.println(&quot; removed &quot; + removedSites + &quot; sites &quot;);</b>
+<i>262</i>&nbsp;        }
+<i>263</i>&nbsp;        
+<i>264</i>&nbsp;        // addjust weight of constant sites, if specified
+<b class="fc"><i>265</i>&nbsp;        if (constantSiteWeightsInput.get() != null) {</b>
+<b class="fc"><i>266</i>&nbsp;        	Integer [] constantWeights = constantSiteWeightsInput.get().getValues(); </b>
+<b class="fc"><i>267</i>&nbsp;        	for (int i = 0; i &lt; nrOfPatterns; i++) {</b>
+<b class="fc"><i>268</i>&nbsp;        		boolean isContant = true;</b>
+<b class="fc"><i>269</i>&nbsp;        		for (int j = 1; j &lt; nrOfTaxa; j++) {</b>
+<b class="fc"><i>270</i>&nbsp;        			if (data[i][j] != data[i][0]) {</b>
+<b class="fc"><i>271</i>&nbsp;        				isContant = false;</b>
+<b class="fc"><i>272</i>&nbsp;        				break;</b>
+<i>273</i>&nbsp;        			}
+<i>274</i>&nbsp;        		}
+<i>275</i>&nbsp;        		// if this is a constant site, and it is not an ambiguous site
+<b class="fc"><i>276</i>&nbsp;        		if (isContant &amp;&amp; data[i][0] &gt;= 0 &amp;&amp; data[i][0] &lt; constantWeights.length) {</b>
+<i>277</i>&nbsp;        			// take weights in data in account as well
+<i>278</i>&nbsp;        			// by adding constant patterns, we added a weight of 1, which now gets corrected
+<i>279</i>&nbsp;        			// but if filtered by stripping constant sites, that weight is already set to zero
+<b class="fc"><i>280</i>&nbsp;            		weights[i] = (stripInvariantSitesInput.get() ? 0 : weights[i] - 1) + constantWeights[data[i][0]];</b>
+<i>281</i>&nbsp;        		}
+<i>282</i>&nbsp;        	}
+<i>283</i>&nbsp;        	
+<i>284</i>&nbsp;        	// need to decrease siteCount for mapping sites to patterns in m_nPatternIndex
+<b class="fc"><i>285</i>&nbsp;        	nrOfSites -= constantWeights.length; </b>
+<i>286</i>&nbsp;        }        
+<i>287</i>&nbsp;        
+<i>288</i>&nbsp;        // reserve memory for patterns
+<b class="fc"><i>289</i>&nbsp;        patternWeight = new int[nrOfPatterns];</b>
+<b class="fc"><i>290</i>&nbsp;        sitePatterns = new int[nrOfPatterns][nrOfTaxa];</b>
+<b class="fc"><i>291</i>&nbsp;        for (int i = 0; i &lt; nrOfPatterns; i++) {</b>
+<b class="fc"><i>292</i>&nbsp;            patternWeight[i] = weights[i];</b>
+<b class="fc"><i>293</i>&nbsp;            sitePatterns[i] = data[i];</b>
+<i>294</i>&nbsp;        }
+<i>295</i>&nbsp;
+<i>296</i>&nbsp;        // find patterns for the sites
+<b class="fc"><i>297</i>&nbsp;        patternIndex = new int[nrOfSites];</b>
+<b class="fc"><i>298</i>&nbsp;        for (int i = 0; i &lt; nrOfSites; i++) {</b>
+<b class="fc"><i>299</i>&nbsp;            int[] sites = new int[nrOfTaxa];</b>
+<b class="fc"><i>300</i>&nbsp;            for (int j = 0; j &lt; nrOfTaxa; j++) {</b>
+<b class="fc"><i>301</i>&nbsp;                sites[j] = counts.get(j).get(filter[i]);</b>
+<b class="fc"><i>302</i>&nbsp;                if (convertDataType) {</b>
+<i>303</i>&nbsp;                	try {
+<b class="nc"><i>304</i>&nbsp;                		sites[j] = m_dataType.string2state(baseType.getCode(sites[j])).get(0);</b>
+<b class="nc"><i>305</i>&nbsp;                	} catch (Exception e) {</b>
+<b class="nc"><i>306</i>&nbsp;                		e.printStackTrace();</b>
+<b class="nc"><i>307</i>&nbsp;                	}</b>
+<i>308</i>&nbsp;                }
+<i>309</i>&nbsp;            }
+<b class="fc"><i>310</i>&nbsp;            patternIndex[i] = Arrays.binarySearch(sitePatterns, sites, comparator);</b>
+<i>311</i>&nbsp;        }
+<i>312</i>&nbsp;
+<b class="fc"><i>313</i>&nbsp;        if (siteWeights != null) {</b>
+<i>314</i>&nbsp;        	// TODO: fill in weights with siteweights.
+<b class="fc"><i>315</i>&nbsp;        	throw new RuntimeException(&quot;Cannot handle site weights in FilteredAlignment. Remove \&quot;weights\&quot; from data input.&quot;);</b>
+<i>316</i>&nbsp;        }
+<i>317</i>&nbsp;
+<i>318</i>&nbsp;        // determine maximum state count
+<i>319</i>&nbsp;        // Usually, the state count is equal for all sites,
+<i>320</i>&nbsp;        // though for SnAP analysis, this is typically not the case.
+<b class="fc"><i>321</i>&nbsp;        maxStateCount = 0;</b>
+<b class="fc"><i>322</i>&nbsp;        for (int stateCount1 : stateCounts) {</b>
+<b class="fc"><i>323</i>&nbsp;            maxStateCount = Math.max(maxStateCount, stateCount1);</b>
+<b class="fc"><i>324</i>&nbsp;        }</b>
+<b class="fc"><i>325</i>&nbsp;        if (convertDataType) {</b>
+<b class="nc"><i>326</i>&nbsp;        	maxStateCount = Math.max(maxStateCount, m_dataType.getStateCount());</b>
+<i>327</i>&nbsp;        }
+<i>328</i>&nbsp;        // report some statistics
+<i>329</i>&nbsp;        //for (int i = 0; i &lt; m_sTaxaNames.size(); i++) {
+<i>330</i>&nbsp;        //    System.err.println(m_sTaxaNames.get(i) + &quot;: &quot; + m_counts.get(i).size() + &quot; &quot; + m_nStateCounts.get(i));
+<i>331</i>&nbsp;        //}
+<b class="fc"><i>332</i>&nbsp;        Log.info.println(&quot;Filter &quot; + filterInput.get());</b>
+<b class="fc"><i>333</i>&nbsp;        Log.info.println(getTaxonCount() + &quot; taxa&quot;);</b>
+<b class="fc"><i>334</i>&nbsp;        if (constantSiteWeightsInput.get() != null) {</b>
+<b class="fc"><i>335</i>&nbsp;        	Integer [] constantWeights = constantSiteWeightsInput.get().getValues();</b>
+<b class="fc"><i>336</i>&nbsp;        	int sum = 0; </b>
+<b class="fc"><i>337</i>&nbsp;        	for (int i : constantWeights) { </b>
+<b class="fc"><i>338</i>&nbsp;        		sum += i;</b>
+<i>339</i>&nbsp;        	}
+<b class="fc"><i>340</i>&nbsp;        	Log.info.println(getSiteCount() + &quot; sites + &quot; + sum + &quot; constant sites&quot;);</b>
+<b class="fc"><i>341</i>&nbsp;        } else {</b>
+<b class="fc"><i>342</i>&nbsp;        	Log.info.println(getSiteCount() + &quot; sites&quot;);</b>
+<i>343</i>&nbsp;        }
+<b class="fc"><i>344</i>&nbsp;        Log.info.println(getPatternCount() + &quot; patterns&quot;);</b>
+<i>345</i>&nbsp;        
+<i>346</i>&nbsp;        // counts are not valid any more -- better set to null in case
+<i>347</i>&nbsp;        // someone gets bitten by this.
+<b class="fc"><i>348</i>&nbsp;        this.counts = null;</b>
+<b class="fc"><i>349</i>&nbsp;    }</b>
+<i>350</i>&nbsp;    
+<i>351</i>&nbsp;    /** return indices of the sites that the filter uses **/
+<i>352</i>&nbsp;    public int [] indices() {
+<b class="nc"><i>353</i>&nbsp;    	return filter.clone();</b>
+<i>354</i>&nbsp;    }
+<i>355</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

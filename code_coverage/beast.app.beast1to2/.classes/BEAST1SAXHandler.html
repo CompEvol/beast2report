@@ -1,0 +1,151 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: BEAST1SAXHandler</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.app.beast1to2</a> ]
+</div>
+
+<h1>Coverage Summary for Class: BEAST1SAXHandler (beast.app.beast1to2)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">BEAST1SAXHandler</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.app.beast1to2;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import beast.evolution.alignment.Sequence;
+<i>4</i>&nbsp;import org.xml.sax.Attributes;
+<i>5</i>&nbsp;import org.xml.sax.SAXException;
+<i>6</i>&nbsp;import org.xml.sax.helpers.DefaultHandler;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import java.io.File;
+<i>9</i>&nbsp;import java.util.*;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;/**
+<i>12</i>&nbsp; * parse BEAST 1 XML alignment section only, and create List&lt;Sequence&gt;
+<i>13</i>&nbsp; * TODO not working, but it seems SAX bug, content is empty for sequence, even there is sequence in xml
+<i>14</i>&nbsp; * @author Walter Xie
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;public class BEAST1SAXHandler extends DefaultHandler {
+<i>17</i>&nbsp;//    private static boolean isBEAST2XML = false; // false, then assume to be BEAST 1 xml
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;    java.util.Map&lt;String, List&lt;Sequence&gt;&gt; alignments = new HashMap&lt;&gt;();
+<i>20</i>&nbsp;    List&lt;Sequence&gt; alignment = null;
+<i>21</i>&nbsp;    String algID = null;
+<i>22</i>&nbsp;    String dataType = null;
+<i>23</i>&nbsp;    Sequence sequence = null;
+<i>24</i>&nbsp;    String taxon = null;
+<i>25</i>&nbsp;    String content = null;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;    @Override
+<i>28</i>&nbsp;    //Triggered when the start of tag is found.
+<i>29</i>&nbsp;    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+<i>30</i>&nbsp;//        if (XMLUtil.isBEASTXML(qName)) {
+<i>31</i>&nbsp;//            String version = attributes.getValue(BEAST_VERSION_ATTRIBUTE);
+<i>32</i>&nbsp;//            if (version == null)
+<i>33</i>&nbsp;//                isBEAST2XML = false;
+<i>34</i>&nbsp;//            System.out.println(&quot;Loading BEAST &quot; + (isBEAST2XML ? &quot;2&quot; : &quot;1&quot;) + &quot; xml ...&quot;);
+<i>35</i>&nbsp;//        } else
+<i>36</i>&nbsp;        if (XMLUtil.isAlignment(qName)) {
+<i>37</i>&nbsp;            alignment = new ArrayList&lt;&gt;();
+<i>38</i>&nbsp;            algID = attributes.getValue(XMLUtil.ID);
+<i>39</i>&nbsp;            dataType = attributes.getValue(XMLUtil.DATA_TYPE);
+<i>40</i>&nbsp;
+<i>41</i>&nbsp;        } else if (XMLUtil.isSequence(qName)) {
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;        } else if (XMLUtil.isTaxon(qName)) {
+<i>44</i>&nbsp;            taxon = attributes.getValue(XMLUtil.IDREF);
+<i>45</i>&nbsp;
+<i>46</i>&nbsp;        }
+<i>47</i>&nbsp;    }
+<i>48</i>&nbsp;
+<i>49</i>&nbsp;    @Override
+<i>50</i>&nbsp;    public void endElement(String uri, String localName, String qName) throws SAXException {
+<i>51</i>&nbsp;        if (XMLUtil.isAlignment(qName) &amp;&amp; algID != null) {
+<i>52</i>&nbsp;            if (alignments.containsKey(algID))
+<i>53</i>&nbsp;                throw new RuntimeException(&quot;Find duplicate alignment &quot; + algID);
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;            alignments.put(algID, alignment);
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;            System.out.println(&quot;Read alignment &quot; + algID + &quot;: &quot; + alignment.size() + &quot; sequences, dataType = &quot; + dataType);
+<i>58</i>&nbsp;
+<i>59</i>&nbsp;        } else if (XMLUtil.isSequence(qName)) {
+<i>60</i>&nbsp;//            String data = content;
+<i>61</i>&nbsp;            if (content == null || content.isEmpty())
+<i>62</i>&nbsp;                throw new RuntimeException(&quot;No sequence in &quot; + taxon + &quot; in &quot; + algID);
+<i>63</i>&nbsp;
+<i>64</i>&nbsp;            try {
+<i>65</i>&nbsp;                sequence = new Sequence(taxon, content);
+<i>66</i>&nbsp;            } catch (Exception e) {
+<i>67</i>&nbsp;                e.printStackTrace();
+<i>68</i>&nbsp;            }
+<i>69</i>&nbsp;            alignment.add(sequence);
+<i>70</i>&nbsp;
+<i>71</i>&nbsp;            System.out.println(sequence.dataInput.get());
+<i>72</i>&nbsp;            System.out.println(&quot;Add sequence &quot; + taxon + &quot; to alignment &quot; + algID);
+<i>73</i>&nbsp;
+<i>74</i>&nbsp;        } else if (XMLUtil.isTaxon(qName)) {
+<i>75</i>&nbsp;
+<i>76</i>&nbsp;        }
+<i>77</i>&nbsp;    }
+<i>78</i>&nbsp;
+<i>79</i>&nbsp;    @Override
+<i>80</i>&nbsp;    public void characters(char[] ch, int start, int length) throws SAXException {
+<i>81</i>&nbsp;        content = String.copyValueOf(ch, start, length).trim();
+<i>82</i>&nbsp;    }
+<i>83</i>&nbsp;
+<i>84</i>&nbsp;
+<i>85</i>&nbsp;    public static void main(String[] args) throws Exception {
+<i>86</i>&nbsp;        if (args.length != 1) throw new IllegalArgumentException(&quot;Working path is missing in the argument !&quot;);
+<i>87</i>&nbsp;
+<i>88</i>&nbsp;        String xmlPath = args[0];
+<i>89</i>&nbsp;
+<i>90</i>&nbsp;        java.util.Map&lt;String, List&lt;Sequence&gt;&gt; alignments = XMLUtil.parse(new File(xmlPath));
+<i>91</i>&nbsp;
+<i>92</i>&nbsp;        SortedSet&lt;String&gt; aligs = new TreeSet&lt;&gt;(alignments.keySet());
+<i>93</i>&nbsp;        for (String al : aligs) {
+<i>94</i>&nbsp;            List&lt;Sequence&gt; alignment = alignments.get(al);
+<i>95</i>&nbsp;            System.out.print(&quot;Key : &quot; + al + &quot;, &quot; + alignment.size() + &quot; Value : &quot;);
+<i>96</i>&nbsp;            for (Sequence seq : alignment) {
+<i>97</i>&nbsp;                System.out.print(seq.taxonInput.get() + &quot;, &quot; + seq.dataInput.get().length() + &quot;, &quot;);
+<i>98</i>&nbsp;            }
+<i>99</i>&nbsp;            System.out.println();
+<i>100</i>&nbsp;        }
+<i>101</i>&nbsp;
+<i>102</i>&nbsp;
+<i>103</i>&nbsp;    }
+<i>104</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

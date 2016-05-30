@@ -1,0 +1,637 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: StarBeastStartState</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.speciation</a> ]
+</div>
+
+<h1>Coverage Summary for Class: StarBeastStartState (beast.evolution.speciation)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StarBeastStartState</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 229)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">StarBeastStartState$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">StarBeastStartState$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 10)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">StarBeastStartState$3</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">StarBeastStartState$Method</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 249)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.speciation;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import static java.lang.Math.abs;
+<i>4</i>&nbsp;import static java.lang.Math.max;
+<i>5</i>&nbsp;import static java.lang.Math.min;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import java.util.ArrayList;
+<i>8</i>&nbsp;import java.util.Arrays;
+<i>9</i>&nbsp;import java.util.HashMap;
+<i>10</i>&nbsp;import java.util.HashSet;
+<i>11</i>&nbsp;import java.util.List;
+<i>12</i>&nbsp;import java.util.Map;
+<i>13</i>&nbsp;import java.util.Set;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;import org.apache.commons.math.MathException;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;import beast.core.*;
+<i>18</i>&nbsp;import beast.core.Input.Validate;
+<i>19</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>20</i>&nbsp;import beast.evolution.alignment.Alignment;
+<i>21</i>&nbsp;import beast.evolution.alignment.Taxon;
+<i>22</i>&nbsp;import beast.evolution.alignment.TaxonSet;
+<i>23</i>&nbsp;import beast.evolution.alignment.distance.Distance;
+<i>24</i>&nbsp;import beast.evolution.alignment.distance.JukesCantorDistance;
+<i>25</i>&nbsp;import beast.evolution.tree.Node;
+<i>26</i>&nbsp;import beast.evolution.tree.RandomTree;
+<i>27</i>&nbsp;import beast.evolution.tree.Tree;
+<i>28</i>&nbsp;import beast.evolution.tree.coalescent.ConstantPopulation;
+<i>29</i>&nbsp;import beast.math.distributions.MRCAPrior;
+<i>30</i>&nbsp;import beast.util.ClusterTree;
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;/**
+<i>33</i>&nbsp;* @author Joseph Heled
+<i>34</i>&nbsp; */
+<i>35</i>&nbsp;
+<b class="nc"><i>36</i>&nbsp;@Description(&quot;Set a starting point for a *BEAST analysis from gene alignment data.&quot;)</b>
+<b class="nc"><i>37</i>&nbsp;public class StarBeastStartState extends Tree implements StateNodeInitialiser {</b>
+<i>38</i>&nbsp;
+<b class="nc"><i>39</i>&nbsp;    static enum Method {</b>
+<b class="nc"><i>40</i>&nbsp;        POINT(&quot;point-estimate&quot;),</b>
+<b class="nc"><i>41</i>&nbsp;        ALL_RANDOM(&quot;random&quot;);</b>
+<i>42</i>&nbsp;
+<b class="nc"><i>43</i>&nbsp;        Method(final String name) {</b>
+<b class="nc"><i>44</i>&nbsp;            this.ename = name;</b>
+<i>45</i>&nbsp;        }
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;        @Override
+<i>48</i>&nbsp;		public String toString() {
+<b class="nc"><i>49</i>&nbsp;            return ename;</b>
+<i>50</i>&nbsp;        }
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;        private final String ename;
+<i>53</i>&nbsp;    }
+<b class="nc"><i>54</i>&nbsp;    final public Input&lt;Method&gt; initMethod = new Input&lt;&gt;(&quot;method&quot;, &quot;Initialise either with a totally random &quot; +</b>
+<i>55</i>&nbsp;            &quot;state or a point estimate based on alignments data (default point-estimate)&quot;,
+<b class="nc"><i>56</i>&nbsp;            Method.POINT, Method.values());</b>
+<i>57</i>&nbsp;
+<b class="nc"><i>58</i>&nbsp;    final public Input&lt;Tree&gt; speciesTreeInput = new Input&lt;&gt;(&quot;speciesTree&quot;, &quot;The species tree to initialize&quot;);</b>
+<i>59</i>&nbsp;
+<b class="nc"><i>60</i>&nbsp;    final public Input&lt;List&lt;Tree&gt;&gt; genes = new Input&lt;&gt;(&quot;gene&quot;, &quot;Gene trees to initialize&quot;, new ArrayList&lt;&gt;());</b>
+<i>61</i>&nbsp;    //,
+<i>62</i>&nbsp;    //        Validate.REQUIRED);
+<i>63</i>&nbsp;
+<b class="nc"><i>64</i>&nbsp;    final public Input&lt;CalibratedYuleModel&gt; calibratedYule = new Input&lt;&gt;(&quot;calibratedYule&quot;,</b>
+<i>65</i>&nbsp;            &quot;The species tree (with calibrations) to initialize&quot;, Validate.XOR, speciesTreeInput);
+<i>66</i>&nbsp;
+<b class="nc"><i>67</i>&nbsp;    final public Input&lt;RealParameter&gt; popMean = new Input&lt;&gt;(&quot;popMean&quot;,</b>
+<i>68</i>&nbsp;            &quot;Population mean hyper prior to initialse&quot;);
+<i>69</i>&nbsp;
+<b class="nc"><i>70</i>&nbsp;    final public Input&lt;RealParameter&gt; birthRate = new Input&lt;&gt;(&quot;birthRate&quot;,</b>
+<i>71</i>&nbsp;            &quot;Tree prior birth rate to initialize&quot;);
+<i>72</i>&nbsp;
+<b class="nc"><i>73</i>&nbsp;    final public Input&lt;SpeciesTreePrior&gt; speciesTreePriorInput =</b>
+<i>74</i>&nbsp;            new Input&lt;&gt;(&quot;speciesTreePrior&quot;, &quot;Population size parameters to initialise&quot;);
+<i>75</i>&nbsp;
+<b class="nc"><i>76</i>&nbsp;    final public Input&lt;Function&gt; muInput = new Input&lt;&gt;(&quot;baseRate&quot;,</b>
+<i>77</i>&nbsp;            &quot;Main clock rate used to scale trees (default 1).&quot;);
+<i>78</i>&nbsp;
+<i>79</i>&nbsp;
+<i>80</i>&nbsp;    private boolean hasCalibrations;
+<i>81</i>&nbsp;
+<i>82</i>&nbsp;    @Override
+<i>83</i>&nbsp;    public void initAndValidate() {
+<i>84</i>&nbsp;        // what does this do and is it dangerous to call it or not to call it at the start or at the end??????
+<b class="nc"><i>85</i>&nbsp;        super.initAndValidate();</b>
+<b class="nc"><i>86</i>&nbsp;        hasCalibrations = calibratedYule.get() != null;</b>
+<i>87</i>&nbsp;    }
+<i>88</i>&nbsp;
+<i>89</i>&nbsp;    @Override
+<i>90</i>&nbsp;    public void initStateNodes() {
+<i>91</i>&nbsp;
+<b class="nc"><i>92</i>&nbsp;        final Set&lt;BEASTInterface&gt; treeOutputs = speciesTreeInput.get().getOutputs();</b>
+<b class="nc"><i>93</i>&nbsp;        List&lt;MRCAPrior&gt; calibrations = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>94</i>&nbsp;        for (final Object plugin : treeOutputs ) {</b>
+<b class="nc"><i>95</i>&nbsp;            if( plugin instanceof MRCAPrior ) {</b>
+<b class="nc"><i>96</i>&nbsp;                calibrations.add((MRCAPrior) plugin);</b>
+<i>97</i>&nbsp;            }
+<b class="nc"><i>98</i>&nbsp;        }</b>
+<i>99</i>&nbsp;
+<b class="nc"><i>100</i>&nbsp;        if( hasCalibrations ) {</b>
+<b class="nc"><i>101</i>&nbsp;            if( calibrations.size() &gt; 0 ) {</b>
+<b class="nc"><i>102</i>&nbsp;                throw new IllegalArgumentException(&quot;Not implemented: mix of calibrated yule and MRCA priors: &quot; +</b>
+<i>103</i>&nbsp;                        &quot;place all priors in the calibrated Yule&quot;);
+<i>104</i>&nbsp;            }
+<i>105</i>&nbsp;            try {
+<b class="nc"><i>106</i>&nbsp;				initWithCalibrations();</b>
+<b class="nc"><i>107</i>&nbsp;			} catch (MathException e) {</b>
+<b class="nc"><i>108</i>&nbsp;				throw new IllegalArgumentException(e);</b>
+<b class="nc"><i>109</i>&nbsp;			}</b>
+<i>110</i>&nbsp;        } else {
+<b class="nc"><i>111</i>&nbsp;            if( calibrations.size() &gt; 0 )  {</b>
+<b class="nc"><i>112</i>&nbsp;                initWithMRCACalibrations(calibrations);</b>
+<i>113</i>&nbsp;                return;
+<i>114</i>&nbsp;            }
+<i>115</i>&nbsp;
+<b class="nc"><i>116</i>&nbsp;            final Method method = initMethod.get();</b>
+<i>117</i>&nbsp;
+<b class="nc"><i>118</i>&nbsp;            switch( method ) {</b>
+<i>119</i>&nbsp;                case POINT:
+<b class="nc"><i>120</i>&nbsp;                    fullInit();</b>
+<b class="nc"><i>121</i>&nbsp;                    break;</b>
+<i>122</i>&nbsp;                case ALL_RANDOM:
+<b class="nc"><i>123</i>&nbsp;                    randomInit();</b>
+<i>124</i>&nbsp;                    break;
+<i>125</i>&nbsp;            }
+<i>126</i>&nbsp;        }
+<i>127</i>&nbsp;    }
+<i>128</i>&nbsp;
+<i>129</i>&nbsp;    private double[] firstMeetings(final Tree gtree, final Map&lt;String, Integer&gt; tipName2Species, final int speciesCount) {
+<b class="nc"><i>130</i>&nbsp;        final Node[] nodes = gtree.listNodesPostOrder(null, null);</b>
+<i>131</i>&nbsp;        @SuppressWarnings(&quot;unchecked&quot;)
+<b class="nc"><i>132</i>&nbsp;		final Set&lt;Integer&gt;[] tipsSpecies = new Set[nodes.length];</b>
+<b class="nc"><i>133</i>&nbsp;        for(int k = 0; k &lt; tipsSpecies.length; ++k) {</b>
+<b class="nc"><i>134</i>&nbsp;            tipsSpecies[k] = new HashSet&lt;&gt;();</b>
+<i>135</i>&nbsp;        }
+<i>136</i>&nbsp;        // d[i,j] = minimum height of node which has tips belonging to species i and j
+<i>137</i>&nbsp;        // d is is upper triangular
+<b class="nc"><i>138</i>&nbsp;        final double[] dmin = new double[(speciesCount*(speciesCount-1))/2];</b>
+<b class="nc"><i>139</i>&nbsp;        Arrays.fill(dmin, Double.MAX_VALUE);</b>
+<i>140</i>&nbsp;
+<b class="nc"><i>141</i>&nbsp;        for (final Node n : nodes) {</b>
+<b class="nc"><i>142</i>&nbsp;            if (n.isLeaf()) {</b>
+<b class="nc"><i>143</i>&nbsp;                tipsSpecies[n.getNr()].add(tipName2Species.get(n.getID()));</b>
+<i>144</i>&nbsp;            } else {
+<b class="nc"><i>145</i>&nbsp;                assert n.getChildCount() == 2;</b>
+<i>146</i>&nbsp;                @SuppressWarnings(&quot;unchecked&quot;)
+<b class="nc"><i>147</i>&nbsp;				final Set&lt;Integer&gt;[] sps = new Set[2];</b>
+<b class="nc"><i>148</i>&nbsp;                sps[0] = tipsSpecies[n.getChild(0).getNr()];</b>
+<b class="nc"><i>149</i>&nbsp;                sps[1] = tipsSpecies[n.getChild(1).getNr()];</b>
+<b class="nc"><i>150</i>&nbsp;                final Set&lt;Integer&gt; u = new HashSet&lt;&gt;(sps[0]);</b>
+<b class="nc"><i>151</i>&nbsp;                u.retainAll(sps[1]);</b>
+<b class="nc"><i>152</i>&nbsp;                sps[0].removeAll(u);</b>
+<b class="nc"><i>153</i>&nbsp;                sps[1].removeAll(u);</b>
+<i>154</i>&nbsp;
+<b class="nc"><i>155</i>&nbsp;                for (final Integer s1 : sps[0]) {</b>
+<b class="nc"><i>156</i>&nbsp;                    for (final Integer s2 : sps[1]) {</b>
+<b class="nc"><i>157</i>&nbsp;                        final int i = getDMindex(speciesCount, s1, s2);</b>
+<b class="nc"><i>158</i>&nbsp;                        dmin[i] = min(dmin[i], n.getHeight());</b>
+<b class="nc"><i>159</i>&nbsp;                    }</b>
+<b class="nc"><i>160</i>&nbsp;                }</b>
+<b class="nc"><i>161</i>&nbsp;                u.addAll(sps[0]);</b>
+<b class="nc"><i>162</i>&nbsp;                u.addAll(sps[1]);</b>
+<b class="nc"><i>163</i>&nbsp;                tipsSpecies[n.getNr()] = u;</b>
+<i>164</i>&nbsp;            }
+<i>165</i>&nbsp;        }
+<b class="nc"><i>166</i>&nbsp;        return dmin;</b>
+<i>167</i>&nbsp;    }
+<i>168</i>&nbsp;
+<i>169</i>&nbsp;    private int getDMindex(final int speciesCount, final int s1, final int s2) {
+<b class="nc"><i>170</i>&nbsp;        final int mij = min(s1,s2);</b>
+<b class="nc"><i>171</i>&nbsp;        return (mij*(2*speciesCount-1 - mij))/2 + (abs(s1-s2)-1);</b>
+<i>172</i>&nbsp;    }
+<i>173</i>&nbsp;
+<i>174</i>&nbsp;
+<i>175</i>&nbsp;    private void fullInit() {
+<i>176</i>&nbsp;        // Build gene trees from  alignments
+<i>177</i>&nbsp;
+<b class="nc"><i>178</i>&nbsp;        final Function muInput = this.muInput.get();</b>
+<b class="nc"><i>179</i>&nbsp;        final double mu =  (muInput != null )  ? muInput.getArrayValue() : 1;</b>
+<i>180</i>&nbsp;
+<b class="nc"><i>181</i>&nbsp;        final Tree stree = speciesTreeInput.get();</b>
+<b class="nc"><i>182</i>&nbsp;        final TaxonSet species = stree.m_taxonset.get();</b>
+<b class="nc"><i>183</i>&nbsp;        final List&lt;String&gt; speciesNames = species.asStringList();</b>
+<b class="nc"><i>184</i>&nbsp;        final int speciesCount = speciesNames.size();</b>
+<i>185</i>&nbsp;
+<b class="nc"><i>186</i>&nbsp;        final List&lt;Tree&gt; geneTrees = genes.get();</b>
+<i>187</i>&nbsp;
+<i>188</i>&nbsp;        //final List&lt;Alignment&gt; alignments = genes.get();
+<i>189</i>&nbsp;        //final List&lt;Tree&gt; geneTrees = new ArrayList&lt;&gt;(alignments.size());
+<b class="nc"><i>190</i>&nbsp;        double maxNsites = 0;</b>
+<i>191</i>&nbsp;        //for( final Alignment alignment : alignments)  {
+<b class="nc"><i>192</i>&nbsp;        for (final Tree gtree : geneTrees) {</b>
+<i>193</i>&nbsp;            //final Tree gtree = new Tree();
+<b class="nc"><i>194</i>&nbsp;            final Alignment alignment = gtree.m_taxonset.get().alignmentInput.get();</b>
+<i>195</i>&nbsp;
+<b class="nc"><i>196</i>&nbsp;            final ClusterTree ctree = new ClusterTree();</b>
+<b class="nc"><i>197</i>&nbsp;            ctree.initByName(&quot;initial&quot;, gtree, &quot;clusterType&quot;, &quot;upgma&quot;, &quot;taxa&quot;, alignment);</b>
+<b class="nc"><i>198</i>&nbsp;            gtree.scale(1 / mu);</b>
+<i>199</i>&nbsp;
+<b class="nc"><i>200</i>&nbsp;            maxNsites = max(maxNsites, alignment.getSiteCount());</b>
+<b class="nc"><i>201</i>&nbsp;        }</b>
+<b class="nc"><i>202</i>&nbsp;        final Map&lt;String, Integer&gt; geneTips2Species = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>203</i>&nbsp;        final List&lt;Taxon&gt; taxonSets = species.taxonsetInput.get();</b>
+<i>204</i>&nbsp;
+<b class="nc"><i>205</i>&nbsp;        for(int k = 0; k &lt; speciesNames.size(); ++k) {</b>
+<b class="nc"><i>206</i>&nbsp;            final Taxon nx = taxonSets.get(k);</b>
+<b class="nc"><i>207</i>&nbsp;            final List&lt;Taxon&gt; taxa = ((TaxonSet) nx).taxonsetInput.get();</b>
+<b class="nc"><i>208</i>&nbsp;            for( final Taxon n : taxa ) {</b>
+<b class="nc"><i>209</i>&nbsp;              geneTips2Species.put(n.getID(), k);</b>
+<b class="nc"><i>210</i>&nbsp;            }</b>
+<i>211</i>&nbsp;        }
+<b class="nc"><i>212</i>&nbsp;        final double[] dg = new double[(speciesCount*(speciesCount-1))/2];</b>
+<i>213</i>&nbsp;
+<b class="nc"><i>214</i>&nbsp;        final double[][] genesDmins = new double[geneTrees.size()][];</b>
+<i>215</i>&nbsp;
+<b class="nc"><i>216</i>&nbsp;        for( int ng = 0; ng &lt; geneTrees.size(); ++ng ) {</b>
+<b class="nc"><i>217</i>&nbsp;            final Tree g = geneTrees.get(ng);</b>
+<b class="nc"><i>218</i>&nbsp;            final double[] dmin = firstMeetings(g, geneTips2Species, speciesCount);</b>
+<b class="nc"><i>219</i>&nbsp;            genesDmins[ng] = dmin;</b>
+<i>220</i>&nbsp;
+<b class="nc"><i>221</i>&nbsp;            for(int i = 0; i &lt; dmin.length; ++i) {</b>
+<b class="nc"><i>222</i>&nbsp;                dg[i] += dmin[i];</b>
+<b class="nc"><i>223</i>&nbsp;                if (dmin[i] == Double.MAX_VALUE) {</b>
+<i>224</i>&nbsp;                	// this happens when a gene tree has no taxa for some species-tree taxon.
+<i>225</i>&nbsp;                	// TODO: ensure that if this happens, there will always be an &quot;infinite&quot;
+<i>226</i>&nbsp;                	// distance between species-taxon 0 and the species-taxon with missing lineages,
+<i>227</i>&nbsp;                	// so i &lt; speciesCount - 1.
+<i>228</i>&nbsp;                	// What if lineages for species-taxon 0 are missing? Then all entries will be &#39;infinite&#39;.
+<b class="nc"><i>229</i>&nbsp;                	String id = (i &lt; speciesCount - 1? stree.getExternalNodes().get(i+1).getID() : &quot;unknown taxon&quot;);</b>
+<b class="nc"><i>230</i>&nbsp;                	if (i == 0) {</b>
+<i>231</i>&nbsp;                		// test that all entries are &#39;infinite&#39;, which implies taxon 0 has lineages missing 
+<b class="nc"><i>232</i>&nbsp;                		boolean b = true;</b>
+<b class="nc"><i>233</i>&nbsp;                		for (int k = 1; b &amp;&amp; k &lt; speciesCount - 1; k++) {</b>
+<b class="nc"><i>234</i>&nbsp;                			b = (dmin[k] == Double.MAX_VALUE);</b>
+<i>235</i>&nbsp;                		}
+<b class="nc"><i>236</i>&nbsp;                		if (b) {</b>
+<i>237</i>&nbsp;                			// if all entries have &#39;infinite&#39; distances, it is probably the first taxon that is at fault
+<b class="nc"><i>238</i>&nbsp;                			id = stree.getExternalNodes().get(0).getID();</b>
+<i>239</i>&nbsp;                		}
+<i>240</i>&nbsp;                	}
+<b class="nc"><i>241</i>&nbsp;                	throw new RuntimeException(&quot;Gene tree &quot; + g.getID() + &quot; has no lineages for species taxon &quot; + id + &quot; &quot;);</b>
+<i>242</i>&nbsp;                }
+<i>243</i>&nbsp;            }
+<i>244</i>&nbsp;        }
+<i>245</i>&nbsp;
+<b class="nc"><i>246</i>&nbsp;        for(int i = 0; i &lt; dg.length; ++i) {</b>
+<b class="nc"><i>247</i>&nbsp;            double d = dg[i] / geneTrees.size();</b>
+<b class="nc"><i>248</i>&nbsp;            if( d == 0 ) {</b>
+<b class="nc"><i>249</i>&nbsp;               d = (0.5/maxNsites) * (1/mu);</b>
+<i>250</i>&nbsp;            } else {
+<i>251</i>&nbsp;                // heights to distances
+<b class="nc"><i>252</i>&nbsp;                d *= 2;</b>
+<i>253</i>&nbsp;            }
+<b class="nc"><i>254</i>&nbsp;            dg[i] = d;</b>
+<i>255</i>&nbsp;        }
+<i>256</i>&nbsp;
+<b class="nc"><i>257</i>&nbsp;        final ClusterTree ctree = new ClusterTree();</b>
+<b class="nc"><i>258</i>&nbsp;        final Distance distance = new Distance() {</b>
+<i>259</i>&nbsp;            @Override
+<i>260</i>&nbsp;            public double pairwiseDistance(final int s1, final int s2) {
+<b class="nc"><i>261</i>&nbsp;                final int i = getDMindex(speciesCount, s1,s2);</b>
+<b class="nc"><i>262</i>&nbsp;                return dg[i];</b>
+<i>263</i>&nbsp;            }
+<i>264</i>&nbsp;        };
+<b class="nc"><i>265</i>&nbsp;        ctree.initByName(&quot;initial&quot;, stree, &quot;taxonset&quot;, species,&quot;clusterType&quot;, &quot;upgma&quot;, &quot;distance&quot;, distance);</b>
+<i>266</i>&nbsp;
+<b class="nc"><i>267</i>&nbsp;        final Map&lt;String, Integer&gt; sptips2SpeciesIndex = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>268</i>&nbsp;        for(int i = 0; i &lt; speciesNames.size(); ++i) {</b>
+<b class="nc"><i>269</i>&nbsp;            sptips2SpeciesIndex.put(speciesNames.get(i), i);</b>
+<i>270</i>&nbsp;        }
+<b class="nc"><i>271</i>&nbsp;        final double[] spmin = firstMeetings(stree, sptips2SpeciesIndex, speciesCount);</b>
+<i>272</i>&nbsp;
+<b class="nc"><i>273</i>&nbsp;        for( int ng = 0; ng &lt; geneTrees.size(); ++ng ) {</b>
+<b class="nc"><i>274</i>&nbsp;            final double[] dmin = genesDmins[ng];</b>
+<b class="nc"><i>275</i>&nbsp;            boolean compatible = true;</b>
+<b class="nc"><i>276</i>&nbsp;            for(int i = 0; i &lt; spmin.length; ++i) {</b>
+<b class="nc"><i>277</i>&nbsp;                if( dmin[i] &lt;= spmin[i] ) {</b>
+<b class="nc"><i>278</i>&nbsp;                    compatible = false;</b>
+<b class="nc"><i>279</i>&nbsp;                    break;</b>
+<i>280</i>&nbsp;                }
+<i>281</i>&nbsp;            }
+<b class="nc"><i>282</i>&nbsp;            if( ! compatible ) {</b>
+<b class="nc"><i>283</i>&nbsp;                final Tree gtree = geneTrees.get(ng);</b>
+<b class="nc"><i>284</i>&nbsp;                final TaxonSet gtreeTaxa = gtree.m_taxonset.get();</b>
+<b class="nc"><i>285</i>&nbsp;                final Alignment alignment = gtreeTaxa.alignmentInput.get();</b>
+<b class="nc"><i>286</i>&nbsp;                final List&lt;String&gt; taxaNames = alignment.getTaxaNames();</b>
+<b class="nc"><i>287</i>&nbsp;                final int taxonCount =  taxaNames.size();</b>
+<i>288</i>&nbsp;                // speedup
+<b class="nc"><i>289</i>&nbsp;                final Map&lt;Integer,Integer&gt; g2s = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>290</i>&nbsp;                for(int i = 0; i &lt; taxonCount; ++i) {</b>
+<b class="nc"><i>291</i>&nbsp;                    g2s.put(i, geneTips2Species.get(taxaNames.get(i)));</b>
+<i>292</i>&nbsp;                }
+<i>293</i>&nbsp;
+<b class="nc"><i>294</i>&nbsp;                final JukesCantorDistance jc = new JukesCantorDistance();</b>
+<b class="nc"><i>295</i>&nbsp;                jc.setPatterns(alignment);</b>
+<b class="nc"><i>296</i>&nbsp;                final Distance gdistance = new Distance() {</b>
+<i>297</i>&nbsp;                    @Override
+<i>298</i>&nbsp;                    public double pairwiseDistance(final int t1, final int t2) {
+<b class="nc"><i>299</i>&nbsp;                        final int s1 = g2s.get(t1);</b>
+<b class="nc"><i>300</i>&nbsp;                        final int s2 = g2s.get(t2);</b>
+<b class="nc"><i>301</i>&nbsp;                        double d = jc.pairwiseDistance(t1,t2)/mu;</b>
+<b class="nc"><i>302</i>&nbsp;                        if( s1 != s2 ) {</b>
+<b class="nc"><i>303</i>&nbsp;                            final int i = getDMindex(speciesCount, s1,s2);</b>
+<b class="nc"><i>304</i>&nbsp;                            final double minDist = 2 * spmin[i];</b>
+<b class="nc"><i>305</i>&nbsp;                            if( d &lt;= minDist ) {</b>
+<b class="nc"><i>306</i>&nbsp;                                d = minDist * 1.001;</b>
+<i>307</i>&nbsp;                            }
+<i>308</i>&nbsp;                        }
+<b class="nc"><i>309</i>&nbsp;                        return d;</b>
+<i>310</i>&nbsp;                    }
+<i>311</i>&nbsp;                };
+<b class="nc"><i>312</i>&nbsp;                final ClusterTree gtreec = new ClusterTree();</b>
+<b class="nc"><i>313</i>&nbsp;                gtreec.initByName(&quot;initial&quot;, gtree, &quot;taxonset&quot;, gtreeTaxa,</b>
+<i>314</i>&nbsp;                        &quot;clusterType&quot;, &quot;upgma&quot;, &quot;distance&quot;, gdistance);
+<i>315</i>&nbsp;            }
+<i>316</i>&nbsp;        }
+<i>317</i>&nbsp;
+<i>318</i>&nbsp;        {
+<b class="nc"><i>319</i>&nbsp;            final RealParameter lambda = birthRate.get();</b>
+<b class="nc"><i>320</i>&nbsp;            if( lambda != null ) {</b>
+<b class="nc"><i>321</i>&nbsp;                final double rh = stree.getRoot().getHeight();</b>
+<b class="nc"><i>322</i>&nbsp;                double l = 0;</b>
+<b class="nc"><i>323</i>&nbsp;                for(int i = 2; i &lt; speciesCount+1; ++i) {</b>
+<b class="nc"><i>324</i>&nbsp;                    l += 1./i;</b>
+<i>325</i>&nbsp;                }
+<b class="nc"><i>326</i>&nbsp;                lambda.setValue((1 / rh) * l);</b>
+<i>327</i>&nbsp;            }
+<i>328</i>&nbsp;
+<b class="nc"><i>329</i>&nbsp;            double totBranches = 0;</b>
+<b class="nc"><i>330</i>&nbsp;            final Node[] streeNodeas = stree.getNodesAsArray();</b>
+<b class="nc"><i>331</i>&nbsp;            for( final Node n : streeNodeas ) {</b>
+<b class="nc"><i>332</i>&nbsp;                if( ! n.isRoot() ) {</b>
+<b class="nc"><i>333</i>&nbsp;                    totBranches += n.getLength();</b>
+<i>334</i>&nbsp;                }
+<i>335</i>&nbsp;            }
+<b class="nc"><i>336</i>&nbsp;            totBranches /= 2* (streeNodeas.length - 1);</b>
+<b class="nc"><i>337</i>&nbsp;            final RealParameter popm = popMean.get();</b>
+<b class="nc"><i>338</i>&nbsp;            if( popm != null ) {</b>
+<b class="nc"><i>339</i>&nbsp;                popm.setValue(totBranches);</b>
+<i>340</i>&nbsp;            }
+<b class="nc"><i>341</i>&nbsp;            final SpeciesTreePrior speciesTreePrior = speciesTreePriorInput.get();</b>
+<b class="nc"><i>342</i>&nbsp;            if( speciesTreePrior != null ) {</b>
+<b class="nc"><i>343</i>&nbsp;                final RealParameter popb = speciesTreePrior.popSizesBottomInput.get();</b>
+<b class="nc"><i>344</i>&nbsp;                if( popb != null ) {</b>
+<b class="nc"><i>345</i>&nbsp;                    for(int i = 0; i &lt; popb.getDimension(); ++i) {</b>
+<b class="nc"><i>346</i>&nbsp;                      popb.setValue(i, 2*totBranches);</b>
+<i>347</i>&nbsp;                    }
+<i>348</i>&nbsp;                }
+<b class="nc"><i>349</i>&nbsp;                final RealParameter popt = speciesTreePrior.popSizesTopInput.get();</b>
+<b class="nc"><i>350</i>&nbsp;                if( popt != null ) {</b>
+<b class="nc"><i>351</i>&nbsp;                    for(int i = 0; i &lt; popt.getDimension(); ++i) {</b>
+<b class="nc"><i>352</i>&nbsp;                        popt.setValue(i, totBranches);</b>
+<i>353</i>&nbsp;                    }
+<i>354</i>&nbsp;                }
+<i>355</i>&nbsp;            }
+<i>356</i>&nbsp;        }
+<i>357</i>&nbsp;    }
+<i>358</i>&nbsp;
+<i>359</i>&nbsp;    private void randomInitGeneTrees(double speciesTreeHeight) {
+<b class="nc"><i>360</i>&nbsp;      final List&lt;Tree&gt; geneTrees = genes.get();</b>
+<b class="nc"><i>361</i>&nbsp;        for (final Tree gtree : geneTrees) {</b>
+<b class="nc"><i>362</i>&nbsp;            gtree.makeCaterpillar(speciesTreeHeight, speciesTreeHeight/gtree.getInternalNodeCount(), true);</b>
+<b class="nc"><i>363</i>&nbsp;        }</b>
+<i>364</i>&nbsp;    }
+<i>365</i>&nbsp;
+<i>366</i>&nbsp;    private void randomInit() {
+<b class="nc"><i>367</i>&nbsp;        double lam = 1;</b>
+<b class="nc"><i>368</i>&nbsp;        final RealParameter lambda = birthRate.get();</b>
+<b class="nc"><i>369</i>&nbsp;        if( lambda != null ) {</b>
+<b class="nc"><i>370</i>&nbsp;            lam = lambda.getArrayValue();</b>
+<i>371</i>&nbsp;        }
+<b class="nc"><i>372</i>&nbsp;        final Tree stree = speciesTreeInput.get();</b>
+<b class="nc"><i>373</i>&nbsp;        final TaxonSet species = stree.m_taxonset.get();</b>
+<b class="nc"><i>374</i>&nbsp;        final int speciesCount = species.asStringList().size();</b>
+<b class="nc"><i>375</i>&nbsp;        double s = 0;</b>
+<b class="nc"><i>376</i>&nbsp;        for(int k = 2; k &lt;= speciesCount; ++k) {</b>
+<b class="nc"><i>377</i>&nbsp;            s += 1.0/k;</b>
+<i>378</i>&nbsp;        }
+<b class="nc"><i>379</i>&nbsp;        final double rootHeight = (1/lam) * s;</b>
+<b class="nc"><i>380</i>&nbsp;        stree.scale(rootHeight/stree.getRoot().getHeight());</b>
+<b class="nc"><i>381</i>&nbsp;        randomInitGeneTrees(rootHeight);</b>
+<i>382</i>&nbsp;//        final List&lt;Tree&gt; geneTrees = genes.get();
+<i>383</i>&nbsp;//        for (final Tree gtree : geneTrees) {
+<i>384</i>&nbsp;//            gtree.makeCaterpillar(rootHeight, rootHeight/gtree.getInternalNodeCount(), true);
+<i>385</i>&nbsp;//        }
+<i>386</i>&nbsp;    }
+<i>387</i>&nbsp;
+<i>388</i>&nbsp;    private void initWithCalibrations() throws MathException {
+<b class="nc"><i>389</i>&nbsp;        final CalibratedYuleModel cYule = calibratedYule.get();</b>
+<b class="nc"><i>390</i>&nbsp;        final Tree spTree = (Tree) cYule.treeInput.get();</b>
+<i>391</i>&nbsp;
+<b class="nc"><i>392</i>&nbsp;        final List&lt;CalibrationPoint&gt; cals = cYule.calibrationsInput.get();</b>
+<i>393</i>&nbsp;
+<b class="nc"><i>394</i>&nbsp;        final CalibratedYuleModel cym = new CalibratedYuleModel();</b>
+<i>395</i>&nbsp;        
+<b class="nc"><i>396</i>&nbsp;        cym.getOutputs().addAll(cYule.getOutputs());</b>
+<i>397</i>&nbsp;
+<b class="nc"><i>398</i>&nbsp;        for( final CalibrationPoint cal : cals ) {</b>
+<b class="nc"><i>399</i>&nbsp;          cym.setInputValue(&quot;calibrations&quot;, cal);</b>
+<b class="nc"><i>400</i>&nbsp;        }</b>
+<b class="nc"><i>401</i>&nbsp;        cym.setInputValue(&quot;tree&quot;, spTree);</b>
+<b class="nc"><i>402</i>&nbsp;        cym.setInputValue(&quot;type&quot;, CalibratedYuleModel.Type.NONE);</b>
+<b class="nc"><i>403</i>&nbsp;        cym.initAndValidate();</b>
+<i>404</i>&nbsp;
+<b class="nc"><i>405</i>&nbsp;        final Tree t = cym.compatibleInitialTree();</b>
+<b class="nc"><i>406</i>&nbsp;        assert spTree.getLeafNodeCount() == t.getLeafNodeCount();</b>
+<i>407</i>&nbsp;
+<b class="nc"><i>408</i>&nbsp;        spTree.assignFromWithoutID(t);</b>
+<i>409</i>&nbsp;
+<i>410</i>&nbsp;//        final CalibratedYuleInitialTree ct = new CalibratedYuleInitialTree();
+<i>411</i>&nbsp;//        ct.initByName(&quot;initial&quot;, spTree, &quot;calibrations&quot;, cYule.calibrationsInput.get());
+<i>412</i>&nbsp;//        ct.initStateNodes();
+<b class="nc"><i>413</i>&nbsp;        final double rootHeight = spTree.getRoot().getHeight();</b>
+<b class="nc"><i>414</i>&nbsp;        randomInitGeneTrees(rootHeight);</b>
+<i>415</i>&nbsp;
+<b class="nc"><i>416</i>&nbsp;        cYule.initAndValidate();</b>
+<i>417</i>&nbsp;    }
+<i>418</i>&nbsp;
+<i>419</i>&nbsp;    private void initWithMRCACalibrations(List&lt;MRCAPrior&gt; calibrations) {
+<b class="nc"><i>420</i>&nbsp;        final Tree spTree = speciesTreeInput.get();</b>
+<b class="nc"><i>421</i>&nbsp;        final RandomTree rnd = new RandomTree();</b>
+<b class="nc"><i>422</i>&nbsp;        rnd.setInputValue(&quot;taxonset&quot;, spTree.getTaxonset());</b>
+<i>423</i>&nbsp;
+<b class="nc"><i>424</i>&nbsp;        for( final MRCAPrior cal : calibrations ) {</b>
+<b class="nc"><i>425</i>&nbsp;          rnd.setInputValue(&quot;constraint&quot;, cal);</b>
+<b class="nc"><i>426</i>&nbsp;        }</b>
+<b class="nc"><i>427</i>&nbsp;        ConstantPopulation pf = new ConstantPopulation();</b>
+<b class="nc"><i>428</i>&nbsp;        pf.setInputValue(&quot;popSize&quot;, new RealParameter(&quot;1.0&quot;));</b>
+<i>429</i>&nbsp;
+<b class="nc"><i>430</i>&nbsp;        rnd.setInputValue(&quot;populationModel&quot;, pf);</b>
+<b class="nc"><i>431</i>&nbsp;        rnd.initAndValidate();</b>
+<b class="nc"><i>432</i>&nbsp;        spTree.assignFromWithoutID((Tree)rnd);</b>
+<i>433</i>&nbsp;
+<b class="nc"><i>434</i>&nbsp;        final double rootHeight = spTree.getRoot().getHeight();</b>
+<b class="nc"><i>435</i>&nbsp;        randomInitGeneTrees(rootHeight);</b>
+<i>436</i>&nbsp;    }
+<i>437</i>&nbsp;
+<i>438</i>&nbsp;    @Override
+<i>439</i>&nbsp;    public void getInitialisedStateNodes(final List&lt;StateNode&gt; stateNodes) {
+<b class="nc"><i>440</i>&nbsp;        if( hasCalibrations ) {</b>
+<b class="nc"><i>441</i>&nbsp;            stateNodes.add((Tree) calibratedYule.get().treeInput.get());</b>
+<i>442</i>&nbsp;        } else {
+<b class="nc"><i>443</i>&nbsp;          stateNodes.add(speciesTreeInput.get());</b>
+<i>444</i>&nbsp;        }
+<i>445</i>&nbsp;
+<b class="nc"><i>446</i>&nbsp;        for( final Tree g : genes.get() ) {</b>
+<b class="nc"><i>447</i>&nbsp;            stateNodes.add(g);</b>
+<b class="nc"><i>448</i>&nbsp;        }</b>
+<i>449</i>&nbsp;
+<b class="nc"><i>450</i>&nbsp;        final RealParameter popm = popMean.get();</b>
+<b class="nc"><i>451</i>&nbsp;        if( popm != null ) {</b>
+<b class="nc"><i>452</i>&nbsp;            stateNodes.add(popm);</b>
+<i>453</i>&nbsp;        }
+<b class="nc"><i>454</i>&nbsp;        final RealParameter brate = birthRate.get();</b>
+<b class="nc"><i>455</i>&nbsp;        if( brate != null ) {</b>
+<b class="nc"><i>456</i>&nbsp;            stateNodes.add(brate) ;</b>
+<i>457</i>&nbsp;        }
+<i>458</i>&nbsp;
+<b class="nc"><i>459</i>&nbsp;        final SpeciesTreePrior speciesTreePrior = speciesTreePriorInput.get();</b>
+<b class="nc"><i>460</i>&nbsp;        if( speciesTreePrior != null ) {</b>
+<b class="nc"><i>461</i>&nbsp;            final RealParameter popb = speciesTreePrior.popSizesBottomInput.get();</b>
+<b class="nc"><i>462</i>&nbsp;            if( popb != null ) {</b>
+<b class="nc"><i>463</i>&nbsp;                stateNodes.add(popb) ;</b>
+<i>464</i>&nbsp;            }
+<b class="nc"><i>465</i>&nbsp;            final RealParameter popt = speciesTreePrior.popSizesTopInput.get();</b>
+<b class="nc"><i>466</i>&nbsp;            if( popt != null ) {</b>
+<b class="nc"><i>467</i>&nbsp;                stateNodes.add(popt);</b>
+<i>468</i>&nbsp;            }
+<i>469</i>&nbsp;        }
+<i>470</i>&nbsp;    }
+<i>471</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

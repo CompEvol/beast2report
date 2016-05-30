@@ -1,0 +1,385 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: SubtreeSlide</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.operators</a> ]
+</div>
+
+<h1>Coverage Summary for Class: SubtreeSlide (beast.evolution.operators)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SubtreeSlide</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 110)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;* File SubtreeSlide.java
+<i>3</i>&nbsp;*
+<i>4</i>&nbsp;* Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>5</i>&nbsp;*
+<i>6</i>&nbsp;* This file is part of BEAST2.
+<i>7</i>&nbsp;* See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp;* information regarding copyright ownership and licensing.
+<i>9</i>&nbsp;*
+<i>10</i>&nbsp;* BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp;* it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp;* published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp;* of the License, or (at your option) any later version.
+<i>14</i>&nbsp;*
+<i>15</i>&nbsp;*  BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp;*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp;*  GNU Lesser General Public License for more details.
+<i>19</i>&nbsp;*
+<i>20</i>&nbsp;* You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp;* License along with BEAST; if not, write to the
+<i>22</i>&nbsp;* Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp;* Boston, MA  02110-1301  USA
+<i>24</i>&nbsp;*/
+<i>25</i>&nbsp;/*
+<i>26</i>&nbsp; * SubtreeSlideOperator.java
+<i>27</i>&nbsp; *
+<i>28</i>&nbsp; * Copyright (C) 2002-2006 Alexei Drummond and Andrew Rambaut
+<i>29</i>&nbsp; *
+<i>30</i>&nbsp; * This file is part of BEAST.
+<i>31</i>&nbsp; * See the NOTICE file distributed with this work for additional
+<i>32</i>&nbsp; * information regarding copyright ownership and licensing.
+<i>33</i>&nbsp; *
+<i>34</i>&nbsp; * BEAST is free software; you can redistribute it and/or modify
+<i>35</i>&nbsp; * it under the terms of the GNU Lesser General Public License as
+<i>36</i>&nbsp; * published by the Free Software Foundation; either version 2
+<i>37</i>&nbsp; * of the License, or (at your option) any later version.
+<i>38</i>&nbsp; *
+<i>39</i>&nbsp; *  BEAST is distributed in the hope that it will be useful,
+<i>40</i>&nbsp; *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>41</i>&nbsp; *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>42</i>&nbsp; *  GNU Lesser General Public License for more details.
+<i>43</i>&nbsp; *
+<i>44</i>&nbsp; * You should have received a copy of the GNU Lesser General Public
+<i>45</i>&nbsp; * License along with BEAST; if not, write to the
+<i>46</i>&nbsp; * Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>47</i>&nbsp; * Boston, MA  02110-1301  USA
+<i>48</i>&nbsp; */
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;package beast.evolution.operators;
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;import java.text.DecimalFormat;
+<i>54</i>&nbsp;import java.util.ArrayList;
+<i>55</i>&nbsp;import java.util.List;
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;import beast.core.Description;
+<i>58</i>&nbsp;import beast.core.Input;
+<i>59</i>&nbsp;import beast.evolution.tree.Node;
+<i>60</i>&nbsp;import beast.evolution.tree.Tree;
+<i>61</i>&nbsp;import beast.util.Randomizer;
+<i>62</i>&nbsp;
+<i>63</i>&nbsp;
+<i>64</i>&nbsp;/**
+<i>65</i>&nbsp; * Implements the subtree slide move.
+<i>66</i>&nbsp; */
+<i>67</i>&nbsp;@Description(&quot;Moves the height of an internal node along the branch. &quot; +
+<i>68</i>&nbsp;        &quot;If it moves up, it can exceed the root and become a new root. &quot; +
+<i>69</i>&nbsp;        &quot;If it moves down, it may need to make a choice which branch to &quot; +
+<i>70</i>&nbsp;        &quot;slide down into.&quot;)
+<b class="nc"><i>71</i>&nbsp;public class SubtreeSlide extends TreeOperator {</b>
+<i>72</i>&nbsp;
+<b class="nc"><i>73</i>&nbsp;    final public Input&lt;Double&gt; sizeInput = new Input&lt;&gt;(&quot;size&quot;, &quot;size of the slide, default 1.0&quot;, 1.0);</b>
+<b class="nc"><i>74</i>&nbsp;    final public Input&lt;Boolean&gt; gaussianInput = new Input&lt;&gt;(&quot;gaussian&quot;, &quot;Gaussian (=true=default) or uniform delta&quot;, true);</b>
+<b class="nc"><i>75</i>&nbsp;    final public Input&lt;Boolean&gt; optimiseInput = new Input&lt;&gt;(&quot;optimise&quot;, &quot;flag to indicate that the scale factor is automatically changed in order to achieve a good acceptance rate (default true)&quot;, true);</b>
+<i>76</i>&nbsp;    final public Input&lt;Double&gt; limitInput = new Input&lt;&gt;(&quot;limit&quot;, &quot;limit on step size, default disable, &quot; +
+<b class="nc"><i>77</i>&nbsp;            &quot;i.e. -1. (when positive, gets multiplied by tree-height/log2(n-taxa).&quot;, -1.0);</b>
+<i>78</i>&nbsp;    // shadows size
+<i>79</i>&nbsp;    double size;
+<i>80</i>&nbsp;    private double limit;
+<i>81</i>&nbsp;
+<i>82</i>&nbsp;    @Override
+<i>83</i>&nbsp;    public void initAndValidate() {
+<b class="nc"><i>84</i>&nbsp;        size = sizeInput.get();</b>
+<b class="nc"><i>85</i>&nbsp;        limit = limitInput.get();</b>
+<i>86</i>&nbsp;    }
+<i>87</i>&nbsp;
+<i>88</i>&nbsp;    /**
+<i>89</i>&nbsp;     * Do a probabilistic subtree slide move.
+<i>90</i>&nbsp;     *
+<i>91</i>&nbsp;     * @return log of Hastings Ratio, or Double.NEGATIVE_INFINITY if proposal should not be accepted *
+<i>92</i>&nbsp;     */
+<i>93</i>&nbsp;    @Override
+<i>94</i>&nbsp;    public double proposal() {
+<b class="nc"><i>95</i>&nbsp;        final Tree tree = treeInput.get(this);</b>
+<i>96</i>&nbsp;
+<i>97</i>&nbsp;        double logq;
+<i>98</i>&nbsp;
+<i>99</i>&nbsp;        Node i;
+<b class="nc"><i>100</i>&nbsp;        final boolean markClades = markCladesInput.get();</b>
+<i>101</i>&nbsp;        // 1. choose a random node avoiding root
+<b class="nc"><i>102</i>&nbsp;        final int nodeCount = tree.getNodeCount();</b>
+<i>103</i>&nbsp;        do {
+<b class="nc"><i>104</i>&nbsp;            i = tree.getNode(Randomizer.nextInt(nodeCount));</b>
+<b class="nc"><i>105</i>&nbsp;        } while (i.isRoot());</b>
+<i>106</i>&nbsp;
+<b class="nc"><i>107</i>&nbsp;        final Node p = i.getParent();</b>
+<b class="nc"><i>108</i>&nbsp;        final Node CiP = getOtherChild(p, i);</b>
+<b class="nc"><i>109</i>&nbsp;        final Node PiP = p.getParent();</b>
+<i>110</i>&nbsp;
+<i>111</i>&nbsp;        // 2. choose a delta to move
+<b class="nc"><i>112</i>&nbsp;        final double delta = getDelta();</b>
+<b class="nc"><i>113</i>&nbsp;        final double oldHeight = p.getHeight();</b>
+<b class="nc"><i>114</i>&nbsp;        final double newHeight = oldHeight + delta;</b>
+<i>115</i>&nbsp;
+<i>116</i>&nbsp;        // 3. if the move is up
+<b class="nc"><i>117</i>&nbsp;        if (delta &gt; 0) {</b>
+<i>118</i>&nbsp;
+<i>119</i>&nbsp;            // 3.1 if the topology will change
+<b class="nc"><i>120</i>&nbsp;            if (PiP != null &amp;&amp; PiP.getHeight() &lt; newHeight) {</b>
+<i>121</i>&nbsp;                // find new parent
+<b class="nc"><i>122</i>&nbsp;                Node newParent = PiP;</b>
+<b class="nc"><i>123</i>&nbsp;                Node newChild = p;</b>
+<b class="nc"><i>124</i>&nbsp;                while (newParent.getHeight() &lt; newHeight) {</b>
+<b class="nc"><i>125</i>&nbsp;                    newChild = newParent;</b>
+<b class="nc"><i>126</i>&nbsp;                    if( markClades ) newParent.makeDirty(Tree.IS_FILTHY); // JH</b>
+<b class="nc"><i>127</i>&nbsp;                    newParent = newParent.getParent();</b>
+<b class="nc"><i>128</i>&nbsp;                    if (newParent == null) break;</b>
+<i>129</i>&nbsp;                }
+<i>130</i>&nbsp;                // the moved node &#39;p&#39; would become a child of &#39;newParent&#39;
+<i>131</i>&nbsp;                //
+<i>132</i>&nbsp;
+<i>133</i>&nbsp;                // 3.1.1 if creating a new root
+<b class="nc"><i>134</i>&nbsp;                if (newChild.isRoot()) {</b>
+<b class="nc"><i>135</i>&nbsp;                    replace(p, CiP, newChild);</b>
+<b class="nc"><i>136</i>&nbsp;                    replace(PiP, p, CiP);</b>
+<i>137</i>&nbsp;
+<b class="nc"><i>138</i>&nbsp;                    p.setParent(null);</b>
+<b class="nc"><i>139</i>&nbsp;                    tree.setRoot(p);</b>
+<i>140</i>&nbsp;                }
+<i>141</i>&nbsp;                // 3.1.2 no new root
+<i>142</i>&nbsp;                else {
+<b class="nc"><i>143</i>&nbsp;                    replace(p, CiP, newChild);</b>
+<b class="nc"><i>144</i>&nbsp;                    replace(PiP, p, CiP);</b>
+<b class="nc"><i>145</i>&nbsp;                    replace(newParent, newChild, p);</b>
+<i>146</i>&nbsp;                }
+<i>147</i>&nbsp;
+<b class="nc"><i>148</i>&nbsp;                p.setHeight(newHeight);</b>
+<i>149</i>&nbsp;
+<i>150</i>&nbsp;                // 3.1.3 count the hypothetical sources of this destination.
+<b class="nc"><i>151</i>&nbsp;                final int possibleSources = intersectingEdges(newChild, oldHeight, null);</b>
+<i>152</i>&nbsp;                //System.out.println(&quot;possible sources = &quot; + possibleSources);
+<i>153</i>&nbsp;
+<b class="nc"><i>154</i>&nbsp;                logq = -Math.log(possibleSources);</b>
+<i>155</i>&nbsp;
+<b class="nc"><i>156</i>&nbsp;            } else {</b>
+<i>157</i>&nbsp;                // just change the node height
+<b class="nc"><i>158</i>&nbsp;                p.setHeight(newHeight);</b>
+<b class="nc"><i>159</i>&nbsp;                logq = 0.0;</b>
+<i>160</i>&nbsp;            }
+<i>161</i>&nbsp;        }
+<i>162</i>&nbsp;        // 4 if we are sliding the subtree down.
+<i>163</i>&nbsp;        else {
+<i>164</i>&nbsp;
+<i>165</i>&nbsp;            // 4.0 is it a valid move?
+<b class="nc"><i>166</i>&nbsp;            if (i.getHeight() &gt; newHeight) {</b>
+<b class="nc"><i>167</i>&nbsp;                return Double.NEGATIVE_INFINITY;</b>
+<i>168</i>&nbsp;            }
+<i>169</i>&nbsp;
+<i>170</i>&nbsp;            // 4.1 will the move change the topology
+<b class="nc"><i>171</i>&nbsp;            if (CiP.getHeight() &gt; newHeight) {</b>
+<i>172</i>&nbsp;
+<b class="nc"><i>173</i>&nbsp;                final List&lt;Node&gt; newChildren = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>174</i>&nbsp;                final int possibleDestinations = intersectingEdges(CiP, newHeight, newChildren);</b>
+<i>175</i>&nbsp;
+<i>176</i>&nbsp;                // if no valid destinations then return a failure
+<b class="nc"><i>177</i>&nbsp;                if (newChildren.size() == 0) {</b>
+<b class="nc"><i>178</i>&nbsp;                    return Double.NEGATIVE_INFINITY;</b>
+<i>179</i>&nbsp;                }
+<i>180</i>&nbsp;
+<i>181</i>&nbsp;                // pick a random parent/child destination edge uniformly from options
+<b class="nc"><i>182</i>&nbsp;                final int childIndex = Randomizer.nextInt(newChildren.size());</b>
+<b class="nc"><i>183</i>&nbsp;                final Node newChild = newChildren.get(childIndex);</b>
+<b class="nc"><i>184</i>&nbsp;                final Node newParent = newChild.getParent();</b>
+<i>185</i>&nbsp;
+<i>186</i>&nbsp;                // 4.1.1 if p was root
+<b class="nc"><i>187</i>&nbsp;                if (p.isRoot()) {</b>
+<i>188</i>&nbsp;                    // new root is CiP
+<b class="nc"><i>189</i>&nbsp;                    replace(p, CiP, newChild);</b>
+<b class="nc"><i>190</i>&nbsp;                    replace(newParent, newChild, p);</b>
+<i>191</i>&nbsp;
+<b class="nc"><i>192</i>&nbsp;                    CiP.setParent(null);</b>
+<b class="nc"><i>193</i>&nbsp;                    tree.setRoot(CiP);</b>
+<i>194</i>&nbsp;
+<i>195</i>&nbsp;                } else {
+<b class="nc"><i>196</i>&nbsp;                    replace(p, CiP, newChild);</b>
+<b class="nc"><i>197</i>&nbsp;                    replace(PiP, p, CiP);</b>
+<b class="nc"><i>198</i>&nbsp;                    replace(newParent, newChild, p);</b>
+<i>199</i>&nbsp;                }
+<i>200</i>&nbsp;
+<b class="nc"><i>201</i>&nbsp;                p.setHeight(newHeight);</b>
+<b class="nc"><i>202</i>&nbsp;                if( markClades ) {</b>
+<i>203</i>&nbsp;                    // make dirty the path from the (down) moved node back up to former parent.
+<b class="nc"><i>204</i>&nbsp;                    Node n = p;</b>
+<b class="nc"><i>205</i>&nbsp;                    while( n != CiP ) {</b>
+<b class="nc"><i>206</i>&nbsp;                        n.makeDirty(Tree.IS_FILTHY); // JH</b>
+<b class="nc"><i>207</i>&nbsp;                        n = n.getParent();</b>
+<i>208</i>&nbsp;                    }
+<i>209</i>&nbsp;                }
+<i>210</i>&nbsp;
+<b class="nc"><i>211</i>&nbsp;                logq = Math.log(possibleDestinations);</b>
+<b class="nc"><i>212</i>&nbsp;            } else {</b>
+<b class="nc"><i>213</i>&nbsp;                p.setHeight(newHeight);</b>
+<b class="nc"><i>214</i>&nbsp;                logq = 0.0;</b>
+<i>215</i>&nbsp;            }
+<i>216</i>&nbsp;        }
+<b class="nc"><i>217</i>&nbsp;        return logq;</b>
+<i>218</i>&nbsp;    }
+<i>219</i>&nbsp;
+<i>220</i>&nbsp;    private double getDelta() {
+<b class="nc"><i>221</i>&nbsp;        if (!gaussianInput.get()) {</b>
+<b class="nc"><i>222</i>&nbsp;            return (Randomizer.nextDouble() * size) - (size / 2.0);</b>
+<i>223</i>&nbsp;        } else {
+<b class="nc"><i>224</i>&nbsp;            return Randomizer.nextGaussian() * size;</b>
+<i>225</i>&nbsp;        }
+<i>226</i>&nbsp;    }
+<i>227</i>&nbsp;
+<i>228</i>&nbsp;    private int intersectingEdges(Node node, double height, List&lt;Node&gt; directChildren) {
+<b class="nc"><i>229</i>&nbsp;        final Node parent = node.getParent();</b>
+<i>230</i>&nbsp;
+<b class="nc"><i>231</i>&nbsp;        if (parent.getHeight() &lt; height) return 0;</b>
+<i>232</i>&nbsp;
+<b class="nc"><i>233</i>&nbsp;        if (node.getHeight() &lt; height) {</b>
+<b class="nc"><i>234</i>&nbsp;            if (directChildren != null) directChildren.add(node);</b>
+<b class="nc"><i>235</i>&nbsp;            return 1;</b>
+<i>236</i>&nbsp;        }
+<i>237</i>&nbsp;
+<b class="nc"><i>238</i>&nbsp;        if (node.isLeaf()) {</b>
+<i>239</i>&nbsp;            // TODO: verify that this makes sense
+<b class="nc"><i>240</i>&nbsp;            return 0;</b>
+<i>241</i>&nbsp;        } else {
+<b class="nc"><i>242</i>&nbsp;            final int count = intersectingEdges(node.getLeft(), height, directChildren) +</b>
+<b class="nc"><i>243</i>&nbsp;                    intersectingEdges(node.getRight(), height, directChildren);</b>
+<b class="nc"><i>244</i>&nbsp;            return count;</b>
+<i>245</i>&nbsp;        }
+<i>246</i>&nbsp;    }
+<i>247</i>&nbsp;
+<i>248</i>&nbsp;    /**
+<i>249</i>&nbsp;     * automatic parameter tuning *
+<i>250</i>&nbsp;     */
+<i>251</i>&nbsp;    @Override
+<i>252</i>&nbsp;    public void optimize(final double logAlpha) {
+<b class="nc"><i>253</i>&nbsp;        if (optimiseInput.get()) {</b>
+<b class="nc"><i>254</i>&nbsp;            double delta = calcDelta(logAlpha);</b>
+<b class="nc"><i>255</i>&nbsp;            delta += Math.log(size);</b>
+<b class="nc"><i>256</i>&nbsp;            final double f = Math.exp(delta);</b>
+<i>257</i>&nbsp;//            double f = Math.exp(delta);
+<b class="nc"><i>258</i>&nbsp;            if( limit &gt; 0 ) {</b>
+<b class="nc"><i>259</i>&nbsp;                final Tree tree = treeInput.get();</b>
+<b class="nc"><i>260</i>&nbsp;                final double h = tree.getRoot().getHeight();</b>
+<b class="nc"><i>261</i>&nbsp;                final double k = Math.log(tree.getLeafNodeCount()) / Math.log(2);</b>
+<b class="nc"><i>262</i>&nbsp;                final double lim = (h / k) * limit;</b>
+<b class="nc"><i>263</i>&nbsp;                if( f &lt;= lim ) {</b>
+<b class="nc"><i>264</i>&nbsp;                    size = f;</b>
+<i>265</i>&nbsp;                }
+<b class="nc"><i>266</i>&nbsp;            } else {</b>
+<b class="nc"><i>267</i>&nbsp;               size = f;</b>
+<i>268</i>&nbsp;            }
+<i>269</i>&nbsp;        }
+<i>270</i>&nbsp;    }
+<i>271</i>&nbsp;
+<i>272</i>&nbsp;    @Override
+<i>273</i>&nbsp;    public double getCoercableParameterValue() {
+<b class="nc"><i>274</i>&nbsp;        return size;</b>
+<i>275</i>&nbsp;    }
+<i>276</i>&nbsp;
+<i>277</i>&nbsp;    @Override
+<i>278</i>&nbsp;    public void setCoercableParameterValue(final double value) {
+<b class="nc"><i>279</i>&nbsp;        size = value;</b>
+<i>280</i>&nbsp;    }
+<i>281</i>&nbsp;
+<i>282</i>&nbsp;    @Override
+<i>283</i>&nbsp;    public String getPerformanceSuggestion() {
+<b class="nc"><i>284</i>&nbsp;        final double prob = m_nNrAccepted / (m_nNrAccepted + m_nNrRejected + 0.0);</b>
+<b class="nc"><i>285</i>&nbsp;        final double targetProb = getTargetAcceptanceProbability();</b>
+<i>286</i>&nbsp;
+<b class="nc"><i>287</i>&nbsp;        double ratio = prob / targetProb;</b>
+<i>288</i>&nbsp;
+<b class="nc"><i>289</i>&nbsp;        if (ratio &gt; 2.0) ratio = 2.0;</b>
+<b class="nc"><i>290</i>&nbsp;        if (ratio &lt; 0.5) ratio = 0.5;</b>
+<i>291</i>&nbsp;
+<b class="nc"><i>292</i>&nbsp;        final double newDelta = size * ratio;</b>
+<i>293</i>&nbsp;
+<b class="nc"><i>294</i>&nbsp;        final DecimalFormat formatter = new DecimalFormat(&quot;#.###&quot;);</b>
+<b class="nc"><i>295</i>&nbsp;        if (prob &lt; 0.10) {</b>
+<b class="nc"><i>296</i>&nbsp;            return &quot;Try decreasing size to about &quot; + formatter.format(newDelta);</b>
+<b class="nc"><i>297</i>&nbsp;        } else if (prob &gt; 0.40) {</b>
+<b class="nc"><i>298</i>&nbsp;            return &quot;Try increasing size to about &quot; + formatter.format(newDelta);</b>
+<b class="nc"><i>299</i>&nbsp;        } else return &quot;&quot;;</b>
+<i>300</i>&nbsp;    }
+<i>301</i>&nbsp;
+<i>302</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

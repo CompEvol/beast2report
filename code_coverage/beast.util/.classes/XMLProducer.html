@@ -1,0 +1,1114 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: XMLProducer</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.util</a> ]
+</div>
+
+<h1>Coverage Summary for Class: XMLProducer (beast.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">XMLProducer</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    70%
+  </span>
+  <span class="absValue">
+    (14/ 20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    56.8%
+  </span>
+  <span class="absValue">
+    (256/ 451)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp;* File XMLProducer.java
+<i>3</i>&nbsp;*
+<i>4</i>&nbsp;* Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>5</i>&nbsp;*
+<i>6</i>&nbsp;* This file is part of BEAST 2.
+<i>7</i>&nbsp;* See the NOTICE file distributed with this work for additional
+<i>8</i>&nbsp;* information regarding copyright ownership and licensing.
+<i>9</i>&nbsp;*
+<i>10</i>&nbsp;* BEAST is free software; you can redistribute it and/or modify
+<i>11</i>&nbsp;* it under the terms of the GNU Lesser General Public License as
+<i>12</i>&nbsp;* published by the Free Software Foundation; either version 2
+<i>13</i>&nbsp;* of the License, or (at your option) any later version.
+<i>14</i>&nbsp;*
+<i>15</i>&nbsp;*  BEAST is distributed in the hope that it will be useful,
+<i>16</i>&nbsp;*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>17</i>&nbsp;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>18</i>&nbsp;*  GNU Lesser General Public License for more details.
+<i>19</i>&nbsp;*
+<i>20</i>&nbsp;* You should have received a copy of the GNU Lesser General Public
+<i>21</i>&nbsp;* License along with BEAST; if not, write to the
+<i>22</i>&nbsp;* Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>23</i>&nbsp;* Boston, MA  02110-1301  USA
+<i>24</i>&nbsp;*/
+<i>25</i>&nbsp;package beast.util;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;import java.io.IOException;
+<i>31</i>&nbsp;import java.io.Reader;
+<i>32</i>&nbsp;import java.io.StringReader;
+<i>33</i>&nbsp;import java.io.StringWriter;
+<i>34</i>&nbsp;import java.util.ArrayList;
+<i>35</i>&nbsp;import java.util.Collection;
+<i>36</i>&nbsp;import java.util.Collections;
+<i>37</i>&nbsp;import java.util.HashMap;
+<i>38</i>&nbsp;import java.util.HashSet;
+<i>39</i>&nbsp;import java.util.List;
+<i>40</i>&nbsp;import java.util.Map;
+<i>41</i>&nbsp;import java.util.Set;
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;import javax.xml.parsers.DocumentBuilderFactory;
+<i>44</i>&nbsp;import javax.xml.parsers.ParserConfigurationException;
+<i>45</i>&nbsp;import javax.xml.transform.Transformer;
+<i>46</i>&nbsp;import javax.xml.transform.TransformerException;
+<i>47</i>&nbsp;import javax.xml.transform.TransformerFactory;
+<i>48</i>&nbsp;import javax.xml.transform.dom.DOMSource;
+<i>49</i>&nbsp;import javax.xml.transform.stream.StreamResult;
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;import org.w3c.dom.Attr;
+<i>52</i>&nbsp;import org.w3c.dom.Element;
+<i>53</i>&nbsp;import org.w3c.dom.NamedNodeMap;
+<i>54</i>&nbsp;import org.w3c.dom.Node;
+<i>55</i>&nbsp;import org.w3c.dom.NodeList;
+<i>56</i>&nbsp;import org.xml.sax.InputSource;
+<i>57</i>&nbsp;import org.xml.sax.SAXException;
+<i>58</i>&nbsp;
+<i>59</i>&nbsp;import beast.core.BEASTInterface;
+<i>60</i>&nbsp;import beast.core.Input;
+<i>61</i>&nbsp;
+<i>62</i>&nbsp;/**
+<i>63</i>&nbsp; * converts MCMC plug in into XML, i.e. does the reverse of XMLParser
+<i>64</i>&nbsp; * but tries to prettify the XML as well.
+<i>65</i>&nbsp; */
+<i>66</i>&nbsp;public class XMLProducer extends XMLParser {
+<i>67</i>&nbsp;    /**
+<i>68</i>&nbsp;     * list of objects already converted to XML, so an idref suffices
+<i>69</i>&nbsp;     */
+<i>70</i>&nbsp;    HashSet&lt;BEASTInterface&gt; isDone;
+<i>71</i>&nbsp;    Map&lt;BEASTInterface, Set&lt;String&gt;&gt; isInputsDone;
+<i>72</i>&nbsp;
+<i>73</i>&nbsp;    /**
+<i>74</i>&nbsp;     * list of IDs of elements produces, used to prevent duplicate ID generation
+<i>75</i>&nbsp;     */
+<i>76</i>&nbsp;    HashSet&lt;String&gt; IDs;
+<i>77</i>&nbsp;    /**
+<i>78</i>&nbsp;     * #spaces before elements in XML *
+<i>79</i>&nbsp;     */
+<i>80</i>&nbsp;    int indent;
+<i>81</i>&nbsp;
+<i>82</i>&nbsp;    final public static String DEFAULT_NAMESPACE = &quot;beast.core:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood&quot;;
+<i>83</i>&nbsp;    //final public static String DO_NOT_EDIT_WARNING = &quot;DO NOT EDIT the following machine generated text, they are used in Beauti&quot;;
+<i>84</i>&nbsp;
+<i>85</i>&nbsp;    public XMLProducer() {
+<b class="fc"><i>86</i>&nbsp;        super();</b>
+<b class="fc"><i>87</i>&nbsp;    }</b>
+<i>88</i>&nbsp;
+<i>89</i>&nbsp;    /**
+<i>90</i>&nbsp;     * Main entry point for this class
+<i>91</i>&nbsp;     * Given a plug-in, produces the XML in BEAST 2.0 format
+<i>92</i>&nbsp;     * representing the plug-in. This assumes beast object is Runnable
+<i>93</i>&nbsp;     */
+<i>94</i>&nbsp;    public String toXML(BEASTInterface beastObject) {
+<b class="fc"><i>95</i>&nbsp;        return toXML(beastObject, new ArrayList&lt;&gt;());</b>
+<i>96</i>&nbsp;    }
+<i>97</i>&nbsp;
+<i>98</i>&nbsp;    public String toXML(BEASTInterface beastObject, Collection&lt;BEASTInterface&gt; others) {
+<i>99</i>&nbsp;        try {
+<b class="fc"><i>100</i>&nbsp;            StringBuffer buf = new StringBuffer();</b>
+<b class="fc"><i>101</i>&nbsp;            buf.append(&quot;&lt;&quot; + XMLParser.BEAST_ELEMENT + &quot; version=&#39;2.0&#39; namespace=&#39;&quot; + DEFAULT_NAMESPACE + &quot;&#39;&gt;\n&quot;);</b>
+<b class="fc"><i>102</i>&nbsp;            for (String element : element2ClassMap.keySet()) {</b>
+<b class="fc"><i>103</i>&nbsp;            	if (!reservedElements.contains(element)) {</b>
+<b class="nc"><i>104</i>&nbsp;            		buf.append(&quot;&lt;map name=&#39;&quot; + element + &quot;&#39;&gt;&quot; + element2ClassMap.get(element) +&quot;&lt;/map&gt;\n&quot;);</b>
+<i>105</i>&nbsp;            	}
+<b class="fc"><i>106</i>&nbsp;            }</b>
+<b class="fc"><i>107</i>&nbsp;            buf.append(&quot;\n\n&quot;);</b>
+<b class="fc"><i>108</i>&nbsp;            isDone = new HashSet&lt;&gt;();</b>
+<b class="fc"><i>109</i>&nbsp;            isInputsDone = new HashMap&lt;&gt;();</b>
+<b class="fc"><i>110</i>&nbsp;            IDs = new HashSet&lt;&gt;();</b>
+<b class="fc"><i>111</i>&nbsp;            indent = 0;</b>
+<b class="fc"><i>112</i>&nbsp;            beastObjectToXML(beastObject, buf, null, true);</b>
+<b class="fc"><i>113</i>&nbsp;            String endBeastString = &quot;&lt;/&quot; + XMLParser.BEAST_ELEMENT + &quot;&gt;&quot;;</b>
+<b class="fc"><i>114</i>&nbsp;            buf.append(endBeastString);</b>
+<i>115</i>&nbsp;            //return buf.toString();
+<i>116</i>&nbsp;            // beautify XML hierarchy
+<b class="fc"><i>117</i>&nbsp;            String xml = cleanUpXML(buf.toString(), m_sXMLBeuatifyXSL);</b>
+<i>118</i>&nbsp;            // TODO: fix m_sIDRefReplacementXSL script to deal with nested taxon sets
+<i>119</i>&nbsp;            // String xml2 = cleanUpXML(xml, m_sIDRefReplacementXSL);
+<b class="fc"><i>120</i>&nbsp;            String xml2 = xml;</b>
+<b class="fc"><i>121</i>&nbsp;            xml = findPlates(xml2);</b>
+<i>122</i>&nbsp;            // beatify by applying name spaces to spec attributes
+<b class="fc"><i>123</i>&nbsp;            String[] nameSpaces = DEFAULT_NAMESPACE.split(&quot;:&quot;);</b>
+<b class="fc"><i>124</i>&nbsp;            for (String nameSpace : nameSpaces) {</b>
+<b class="fc"><i>125</i>&nbsp;                xml = xml.replaceAll(&quot;spec=\&quot;&quot; + nameSpace + &quot;.&quot;, &quot;spec=\&quot;&quot;);</b>
+<i>126</i>&nbsp;            }
+<i>127</i>&nbsp;
+<i>128</i>&nbsp;
+<b class="fc"><i>129</i>&nbsp;            buf = new StringBuffer();</b>
+<b class="fc"><i>130</i>&nbsp;            if (others.size() &gt; 0) {</b>
+<b class="nc"><i>131</i>&nbsp;                for (BEASTInterface beastObject2 : others) {</b>
+<b class="nc"><i>132</i>&nbsp;                    if (!IDs.contains(beastObject2.getID())) {</b>
+<b class="nc"><i>133</i>&nbsp;                        beastObjectToXML(beastObject2, buf, null, false);</b>
+<i>134</i>&nbsp;                    }
+<b class="nc"><i>135</i>&nbsp;                }</b>
+<i>136</i>&nbsp;            }
+<b class="fc"><i>137</i>&nbsp;            int endIndex = xml.indexOf(endBeastString);</b>
+<b class="fc"><i>138</i>&nbsp;            String extras = buf.toString();</b>
+<i>139</i>&nbsp;            // prevent double -- inside XML comment, this can happen in sequences
+<b class="fc"><i>140</i>&nbsp;            extras = extras.replaceAll(&quot;--&quot;,&quot;- - &quot;);</b>
+<b class="fc"><i>141</i>&nbsp;            xml = xml.substring(0, endIndex) //+ &quot;\n\n&lt;!-- &quot; + DO_NOT_EDIT_WARNING + &quot; \n\n&quot; + </b>
+<i>142</i>&nbsp;            	//extras +  &quot;\n\n--&gt;\n\n&quot; 
+<i>143</i>&nbsp;            		+ endBeastString;
+<i>144</i>&nbsp;
+<b class="fc"><i>145</i>&nbsp;            xml = xml.replaceAll(&quot;xmlns=\&quot;http://www.w3.org/TR/xhtml1/strict\&quot;&quot;, &quot;&quot;);</b>
+<i>146</i>&nbsp;            
+<b class="fc"><i>147</i>&nbsp;            xml = dedupName(xml);</b>
+<b class="fc"><i>148</i>&nbsp;            xml = sortTags(xml);</b>
+<i>149</i>&nbsp;            
+<i>150</i>&nbsp;
+<i>151</i>&nbsp;            //insert newlines in alignments
+<b class="fc"><i>152</i>&nbsp;            int k = xml.indexOf(&quot;&lt;data &quot;);</b>
+<b class="fc"><i>153</i>&nbsp;            StringBuffer buf2 = new StringBuffer(xml); </b>
+<b class="fc"><i>154</i>&nbsp;            while (k &gt; 0) {</b>
+<b class="nc"><i>155</i>&nbsp;            	while (xml.charAt(k) != &#39;&gt;&#39;) {</b>
+<b class="nc"><i>156</i>&nbsp;            		if (xml.charAt(k) == &#39; &#39; &amp;&amp; !xml.startsWith(&quot;idref&quot;, k+1)) {</b>
+<b class="nc"><i>157</i>&nbsp;            			buf2.setCharAt(k, &#39;\n&#39;);</b>
+<i>158</i>&nbsp;            		}
+<b class="nc"><i>159</i>&nbsp;            		k++;</b>
+<i>160</i>&nbsp;            	}
+<b class="nc"><i>161</i>&nbsp;            	k = xml.indexOf(&quot;&lt;data &quot;, k + 1);</b>
+<i>162</i>&nbsp;            }
+<i>163</i>&nbsp;            
+<i>164</i>&nbsp;
+<b class="fc"><i>165</i>&nbsp;            return buf2.toString();</b>
+<b class="nc"><i>166</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>167</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>168</i>&nbsp;            return null;</b>
+<i>169</i>&nbsp;        }
+<i>170</i>&nbsp;    } // toXML
+<i>171</i>&nbsp;
+<i>172</i>&nbsp;    // ensure attributes are ordered so that id goes first, then spec, then remainder of attributes
+<i>173</i>&nbsp;    private String sortTags(String xml) {
+<i>174</i>&nbsp;    	//if (true) return xml;
+<b class="fc"><i>175</i>&nbsp;    	String [] strs = xml.split(&quot;&lt;&quot;);</b>
+<b class="fc"><i>176</i>&nbsp;    	StringBuilder bf = new StringBuilder();</b>
+<b class="fc"><i>177</i>&nbsp;    	bf.append(strs[0]);</b>
+<b class="fc"><i>178</i>&nbsp;    	for (int i = 1; i &lt; strs.length; i++) {</b>
+<b class="fc"><i>179</i>&nbsp;    		String str = strs[i];</b>
+<b class="fc"><i>180</i>&nbsp;    		String [] ss = str.split(&quot;&gt;&quot;);</b>
+<b class="fc"><i>181</i>&nbsp;    		boolean [] isShortEnd = new  boolean[ss.length];</b>
+<b class="fc"><i>182</i>&nbsp;    		for (int j = 0; j &lt; ss.length; j++) {</b>
+<b class="fc"><i>183</i>&nbsp;    			if (ss[j].endsWith(&quot;/&quot;)) {</b>
+<b class="fc"><i>184</i>&nbsp;    				isShortEnd[j] = true;</b>
+<b class="fc"><i>185</i>&nbsp;    				ss[j] = ss[j].substring(0,  ss[j].length() - 1);</b>
+<i>186</i>&nbsp;    			}
+<i>187</i>&nbsp;    		}
+<b class="fc"><i>188</i>&nbsp;   			String [] strs2 = split(ss[0]);</b>
+<b class="fc"><i>189</i>&nbsp;   			int spec = 0;</b>
+<b class="fc"><i>190</i>&nbsp;   			while (spec &lt; strs2.length &amp;&amp; !strs2[spec].startsWith(&quot;spec=&quot;)) {</b>
+<b class="fc"><i>191</i>&nbsp;   				spec++;</b>
+<i>192</i>&nbsp;   			}
+<b class="fc"><i>193</i>&nbsp;   			int iD = 0;</b>
+<b class="fc"><i>194</i>&nbsp;   			while (iD &lt; strs2.length &amp;&amp; !strs2[iD].startsWith(&quot;id=&quot;)) {</b>
+<b class="fc"><i>195</i>&nbsp;   				iD++;</b>
+<i>196</i>&nbsp;   			}
+<b class="fc"><i>197</i>&nbsp;			bf.append(&#39;&lt;&#39;);</b>
+<b class="fc"><i>198</i>&nbsp;			if (strs2[0] != null)</b>
+<b class="fc"><i>199</i>&nbsp;				bf.append(strs2[0]);</b>
+<b class="fc"><i>200</i>&nbsp;			if (iD &lt; strs2.length) {</b>
+<b class="fc"><i>201</i>&nbsp;				bf.append(&#39; &#39;);</b>
+<b class="fc"><i>202</i>&nbsp;				bf.append(strs2[iD]);</b>
+<i>203</i>&nbsp;			}
+<b class="fc"><i>204</i>&nbsp;			if (spec &lt; strs2.length) {</b>
+<b class="fc"><i>205</i>&nbsp;				bf.append(&#39; &#39;);</b>
+<b class="fc"><i>206</i>&nbsp;				bf.append(strs2[spec]);</b>
+<i>207</i>&nbsp;			}
+<b class="fc"><i>208</i>&nbsp;			for (int j = 1; j &lt; strs2.length; j++) {</b>
+<b class="fc"><i>209</i>&nbsp;				if (j != iD &amp;&amp; j != spec) {</b>
+<b class="fc"><i>210</i>&nbsp;	    			bf.append(&#39; &#39;);</b>
+<b class="fc"><i>211</i>&nbsp;	    			if (strs2[j] != null)</b>
+<b class="fc"><i>212</i>&nbsp;	    				bf.append(strs2[j]);</b>
+<i>213</i>&nbsp;				}
+<i>214</i>&nbsp;			}
+<b class="fc"><i>215</i>&nbsp;			for (int k = 1; k &lt; ss.length; k++) {</b>
+<b class="fc"><i>216</i>&nbsp;				if (isShortEnd[k-1]) {</b>
+<b class="fc"><i>217</i>&nbsp;					bf.append(&#39;/&#39;);</b>
+<i>218</i>&nbsp;				}
+<b class="fc"><i>219</i>&nbsp;				bf.append(&#39;&gt;&#39;);</b>
+<b class="fc"><i>220</i>&nbsp;				bf.append(ss[k]);</b>
+<i>221</i>&nbsp;			}
+<b class="fc"><i>222</i>&nbsp;			if (ss.length == 1 &amp;&amp; str != null &amp;&amp; str.endsWith(&quot;&gt;&quot;)) {</b>
+<b class="fc"><i>223</i>&nbsp;				bf.append(&#39;&gt;&#39;);</b>
+<i>224</i>&nbsp;			}
+<i>225</i>&nbsp;    	}
+<b class="fc"><i>226</i>&nbsp;		return bf.toString();</b>
+<i>227</i>&nbsp;	}
+<i>228</i>&nbsp;    
+<i>229</i>&nbsp;    // since str.split(&quot; &quot;): does not match trailing spaces, we need to split by hand
+<i>230</i>&nbsp;    // also, attributes with spaces in them should not be split, e.g. &lt;x id=&quot;a b&quot;/&gt; should be split in 2, not 3
+<i>231</i>&nbsp;    String [] split(String str) {
+<b class="fc"><i>232</i>&nbsp;    	List&lt;String&gt; s = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>233</i>&nbsp;    	StringBuilder buf = new StringBuilder();</b>
+<b class="fc"><i>234</i>&nbsp;    	int i = 0;</b>
+<b class="fc"><i>235</i>&nbsp;    	while (i &lt; str.length()) {</b>
+<b class="fc"><i>236</i>&nbsp;    		char c = str.charAt(i);</b>
+<b class="fc"><i>237</i>&nbsp;    		if (c == &#39; &#39;) {</b>
+<b class="fc"><i>238</i>&nbsp;    			String str2 = buf.toString();</b>
+<b class="fc"><i>239</i>&nbsp;    			if ((str2.contains(&quot;=&#39;&quot;) &amp;&amp; !str2.endsWith(&quot;&#39;&quot;)) || </b>
+<b class="fc"><i>240</i>&nbsp;    					(str2.contains(&quot;=\&quot;&quot;) &amp;&amp; !str2.endsWith(&quot;\&quot;&quot;))) {</b>
+<b class="fc"><i>241</i>&nbsp;    				buf.append(c);</b>
+<i>242</i>&nbsp;    			} else {
+<b class="fc"><i>243</i>&nbsp;    				s.add(str2);</b>
+<b class="fc"><i>244</i>&nbsp;    				buf = new StringBuilder();</b>
+<i>245</i>&nbsp;    			}
+<b class="fc"><i>246</i>&nbsp;    		} else {</b>
+<b class="fc"><i>247</i>&nbsp;    			buf.append(c);</b>
+<i>248</i>&nbsp;    		}
+<b class="fc"><i>249</i>&nbsp;    		i++;</b>
+<b class="fc"><i>250</i>&nbsp;    	}</b>
+<b class="fc"><i>251</i>&nbsp;		s.add(buf.toString());</b>
+<b class="fc"><i>252</i>&nbsp;    	return s.toArray(new String []{});</b>
+<i>253</i>&nbsp;    }
+<i>254</i>&nbsp;
+<i>255</i>&nbsp;	String dedupName(String xml) {
+<i>256</i>&nbsp;        // replace &lt;$x name=&quot;$y&quot; idref=&quot;$z&quot;/&gt; and &lt;$x idref=&quot;$z&quot; name=&quot;$y&quot;/&gt; 
+<i>257</i>&nbsp;        // with &lt;$y idref=&quot;$z&quot;/&gt;
+<b class="fc"><i>258</i>&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<b class="fc"><i>259</i>&nbsp;        int i = -1;</b>
+<b class="fc"><i>260</i>&nbsp;        while (++i &lt; xml.length()) {</b>
+<b class="fc"><i>261</i>&nbsp;        	char c = xml.charAt(i);</b>
+<b class="fc"><i>262</i>&nbsp;        	if (c == &#39;&lt;&#39;) {</b>
+<b class="fc"><i>263</i>&nbsp;                StringBuilder tag = new StringBuilder();</b>
+<b class="fc"><i>264</i>&nbsp;        		tag.append(c);</b>
+<b class="fc"><i>265</i>&nbsp;        		while (((c = xml.charAt(++i)) != &#39; &#39;) &amp;&amp; (c != &#39;/&#39;) &amp;&amp; c != &#39;&gt;&#39;) {</b>
+<b class="fc"><i>266</i>&nbsp;        			tag.append(c);</b>
+<i>267</i>&nbsp;        		}
+<b class="fc"><i>268</i>&nbsp;        		if (c != &#39;/&#39; &amp;&amp; c != &#39;&gt;&#39;) {</b>
+<b class="fc"><i>269</i>&nbsp;                    StringBuilder tag2 = new StringBuilder();</b>
+<b class="fc"><i>270</i>&nbsp;            		while ((c = xml.charAt(++i)) != &#39;=&#39;) {</b>
+<b class="fc"><i>271</i>&nbsp;            			tag2.append(c);</b>
+<i>272</i>&nbsp;            		}
+<b class="fc"><i>273</i>&nbsp;            		if (tag2.toString().equals(&quot;name&quot;)) {</b>
+<b class="nc"><i>274</i>&nbsp;                        ++i;</b>
+<b class="nc"><i>275</i>&nbsp;                        StringBuilder value2 = new StringBuilder();</b>
+<b class="nc"><i>276</i>&nbsp;                		while ((c = xml.charAt(++i)) != &#39;&quot;&#39;) {</b>
+<b class="nc"><i>277</i>&nbsp;                			value2.append(c);</b>
+<i>278</i>&nbsp;                		}
+<b class="nc"><i>279</i>&nbsp;                        StringBuilder tag3 = new StringBuilder();</b>
+<b class="nc"><i>280</i>&nbsp;                    	c = xml.charAt(++i);</b>
+<b class="nc"><i>281</i>&nbsp;                        if (c != &#39;&gt;&#39;) {</b>
+<b class="nc"><i>282</i>&nbsp;                            if (c == &#39;/&#39;) {</b>
+<b class="nc"><i>283</i>&nbsp;                        		tag3.append(c);</b>
+<i>284</i>&nbsp;                            }
+<b class="nc"><i>285</i>&nbsp;                        	while (((c = xml.charAt(++i)) != &#39;=&#39;) &amp;&amp; (c != &#39;/&#39;) &amp;&amp; (c != &#39;&gt;&#39;)) {</b>
+<b class="nc"><i>286</i>&nbsp;                        		tag3.append(c);</b>
+<i>287</i>&nbsp;                        	}
+<i>288</i>&nbsp;                        }
+<b class="nc"><i>289</i>&nbsp;                		if (c != &#39;/&#39; &amp;&amp; c != &#39;&gt;&#39; &amp;&amp; tag3.toString().equals(&quot;idref&quot;)) {</b>
+<b class="nc"><i>290</i>&nbsp;                			tag3.append(c);</b>
+<b class="nc"><i>291</i>&nbsp;                			tag3.append(xml.charAt(++i));</b>
+<b class="nc"><i>292</i>&nbsp;                    		while ((c = xml.charAt(++i)) != &#39;&quot;&#39;) {</b>
+<b class="nc"><i>293</i>&nbsp;                    			tag3.append(c);</b>
+<i>294</i>&nbsp;                    		}
+<b class="nc"><i>295</i>&nbsp;                    		sb.append(&#39;&lt;&#39;);</b>
+<b class="nc"><i>296</i>&nbsp;                			sb.append(value2);                			</b>
+<b class="nc"><i>297</i>&nbsp;                    		sb.append(&#39;=&#39;);</b>
+<b class="nc"><i>298</i>&nbsp;                    		sb.append(tag3);</b>
+<b class="nc"><i>299</i>&nbsp;                    		sb.append(&quot;/&gt;&quot;);</b>
+<b class="nc"><i>300</i>&nbsp;                    		while ((c = xml.charAt(++i)) != &#39;&gt;&#39;) {}</b>
+<i>301</i>&nbsp;                		} else {
+<b class="nc"><i>302</i>&nbsp;                			sb.append(tag);</b>
+<b class="nc"><i>303</i>&nbsp;                			sb.append(&#39; &#39;);</b>
+<b class="nc"><i>304</i>&nbsp;                			sb.append(tag2);</b>
+<b class="nc"><i>305</i>&nbsp;                			sb.append(&quot;=\&quot;&quot;);</b>
+<b class="nc"><i>306</i>&nbsp;                			sb.append(value2);                			</b>
+<b class="nc"><i>307</i>&nbsp;                			sb.append(&#39;&quot;&#39;);</b>
+<b class="nc"><i>308</i>&nbsp;                			sb.append(&#39; &#39;);</b>
+<b class="nc"><i>309</i>&nbsp;                			sb.append(tag3);</b>
+<b class="nc"><i>310</i>&nbsp;                			sb.append(c);</b>
+<i>311</i>&nbsp;                		}
+<b class="nc"><i>312</i>&nbsp;            		} else if (tag2.toString().equals(&quot;idref&quot;)) {</b>
+<b class="nc"><i>313</i>&nbsp;            			tag2.append(c);</b>
+<b class="nc"><i>314</i>&nbsp;            			tag2.append(xml.charAt(++i));</b>
+<b class="nc"><i>315</i>&nbsp;                		while (((c = xml.charAt(++i)) != &#39; &#39;) &amp;&amp; (c != &#39;/&#39;) &amp;&amp; c != &#39;&gt;&#39;) {</b>
+<b class="nc"><i>316</i>&nbsp;                			tag2.append(c);</b>
+<i>317</i>&nbsp;                		}
+<b class="nc"><i>318</i>&nbsp;                		if (c != &#39;/&#39; &amp;&amp; c != &#39;&gt;&#39;) {</b>
+<b class="nc"><i>319</i>&nbsp;                            StringBuilder tag3 = new StringBuilder();</b>
+<b class="nc"><i>320</i>&nbsp;                    		while ((c = xml.charAt(++i)) != &#39;=&#39;) {</b>
+<b class="nc"><i>321</i>&nbsp;                    			tag3.append(c);</b>
+<i>322</i>&nbsp;                    		}
+<b class="nc"><i>323</i>&nbsp;                    		if (tag3.toString().equals(&quot;name&quot;)) {</b>
+<b class="nc"><i>324</i>&nbsp;                                ++i;</b>
+<b class="nc"><i>325</i>&nbsp;                                StringBuilder value2 = new StringBuilder();</b>
+<b class="nc"><i>326</i>&nbsp;                        		while ((c = xml.charAt(++i)) != &#39;&quot;&#39;) {</b>
+<b class="nc"><i>327</i>&nbsp;                        			value2.append(c);</b>
+<i>328</i>&nbsp;                        		}
+<b class="nc"><i>329</i>&nbsp;                        		sb.append(&#39;&lt;&#39;);</b>
+<b class="nc"><i>330</i>&nbsp;                    			sb.append(value2);                			</b>
+<b class="nc"><i>331</i>&nbsp;                        		sb.append(&#39; &#39;);</b>
+<b class="nc"><i>332</i>&nbsp;                        		sb.append(tag2);</b>
+<b class="nc"><i>333</i>&nbsp;                        		sb.append(&quot;/&gt;&quot;);</b>
+<b class="nc"><i>334</i>&nbsp;                        		while ((c = xml.charAt(++i)) != &#39;&gt;&#39;) {}</b>
+<b class="nc"><i>335</i>&nbsp;                    		} else {</b>
+<b class="nc"><i>336</i>&nbsp;                    			sb.append(tag);</b>
+<b class="nc"><i>337</i>&nbsp;                    			sb.append(&#39; &#39;);</b>
+<b class="nc"><i>338</i>&nbsp;                    			sb.append(tag2);</b>
+<b class="nc"><i>339</i>&nbsp;                    			sb.append(&#39; &#39;);</b>
+<b class="nc"><i>340</i>&nbsp;                    			sb.append(tag3);</b>
+<b class="nc"><i>341</i>&nbsp;                    			sb.append(c);</b>
+<i>342</i>&nbsp;                    		}
+<b class="nc"><i>343</i>&nbsp;                		} else {</b>
+<b class="nc"><i>344</i>&nbsp;                			sb.append(tag);</b>
+<b class="nc"><i>345</i>&nbsp;                			sb.append(&#39; &#39;);</b>
+<b class="nc"><i>346</i>&nbsp;                			sb.append(tag2);</b>
+<b class="nc"><i>347</i>&nbsp;                			sb.append(c);</b>
+<i>348</i>&nbsp;                		}
+<i>349</i>&nbsp;            		} else {
+<b class="fc"><i>350</i>&nbsp;            			sb.append(tag);</b>
+<b class="fc"><i>351</i>&nbsp;            			sb.append(&#39; &#39;);</b>
+<b class="fc"><i>352</i>&nbsp;            			sb.append(tag2);                			</b>
+<b class="fc"><i>353</i>&nbsp;            			sb.append(c);</b>
+<i>354</i>&nbsp;            		}
+<b class="fc"><i>355</i>&nbsp;        		} else {</b>
+<b class="fc"><i>356</i>&nbsp;        			sb.append(tag);</b>
+<b class="fc"><i>357</i>&nbsp;        			sb.append(c);</b>
+<i>358</i>&nbsp;        		}
+<b class="fc"><i>359</i>&nbsp;        	} else {</b>
+<b class="fc"><i>360</i>&nbsp;        		sb.append(c);</b>
+<i>361</i>&nbsp;        	}
+<b class="fc"><i>362</i>&nbsp;        }</b>
+<b class="fc"><i>363</i>&nbsp;        return sb.toString();</b>
+<i>364</i>&nbsp;	}
+<i>365</i>&nbsp;
+<i>366</i>&nbsp;	/**
+<i>367</i>&nbsp;     * like toXML() but without the assumption that beast object is Runnable *
+<i>368</i>&nbsp;     */
+<i>369</i>&nbsp;    public String modelToXML(BEASTInterface beastObject) {
+<i>370</i>&nbsp;        try {
+<b class="nc"><i>371</i>&nbsp;            String xML0 = toRawXML(beastObject);</b>
+<b class="nc"><i>372</i>&nbsp;            String xml = cleanUpXML(xML0, m_sSupressAlignmentXSL);</b>
+<i>373</i>&nbsp;            // TODO: fix m_sIDRefReplacementXSL script to deal with nested taxon sets
+<i>374</i>&nbsp;            //String xml2 = cleanUpXML(xml, m_sIDRefReplacementXSL);
+<b class="nc"><i>375</i>&nbsp;            String xml2 = xml;</b>
+<b class="nc"><i>376</i>&nbsp;            xml = findPlates(xml2);</b>
+<b class="nc"><i>377</i>&nbsp;            xml = xml.replaceAll(&quot;&lt;\\?xml version=\&quot;1.0\&quot; encoding=\&quot;UTF-8\&quot;\\?&gt;&quot;, &quot;&quot;);</b>
+<b class="nc"><i>378</i>&nbsp;            xml = xml.replaceAll(&quot;\\n\\s*\\n&quot;, &quot;\n&quot;);</b>
+<b class="nc"><i>379</i>&nbsp;            return xml;</b>
+<b class="nc"><i>380</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>381</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>382</i>&nbsp;            return null;</b>
+<i>383</i>&nbsp;        }
+<i>384</i>&nbsp;    } // toXML
+<i>385</i>&nbsp;
+<i>386</i>&nbsp;    /**
+<i>387</i>&nbsp;     * like modelToXML, but without the cleanup *
+<i>388</i>&nbsp;     */
+<i>389</i>&nbsp;    public String toRawXML(BEASTInterface beastObject) {
+<b class="nc"><i>390</i>&nbsp;        return toRawXML(beastObject, null);</b>
+<i>391</i>&nbsp;    } // toRawXML
+<i>392</i>&nbsp;
+<i>393</i>&nbsp;    /**
+<i>394</i>&nbsp;     * like modelToXML, but without the cleanup *
+<i>395</i>&nbsp;     * For beast object without name
+<i>396</i>&nbsp;     */
+<i>397</i>&nbsp;    public String toRawXML(BEASTInterface beastObject, String name) {
+<i>398</i>&nbsp;        try {
+<b class="nc"><i>399</i>&nbsp;            StringBuffer buf = new StringBuffer();</b>
+<b class="nc"><i>400</i>&nbsp;            isDone = new HashSet&lt;&gt;();</b>
+<b class="nc"><i>401</i>&nbsp;            isInputsDone = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>402</i>&nbsp;            IDs = new HashSet&lt;&gt;();</b>
+<b class="nc"><i>403</i>&nbsp;            indent = 0;</b>
+<b class="nc"><i>404</i>&nbsp;            beastObjectToXML(beastObject, buf, name, false);</b>
+<b class="nc"><i>405</i>&nbsp;            return buf.toString();</b>
+<b class="nc"><i>406</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>407</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>408</i>&nbsp;            return null;</b>
+<i>409</i>&nbsp;        }
+<i>410</i>&nbsp;    } // toRawXML
+<i>411</i>&nbsp;
+<i>412</i>&nbsp;
+<i>413</i>&nbsp;
+<i>414</i>&nbsp;    public String stateNodeToXML(BEASTInterface beastObject) {
+<i>415</i>&nbsp;        try {
+<b class="nc"><i>416</i>&nbsp;            StringBuffer buf = new StringBuffer();</b>
+<i>417</i>&nbsp;            //buf.append(&quot;&lt;&quot; + XMLParser.BEAST_ELEMENT + &quot; version=&#39;2.0&#39;&gt;\n&quot;);
+<b class="nc"><i>418</i>&nbsp;            isDone = new HashSet&lt;&gt;();</b>
+<b class="nc"><i>419</i>&nbsp;            IDs = new HashSet&lt;&gt;();</b>
+<b class="nc"><i>420</i>&nbsp;            indent = 0;</b>
+<b class="nc"><i>421</i>&nbsp;            beastObjectToXML(beastObject, buf, null, false);</b>
+<b class="nc"><i>422</i>&nbsp;            return buf.toString();</b>
+<b class="nc"><i>423</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>424</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>425</i>&nbsp;            return null;</b>
+<i>426</i>&nbsp;        }
+<i>427</i>&nbsp;    }
+<i>428</i>&nbsp;
+<i>429</i>&nbsp;    /**
+<i>430</i>&nbsp;     * Applies XSL script (specified in m_sXSL) to make XML a bit
+<i>431</i>&nbsp;     * nicer by removing unused IDs and moving data, beast.tree and likelihood
+<i>432</i>&nbsp;     * outside MCMC element.
+<i>433</i>&nbsp;     * Tries to compress common parts into plates.
+<i>434</i>&nbsp;     */
+<i>435</i>&nbsp;    String cleanUpXML(String xml, String xsl) throws TransformerException {
+<b class="fc"><i>436</i>&nbsp;        StringWriter strWriter = new StringWriter();</b>
+<b class="fc"><i>437</i>&nbsp;        Reader xmlInput = new StringReader(xml);</b>
+<b class="fc"><i>438</i>&nbsp;        javax.xml.transform.Source xmlSource =</b>
+<i>439</i>&nbsp;                new javax.xml.transform.stream.StreamSource(xmlInput);
+<b class="fc"><i>440</i>&nbsp;        Reader xslInput = new StringReader(xsl);</b>
+<b class="fc"><i>441</i>&nbsp;        javax.xml.transform.Source xsltSource =</b>
+<i>442</i>&nbsp;                new javax.xml.transform.stream.StreamSource(xslInput);
+<b class="fc"><i>443</i>&nbsp;        javax.xml.transform.Result result =</b>
+<i>444</i>&nbsp;                new javax.xml.transform.stream.StreamResult(strWriter);
+<i>445</i>&nbsp;        // create an instance of TransformerFactory
+<b class="fc"><i>446</i>&nbsp;        javax.xml.transform.TransformerFactory transFact = javax.xml.transform.TransformerFactory.newInstance();</b>
+<b class="fc"><i>447</i>&nbsp;        javax.xml.transform.Transformer trans = transFact.newTransformer(xsltSource);</b>
+<b class="fc"><i>448</i>&nbsp;        trans.transform(xmlSource, result);</b>
+<i>449</i>&nbsp;
+<b class="fc"><i>450</i>&nbsp;        String xml2 = strWriter.toString();</b>
+<b class="fc"><i>451</i>&nbsp;        return xml2;</b>
+<i>452</i>&nbsp;    }
+<i>453</i>&nbsp;
+<i>454</i>&nbsp;    // compress parts into plates
+<i>455</i>&nbsp;    String findPlates(String xml) throws SAXException, IOException, ParserConfigurationException, TransformerException  {
+<b class="fc"><i>456</i>&nbsp;        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();</b>
+<b class="fc"><i>457</i>&nbsp;        doc = factory.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));</b>
+<b class="fc"><i>458</i>&nbsp;        doc.normalize();</b>
+<i>459</i>&nbsp;
+<b class="fc"><i>460</i>&nbsp;        Node topNode = doc.getElementsByTagName(&quot;*&quot;).item(0);</b>
+<b class="fc"><i>461</i>&nbsp;        findPlates(topNode);</b>
+<i>462</i>&nbsp;
+<i>463</i>&nbsp;        //create string from xml tree
+<b class="fc"><i>464</i>&nbsp;        StringWriter sw = new StringWriter();</b>
+<b class="fc"><i>465</i>&nbsp;        StreamResult result = new StreamResult(sw);</b>
+<b class="fc"><i>466</i>&nbsp;        DOMSource source = new DOMSource(doc);</b>
+<b class="fc"><i>467</i>&nbsp;        TransformerFactory factory2 = TransformerFactory.newInstance();</b>
+<b class="fc"><i>468</i>&nbsp;        Transformer transformer = factory2.newTransformer();</b>
+<b class="fc"><i>469</i>&nbsp;        transformer.transform(source, result);</b>
+<i>470</i>&nbsp;
+<b class="fc"><i>471</i>&nbsp;        return sw.toString();</b>
+<i>472</i>&nbsp;    }
+<i>473</i>&nbsp;
+<i>474</i>&nbsp;    /**
+<i>475</i>&nbsp;     * tries to compress XML into plates *
+<i>476</i>&nbsp;     */
+<i>477</i>&nbsp;    void findPlates(Node node) {
+<b class="fc"><i>478</i>&nbsp;        NodeList children = node.getChildNodes();</b>
+<b class="fc"><i>479</i>&nbsp;        for (int childIndex = 0; childIndex &lt; children.getLength(); childIndex++) {</b>
+<b class="fc"><i>480</i>&nbsp;            Node child = children.item(childIndex);</b>
+<b class="fc"><i>481</i>&nbsp;            if (child.getNodeType() == Node.ELEMENT_NODE) {</b>
+<b class="fc"><i>482</i>&nbsp;                List&lt;Node&gt; comparables = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>483</i>&nbsp;                for (int siblingNr = childIndex + 1; siblingNr &lt; children.getLength(); siblingNr++) {</b>
+<b class="fc"><i>484</i>&nbsp;                    if (children.item(siblingNr).getNodeType() == Node.ELEMENT_NODE) {</b>
+<b class="fc"><i>485</i>&nbsp;                        Node sibling = children.item(siblingNr);</b>
+<b class="fc"><i>486</i>&nbsp;                        if (comparable(child, sibling, &quot;.p1&quot;, &quot;.p&quot; + (comparables.size() + 2))) {</b>
+<b class="nc"><i>487</i>&nbsp;                            comparables.add(sibling);</b>
+<i>488</i>&nbsp;                        } else {
+<i>489</i>&nbsp;                            // break
+<b class="fc"><i>490</i>&nbsp;                            siblingNr = children.getLength();</b>
+<i>491</i>&nbsp;                        }
+<i>492</i>&nbsp;                    }
+<i>493</i>&nbsp;                }
+<b class="fc"><i>494</i>&nbsp;                if (comparables.size() &gt; 0) {</b>
+<i>495</i>&nbsp;                	// TODO: FIX THIS SO THAT NOT AN ARBITRARY `1&#39; is used to generate the plate
+<i>496</i>&nbsp;                    // we can make a plate now
+<i>497</i>&nbsp;//                    String rangeString = &quot;1&quot;;
+<i>498</i>&nbsp;//                    int k = 2;
+<i>499</i>&nbsp;//                    for (Node sibling : comparables) {
+<i>500</i>&nbsp;//                        rangeString += &quot;,&quot; + k++;
+<i>501</i>&nbsp;//                        sibling.getParentNode().removeChild(sibling);
+<i>502</i>&nbsp;//                    }
+<i>503</i>&nbsp;//                    makePlate(child, &quot;1&quot;, &quot;n&quot;, rangeString);
+<i>504</i>&nbsp;                }
+<i>505</i>&nbsp;            }
+<i>506</i>&nbsp;        }
+<i>507</i>&nbsp;        // recurse to lower levels
+<b class="fc"><i>508</i>&nbsp;        children = node.getChildNodes();</b>
+<b class="fc"><i>509</i>&nbsp;        for (int childIndex = 0; childIndex &lt; children.getLength(); childIndex++) {</b>
+<b class="fc"><i>510</i>&nbsp;            findPlates(children.item(childIndex));</b>
+<i>511</i>&nbsp;        }
+<b class="fc"><i>512</i>&nbsp;    } // findPlates</b>
+<i>513</i>&nbsp;
+<i>514</i>&nbsp;    /**
+<i>515</i>&nbsp;     * replace node element by a plate element with variable var and range rangeString *
+<i>516</i>&nbsp;     */
+<i>517</i>&nbsp;    void makePlate(Node node, String pattern, String var, String rangeString) {
+<b class="nc"><i>518</i>&nbsp;        Element plate = doc.createElement(&quot;plate&quot;);</b>
+<b class="nc"><i>519</i>&nbsp;        plate.setAttribute(&quot;var&quot;, var);</b>
+<b class="nc"><i>520</i>&nbsp;        plate.setAttribute(&quot;range&quot;, rangeString);</b>
+<b class="nc"><i>521</i>&nbsp;        String indent = node.getPreviousSibling().getTextContent();</b>
+<b class="nc"><i>522</i>&nbsp;        replace(node, pattern, var);</b>
+<b class="nc"><i>523</i>&nbsp;        node.getParentNode().replaceChild(plate, node);</b>
+<b class="nc"><i>524</i>&nbsp;        plate.appendChild(doc.createTextNode(indent + &quot;  &quot;));</b>
+<b class="nc"><i>525</i>&nbsp;        plate.appendChild(node);</b>
+<b class="nc"><i>526</i>&nbsp;        plate.appendChild(doc.createTextNode(indent));</b>
+<b class="nc"><i>527</i>&nbsp;    }</b>
+<i>528</i>&nbsp;
+<i>529</i>&nbsp;    /**
+<i>530</i>&nbsp;     * recursively replace all attribute values containing the pattern with variable var *
+<i>531</i>&nbsp;     */
+<i>532</i>&nbsp;    void replace(Node node, String pattern, String var) {
+<b class="nc"><i>533</i>&nbsp;        NamedNodeMap atts = node.getAttributes();</b>
+<b class="nc"><i>534</i>&nbsp;        if (atts != null) {</b>
+<b class="nc"><i>535</i>&nbsp;            for (int i = 0; i &lt; atts.getLength(); i++) {</b>
+<b class="nc"><i>536</i>&nbsp;                Attr attr = (Attr) atts.item(i);</b>
+<b class="nc"><i>537</i>&nbsp;                String valueString = attr.getValue().replaceAll(pattern, &quot;\\$\\(&quot; + var + &quot;\\)&quot;);</b>
+<b class="nc"><i>538</i>&nbsp;                attr.setValue(valueString);</b>
+<i>539</i>&nbsp;            }
+<i>540</i>&nbsp;        }
+<b class="nc"><i>541</i>&nbsp;        NodeList children = node.getChildNodes();</b>
+<b class="nc"><i>542</i>&nbsp;        for (int childIndex = 0; childIndex &lt; children.getLength(); childIndex++) {</b>
+<b class="nc"><i>543</i>&nbsp;            Node child = children.item(childIndex);</b>
+<b class="nc"><i>544</i>&nbsp;            replace(child, pattern, var);</b>
+<i>545</i>&nbsp;        }
+<b class="nc"><i>546</i>&nbsp;    }</b>
+<i>547</i>&nbsp;
+<i>548</i>&nbsp;    /**
+<i>549</i>&nbsp;     * check if two XML nodes are the same, when pattern1 is replaced by pattothersern2 *
+<i>550</i>&nbsp;     */
+<i>551</i>&nbsp;    boolean comparable(Node node1, Node node2, String pattern1, String pattern2) {
+<i>552</i>&nbsp;        // compare name
+<b class="fc"><i>553</i>&nbsp;        if (!node1.getNodeName().equals(node2.getNodeName())) {</b>
+<b class="nc"><i>554</i>&nbsp;            return false;</b>
+<i>555</i>&nbsp;        }
+<i>556</i>&nbsp;        // compare text
+<b class="fc"><i>557</i>&nbsp;        if (!node1.getTextContent().trim().equals(node2.getTextContent().trim())) {</b>
+<b class="nc"><i>558</i>&nbsp;            return false;</b>
+<i>559</i>&nbsp;        }
+<i>560</i>&nbsp;        // compare attributes
+<b class="fc"><i>561</i>&nbsp;        NamedNodeMap atts = node1.getAttributes();</b>
+<b class="fc"><i>562</i>&nbsp;        NamedNodeMap atts2 = node2.getAttributes();</b>
+<b class="fc"><i>563</i>&nbsp;        if (atts.getLength() != atts2.getLength()) {</b>
+<b class="nc"><i>564</i>&nbsp;            return false;</b>
+<i>565</i>&nbsp;        }
+<b class="fc"><i>566</i>&nbsp;        for (int i = 0; i &lt; atts.getLength(); i++) {</b>
+<b class="fc"><i>567</i>&nbsp;            Attr attr = (Attr) atts.item(i);</b>
+<b class="fc"><i>568</i>&nbsp;            String name = attr.getName();</b>
+<b class="fc"><i>569</i>&nbsp;            String valueString = attr.getValue();</b>
+<b class="fc"><i>570</i>&nbsp;            Node att = atts2.getNamedItem(name);</b>
+<b class="fc"><i>571</i>&nbsp;            if (att == null) {</b>
+<b class="nc"><i>572</i>&nbsp;                return false;</b>
+<i>573</i>&nbsp;            }
+<b class="fc"><i>574</i>&nbsp;            String valueString2 = ((Attr) att).getValue();</b>
+<b class="fc"><i>575</i>&nbsp;            if (!valueString.equals(valueString2)) {</b>
+<b class="fc"><i>576</i>&nbsp;                valueString = valueString.replaceAll(pattern1, &quot;\\$\\(n\\)&quot;);</b>
+<b class="fc"><i>577</i>&nbsp;                valueString2 = valueString2.replaceAll(pattern2, &quot;\\$\\(n\\)&quot;);</b>
+<b class="fc"><i>578</i>&nbsp;                if (!valueString.equals(valueString2)) {</b>
+<b class="fc"><i>579</i>&nbsp;                    return false;</b>
+<i>580</i>&nbsp;                }
+<i>581</i>&nbsp;            }
+<i>582</i>&nbsp;        }
+<i>583</i>&nbsp;        // compare children
+<b class="nc"><i>584</i>&nbsp;        NodeList children = node1.getChildNodes();</b>
+<b class="nc"><i>585</i>&nbsp;        NodeList children2 = node2.getChildNodes();</b>
+<b class="nc"><i>586</i>&nbsp;        for (int childIndex = 0; childIndex &lt; children.getLength(); childIndex++) {</b>
+<b class="nc"><i>587</i>&nbsp;            Node child = children.item(childIndex);</b>
+<b class="nc"><i>588</i>&nbsp;            if (child.getNodeType() == Node.ELEMENT_NODE) {</b>
+<b class="nc"><i>589</i>&nbsp;                String name = child.getNodeName();</b>
+<b class="nc"><i>590</i>&nbsp;                boolean isMatch = false;</b>
+<b class="nc"><i>591</i>&nbsp;                for (int childIndex2 = 0; !isMatch &amp;&amp; childIndex2 &lt; children2.getLength(); childIndex2++) {</b>
+<b class="nc"><i>592</i>&nbsp;                    Node child2 = children2.item(childIndex2);</b>
+<b class="nc"><i>593</i>&nbsp;                    if (child2.getNodeType() == Node.ELEMENT_NODE &amp;&amp; name.equals(child2.getNodeName())) {</b>
+<b class="nc"><i>594</i>&nbsp;                        isMatch = comparable(child, child2, pattern1, pattern2);</b>
+<i>595</i>&nbsp;                    }
+<i>596</i>&nbsp;                }
+<b class="nc"><i>597</i>&nbsp;                if (!isMatch) {</b>
+<b class="nc"><i>598</i>&nbsp;                    return false;</b>
+<i>599</i>&nbsp;                }
+<i>600</i>&nbsp;            }
+<i>601</i>&nbsp;        }
+<b class="nc"><i>602</i>&nbsp;        return true;</b>
+<i>603</i>&nbsp;    } // comparable
+<i>604</i>&nbsp;
+<i>605</i>&nbsp;
+<i>606</i>&nbsp;    /**
+<i>607</i>&nbsp;     * XSL stylesheet for cleaning up bits and pieces of the vanilla XML
+<i>608</i>&nbsp;     * in order to make it more readable *
+<i>609</i>&nbsp;     */
+<b class="fc"><i>610</i>&nbsp;    String m_sXMLBeuatifyXSL = &quot;&lt;xsl:stylesheet version=&#39;1.0&#39; xmlns:xsl=&#39;http://www.w3.org/1999/XSL/Transform&#39; xmlns=&#39;http://www.w3.org/TR/xhtml1/strict&#39;&gt;\n&quot; +</b>
+<i>611</i>&nbsp;            &quot;\n&quot; +
+<i>612</i>&nbsp;            &quot;&lt;xsl:output method=&#39;xml&#39; indent=&#39;yes&#39;/&gt;\n&quot; +
+<i>613</i>&nbsp;            &quot;\n&quot; +
+<i>614</i>&nbsp;            &quot;&lt;xsl:template match=&#39;beast&#39;&gt;\n&quot; +
+<i>615</i>&nbsp;            &quot;    &lt;xsl:copy&gt;\n&quot; +
+<i>616</i>&nbsp;            &quot;        &lt;xsl:apply-templates select=&#39;@*&#39;/&gt;\n&quot; +
+<i>617</i>&nbsp;            &quot;        &lt;xsl:text&gt;&amp;#x0a;&amp;#x0a;&amp;#x0a;    &lt;/xsl:text&gt;\n&quot; +
+<i>618</i>&nbsp;            &quot;        &lt;xsl:apply-templates  select=&#39;//data[not(@idref)]&#39; mode=&#39;copy&#39;/&gt;\n&quot; +
+<i>619</i>&nbsp;            &quot;        &lt;xsl:text&gt;&amp;#x0a;&amp;#x0a;&amp;#x0a;    &lt;/xsl:text&gt;\n&quot; +
+<i>620</i>&nbsp;            &quot;        &lt;xsl:apply-templates select=&#39;//beast.tree[not(@idref)]&#39; mode=&#39;copy&#39;/&gt;\n&quot; +
+<i>621</i>&nbsp;            &quot;        &lt;xsl:text&gt;&amp;#x0a;&amp;#x0a;&amp;#x0a;    &lt;/xsl:text&gt;\n&quot; +
+<i>622</i>&nbsp;            &quot;        &lt;xsl:apply-templates select=&#39;//distribution[not(@idref) and not(ancestor::distribution)]&#39; mode=&#39;copy&#39;/&gt;\n&quot; +
+<i>623</i>&nbsp;            &quot;        &lt;xsl:text&gt;&amp;#x0a;&amp;#x0a;&amp;#x0a;    &lt;/xsl:text&gt;\n&quot; +
+<i>624</i>&nbsp;            &quot;        &lt;xsl:apply-templates select=&#39;node()&#39;/&gt;    \n&quot; +
+<i>625</i>&nbsp;            &quot;    &lt;/xsl:copy&gt;\n&quot; +
+<i>626</i>&nbsp;            &quot;&lt;/xsl:template&gt;\n&quot; +
+<i>627</i>&nbsp;            &quot;\n&quot; +
+<i>628</i>&nbsp;            &quot;&lt;xsl:template match=&#39;*&#39; mode=&#39;copy&#39;&gt;\n&quot; +
+<i>629</i>&nbsp;            &quot;  &lt;xsl:copy&gt;\n&quot; +
+<i>630</i>&nbsp;            &quot;    &lt;xsl:attribute name=&#39;id&#39;&gt;\n&quot; +
+<i>631</i>&nbsp;            &quot;         &lt;xsl:value-of select=&#39;@id&#39;/&gt;\n&quot; +
+<i>632</i>&nbsp;            &quot;    &lt;/xsl:attribute&gt;\n&quot; +
+<i>633</i>&nbsp;            &quot;    &lt;xsl:apply-templates select=&#39;@*|node()&#39;/&gt;\n&quot; +
+<i>634</i>&nbsp;            &quot;  &lt;/xsl:copy&gt;\n&quot; +
+<i>635</i>&nbsp;            &quot;&lt;/xsl:template&gt;\n&quot; +
+<i>636</i>&nbsp;            &quot;\n&quot; +
+<i>637</i>&nbsp;            &quot;&lt;xsl:template match=&#39;data|beast.tree|distribution[not(ancestor::distribution)]&#39;&gt;\n&quot; +
+<i>638</i>&nbsp;            &quot;    &lt;xsl:copy&gt;\n&quot; +
+<i>639</i>&nbsp;            &quot;        &lt;xsl:attribute name=&#39;idref&#39;&gt;\n&quot; +
+<i>640</i>&nbsp;            &quot;            &lt;xsl:choose&gt;\n&quot; +
+<i>641</i>&nbsp;            &quot;                &lt;xsl:when test=&#39;@idref!=\&quot;\&quot;&#39;&gt;&lt;xsl:value-of select=&#39;@idref&#39;/&gt;&lt;/xsl:when&gt;\n&quot; +
+<i>642</i>&nbsp;            &quot;                &lt;xsl:otherwise&gt;&lt;xsl:value-of select=&#39;@id&#39;/&gt;&lt;/xsl:otherwise&gt;\n&quot; +
+<i>643</i>&nbsp;            &quot;            &lt;/xsl:choose&gt;\n&quot; +
+<i>644</i>&nbsp;            &quot;        &lt;/xsl:attribute&gt;\n&quot; +
+<i>645</i>&nbsp;            &quot;    &lt;xsl:apply-templates select=&#39;@name&#39;/&gt;\n&quot; +
+<i>646</i>&nbsp;            &quot;    &lt;/xsl:copy&gt;\n&quot; +
+<i>647</i>&nbsp;            &quot;&lt;/xsl:template&gt;\n&quot; +
+<i>648</i>&nbsp;            &quot;\n&quot; +
+<i>649</i>&nbsp;            &quot;&lt;xsl:template match=&#39;input&#39;&gt;\n&quot; +
+<i>650</i>&nbsp;            &quot;    &lt;xsl:element name=&#39;{@name}&#39;&gt;&quot; +
+<i>651</i>&nbsp;            &quot;		&lt;xsl:apply-templates select=&#39;node()|@*[name()!=\&quot;name\&quot;]&#39;/&gt;&quot; +
+<i>652</i>&nbsp;            &quot;	&lt;/xsl:element&gt;\n&quot; +
+<i>653</i>&nbsp;            &quot;&lt;/xsl:template&gt;\n&quot; +
+<i>654</i>&nbsp;
+<i>655</i>&nbsp;            &quot;&lt;xsl:template match=&#39;log/log&#39;&gt;\n&quot; +
+<i>656</i>&nbsp;            &quot;    &lt;xsl:copy&gt;&lt;xsl:apply-templates select=&#39;*[@*!=\&quot;\&quot;]&#39;/&gt; &lt;/xsl:copy&gt;\n&quot; +
+<i>657</i>&nbsp;            &quot;&lt;/xsl:template&gt;\n&quot; +
+<i>658</i>&nbsp;            &quot;\n&quot; +
+<i>659</i>&nbsp;            // Better not suppress unused id&#39;s; used for example in reporting Operators
+<i>660</i>&nbsp;            //&quot;&lt;xsl:template match=&#39;@id&#39;&gt;\n&quot; +
+<i>661</i>&nbsp;            //&quot;    &lt;xsl:if test=&#39;//@idref=. or not(contains(../@spec,substring(.,string-length(.)-2)))&#39;&gt;\n&quot; +
+<i>662</i>&nbsp;            //&quot;        &lt;xsl:copy/&gt;\n&quot; +
+<i>663</i>&nbsp;            //&quot;    &lt;/xsl:if&gt;\n&quot; +
+<i>664</i>&nbsp;            //&quot;&lt;/xsl:template&gt;\n&quot; +
+<i>665</i>&nbsp;            &quot;\n&quot; +
+<i>666</i>&nbsp;            &quot;&lt;xsl:template match=&#39;@*|node()&#39;&gt;\n&quot; +
+<i>667</i>&nbsp;            &quot;  &lt;xsl:copy&gt;\n&quot; +
+<i>668</i>&nbsp;            &quot;    &lt;xsl:apply-templates select=&#39;@*|node()&#39;/&gt;\n&quot; +
+<i>669</i>&nbsp;            &quot;  &lt;/xsl:copy&gt;\n&quot; +
+<i>670</i>&nbsp;            &quot;&lt;/xsl:template&gt;\n&quot; +
+<i>671</i>&nbsp;            &quot;\n&quot; +
+<i>672</i>&nbsp;            &quot;&lt;/xsl:stylesheet&gt;\n&quot;;
+<i>673</i>&nbsp;
+<i>674</i>&nbsp;
+<i>675</i>&nbsp;    /**
+<i>676</i>&nbsp;     * script to reduce elements of the form &lt;name idref=&#39;xyz&#39;/&gt; to name=&#39;@xyz&#39; attributes *
+<i>677</i>&nbsp;     */
+<b class="fc"><i>678</i>&nbsp;    String m_sIDRefReplacementXSL =</b>
+<i>679</i>&nbsp;            &quot;&lt;xsl:stylesheet version=&#39;1.0&#39; xmlns:xsl=&#39;http://www.w3.org/1999/XSL/Transform&#39; xmlns=&#39;http://www.w3.org/TR/xhtml1/strict&#39;&gt;\n&quot; +
+<i>680</i>&nbsp;                    &quot;\n&quot; +
+<i>681</i>&nbsp;                    &quot;&lt;xsl:output method=&#39;xml&#39; indent=&#39;yes&#39;/&gt;\n&quot; +
+<i>682</i>&nbsp;                    &quot;\n&quot; +
+<i>683</i>&nbsp;                    &quot;&lt;xsl:template match=&#39;beast&#39;&gt;\n&quot; +
+<i>684</i>&nbsp;                    &quot;  &lt;xsl:copy&gt;\n&quot; +
+<i>685</i>&nbsp;                    &quot;    &lt;xsl:apply-templates select=&#39;@*|node()&#39;/&gt;\n&quot; +
+<i>686</i>&nbsp;                    &quot;  &lt;/xsl:copy&gt;\n&quot; +
+<i>687</i>&nbsp;                    &quot;&lt;/xsl:template&gt;\n&quot; +
+<i>688</i>&nbsp;                    &quot;\n&quot; +
+<i>689</i>&nbsp;                    &quot;&lt;xsl:template match=&#39;node()&#39;&gt;\n&quot; +
+<i>690</i>&nbsp;                    &quot;    &lt;xsl:choose&gt;\n&quot; +
+<i>691</i>&nbsp;                    &quot;    &lt;xsl:when test=&#39;count(@idref)=1 and count(@name)=1 and count(@*)=2&#39;&gt;\n&quot; +
+<i>692</i>&nbsp;                    &quot;        &lt;xsl:element name=&#39;{@name}&#39;&gt;\n&quot; +
+<i>693</i>&nbsp;                    &quot;            &lt;xsl:attribute name=&#39;idref&#39;&gt;\n&quot; +
+<i>694</i>&nbsp;                    &quot;                &lt;xsl:value-of select=&#39;@idref&#39;/&gt;\n&quot; +
+<i>695</i>&nbsp;                    &quot;            &lt;/xsl:attribute&gt;\n&quot; +
+<i>696</i>&nbsp;                    &quot;        &lt;/xsl:element&gt;\n&quot; +
+<i>697</i>&nbsp;                    &quot;    &lt;/xsl:when&gt;\n&quot; +
+<i>698</i>&nbsp;                    &quot;    &lt;xsl:when test=&#39;not(count(@idref)=1 and count(@*)=1)&#39;&gt;\n&quot; +
+<i>699</i>&nbsp;                    &quot;        &lt;xsl:copy&gt;\n&quot; +
+<i>700</i>&nbsp;                    &quot;           &lt;xsl:apply-templates select=&#39;@*&#39;/&gt;\n&quot; +
+<i>701</i>&nbsp;                    &quot;		    &lt;xsl:for-each select=&#39;*&#39;&gt;\n&quot; +
+<i>702</i>&nbsp;                    &quot;                &lt;xsl:if test=&#39;count(@idref)=1 and count(@*)=1&#39;&gt;\n&quot; +
+<i>703</i>&nbsp;                    &quot;                    &lt;xsl:attribute name=&#39;{name()}&#39;&gt;@&lt;xsl:value-of select=&#39;@idref&#39;/&gt;&lt;/xsl:attribute&gt;\n&quot; +
+<i>704</i>&nbsp;                    &quot;                &lt;/xsl:if&gt;\n&quot; +
+<i>705</i>&nbsp;                    &quot;		    &lt;/xsl:for-each&gt;\n&quot; +
+<i>706</i>&nbsp;                    &quot;           &lt;xsl:apply-templates/&gt;\n&quot; +
+<i>707</i>&nbsp;                    &quot;        &lt;/xsl:copy&gt;\n&quot; +
+<i>708</i>&nbsp;                    &quot;    &lt;/xsl:when&gt;\n&quot; +
+<i>709</i>&nbsp;                    &quot;    &lt;/xsl:choose&gt;\n&quot; +
+<i>710</i>&nbsp;                    &quot;&lt;/xsl:template&gt;\n&quot; +
+<i>711</i>&nbsp;                    &quot;\n&quot; +
+<i>712</i>&nbsp;                    &quot;&lt;xsl:template match=&#39;@*&#39;&gt;\n&quot; +
+<i>713</i>&nbsp;                    &quot;  &lt;xsl:copy&gt;\n&quot; +
+<i>714</i>&nbsp;                    &quot;    &lt;xsl:apply-templates select=&#39;@*|node()&#39;/&gt;\n&quot; +
+<i>715</i>&nbsp;                    &quot;  &lt;/xsl:copy&gt;\n&quot; +
+<i>716</i>&nbsp;                    &quot;&lt;/xsl:template&gt;\n&quot; +
+<i>717</i>&nbsp;                    &quot;\n&quot; +
+<i>718</i>&nbsp;                    &quot;&lt;/xsl:stylesheet&gt;&quot;;
+<i>719</i>&nbsp;
+<b class="fc"><i>720</i>&nbsp;    String s = &quot;&lt;xsl:stylesheet version=&#39;1.0&#39; xmlns:xsl=&#39;http://www.w3.org/1999/XSL/Transform&#39; xmlns=&#39;http://www.w3.org/TR/xhtml1/strict&#39;&gt;\n&quot; +</b>
+<i>721</i>&nbsp;            &quot;\n&quot; +
+<i>722</i>&nbsp;            &quot;&lt;xsl:output method=&#39;xml&#39; indent=&#39;yes&#39;/&gt;\n&quot; +
+<i>723</i>&nbsp;            &quot;\n&quot; +
+<i>724</i>&nbsp;            &quot;&lt;xsl:template match=&#39;beast&#39;&gt;\n&quot; +
+<i>725</i>&nbsp;            &quot;  &lt;xsl:copy&gt;\n&quot; +
+<i>726</i>&nbsp;            &quot;    &lt;xsl:apply-templates select=&#39;@*|node()&#39;/&gt;\n&quot; +
+<i>727</i>&nbsp;            &quot;  &lt;/xsl:copy&gt;\n&quot; +
+<i>728</i>&nbsp;            &quot;&lt;/xsl:template&gt;\n&quot; +
+<i>729</i>&nbsp;            &quot;\n&quot; +
+<i>730</i>&nbsp;            &quot;&lt;xsl:template match=&#39;node()&#39;&gt;\n&quot; +
+<i>731</i>&nbsp;            &quot;    &lt;xsl:if test=&#39;not(count(@idref)=1 and count(@*)=1)&#39;&gt;\n&quot; +
+<i>732</i>&nbsp;            &quot;    &lt;xsl:copy&gt;\n&quot; +
+<i>733</i>&nbsp;            &quot;       &lt;xsl:apply-templates select=&#39;@*&#39;/&gt;\n&quot; +
+<i>734</i>&nbsp;            &quot;		&lt;xsl:for-each select=&#39;*&#39;&gt;\n&quot; +
+<i>735</i>&nbsp;            &quot;            &lt;xsl:if test=&#39;count(@idref)=1 and count(@*)=1&#39;&gt;\n&quot; +
+<i>736</i>&nbsp;            &quot;                &lt;xsl:attribute name=&#39;{name()}&#39;&gt;@&lt;xsl:value-of select=&#39;@idref&#39;/&gt;&lt;/xsl:attribute&gt;\n&quot; +
+<i>737</i>&nbsp;            &quot;            &lt;/xsl:if&gt;\n&quot; +
+<i>738</i>&nbsp;            &quot;		&lt;/xsl:for-each&gt;\n&quot; +
+<i>739</i>&nbsp;            &quot;       &lt;xsl:apply-templates/&gt;\n&quot; +
+<i>740</i>&nbsp;            &quot;    &lt;/xsl:copy&gt;\n&quot; +
+<i>741</i>&nbsp;            &quot;    &lt;/xsl:if&gt;\n&quot; +
+<i>742</i>&nbsp;            &quot;&lt;/xsl:template&gt;\n&quot; +
+<i>743</i>&nbsp;            &quot;\n&quot; +
+<i>744</i>&nbsp;            &quot;&lt;xsl:template match=&#39;@*&#39;&gt;\n&quot; +
+<i>745</i>&nbsp;            &quot;  &lt;xsl:copy&gt;\n&quot; +
+<i>746</i>&nbsp;            &quot;    &lt;xsl:apply-templates select=&#39;@*|node()&#39;/&gt;\n&quot; +
+<i>747</i>&nbsp;            &quot;  &lt;/xsl:copy&gt;\n&quot; +
+<i>748</i>&nbsp;            &quot;&lt;/xsl:template&gt;\n&quot; +
+<i>749</i>&nbsp;            &quot;\n&quot; +
+<i>750</i>&nbsp;            &quot;&lt;/xsl:stylesheet&gt;\n&quot;;
+<i>751</i>&nbsp;
+<i>752</i>&nbsp;
+<i>753</i>&nbsp;    /**
+<i>754</i>&nbsp;     * XSL stylesheet for suppressing alignment*
+<i>755</i>&nbsp;     */
+<b class="fc"><i>756</i>&nbsp;    String m_sSupressAlignmentXSL = &quot;&lt;xsl:stylesheet version=&#39;1.0&#39; xmlns:xsl=&#39;http://www.w3.org/1999/XSL/Transform&#39; xmlns=&#39;http://www.w3.org/TR/xhtml1/strict&#39;&gt;\n&quot; +</b>
+<i>757</i>&nbsp;            &quot;\n&quot; +
+<i>758</i>&nbsp;            &quot;&lt;xsl:output method=&#39;xml&#39;/&gt;\n&quot; +
+<i>759</i>&nbsp;            &quot;\n&quot; +
+<i>760</i>&nbsp;            &quot;&lt;xsl:template match=&#39;data&#39;/&gt;\n&quot; +
+<i>761</i>&nbsp;            &quot;\n&quot; +
+<i>762</i>&nbsp;            &quot;&lt;xsl:template match=&#39;input[@name]&#39;&gt;\n&quot; +
+<i>763</i>&nbsp;            &quot;    &lt;xsl:element name=&#39;{@name}&#39;&gt;&quot; +
+<i>764</i>&nbsp;            &quot;		&lt;xsl:apply-templates select=&#39;node()|@*[name()!=\&quot;name\&quot;]&#39;/&gt;&quot; +
+<i>765</i>&nbsp;            &quot;	&lt;/xsl:element&gt;\n&quot; +
+<i>766</i>&nbsp;            &quot;&lt;/xsl:template&gt;\n&quot; +
+<i>767</i>&nbsp;            &quot;\n&quot; +
+<i>768</i>&nbsp;            &quot;&lt;xsl:template match=&#39;@*|node()&#39;&gt;\n&quot; +
+<i>769</i>&nbsp;            &quot;  &lt;xsl:copy&gt;\n&quot; +
+<i>770</i>&nbsp;            &quot;    &lt;xsl:apply-templates select=&#39;@*|node()&#39;/&gt;\n&quot; +
+<i>771</i>&nbsp;            &quot;  &lt;/xsl:copy&gt;\n&quot; +
+<i>772</i>&nbsp;            &quot;&lt;/xsl:template&gt;\n&quot; +
+<i>773</i>&nbsp;            &quot;\n&quot; +
+<i>774</i>&nbsp;            &quot;&lt;/xsl:stylesheet&gt;\n&quot;;
+<i>775</i>&nbsp;
+<i>776</i>&nbsp;    /**
+<i>777</i>&nbsp;     * produce elements for a beast object with name name, putting results in buf.
+<i>778</i>&nbsp;     * It tries to create XML conforming to the XML transformation rules (see XMLParser)
+<i>779</i>&nbsp;     * that is moderately readable.
+<i>780</i>&nbsp;     * @throws ClassNotFoundException 
+<i>781</i>&nbsp;     */
+<i>782</i>&nbsp;    @SuppressWarnings(&quot;rawtypes&quot;)
+<i>783</i>&nbsp;    void beastObjectToXML(BEASTInterface beastObject, StringBuffer buf, String name, boolean isTopLevel) throws ClassNotFoundException {
+<i>784</i>&nbsp;        // determine element name, default is input, otherswise find one of the defaults
+<b class="fc"><i>785</i>&nbsp;        String elementName = &quot;input&quot;;</b>
+<b class="fc"><i>786</i>&nbsp;        for (String key : element2ClassMap.keySet()) {</b>
+<b class="fc"><i>787</i>&nbsp;        	String className = element2ClassMap.get(key);</b>
+<b class="fc"><i>788</i>&nbsp;        	Class _class = Class.forName(className);</b>
+<b class="fc"><i>789</i>&nbsp;        	if (_class.equals(beastObject.getClass())) {</b>
+<b class="nc"><i>790</i>&nbsp;        		elementName = key;</b>
+<i>791</i>&nbsp;        	}
+<b class="fc"><i>792</i>&nbsp;        }</b>
+<i>793</i>&nbsp;        
+<i>794</i>&nbsp;//        if (beastObject instanceof Alignment) {
+<i>795</i>&nbsp;//            elementName = XMLParser.DATA_ELEMENT;
+<i>796</i>&nbsp;//        }
+<i>797</i>&nbsp;//        if (beastObject instanceof Sequence) {
+<i>798</i>&nbsp;//            elementName = XMLParser.SEQUENCE_ELEMENT;
+<i>799</i>&nbsp;//        }
+<i>800</i>&nbsp;//        if (beastObject instanceof State) {
+<i>801</i>&nbsp;//            elementName = XMLParser.STATE_ELEMENT;
+<i>802</i>&nbsp;//        }
+<i>803</i>&nbsp;//        if (beastObject instanceof Distribution) {
+<i>804</i>&nbsp;//            elementName = XMLParser.DISTRIBUTION_ELEMENT;
+<i>805</i>&nbsp;//        }
+<i>806</i>&nbsp;//        if (beastObject instanceof Logger) {
+<i>807</i>&nbsp;//            elementName = XMLParser.LOG_ELEMENT;
+<i>808</i>&nbsp;//        }
+<i>809</i>&nbsp;//        if (beastObject instanceof Operator) {
+<i>810</i>&nbsp;//            elementName = XMLParser.OPERATOR_ELEMENT;
+<i>811</i>&nbsp;//        }
+<i>812</i>&nbsp;//        if (beastObject instanceof RealParameter) {
+<i>813</i>&nbsp;//            elementName = XMLParser.REAL_PARAMETER_ELEMENT;
+<i>814</i>&nbsp;//        }
+<i>815</i>&nbsp;//        if (beastObject instanceof Tree) {
+<i>816</i>&nbsp;//            elementName = XMLParser.TREE_ELEMENT;
+<i>817</i>&nbsp;//        }
+<i>818</i>&nbsp;
+<b class="fc"><i>819</i>&nbsp;        if (isTopLevel) {</b>
+<b class="fc"><i>820</i>&nbsp;            elementName = XMLParser.RUN_ELEMENT;</b>
+<i>821</i>&nbsp;        }
+<b class="fc"><i>822</i>&nbsp;        for (int i = 0; i &lt; indent; i++) {</b>
+<b class="fc"><i>823</i>&nbsp;            buf.append(&quot;    &quot;);</b>
+<i>824</i>&nbsp;        }
+<b class="fc"><i>825</i>&nbsp;        indent++;</b>
+<i>826</i>&nbsp;
+<i>827</i>&nbsp;        // open element
+<b class="fc"><i>828</i>&nbsp;        buf.append(&quot;&lt;&quot;).append(elementName);</b>
+<i>829</i>&nbsp;
+<b class="fc"><i>830</i>&nbsp;        boolean skipInputs = false;</b>
+<b class="fc"><i>831</i>&nbsp;        if (isDone.stream().anyMatch(x -&gt; x == beastObject)) {</b>
+<i>832</i>&nbsp;            // XML is already produced, we can idref it
+<b class="nc"><i>833</i>&nbsp;            buf.append(&quot; idref=&#39;&quot; + normalise(beastObject.getID()) + &quot;&#39;&quot;);</b>
+<b class="nc"><i>834</i>&nbsp;            skipInputs = true;</b>
+<i>835</i>&nbsp;        } else {
+<i>836</i>&nbsp;            // see whether a reasonable id can be generated
+<b class="fc"><i>837</i>&nbsp;            if (beastObject.getID() != null &amp;&amp; !beastObject.getID().equals(&quot;&quot;)) {</b>
+<b class="fc"><i>838</i>&nbsp;                String id = beastObject.getID();</b>
+<i>839</i>&nbsp;                // ensure ID is unique, if not add index behind
+<b class="fc"><i>840</i>&nbsp;                uniqueID(id, buf);</b>
+<i>841</i>&nbsp;            }
+<b class="fc"><i>842</i>&nbsp;            isDone.add(beastObject);</b>
+<i>843</i>&nbsp;        }
+<b class="fc"><i>844</i>&nbsp;        String className = beastObject.getClass().getName();</b>
+<b class="fc"><i>845</i>&nbsp;        if (skipInputs == false &amp;&amp; (!element2ClassMap.containsKey(elementName) ||</b>
+<b class="fc"><i>846</i>&nbsp;                !element2ClassMap.get(elementName).equals(className))) {</b>
+<i>847</i>&nbsp;            // only add spec element if it cannot be deduced otherwise (i.e., by idref or default mapping
+<b class="fc"><i>848</i>&nbsp;            buf.append(&quot; spec=&#39;&quot; + className + &quot;&#39;&quot;);</b>
+<i>849</i>&nbsp;        }
+<b class="fc"><i>850</i>&nbsp;        if (name != null &amp;&amp; !name.equals(elementName)) {</b>
+<i>851</i>&nbsp;            // only add name element if it differs from element = default name
+<b class="fc"><i>852</i>&nbsp;            buf.append(&quot; name=&#39;&quot; + name + &quot;&#39;&quot;);</b>
+<i>853</i>&nbsp;        }
+<i>854</i>&nbsp;
+<b class="fc"><i>855</i>&nbsp;        if (!skipInputs) {</b>
+<i>856</i>&nbsp;            // process inputs of this beast object
+<i>857</i>&nbsp;            // first, collect values as attributes
+<b class="fc"><i>858</i>&nbsp;            List&lt;Input&lt;?&gt;&gt; inputs = beastObject.listInputs();</b>
+<b class="fc"><i>859</i>&nbsp;            for (Input&lt;?&gt; input : inputs) {</b>
+<b class="fc"><i>860</i>&nbsp;            	Object value = input.get();</b>
+<b class="fc"><i>861</i>&nbsp;                inputToXML(input, value, beastObject, buf, true);</b>
+<b class="fc"><i>862</i>&nbsp;            }</b>
+<i>863</i>&nbsp;            // next, collect values as input elements
+<b class="fc"><i>864</i>&nbsp;            StringBuffer buf2 = new StringBuffer();</b>
+<b class="fc"><i>865</i>&nbsp;            for (Input input : inputs) {</b>
+<b class="fc"><i>866</i>&nbsp;            	Object value = input.get();</b>
+<b class="fc"><i>867</i>&nbsp;                inputToXML(input, value, beastObject, buf2, false);</b>
+<b class="fc"><i>868</i>&nbsp;            }</b>
+<b class="fc"><i>869</i>&nbsp;            if (buf2.length() == 0) {</b>
+<i>870</i>&nbsp;                // if nothing was added by the inputs, close element
+<b class="fc"><i>871</i>&nbsp;                indent--;</b>
+<b class="fc"><i>872</i>&nbsp;                buf.append(&quot;/&gt;\n&quot;);</b>
+<i>873</i>&nbsp;            } else {
+<i>874</i>&nbsp;                // add contribution of inputs
+<b class="fc"><i>875</i>&nbsp;            	if (buf2.indexOf(&quot;&lt;&quot;) &gt;= 0) {</b>
+<b class="fc"><i>876</i>&nbsp;                    buf.append(&quot;&gt;\n&quot;);</b>
+<b class="fc"><i>877</i>&nbsp;                    buf.append(buf2);</b>
+<b class="fc"><i>878</i>&nbsp;                    indent--;</b>
+<b class="fc"><i>879</i>&nbsp;                    for (int i = 0; i &lt; indent; i++) {</b>
+<b class="nc"><i>880</i>&nbsp;                        buf.append(&quot;    &quot;);</b>
+<i>881</i>&nbsp;                    }
+<i>882</i>&nbsp;            	} else {
+<b class="nc"><i>883</i>&nbsp;                    buf.append(&quot;&gt;&quot;);</b>
+<b class="nc"><i>884</i>&nbsp;            		buf.append(buf2.toString().trim());</b>
+<b class="nc"><i>885</i>&nbsp;                    indent--;</b>
+<i>886</i>&nbsp;            	}
+<i>887</i>&nbsp;                // add closing element
+<b class="fc"><i>888</i>&nbsp;                buf.append(&quot;&lt;/&quot; + elementName + &quot;&gt;\n&quot;);</b>
+<i>889</i>&nbsp;            }
+<b class="fc"><i>890</i>&nbsp;        } else {</b>
+<i>891</i>&nbsp;            // close element
+<b class="nc"><i>892</i>&nbsp;            indent--;</b>
+<b class="nc"><i>893</i>&nbsp;            buf.append(&quot;/&gt;\n&quot;);</b>
+<i>894</i>&nbsp;        }
+<b class="fc"><i>895</i>&nbsp;        if (indent &lt; 2) {</b>
+<b class="fc"><i>896</i>&nbsp;            buf.append(&quot;\n&quot;);</b>
+<i>897</i>&nbsp;        }
+<b class="fc"><i>898</i>&nbsp;    } // pluginToXML</b>
+<i>899</i>&nbsp;
+<i>900</i>&nbsp;    // ensure ID is unique, if not add index behind
+<i>901</i>&nbsp;    private void uniqueID(String id, StringBuffer buf) {
+<b class="fc"><i>902</i>&nbsp;        if (IDs.contains(id)) {</b>
+<b class="nc"><i>903</i>&nbsp;            int k = 1;</b>
+<b class="nc"><i>904</i>&nbsp;            while (IDs.contains(id + k)) {</b>
+<b class="nc"><i>905</i>&nbsp;                k++;</b>
+<i>906</i>&nbsp;            }
+<b class="nc"><i>907</i>&nbsp;            id = id + k;</b>
+<i>908</i>&nbsp;        }
+<b class="fc"><i>909</i>&nbsp;        buf.append(&quot; id=&#39;&quot; + normalise(id) + &quot;&#39;&quot;);</b>
+<b class="fc"><i>910</i>&nbsp;        IDs.add(id);</b>
+<b class="fc"><i>911</i>&nbsp;    }</b>
+<i>912</i>&nbsp;
+<i>913</i>&nbsp;    /**
+<i>914</i>&nbsp;     * produce XML for an input of a beast object, both as attribute/value pairs for
+<i>915</i>&nbsp;     * primitive inputs (if isShort=true) and as individual elements (if isShort=false)
+<i>916</i>&nbsp;     *
+<i>917</i>&nbsp;     * @param input: name of the input
+<i>918</i>&nbsp;     * @param beastObject: beast object to produce this input XML for
+<i>919</i>&nbsp;     * @param buf:    gets XML results are appended
+<i>920</i>&nbsp;     * @param isShort: flag to indicate attribute/value format (true) or element format (false)
+<i>921</i>&nbsp;     * @throws ClassNotFoundException 
+<i>922</i>&nbsp;     */
+<i>923</i>&nbsp;    void inputToXML(Input&lt;?&gt; input, Object value, BEASTInterface beastObject, StringBuffer buf, boolean isShort) throws ClassNotFoundException {
+<i>924</i>&nbsp;    	//if (input.getName().equals(&quot;*&quot;)) {
+<i>925</i>&nbsp;    		// this can happen with beast.core.parameter.Map
+<i>926</i>&nbsp;    		// and * is not a valid XML attribute name
+<i>927</i>&nbsp;    		//return;
+<i>928</i>&nbsp;    	//}
+<b class="fc"><i>929</i>&nbsp;        if (value != null) {</b>
+<b class="fc"><i>930</i>&nbsp;            if (value instanceof Map) {</b>
+<i>931</i>&nbsp;                // distinguish between List, Map, BEASTInterface and primitive input types
+<b class="nc"><i>932</i>&nbsp;            	if (isShort) {</b>
+<i>933</i>&nbsp;					@SuppressWarnings(&quot;unchecked&quot;)
+<b class="nc"><i>934</i>&nbsp;					Map&lt;String,?&gt; map = (Map&lt;String,?&gt;) value;</b>
+<i>935</i>&nbsp;                	// determine label width
+<b class="nc"><i>936</i>&nbsp;                	int whiteSpaceWidth = 0;</b>
+<b class="nc"><i>937</i>&nbsp;                	List&lt;String&gt; keys = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>938</i>&nbsp;                	keys.addAll(map.keySet());</b>
+<b class="nc"><i>939</i>&nbsp;                	Collections.sort(keys);</b>
+<b class="nc"><i>940</i>&nbsp;                	for (String key : keys) {</b>
+<b class="nc"><i>941</i>&nbsp;                		whiteSpaceWidth = Math.max(whiteSpaceWidth, key.length());</b>
+<b class="nc"><i>942</i>&nbsp;                	}</b>
+<b class="nc"><i>943</i>&nbsp;                	for (String key : map.keySet()) {</b>
+<i>944</i>&nbsp;                        //buf.append(&quot;        &lt;input name=&#39;&quot; + key + &quot;&#39;&gt;&quot;);
+<b class="nc"><i>945</i>&nbsp;                        buf.append(&quot;\n        &quot; + key);</b>
+<b class="nc"><i>946</i>&nbsp;                		for (int k = key.length(); k &lt; whiteSpaceWidth; k++) {</b>
+<b class="nc"><i>947</i>&nbsp;                			buf.append(&#39; &#39;);</b>
+<i>948</i>&nbsp;                		}
+<b class="nc"><i>949</i>&nbsp;                		buf.append(&quot;=\&quot;&quot; + normalise(map.get(key).toString()) + &quot;\&quot;&quot;);</b>
+<b class="nc"><i>950</i>&nbsp;                	}</b>
+<i>951</i>&nbsp;                }
+<b class="nc"><i>952</i>&nbsp;            	return;</b>
+<b class="fc"><i>953</i>&nbsp;            } else if (input.getName().startsWith(&quot;*&quot;)) {</b>
+<i>954</i>&nbsp;        		// this can happen with private inputs, like in ThreadedTreeLikelihood
+<i>955</i>&nbsp;        		// and * is not a valid XML attribute name
+<b class="nc"><i>956</i>&nbsp;        		return;</b>
+<b class="fc"><i>957</i>&nbsp;            } else if (value instanceof List) {</b>
+<b class="fc"><i>958</i>&nbsp;                if (!isShort) {</b>
+<b class="fc"><i>959</i>&nbsp;                	int k = 0;</b>
+<b class="fc"><i>960</i>&nbsp;                	List&lt;?&gt; list = (List&lt;?&gt;) value;</b>
+<b class="fc"><i>961</i>&nbsp;                    for (Object o2 : list) {</b>
+<b class="fc"><i>962</i>&nbsp;                    	if (o2 instanceof BEASTInterface) {</b>
+<b class="fc"><i>963</i>&nbsp;                    		beastObjectToXML((BEASTInterface) o2, buf, input.getName(), false);</b>
+<i>964</i>&nbsp;                    	} else {
+<b class="nc"><i>965</i>&nbsp;                    		k++;</b>
+<b class="nc"><i>966</i>&nbsp;                    		buf.append(o2.toString());</b>
+<b class="nc"><i>967</i>&nbsp;                    		if (k &lt; list.size()) {</b>
+<b class="nc"><i>968</i>&nbsp;                    			buf.append(&#39; &#39;);</b>
+<i>969</i>&nbsp;                    		}
+<i>970</i>&nbsp;                    	}
+<b class="fc"><i>971</i>&nbsp;                    }</b>
+<i>972</i>&nbsp;                }
+<b class="fc"><i>973</i>&nbsp;                return;</b>
+<b class="fc"><i>974</i>&nbsp;            } else if (value instanceof BEASTInterface) {</b>
+<b class="nc"><i>975</i>&nbsp;            	if (!value.equals(input.defaultValue)) {</b>
+<b class="nc"><i>976</i>&nbsp;                    if (isShort &amp;&amp; isDone.contains(value)) {</b>
+<b class="nc"><i>977</i>&nbsp;                        buf.append(&quot; &quot; + input.getName() + &quot;=&#39;@&quot; + normalise( ((BEASTInterface) value).getID() ) + &quot;&#39;&quot;);</b>
+<b class="nc"><i>978</i>&nbsp;                        if (!isInputsDone.containsKey(beastObject)) {</b>
+<b class="nc"><i>979</i>&nbsp;                        	isInputsDone.put(beastObject, new HashSet&lt;&gt;());</b>
+<i>980</i>&nbsp;                        }
+<b class="nc"><i>981</i>&nbsp;                        isInputsDone.get(beastObject).add(input.getName());</b>
+<i>982</i>&nbsp;                    }
+<b class="nc"><i>983</i>&nbsp;                    if (!isShort &amp;&amp; (!isInputsDone.containsKey(beastObject) ||</b>
+<b class="nc"><i>984</i>&nbsp;                    		!isInputsDone.get(beastObject).contains(input.getName()))) {</b>
+<b class="nc"><i>985</i>&nbsp;                        beastObjectToXML((BEASTInterface) value, buf, input.getName(), false);</b>
+<i>986</i>&nbsp;                    }
+<i>987</i>&nbsp;            	}
+<b class="nc"><i>988</i>&nbsp;                return;</b>
+<i>989</i>&nbsp;            } else {
+<b class="fc"><i>990</i>&nbsp;            	if (!value.equals(input.defaultValue)) {</b>
+<i>991</i>&nbsp;                    // primitive type
+<b class="fc"><i>992</i>&nbsp;                    String valueString = value.toString();</b>
+<b class="fc"><i>993</i>&nbsp;                    if (isShort) {</b>
+<b class="fc"><i>994</i>&nbsp;                        if (valueString.indexOf(&#39;\n&#39;) &lt; 0) {</b>
+<b class="fc"><i>995</i>&nbsp;                            buf.append(&quot; &quot; + input.getName() + &quot;=&#39;&quot; + normalise(value.toString()) + &quot;&#39;&quot;);</b>
+<i>996</i>&nbsp;                        }
+<i>997</i>&nbsp;                    } else {
+<b class="fc"><i>998</i>&nbsp;                        if (valueString.indexOf(&#39;\n&#39;) &gt;= 0) {</b>
+<b class="nc"><i>999</i>&nbsp;                            for (int j = 0; j &lt; indent; j++) {</b>
+<b class="nc"><i>1000</i>&nbsp;                                buf.append(&quot;    &quot;);</b>
+<i>1001</i>&nbsp;                            }
+<b class="nc"><i>1002</i>&nbsp;                            if (input.getName().equals(&quot;value&quot;)) {</b>
+<b class="nc"><i>1003</i>&nbsp;                                buf.append(normalise(value.toString()));</b>
+<i>1004</i>&nbsp;                            } else {
+<b class="nc"><i>1005</i>&nbsp;                                buf.append(&quot;&lt;input name=&#39;&quot; + input.getName() + &quot;&#39;&gt;&quot; + normalise(value.toString()) + &quot;&lt;/input&gt;\n&quot;);</b>
+<i>1006</i>&nbsp;                            }
+<i>1007</i>&nbsp;                        }
+<i>1008</i>&nbsp;                    }
+<i>1009</i>&nbsp;            	}
+<b class="fc"><i>1010</i>&nbsp;                return;</b>
+<i>1011</i>&nbsp;            }
+<i>1012</i>&nbsp;        } else {
+<i>1013</i>&nbsp;            // value=null, no XML to produce
+<b class="fc"><i>1014</i>&nbsp;            return;</b>
+<i>1015</i>&nbsp;        }
+<i>1016</i>&nbsp;    } // inputToXML
+<i>1017</i>&nbsp;
+<i>1018</i>&nbsp;    
+<i>1019</i>&nbsp;   /** convert plain text string to XML string, replacing some entities **/
+<i>1020</i>&nbsp;    String normalise(String str) {
+<b class="fc"><i>1021</i>&nbsp;    	str = str.replaceAll(&quot;&amp;&quot;, &quot;&amp;amp;&quot;);    	</b>
+<b class="fc"><i>1022</i>&nbsp;    	str = str.replaceAll(&quot;&#39;&quot;, &quot;&amp;apos;&quot;);</b>
+<b class="fc"><i>1023</i>&nbsp;    	str = str.replaceAll(&quot;\&quot;&quot;, &quot;&amp;quot;&quot;);</b>
+<b class="fc"><i>1024</i>&nbsp;    	str = str.replaceAll(&quot;&lt;&quot;, &quot;&amp;lt;&quot;);</b>
+<b class="fc"><i>1025</i>&nbsp;    	str = str.replaceAll(&quot;&gt;&quot;, &quot;&amp;gt;&quot;);</b>
+<b class="fc"><i>1026</i>&nbsp;    	return str;</b>
+<i>1027</i>&nbsp;    }
+<i>1028</i>&nbsp;
+<i>1029</i>&nbsp;
+<i>1030</i>&nbsp;} // class XMLProducer
+<i>1031</i>&nbsp;
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

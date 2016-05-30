@@ -1,0 +1,450 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: DeltaExchangeOperator</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.operators</a> ]
+</div>
+
+<h1>Coverage Summary for Class: DeltaExchangeOperator (beast.evolution.operators)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DeltaExchangeOperator</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (4/ 8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    34.1%
+  </span>
+  <span class="absValue">
+    (60/ 176)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.operators;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import java.text.DecimalFormat;
+<i>6</i>&nbsp;import java.util.ArrayList;
+<i>7</i>&nbsp;import java.util.List;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;import beast.core.Description;
+<i>10</i>&nbsp;import beast.core.Input;
+<i>11</i>&nbsp;import beast.core.Operator;
+<i>12</i>&nbsp;import beast.core.parameter.IntegerParameter;
+<i>13</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>14</i>&nbsp;import beast.core.util.Log;
+<i>15</i>&nbsp;import beast.util.Randomizer;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;/**
+<i>19</i>&nbsp; * A generic operator for use with a sum-constrained (possibly weighted) vector parameter.
+<i>20</i>&nbsp; *
+<i>21</i>&nbsp; * @author Alexei Drummond
+<i>22</i>&nbsp; * @author Andrew Rambaut
+<i>23</i>&nbsp; *         &lt;p/&gt;
+<i>24</i>&nbsp; *         Migrated to BEAST 2 by CHW and Walter
+<i>25</i>&nbsp; */
+<i>26</i>&nbsp;@Description(&quot;A generic operator for use with a sum-constrained (possibly weighted) vector parameter.&quot;)
+<b class="fc"><i>27</i>&nbsp;public class DeltaExchangeOperator extends Operator {</b>
+<i>28</i>&nbsp;    //public Input&lt;Tree&gt; m_pTree = new Input&lt;&gt;(&quot;tree&quot;, &quot;if specified, all beast.tree branch length are scaled&quot;);
+<i>29</i>&nbsp;
+<b class="fc"><i>30</i>&nbsp;    public final Input&lt;List&lt;RealParameter&gt;&gt; parameterInput = new Input&lt;&gt;(&quot;parameter&quot;,</b>
+<i>31</i>&nbsp;            &quot;if specified, this parameter is operated on&quot;, new ArrayList&lt;&gt;());
+<b class="fc"><i>32</i>&nbsp;    public final Input&lt;List&lt;IntegerParameter&gt;&gt; intparameterInput = new Input&lt;&gt;(&quot;intparameter&quot;,</b>
+<i>33</i>&nbsp;            &quot;if specified, this parameter is operated on&quot;, new ArrayList&lt;&gt;());
+<i>34</i>&nbsp;
+<b class="fc"><i>35</i>&nbsp;    public final Input&lt;Double&gt; deltaInput = new Input&lt;&gt;(&quot;delta&quot;, &quot;Magnitude of change for two randomly picked values.&quot;, 1.0);</b>
+<b class="fc"><i>36</i>&nbsp;    public final Input&lt;Boolean&gt; autoOptimizeiInput =</b>
+<b class="fc"><i>37</i>&nbsp;            new Input&lt;&gt;(&quot;autoOptimize&quot;, &quot;if true, window size will be adjusted during the MCMC run to improve mixing.&quot;, true);</b>
+<b class="fc"><i>38</i>&nbsp;    public final Input&lt;Boolean&gt; integerOperatorInput = new Input&lt;&gt;(&quot;integer&quot;, &quot;if true, changes are all integers.&quot;, false);</b>
+<b class="fc"><i>39</i>&nbsp;    public final Input&lt;IntegerParameter&gt; parameterWeightsInput = new Input&lt;&gt;(&quot;weightvector&quot;, &quot;weights on a vector parameter&quot;);</b>
+<i>40</i>&nbsp;
+<i>41</i>&nbsp;    private boolean autoOptimize;
+<i>42</i>&nbsp;    private double delta;
+<i>43</i>&nbsp;    private boolean isIntegerOperator;
+<b class="fc"><i>44</i>&nbsp;    private CompoundParameterHelper compoundParameter = null;</b>
+<i>45</i>&nbsp;    // because CompoundParameter cannot derive from parameter due to framework, the code complexity is doubled
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;	private int[] weights() {
+<i>48</i>&nbsp;		int[] weights;
+<b class="fc"><i>49</i>&nbsp;		if (compoundParameter == null) { // one parameter case</b>
+<b class="fc"><i>50</i>&nbsp;			if (parameterInput.get().isEmpty()) {</b>
+<b class="nc"><i>51</i>&nbsp;				if (intparameterInput.get().size() &gt; 0) {</b>
+<b class="nc"><i>52</i>&nbsp;					weights = new int[intparameterInput.get().get(0)</b>
+<b class="nc"><i>53</i>&nbsp;							.getDimension()];</b>
+<i>54</i>&nbsp;				} else {
+<i>55</i>&nbsp;					// happens when BEAUti is setting things up
+<b class="nc"><i>56</i>&nbsp;					weights = new int[0];</b>
+<i>57</i>&nbsp;				}
+<i>58</i>&nbsp;			} else {
+<b class="fc"><i>59</i>&nbsp;				weights = new int[parameterInput.get().get(0).getDimension()];</b>
+<i>60</i>&nbsp;			}
+<i>61</i>&nbsp;		} else {
+<b class="nc"><i>62</i>&nbsp;			if (compoundParameter.getDimension() &lt; 1)</b>
+<b class="nc"><i>63</i>&nbsp;				throw new IllegalArgumentException(</b>
+<i>64</i>&nbsp;						&quot;Compound parameter is not created properly, dimension = &quot;
+<b class="nc"><i>65</i>&nbsp;								+ compoundParameter.getDimension());</b>
+<i>66</i>&nbsp;
+<b class="nc"><i>67</i>&nbsp;			weights = new int[compoundParameter.getDimension()];</b>
+<i>68</i>&nbsp;		}
+<i>69</i>&nbsp;
+<b class="fc"><i>70</i>&nbsp;		if (parameterWeightsInput.get() != null) {</b>
+<b class="nc"><i>71</i>&nbsp;			if (weights.length != parameterWeightsInput.get().getDimension())</b>
+<b class="nc"><i>72</i>&nbsp;				throw new IllegalArgumentException(</b>
+<i>73</i>&nbsp;						&quot;Weights vector should have the same length as parameter dimension&quot;);
+<i>74</i>&nbsp;
+<b class="nc"><i>75</i>&nbsp;			for (int i = 0; i &lt; weights.length; i++) {</b>
+<b class="nc"><i>76</i>&nbsp;				weights[i] = parameterWeightsInput.get().getValue(i);</b>
+<i>77</i>&nbsp;			}
+<i>78</i>&nbsp;		} else {
+<b class="fc"><i>79</i>&nbsp;			for (int i = 0; i &lt; weights.length; i++) {</b>
+<b class="fc"><i>80</i>&nbsp;				weights[i] = 1;</b>
+<i>81</i>&nbsp;			}
+<i>82</i>&nbsp;		}
+<b class="fc"><i>83</i>&nbsp;		return weights;</b>
+<i>84</i>&nbsp;	}
+<i>85</i>&nbsp;
+<i>86</i>&nbsp;    public void initAndValidate() {
+<b class="fc"><i>87</i>&nbsp;        autoOptimize = autoOptimizeiInput.get();</b>
+<b class="fc"><i>88</i>&nbsp;        delta = deltaInput.get();</b>
+<b class="fc"><i>89</i>&nbsp;        isIntegerOperator = integerOperatorInput.get();</b>
+<i>90</i>&nbsp;
+<b class="fc"><i>91</i>&nbsp;        if (parameterInput.get().isEmpty()) {</b>
+<b class="nc"><i>92</i>&nbsp;            if (intparameterInput.get().size() &gt; 1) {</b>
+<i>93</i>&nbsp;            	// sanity check
+<b class="nc"><i>94</i>&nbsp;            	for (int i = 0; i &lt; intparameterInput.get().size(); i++) {</b>
+<b class="nc"><i>95</i>&nbsp;            		for (int j = i + 1; j &lt; intparameterInput.get().size(); j++) {</b>
+<b class="nc"><i>96</i>&nbsp;            			if (intparameterInput.get().get(i) == intparameterInput.get().get(j)) {</b>
+<b class="nc"><i>97</i>&nbsp;            				throw new RuntimeException(&quot;Duplicate intparameter (&quot; + intparameterInput.get().get(j).getID() + &quot;) found in operator &quot; + getID());</b>
+<i>98</i>&nbsp;            			}
+<i>99</i>&nbsp;            		}
+<i>100</i>&nbsp;            	}
+<i>101</i>&nbsp;            	// create single parameter from the list of int-parameters
+<b class="nc"><i>102</i>&nbsp;                compoundParameter = new CompoundParameterHelper((intparameterInput.get()));</b>
+<i>103</i>&nbsp;            }
+<i>104</i>&nbsp;        } else {
+<b class="fc"><i>105</i>&nbsp;            if (parameterInput.get().size() &gt; 1) {</b>
+<i>106</i>&nbsp;            	// sanity check
+<b class="nc"><i>107</i>&nbsp;            	for (int i = 0; i &lt; parameterInput.get().size(); i++) {</b>
+<b class="nc"><i>108</i>&nbsp;            		for (int j = i + 1; j &lt; parameterInput.get().size(); j++) {</b>
+<b class="nc"><i>109</i>&nbsp;            			if (parameterInput.get().get(i) == parameterInput.get().get(j)) {</b>
+<b class="nc"><i>110</i>&nbsp;            				throw new RuntimeException(&quot;Duplicate intparameter (&quot; + parameterInput.get().get(j).getID() + &quot;) found in operator &quot; + getID());</b>
+<i>111</i>&nbsp;            			}
+<i>112</i>&nbsp;            		}
+<i>113</i>&nbsp;            	}
+<i>114</i>&nbsp;            	// create single parameter from the list of parameters
+<b class="nc"><i>115</i>&nbsp;                compoundParameter = new CompoundParameterHelper(parameterInput.get());</b>
+<i>116</i>&nbsp;            }
+<i>117</i>&nbsp;        }
+<i>118</i>&nbsp;
+<b class="fc"><i>119</i>&nbsp;        if (isIntegerOperator &amp;&amp; delta != Math.round(delta)) {</b>
+<b class="nc"><i>120</i>&nbsp;            throw new IllegalArgumentException(&quot;Can&#39;t be an integer operator if delta is not integer&quot;);</b>
+<i>121</i>&nbsp;        }
+<i>122</i>&nbsp;
+<i>123</i>&nbsp;        // dimension sanity check
+<b class="fc"><i>124</i>&nbsp;        int dim = -1;</b>
+<b class="fc"><i>125</i>&nbsp;        if (compoundParameter == null) { // one parameter case</b>
+<b class="fc"><i>126</i>&nbsp;        	dim = (!parameterInput.get().isEmpty() ? parameterInput.get().get(0).getDimension() : intparameterInput.get().get(0).getDimension());</b>
+<i>127</i>&nbsp;        } else {
+<b class="nc"><i>128</i>&nbsp;            dim = compoundParameter.getDimension();</b>
+<i>129</i>&nbsp;        }
+<b class="fc"><i>130</i>&nbsp;    	if (dim &lt;= 1) {</b>
+<b class="nc"><i>131</i>&nbsp;    		Log.warning.println(&quot;WARNING: the dimension of the parameter is &quot; + dim + &quot; at the start of the run.\n&quot;</b>
+<b class="nc"><i>132</i>&nbsp;    				+ &quot;         The operator &quot; + getID() + &quot; has no effect (if this does not change).&quot;);</b>
+<i>133</i>&nbsp;    	}
+<i>134</i>&nbsp;
+<b class="fc"><i>135</i>&nbsp;    }</b>
+<i>136</i>&nbsp;
+<i>137</i>&nbsp;    @Override
+<i>138</i>&nbsp;    public final double proposal() {
+<b class="fc"><i>139</i>&nbsp;    	int[] parameterWeights = weights();</b>
+<b class="fc"><i>140</i>&nbsp;    	final int dim = parameterWeights.length;</b>
+<i>141</i>&nbsp;    	
+<i>142</i>&nbsp;    	// Find the number of weights that are nonzero
+<b class="fc"><i>143</i>&nbsp;    	int nonZeroWeights = 0;</b>
+<b class="fc"><i>144</i>&nbsp;    	for (int i: parameterWeights) {</b>
+<b class="fc"><i>145</i>&nbsp;    		if (i != 0) {</b>
+<b class="fc"><i>146</i>&nbsp;    			++nonZeroWeights;</b>
+<i>147</i>&nbsp;    		}
+<i>148</i>&nbsp;    	}
+<i>149</i>&nbsp;    	
+<b class="fc"><i>150</i>&nbsp;        if (nonZeroWeights &lt;= 1) {</b>
+<i>151</i>&nbsp;        	// it is impossible to select two distinct entries in this case, so there is nothing to propose 
+<b class="nc"><i>152</i>&nbsp;        	return 0.0;</b>
+<i>153</i>&nbsp;        }
+<i>154</i>&nbsp;    	
+<i>155</i>&nbsp;        // Generate indices for the values to be modified
+<b class="fc"><i>156</i>&nbsp;        int dim1 = Randomizer.nextInt(nonZeroWeights);</b>
+<b class="fc"><i>157</i>&nbsp;        int dim2 = Randomizer.nextInt(nonZeroWeights-1);</b>
+<b class="fc"><i>158</i>&nbsp;        if (dim2 &gt;= dim1) {</b>
+<b class="fc"><i>159</i>&nbsp;        	++dim2;</b>
+<i>160</i>&nbsp;        }
+<b class="fc"><i>161</i>&nbsp;        if (nonZeroWeights&lt;dim) {</b>
+<i>162</i>&nbsp;        	// There are zero weights, so we need to increase dim1 and dim2 accordingly.
+<b class="nc"><i>163</i>&nbsp;        	int nonZerosBeforeDim1 = dim1;</b>
+<b class="nc"><i>164</i>&nbsp;        	int nonZerosBeforeDim2 = dim2;</b>
+<b class="nc"><i>165</i>&nbsp;        	dim1 = 0;</b>
+<b class="nc"><i>166</i>&nbsp;        	dim2 = 0;</b>
+<b class="nc"><i>167</i>&nbsp;        	while (nonZerosBeforeDim1 &gt; 0 | parameterWeights[dim1] == 0 ) {</b>
+<b class="nc"><i>168</i>&nbsp;        		if (parameterWeights[dim1] != 0) {</b>
+<b class="nc"><i>169</i>&nbsp;        			--nonZerosBeforeDim1;</b>
+<i>170</i>&nbsp;        		}
+<b class="nc"><i>171</i>&nbsp;        		++dim1;</b>
+<i>172</i>&nbsp;        	}
+<b class="nc"><i>173</i>&nbsp;        	while (nonZerosBeforeDim2 &gt; 0 | parameterWeights[dim2] == 0 ) {</b>
+<b class="nc"><i>174</i>&nbsp;        		if (parameterWeights[dim2] != 0) {</b>
+<b class="nc"><i>175</i>&nbsp;        			--nonZerosBeforeDim2;</b>
+<i>176</i>&nbsp;        		}
+<b class="nc"><i>177</i>&nbsp;        		++dim2;</b>
+<i>178</i>&nbsp;        	}
+<i>179</i>&nbsp;        }
+<i>180</i>&nbsp;
+<b class="fc"><i>181</i>&nbsp;        double logq = 0.0;</b>
+<i>182</i>&nbsp;
+<b class="fc"><i>183</i>&nbsp;        if (compoundParameter == null) { // one parameter case</b>
+<i>184</i>&nbsp;            // get two dimensions
+<b class="fc"><i>185</i>&nbsp;            RealParameter realparameter = null;</b>
+<b class="fc"><i>186</i>&nbsp;            IntegerParameter intparameter = null;</b>
+<i>187</i>&nbsp;
+<b class="fc"><i>188</i>&nbsp;            if (parameterInput.get().isEmpty()) {</b>
+<b class="nc"><i>189</i>&nbsp;                intparameter = intparameterInput.get().get(0);</b>
+<i>190</i>&nbsp;            } else {
+<b class="fc"><i>191</i>&nbsp;                realparameter = parameterInput.get().get(0);</b>
+<i>192</i>&nbsp;            }
+<i>193</i>&nbsp;
+<b class="fc"><i>194</i>&nbsp;            if (intparameter == null) {</b>
+<i>195</i>&nbsp;                // operate on real parameter
+<b class="fc"><i>196</i>&nbsp;                double scalar1 = realparameter.getValue(dim1);</b>
+<b class="fc"><i>197</i>&nbsp;                double scalar2 = realparameter.getValue(dim2);</b>
+<i>198</i>&nbsp;
+<b class="fc"><i>199</i>&nbsp;                if (isIntegerOperator) {</b>
+<b class="nc"><i>200</i>&nbsp;                    final int d = Randomizer.nextInt((int) Math.round(delta)) + 1;</b>
+<i>201</i>&nbsp;
+<b class="nc"><i>202</i>&nbsp;                    if (parameterWeights[dim1] != parameterWeights[dim2]) throw new RuntimeException();</b>
+<b class="nc"><i>203</i>&nbsp;                    scalar1 = Math.round(scalar1 - d);</b>
+<b class="nc"><i>204</i>&nbsp;                    scalar2 = Math.round(scalar2 + d);</b>
+<b class="nc"><i>205</i>&nbsp;                } else {</b>
+<i>206</i>&nbsp;
+<i>207</i>&nbsp;                    // exchange a random delta
+<b class="fc"><i>208</i>&nbsp;                    final double d = Randomizer.nextDouble() * delta;</b>
+<b class="fc"><i>209</i>&nbsp;                    scalar1 -= d;</b>
+<b class="fc"><i>210</i>&nbsp;                    if (parameterWeights[dim1] != parameterWeights[dim2]) {</b>
+<b class="nc"><i>211</i>&nbsp;                        scalar2 += d * parameterWeights[dim1] / parameterWeights[dim2];</b>
+<i>212</i>&nbsp;                    } else {
+<b class="fc"><i>213</i>&nbsp;                        scalar2 += d;</b>
+<i>214</i>&nbsp;                    }
+<i>215</i>&nbsp;
+<i>216</i>&nbsp;                }
+<i>217</i>&nbsp;
+<b class="fc"><i>218</i>&nbsp;                if (scalar1 &lt; realparameter.getLower() || scalar1 &gt; realparameter.getUpper() ||</b>
+<b class="fc"><i>219</i>&nbsp;                        scalar2 &lt; realparameter.getLower() || scalar2 &gt; realparameter.getUpper()) {</b>
+<b class="nc"><i>220</i>&nbsp;                    logq = Double.NEGATIVE_INFINITY;</b>
+<i>221</i>&nbsp;                } else {
+<b class="fc"><i>222</i>&nbsp;                    realparameter.setValue(dim1, scalar1);</b>
+<b class="fc"><i>223</i>&nbsp;                    realparameter.setValue(dim2, scalar2);</b>
+<i>224</i>&nbsp;                }
+<b class="fc"><i>225</i>&nbsp;            } else {</b>
+<i>226</i>&nbsp;                // operate on int parameter
+<b class="nc"><i>227</i>&nbsp;                int scalar1 = intparameter.getValue(dim1);</b>
+<b class="nc"><i>228</i>&nbsp;                int scalar2 = intparameter.getValue(dim2);</b>
+<i>229</i>&nbsp;
+<b class="nc"><i>230</i>&nbsp;                final int d = Randomizer.nextInt((int) Math.round(delta)) + 1;</b>
+<i>231</i>&nbsp;
+<b class="nc"><i>232</i>&nbsp;                if (parameterWeights[dim1] != parameterWeights[dim2]) throw new RuntimeException();</b>
+<b class="nc"><i>233</i>&nbsp;                scalar1 = Math.round(scalar1 - d);</b>
+<b class="nc"><i>234</i>&nbsp;                scalar2 = Math.round(scalar2 + d);</b>
+<i>235</i>&nbsp;
+<i>236</i>&nbsp;
+<b class="nc"><i>237</i>&nbsp;                if (scalar1 &lt; intparameter.getLower() || scalar1 &gt; intparameter.getUpper() ||</b>
+<b class="nc"><i>238</i>&nbsp;                        scalar2 &lt; intparameter.getLower() || scalar2 &gt; intparameter.getUpper()) {</b>
+<b class="nc"><i>239</i>&nbsp;                    logq = Double.NEGATIVE_INFINITY;</b>
+<i>240</i>&nbsp;                } else {
+<b class="nc"><i>241</i>&nbsp;                    intparameter.setValue(dim1, scalar1);</b>
+<b class="nc"><i>242</i>&nbsp;                    intparameter.setValue(dim2, scalar2);</b>
+<i>243</i>&nbsp;                }
+<i>244</i>&nbsp;
+<i>245</i>&nbsp;            }
+<i>246</i>&nbsp;
+<b class="fc"><i>247</i>&nbsp;        } else { // compound parameter case</b>
+<i>248</i>&nbsp;
+<b class="nc"><i>249</i>&nbsp;            if (intparameterInput.get().isEmpty()) {</b>
+<i>250</i>&nbsp;                // operate on real parameter
+<b class="nc"><i>251</i>&nbsp;                double scalar1 = (Double) compoundParameter.getValue(dim1);</b>
+<b class="nc"><i>252</i>&nbsp;                double scalar2 = (Double) compoundParameter.getValue(dim2);</b>
+<i>253</i>&nbsp;
+<b class="nc"><i>254</i>&nbsp;                if (isIntegerOperator) {</b>
+<b class="nc"><i>255</i>&nbsp;                    final int d = Randomizer.nextInt((int) Math.round(delta)) + 1;</b>
+<i>256</i>&nbsp;
+<b class="nc"><i>257</i>&nbsp;                    if (parameterWeights[dim1] != parameterWeights[dim2]) throw new RuntimeException();</b>
+<b class="nc"><i>258</i>&nbsp;                    scalar1 = Math.round(scalar1 - d);</b>
+<b class="nc"><i>259</i>&nbsp;                    scalar2 = Math.round(scalar2 + d);</b>
+<b class="nc"><i>260</i>&nbsp;                } else {</b>
+<i>261</i>&nbsp;
+<i>262</i>&nbsp;                    // exchange a random delta
+<b class="nc"><i>263</i>&nbsp;                    final double d = Randomizer.nextDouble() * delta;</b>
+<b class="nc"><i>264</i>&nbsp;                    scalar1 -= d;</b>
+<b class="nc"><i>265</i>&nbsp;                    if (parameterWeights[dim1] != parameterWeights[dim2]) {</b>
+<b class="nc"><i>266</i>&nbsp;                        scalar2 += d * parameterWeights[dim1] / parameterWeights[dim2];</b>
+<i>267</i>&nbsp;                    } else {
+<b class="nc"><i>268</i>&nbsp;                        scalar2 += d;</b>
+<i>269</i>&nbsp;                    }
+<i>270</i>&nbsp;
+<i>271</i>&nbsp;                }
+<i>272</i>&nbsp;
+<b class="nc"><i>273</i>&nbsp;                if (scalar1 &lt; (Double) compoundParameter.getLower(dim1) ||</b>
+<b class="nc"><i>274</i>&nbsp;                        scalar1 &gt; (Double) compoundParameter.getUpper(dim1) ||</b>
+<b class="nc"><i>275</i>&nbsp;                        scalar2 &lt; (Double) compoundParameter.getLower(dim2) ||</b>
+<b class="nc"><i>276</i>&nbsp;                        scalar2 &gt; (Double) compoundParameter.getUpper(dim2)) {</b>
+<b class="nc"><i>277</i>&nbsp;                    logq = Double.NEGATIVE_INFINITY;</b>
+<i>278</i>&nbsp;                } else {
+<b class="nc"><i>279</i>&nbsp;                    compoundParameter.setValue(dim1, scalar1);</b>
+<b class="nc"><i>280</i>&nbsp;                    compoundParameter.setValue(dim2, scalar2);</b>
+<i>281</i>&nbsp;                }
+<b class="nc"><i>282</i>&nbsp;            } else {</b>
+<i>283</i>&nbsp;                // operate on int parameter
+<b class="nc"><i>284</i>&nbsp;                int scalar1 = (Integer) compoundParameter.getValue(dim1);</b>
+<b class="nc"><i>285</i>&nbsp;                int scalar2 = (Integer) compoundParameter.getValue(dim2);</b>
+<i>286</i>&nbsp;
+<b class="nc"><i>287</i>&nbsp;                final int d = Randomizer.nextInt((int) Math.round(delta)) + 1;</b>
+<i>288</i>&nbsp;
+<b class="nc"><i>289</i>&nbsp;                if (parameterWeights[dim1] != parameterWeights[dim2]) throw new RuntimeException();</b>
+<b class="nc"><i>290</i>&nbsp;                scalar1 = Math.round(scalar1 - d);</b>
+<b class="nc"><i>291</i>&nbsp;                scalar2 = Math.round(scalar2 + d);</b>
+<i>292</i>&nbsp;
+<i>293</i>&nbsp;
+<b class="nc"><i>294</i>&nbsp;                if (scalar1 &lt; (Integer) compoundParameter.getLower(dim1) ||</b>
+<b class="nc"><i>295</i>&nbsp;                        scalar1 &gt; (Integer) compoundParameter.getUpper(dim1) ||</b>
+<b class="nc"><i>296</i>&nbsp;                        scalar2 &lt; (Integer) compoundParameter.getLower(dim2) ||</b>
+<b class="nc"><i>297</i>&nbsp;                        scalar2 &gt; (Integer) compoundParameter.getUpper(dim2)) {</b>
+<b class="nc"><i>298</i>&nbsp;                    logq = Double.NEGATIVE_INFINITY;</b>
+<i>299</i>&nbsp;                } else {
+<b class="nc"><i>300</i>&nbsp;                    compoundParameter.setValue(dim1, scalar1);</b>
+<b class="nc"><i>301</i>&nbsp;                    compoundParameter.setValue(dim2, scalar2);</b>
+<i>302</i>&nbsp;                }
+<i>303</i>&nbsp;
+<i>304</i>&nbsp;            }
+<i>305</i>&nbsp;
+<i>306</i>&nbsp;        }
+<i>307</i>&nbsp;
+<i>308</i>&nbsp;        //System.err.println(&quot;apply deltaEx&quot;);
+<i>309</i>&nbsp;        // symmetrical move so return a zero hasting ratio
+<b class="fc"><i>310</i>&nbsp;        return logq;</b>
+<i>311</i>&nbsp;    }
+<i>312</i>&nbsp;
+<i>313</i>&nbsp;    @Override
+<i>314</i>&nbsp;    public double getCoercableParameterValue() {
+<b class="nc"><i>315</i>&nbsp;        return delta;</b>
+<i>316</i>&nbsp;    }
+<i>317</i>&nbsp;
+<i>318</i>&nbsp;    @Override
+<i>319</i>&nbsp;    public void setCoercableParameterValue(final double value) {
+<b class="nc"><i>320</i>&nbsp;        delta = value;</b>
+<b class="nc"><i>321</i>&nbsp;    }</b>
+<i>322</i>&nbsp;
+<i>323</i>&nbsp;    /**
+<i>324</i>&nbsp;     * called after every invocation of this operator to see whether
+<i>325</i>&nbsp;     * a parameter can be optimised for better acceptance hence faster
+<i>326</i>&nbsp;     * mixing
+<i>327</i>&nbsp;     *
+<i>328</i>&nbsp;     * @param logAlpha difference in posterior between previous state &amp; proposed state + hasting ratio
+<i>329</i>&nbsp;     */
+<i>330</i>&nbsp;    @Override
+<i>331</i>&nbsp;    public void optimize(final double logAlpha) {
+<i>332</i>&nbsp;        // must be overridden by operator implementation to have an effect
+<b class="nc"><i>333</i>&nbsp;        if (autoOptimize) {</b>
+<b class="nc"><i>334</i>&nbsp;            double _delta = calcDelta(logAlpha);</b>
+<b class="nc"><i>335</i>&nbsp;            _delta += Math.log(delta);</b>
+<b class="nc"><i>336</i>&nbsp;            delta = Math.exp(_delta);</b>
+<b class="nc"><i>337</i>&nbsp;            if (isIntegerOperator) {</b>
+<i>338</i>&nbsp;            	// when delta &lt; 0.5
+<i>339</i>&nbsp;            	// Randomizer.nextInt((int) Math.round(delta)) becomes
+<i>340</i>&nbsp;            	// Randomizer.nextInt(0) which results in an exception
+<b class="nc"><i>341</i>&nbsp;            	delta = Math.max(0.5000000001, delta);</b>
+<i>342</i>&nbsp;            }
+<i>343</i>&nbsp;        }
+<i>344</i>&nbsp;
+<b class="nc"><i>345</i>&nbsp;    }</b>
+<i>346</i>&nbsp;
+<i>347</i>&nbsp;    @Override
+<i>348</i>&nbsp;    public final String getPerformanceSuggestion() {
+<b class="nc"><i>349</i>&nbsp;        final double prob = m_nNrAccepted / (m_nNrAccepted + m_nNrRejected + 0.0);</b>
+<b class="nc"><i>350</i>&nbsp;        final double targetProb = getTargetAcceptanceProbability();</b>
+<i>351</i>&nbsp;
+<b class="nc"><i>352</i>&nbsp;        double ratio = prob / targetProb;</b>
+<b class="nc"><i>353</i>&nbsp;        if (ratio &gt; 2.0) ratio = 2.0;</b>
+<b class="nc"><i>354</i>&nbsp;        if (ratio &lt; 0.5) ratio = 0.5;</b>
+<i>355</i>&nbsp;
+<i>356</i>&nbsp;        // new scale factor
+<b class="nc"><i>357</i>&nbsp;        final double newDelta = delta * ratio;</b>
+<i>358</i>&nbsp;
+<b class="nc"><i>359</i>&nbsp;        final DecimalFormat formatter = new DecimalFormat(&quot;#.###&quot;);</b>
+<b class="nc"><i>360</i>&nbsp;        if (prob &lt; 0.10) {</b>
+<b class="nc"><i>361</i>&nbsp;            return &quot;Try setting delta to about &quot; + formatter.format(newDelta);</b>
+<b class="nc"><i>362</i>&nbsp;        } else if (prob &gt; 0.40) {</b>
+<b class="nc"><i>363</i>&nbsp;            return &quot;Try setting delta to about &quot; + formatter.format(newDelta);</b>
+<b class="nc"><i>364</i>&nbsp;        } else return &quot;&quot;;</b>
+<i>365</i>&nbsp;    }
+<i>366</i>&nbsp;    
+<i>367</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

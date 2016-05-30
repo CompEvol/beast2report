@@ -1,0 +1,335 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: BeerLikelihoodCoreSimple4</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.likelihood</a> ]
+</div>
+
+<h1>Coverage Summary for Class: BeerLikelihoodCoreSimple4 (beast.evolution.likelihood)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BeerLikelihoodCoreSimple4</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 148)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;
+<i>2</i>&nbsp;/*
+<i>3</i>&nbsp; * File BeerLikelihoodCoreSimple4.java
+<i>4</i>&nbsp; *
+<i>5</i>&nbsp; * Copyright (C) 2010 Remco Bouckaert remco@cs.auckland.ac.nz
+<i>6</i>&nbsp; *
+<i>7</i>&nbsp; * This file is part of BEAST2.
+<i>8</i>&nbsp; * See the NOTICE file distributed with this work for additional
+<i>9</i>&nbsp; * information regarding copyright ownership and licensing.
+<i>10</i>&nbsp; *
+<i>11</i>&nbsp; * BEAST is free software; you can redistribute it and/or modify
+<i>12</i>&nbsp; * it under the terms of the GNU Lesser General Public License as
+<i>13</i>&nbsp; * published by the Free Software Foundation; either version 2
+<i>14</i>&nbsp; * of the License, or (at your option) any later version.
+<i>15</i>&nbsp; *
+<i>16</i>&nbsp; *  BEAST is distributed in the hope that it will be useful,
+<i>17</i>&nbsp; *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<i>18</i>&nbsp; *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<i>19</i>&nbsp; *  GNU Lesser General Public License for more details.
+<i>20</i>&nbsp; *
+<i>21</i>&nbsp; * You should have received a copy of the GNU Lesser General Public
+<i>22</i>&nbsp; * License along with BEAST; if not, write to the
+<i>23</i>&nbsp; * Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+<i>24</i>&nbsp; * Boston, MA  02110-1301  USA
+<i>25</i>&nbsp; */
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;package beast.evolution.likelihood;
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;import beast.evolution.sitemodel.SiteModel;
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;public class BeerLikelihoodCoreSimple4 extends BeerLikelihoodCoreSimple {
+<i>34</i>&nbsp;	
+<i>35</i>&nbsp;	public BeerLikelihoodCoreSimple4() {
+<b class="nc"><i>36</i>&nbsp;		super(4);</b>
+<i>37</i>&nbsp;	} // c&#39;tor
+<i>38</i>&nbsp;
+<i>39</i>&nbsp;	
+<i>40</i>&nbsp;	protected void calcAllMatrixSSP(int iNode1, int iNode2, int iNode3) {
+<b class="nc"><i>41</i>&nbsp;		int [] iStates1 = m_iStates[iNode1];</b>
+<b class="nc"><i>42</i>&nbsp;		int [] iStates2 = m_iStates[iNode2];</b>
+<b class="nc"><i>43</i>&nbsp;		double [] fMatrices1 = m_fMatrices[m_iCurrentMatrices[iNode1]][iNode1];</b>
+<b class="nc"><i>44</i>&nbsp;		double [] fMatrices2 = m_fMatrices[m_iCurrentMatrices[iNode2]][iNode2];</b>
+<b class="nc"><i>45</i>&nbsp;		double [] fPartials3 = m_fPartials[m_iCurrentPartials[iNode3]][iNode3];</b>
+<i>46</i>&nbsp;
+<b class="nc"><i>47</i>&nbsp;		int v = 0;</b>
+<i>48</i>&nbsp;
+<b class="nc"><i>49</i>&nbsp;		for (int l = 0; l &lt; m_nMatrices; l++) {</b>
+<i>50</i>&nbsp;
+<b class="nc"><i>51</i>&nbsp;			for (int k = 0; k &lt; m_nPatterns; k++) {</b>
+<i>52</i>&nbsp;
+<b class="nc"><i>53</i>&nbsp;				int state1 = iStates1[k];</b>
+<b class="nc"><i>54</i>&nbsp;				int state2 = iStates2[k];</b>
+<i>55</i>&nbsp;
+<b class="nc"><i>56</i>&nbsp;				int w = l * m_nMatrixSize;</b>
+<i>57</i>&nbsp;
+<b class="nc"><i>58</i>&nbsp;				if (state1 &lt; 4 &amp;&amp; state2 &lt; 4) {</b>
+<i>59</i>&nbsp;
+<b class="nc"><i>60</i>&nbsp;					fPartials3[v] = fMatrices1[w + state1] * fMatrices2[w + state2];</b>
+<b class="nc"><i>61</i>&nbsp;					v++;	w += 4;</b>
+<b class="nc"><i>62</i>&nbsp;					fPartials3[v] = fMatrices1[w + state1] * fMatrices2[w + state2];</b>
+<b class="nc"><i>63</i>&nbsp;					v++;	w += 4;</b>
+<b class="nc"><i>64</i>&nbsp;					fPartials3[v] = fMatrices1[w + state1] * fMatrices2[w + state2];</b>
+<b class="nc"><i>65</i>&nbsp;					v++;	w += 4;</b>
+<b class="nc"><i>66</i>&nbsp;					fPartials3[v] = fMatrices1[w + state1] * fMatrices2[w + state2];</b>
+<b class="nc"><i>67</i>&nbsp;					v++;	w += 4;</b>
+<i>68</i>&nbsp;
+<b class="nc"><i>69</i>&nbsp;				} else if (state1 &lt; 4) {</b>
+<i>70</i>&nbsp;					// child 2 has a gap or unknown state so don&#39;t use it
+<i>71</i>&nbsp;
+<b class="nc"><i>72</i>&nbsp;					fPartials3[v] = fMatrices1[w + state1];</b>
+<b class="nc"><i>73</i>&nbsp;					v++;	w += 4;</b>
+<b class="nc"><i>74</i>&nbsp;					fPartials3[v] = fMatrices1[w + state1];</b>
+<b class="nc"><i>75</i>&nbsp;					v++;	w += 4;</b>
+<b class="nc"><i>76</i>&nbsp;					fPartials3[v] = fMatrices1[w + state1];</b>
+<b class="nc"><i>77</i>&nbsp;					v++;	w += 4;</b>
+<b class="nc"><i>78</i>&nbsp;					fPartials3[v] = fMatrices1[w + state1];</b>
+<b class="nc"><i>79</i>&nbsp;					v++;	w += 4;</b>
+<i>80</i>&nbsp;
+<b class="nc"><i>81</i>&nbsp;				} else if (state2 &lt; 4) {</b>
+<i>82</i>&nbsp;					// child 2 has a gap or unknown state so don&#39;t use it
+<b class="nc"><i>83</i>&nbsp;					fPartials3[v] = fMatrices2[w + state2];</b>
+<b class="nc"><i>84</i>&nbsp;					v++;	w += 4;</b>
+<b class="nc"><i>85</i>&nbsp;					fPartials3[v] = fMatrices2[w + state2];</b>
+<b class="nc"><i>86</i>&nbsp;					v++;	w += 4;</b>
+<b class="nc"><i>87</i>&nbsp;					fPartials3[v] = fMatrices2[w + state2];</b>
+<b class="nc"><i>88</i>&nbsp;					v++;	w += 4;</b>
+<b class="nc"><i>89</i>&nbsp;					fPartials3[v] = fMatrices2[w + state2];</b>
+<b class="nc"><i>90</i>&nbsp;					v++;	w += 4;</b>
+<i>91</i>&nbsp;
+<i>92</i>&nbsp;				} else {
+<i>93</i>&nbsp;					// both children have a gap or unknown state so set partials to 1
+<b class="nc"><i>94</i>&nbsp;					fPartials3[v] = 1.0;</b>
+<b class="nc"><i>95</i>&nbsp;					v++;</b>
+<b class="nc"><i>96</i>&nbsp;					fPartials3[v] = 1.0;</b>
+<b class="nc"><i>97</i>&nbsp;					v++;</b>
+<b class="nc"><i>98</i>&nbsp;					fPartials3[v] = 1.0;</b>
+<b class="nc"><i>99</i>&nbsp;					v++;</b>
+<b class="nc"><i>100</i>&nbsp;					fPartials3[v] = 1.0;</b>
+<b class="nc"><i>101</i>&nbsp;					v++;</b>
+<i>102</i>&nbsp;				}
+<i>103</i>&nbsp;			}
+<i>104</i>&nbsp;		}
+<i>105</i>&nbsp;	}
+<i>106</i>&nbsp;
+<i>107</i>&nbsp;	
+<i>108</i>&nbsp;	protected void calcAllMatrixSPP(int iNode1, int iNode2, int iNode3) {
+<b class="nc"><i>109</i>&nbsp;		int [] iStates1 = m_iStates[iNode1];</b>
+<b class="nc"><i>110</i>&nbsp;		double [] fMatrices1 = m_fMatrices[m_iCurrentMatrices[iNode1]][iNode1];</b>
+<b class="nc"><i>111</i>&nbsp;		double [] fPartials2 = m_fPartials[m_iCurrentPartials[iNode2]][iNode2];</b>
+<b class="nc"><i>112</i>&nbsp;		double [] fMatrices2 = m_fMatrices[m_iCurrentMatrices[iNode2]][iNode2];</b>
+<b class="nc"><i>113</i>&nbsp;		double [] fPartials3 = m_fPartials[m_iCurrentPartials[iNode3]][iNode3];</b>
+<i>114</i>&nbsp;		double sum;//, tmp;
+<i>115</i>&nbsp;
+<b class="nc"><i>116</i>&nbsp;		int u = 0;</b>
+<b class="nc"><i>117</i>&nbsp;		int v = 0;</b>
+<i>118</i>&nbsp;
+<b class="nc"><i>119</i>&nbsp;		for (int l = 0; l &lt; m_nMatrices; l++) {</b>
+<b class="nc"><i>120</i>&nbsp;			for (int k = 0; k &lt; m_nPatterns; k++) {</b>
+<i>121</i>&nbsp;
+<b class="nc"><i>122</i>&nbsp;				int state1 = iStates1[k];</b>
+<i>123</i>&nbsp;
+<b class="nc"><i>124</i>&nbsp;                int w = l * m_nMatrixSize;</b>
+<i>125</i>&nbsp;
+<b class="nc"><i>126</i>&nbsp;				if (state1 &lt; 4) {</b>
+<i>127</i>&nbsp;
+<i>128</i>&nbsp;
+<b class="nc"><i>129</i>&nbsp;					sum =	fMatrices2[w] * fPartials2[v];</b>
+<b class="nc"><i>130</i>&nbsp;					sum +=	fMatrices2[w + 1] * fPartials2[v + 1];</b>
+<b class="nc"><i>131</i>&nbsp;					sum +=	fMatrices2[w + 2] * fPartials2[v + 2];</b>
+<b class="nc"><i>132</i>&nbsp;					sum +=	fMatrices2[w + 3] * fPartials2[v + 3];</b>
+<b class="nc"><i>133</i>&nbsp;					fPartials3[u] = fMatrices1[w + state1] * sum;	u++;</b>
+<i>134</i>&nbsp;
+<b class="nc"><i>135</i>&nbsp;					sum =	fMatrices2[w + 4] * fPartials2[v];</b>
+<b class="nc"><i>136</i>&nbsp;					sum +=	fMatrices2[w + 5] * fPartials2[v + 1];</b>
+<b class="nc"><i>137</i>&nbsp;					sum +=	fMatrices2[w + 6] * fPartials2[v + 2];</b>
+<b class="nc"><i>138</i>&nbsp;					sum +=	fMatrices2[w + 7] * fPartials2[v + 3];</b>
+<b class="nc"><i>139</i>&nbsp;					fPartials3[u] = fMatrices1[w + 4 + state1] * sum;	u++;</b>
+<i>140</i>&nbsp;
+<b class="nc"><i>141</i>&nbsp;					sum =	fMatrices2[w + 8] * fPartials2[v];</b>
+<b class="nc"><i>142</i>&nbsp;					sum +=	fMatrices2[w + 9] * fPartials2[v + 1];</b>
+<b class="nc"><i>143</i>&nbsp;					sum +=	fMatrices2[w + 10] * fPartials2[v + 2];</b>
+<b class="nc"><i>144</i>&nbsp;					sum +=	fMatrices2[w + 11] * fPartials2[v + 3];</b>
+<b class="nc"><i>145</i>&nbsp;					fPartials3[u] = fMatrices1[w + 8 + state1] * sum;	u++;</b>
+<i>146</i>&nbsp;
+<b class="nc"><i>147</i>&nbsp;					sum =	fMatrices2[w + 12] * fPartials2[v];</b>
+<b class="nc"><i>148</i>&nbsp;					sum +=	fMatrices2[w + 13] * fPartials2[v + 1];</b>
+<b class="nc"><i>149</i>&nbsp;					sum +=	fMatrices2[w + 14] * fPartials2[v + 2];</b>
+<b class="nc"><i>150</i>&nbsp;					sum +=	fMatrices2[w + 15] * fPartials2[v + 3];</b>
+<b class="nc"><i>151</i>&nbsp;					fPartials3[u] = fMatrices1[w + 12 + state1] * sum;	u++;</b>
+<i>152</i>&nbsp;
+<b class="nc"><i>153</i>&nbsp;					v += 4;</b>
+<i>154</i>&nbsp;
+<i>155</i>&nbsp;				} else {
+<i>156</i>&nbsp;					// Child 1 has a gap or unknown state so don&#39;t use it
+<i>157</i>&nbsp;
+<i>158</i>&nbsp;
+<b class="nc"><i>159</i>&nbsp;					sum =	fMatrices2[w] * fPartials2[v];</b>
+<b class="nc"><i>160</i>&nbsp;					sum +=	fMatrices2[w + 1] * fPartials2[v + 1];</b>
+<b class="nc"><i>161</i>&nbsp;					sum +=	fMatrices2[w + 2] * fPartials2[v + 2];</b>
+<b class="nc"><i>162</i>&nbsp;					sum +=	fMatrices2[w + 3] * fPartials2[v + 3];</b>
+<b class="nc"><i>163</i>&nbsp;					fPartials3[u] = sum;	u++;</b>
+<i>164</i>&nbsp;
+<b class="nc"><i>165</i>&nbsp;					sum =	fMatrices2[w + 4] * fPartials2[v];</b>
+<b class="nc"><i>166</i>&nbsp;					sum +=	fMatrices2[w + 5] * fPartials2[v + 1];</b>
+<b class="nc"><i>167</i>&nbsp;					sum +=	fMatrices2[w + 6] * fPartials2[v + 2];</b>
+<b class="nc"><i>168</i>&nbsp;					sum +=	fMatrices2[w + 7] * fPartials2[v + 3];</b>
+<b class="nc"><i>169</i>&nbsp;					fPartials3[u] = sum;	u++;</b>
+<i>170</i>&nbsp;
+<b class="nc"><i>171</i>&nbsp;					sum =	fMatrices2[w + 8] * fPartials2[v];</b>
+<b class="nc"><i>172</i>&nbsp;					sum +=	fMatrices2[w + 9] * fPartials2[v + 1];</b>
+<b class="nc"><i>173</i>&nbsp;					sum +=	fMatrices2[w + 10] * fPartials2[v + 2];</b>
+<b class="nc"><i>174</i>&nbsp;					sum +=	fMatrices2[w + 11] * fPartials2[v + 3];</b>
+<b class="nc"><i>175</i>&nbsp;					fPartials3[u] = sum;	u++;</b>
+<i>176</i>&nbsp;
+<b class="nc"><i>177</i>&nbsp;					sum =	fMatrices2[w + 12] * fPartials2[v];</b>
+<b class="nc"><i>178</i>&nbsp;					sum +=	fMatrices2[w + 13] * fPartials2[v + 1];</b>
+<b class="nc"><i>179</i>&nbsp;					sum +=	fMatrices2[w + 14] * fPartials2[v + 2];</b>
+<b class="nc"><i>180</i>&nbsp;					sum +=	fMatrices2[w + 15] * fPartials2[v + 3];</b>
+<b class="nc"><i>181</i>&nbsp;					fPartials3[u] = sum;	u++;</b>
+<i>182</i>&nbsp;
+<b class="nc"><i>183</i>&nbsp;					v += 4;</b>
+<i>184</i>&nbsp;				}
+<i>185</i>&nbsp;			}
+<i>186</i>&nbsp;		}
+<i>187</i>&nbsp;	}
+<i>188</i>&nbsp;
+<i>189</i>&nbsp;	
+<i>190</i>&nbsp;	protected void calcAllMatrixPPP(int iNode1, int iNode2, int iNode3) {
+<b class="nc"><i>191</i>&nbsp;		double [] fPartials1 = m_fPartials[m_iCurrentPartials[iNode1]][iNode1];</b>
+<b class="nc"><i>192</i>&nbsp;		double [] fMatrices1 = m_fMatrices[m_iCurrentMatrices[iNode1]][iNode1];</b>
+<b class="nc"><i>193</i>&nbsp;		double [] fPartials2 = m_fPartials[m_iCurrentPartials[iNode2]][iNode2];</b>
+<b class="nc"><i>194</i>&nbsp;		double [] fMatrices2 = m_fMatrices[m_iCurrentMatrices[iNode2]][iNode2];</b>
+<b class="nc"><i>195</i>&nbsp;		double [] fPartials3 = m_fPartials[m_iCurrentPartials[iNode3]][iNode3];</b>
+<i>196</i>&nbsp;		double sum1, sum2;
+<i>197</i>&nbsp;
+<b class="nc"><i>198</i>&nbsp;		int u = 0;</b>
+<b class="nc"><i>199</i>&nbsp;		int v = 0;</b>
+<i>200</i>&nbsp;
+<b class="nc"><i>201</i>&nbsp;		for (int l = 0; l &lt; m_nMatrices; l++) {</b>
+<i>202</i>&nbsp;
+<b class="nc"><i>203</i>&nbsp;			for (int k = 0; k &lt; m_nPatterns; k++) {</b>
+<i>204</i>&nbsp;
+<b class="nc"><i>205</i>&nbsp;                int w = l * m_nMatrixSize;</b>
+<i>206</i>&nbsp;
+<b class="nc"><i>207</i>&nbsp;				sum1 = fMatrices1[w] * fPartials1[v];</b>
+<b class="nc"><i>208</i>&nbsp;				sum2 = fMatrices2[w] * fPartials2[v];</b>
+<b class="nc"><i>209</i>&nbsp;				sum1 += fMatrices1[w + 1] * fPartials1[v + 1];</b>
+<b class="nc"><i>210</i>&nbsp;				sum2 += fMatrices2[w + 1] * fPartials2[v + 1];</b>
+<b class="nc"><i>211</i>&nbsp;				sum1 += fMatrices1[w + 2] * fPartials1[v + 2];</b>
+<b class="nc"><i>212</i>&nbsp;				sum2 += fMatrices2[w + 2] * fPartials2[v + 2];</b>
+<b class="nc"><i>213</i>&nbsp;				sum1 += fMatrices1[w + 3] * fPartials1[v + 3];</b>
+<b class="nc"><i>214</i>&nbsp;				sum2 += fMatrices2[w + 3] * fPartials2[v + 3];</b>
+<b class="nc"><i>215</i>&nbsp;				fPartials3[u] = sum1 * sum2; u++;</b>
+<i>216</i>&nbsp;
+<b class="nc"><i>217</i>&nbsp;				sum1 = fMatrices1[w + 4] * fPartials1[v];</b>
+<b class="nc"><i>218</i>&nbsp;				sum2 = fMatrices2[w + 4] * fPartials2[v];</b>
+<b class="nc"><i>219</i>&nbsp;				sum1 += fMatrices1[w + 5] * fPartials1[v + 1];</b>
+<b class="nc"><i>220</i>&nbsp;				sum2 += fMatrices2[w + 5] * fPartials2[v + 1];</b>
+<b class="nc"><i>221</i>&nbsp;				sum1 += fMatrices1[w + 6] * fPartials1[v + 2];</b>
+<b class="nc"><i>222</i>&nbsp;				sum2 += fMatrices2[w + 6] * fPartials2[v + 2];</b>
+<b class="nc"><i>223</i>&nbsp;				sum1 += fMatrices1[w + 7] * fPartials1[v + 3];</b>
+<b class="nc"><i>224</i>&nbsp;				sum2 += fMatrices2[w + 7] * fPartials2[v + 3];</b>
+<b class="nc"><i>225</i>&nbsp;				fPartials3[u] = sum1 * sum2; u++;</b>
+<i>226</i>&nbsp;
+<b class="nc"><i>227</i>&nbsp;				sum1 = fMatrices1[w + 8] * fPartials1[v];</b>
+<b class="nc"><i>228</i>&nbsp;				sum2 = fMatrices2[w + 8] * fPartials2[v];</b>
+<b class="nc"><i>229</i>&nbsp;				sum1 += fMatrices1[w + 9] * fPartials1[v + 1];</b>
+<b class="nc"><i>230</i>&nbsp;				sum2 += fMatrices2[w + 9] * fPartials2[v + 1];</b>
+<b class="nc"><i>231</i>&nbsp;				sum1 += fMatrices1[w + 10] * fPartials1[v + 2];</b>
+<b class="nc"><i>232</i>&nbsp;				sum2 += fMatrices2[w + 10] * fPartials2[v + 2];</b>
+<b class="nc"><i>233</i>&nbsp;				sum1 += fMatrices1[w + 11] * fPartials1[v + 3];</b>
+<b class="nc"><i>234</i>&nbsp;				sum2 += fMatrices2[w + 11] * fPartials2[v + 3];</b>
+<b class="nc"><i>235</i>&nbsp;				fPartials3[u] = sum1 * sum2; u++;</b>
+<i>236</i>&nbsp;
+<b class="nc"><i>237</i>&nbsp;				sum1 = fMatrices1[w + 12] * fPartials1[v];</b>
+<b class="nc"><i>238</i>&nbsp;				sum2 = fMatrices2[w + 12] * fPartials2[v];</b>
+<b class="nc"><i>239</i>&nbsp;				sum1 += fMatrices1[w + 13] * fPartials1[v + 1];</b>
+<b class="nc"><i>240</i>&nbsp;				sum2 += fMatrices2[w + 13] * fPartials2[v + 1];</b>
+<b class="nc"><i>241</i>&nbsp;				sum1 += fMatrices1[w + 14] * fPartials1[v + 2];</b>
+<b class="nc"><i>242</i>&nbsp;				sum2 += fMatrices2[w + 14] * fPartials2[v + 2];</b>
+<b class="nc"><i>243</i>&nbsp;				sum1 += fMatrices1[w + 15] * fPartials1[v + 3];</b>
+<b class="nc"><i>244</i>&nbsp;				sum2 += fMatrices2[w + 15] * fPartials2[v + 3];</b>
+<b class="nc"><i>245</i>&nbsp;				fPartials3[u] = sum1 * sum2; u++;</b>
+<i>246</i>&nbsp;
+<b class="nc"><i>247</i>&nbsp;				v += 4;</b>
+<i>248</i>&nbsp;			}
+<i>249</i>&nbsp;		}
+<i>250</i>&nbsp;	}
+<i>251</i>&nbsp;
+<i>252</i>&nbsp;} // class BeerLikelihoodCoreSimple
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

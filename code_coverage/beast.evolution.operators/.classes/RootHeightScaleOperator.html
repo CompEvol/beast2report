@@ -1,0 +1,122 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: RootHeightScaleOperator</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.evolution.operators</a> ]
+</div>
+
+<h1>Coverage Summary for Class: RootHeightScaleOperator (beast.evolution.operators)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RootHeightScaleOperator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.evolution.operators;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import beast.core.Description;
+<i>4</i>&nbsp;import beast.core.Input;
+<i>5</i>&nbsp;import beast.evolution.operators.TreeOperator;
+<i>6</i>&nbsp;import beast.evolution.tree.Node;
+<i>7</i>&nbsp;import beast.util.Randomizer;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;@Description(&quot;Operator for scaling only the root of a tree&quot;)
+<b class="nc"><i>10</i>&nbsp;public class RootHeightScaleOperator extends TreeOperator {</b>
+<b class="nc"><i>11</i>&nbsp;    public Input&lt;Double&gt; m_pScaleFactor = new Input&lt;Double&gt;(&quot;scaleFactor&quot;, &quot;scaling factor: larger means more bold proposals&quot;, 1.0);</b>
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;    double m_fScaleFactor;
+<i>14</i>&nbsp;    
+<i>15</i>&nbsp;	@Override
+<i>16</i>&nbsp;	public void initAndValidate() {
+<b class="nc"><i>17</i>&nbsp;        m_fScaleFactor = m_pScaleFactor.get();</b>
+<i>18</i>&nbsp;    }
+<i>19</i>&nbsp;	
+<i>20</i>&nbsp;	@Override
+<i>21</i>&nbsp;	public double proposal() {
+<b class="nc"><i>22</i>&nbsp;        final double scale = m_fScaleFactor + (Randomizer.nextDouble() * ((1.0 / m_fScaleFactor) - m_fScaleFactor));</b>
+<b class="nc"><i>23</i>&nbsp;        double hastingsRatio = -Math.log(scale);</b>
+<b class="nc"><i>24</i>&nbsp;        Node root = treeInput.get().getRoot();</b>
+<b class="nc"><i>25</i>&nbsp;        double fNewHeight = root.getHeight() * scale;</b>
+<b class="nc"><i>26</i>&nbsp;        if (fNewHeight &lt; Math.max(root.getLeft().getHeight(), root.getRight().getHeight())) {</b>
+<b class="nc"><i>27</i>&nbsp;        	return Double.NEGATIVE_INFINITY;</b>
+<i>28</i>&nbsp;        }
+<b class="nc"><i>29</i>&nbsp;        root.setHeight(fNewHeight);</b>
+<b class="nc"><i>30</i>&nbsp;        return hastingsRatio;</b>
+<i>31</i>&nbsp;	}
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;    @Override
+<i>34</i>&nbsp;    public void optimize(double logAlpha) {
+<b class="nc"><i>35</i>&nbsp;        double fDelta = calcDelta(logAlpha);</b>
+<b class="nc"><i>36</i>&nbsp;        fDelta += Math.log(1.0 / m_fScaleFactor - 1.0);</b>
+<b class="nc"><i>37</i>&nbsp;        m_fScaleFactor = 1.0 / (Math.exp(fDelta) + 1.0);</b>
+<i>38</i>&nbsp;    }
+<i>39</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>

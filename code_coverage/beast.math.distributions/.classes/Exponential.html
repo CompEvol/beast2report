@@ -1,0 +1,138 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Exponential</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">beast.math.distributions</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Exponential (beast.math.distributions)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Exponential</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (14/ 16)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package beast.math.distributions;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import org.apache.commons.math.distribution.ContinuousDistribution;
+<i>5</i>&nbsp;import org.apache.commons.math.distribution.ExponentialDistributionImpl;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import beast.core.Description;
+<i>8</i>&nbsp;import beast.core.Input;
+<i>9</i>&nbsp;import beast.core.parameter.RealParameter;
+<i>10</i>&nbsp;import beast.core.util.Log;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;@Description(&quot;Exponential distribution.  f(x;\\lambda) = 1/\\lambda e^{-x/\\lambda}, if x &gt;= 0 &quot; +
+<i>14</i>&nbsp;        &quot;If the input x is a multidimensional parameter, each of the dimensions is considered as a &quot; +
+<i>15</i>&nbsp;        &quot;separate independent component.&quot;)
+<b class="fc"><i>16</i>&nbsp;public class Exponential extends ParametricDistribution {</b>
+<b class="fc"><i>17</i>&nbsp;    final public Input&lt;RealParameter&gt; lambdaInput = new Input&lt;&gt;(&quot;mean&quot;, &quot;mean parameter, defaults to 1&quot;);</b>
+<i>18</i>&nbsp;
+<b class="fc"><i>19</i>&nbsp;    static org.apache.commons.math.distribution.ExponentialDistribution m_dist = new ExponentialDistributionImpl(1);</b>
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;    @Override
+<i>22</i>&nbsp;    public void initAndValidate() {
+<b class="fc"><i>23</i>&nbsp;        refresh();</b>
+<b class="fc"><i>24</i>&nbsp;    }</b>
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;    /**
+<i>27</i>&nbsp;     * make sure internal state is up to date *
+<i>28</i>&nbsp;     */
+<i>29</i>&nbsp;    @SuppressWarnings(&quot;deprecation&quot;)
+<i>30</i>&nbsp;	void refresh() {
+<i>31</i>&nbsp;        double lambda;
+<b class="fc"><i>32</i>&nbsp;        if (lambdaInput.get() == null) {</b>
+<b class="fc"><i>33</i>&nbsp;            lambda = 1;</b>
+<i>34</i>&nbsp;        } else {
+<b class="fc"><i>35</i>&nbsp;            lambda = lambdaInput.get().getValue();</b>
+<b class="fc"><i>36</i>&nbsp;            if (lambda &lt; 0) {</b>
+<b class="nc"><i>37</i>&nbsp;                Log.err.println(&quot;Exponential::Lambda should be positive not &quot; + lambda + &quot;. Assigning default value.&quot;);</b>
+<b class="nc"><i>38</i>&nbsp;                lambda = 1;</b>
+<i>39</i>&nbsp;            }
+<i>40</i>&nbsp;        }
+<b class="fc"><i>41</i>&nbsp;        m_dist.setMean(lambda);</b>
+<b class="fc"><i>42</i>&nbsp;    }</b>
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;    @Override
+<i>45</i>&nbsp;    public ContinuousDistribution getDistribution() {
+<b class="fc"><i>46</i>&nbsp;        refresh();</b>
+<b class="fc"><i>47</i>&nbsp;        return m_dist;</b>
+<i>48</i>&nbsp;    }
+<i>49</i>&nbsp;    
+<i>50</i>&nbsp;    @Override
+<i>51</i>&nbsp;    public double getMean() {
+<b class="fc"><i>52</i>&nbsp;    	return offsetInput.get() + m_dist.getMean();</b>
+<i>53</i>&nbsp;    }
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;} // class Exponential
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-05-30 16:46</div>
+</div>
+</body>
+</html>
