@@ -12,7 +12,16 @@ git log --all -M -C --name-only --format='format:' "$@" | sort | grep -v '^$' | 
 ## The frequency of classes associated to unique issues
 
 Run the script [genIssueDist.sh](https://github.com/CompEvol/beast2report/blob/master/genIssueDist.sh) 
-in terminal to get *issue_dist.text*, which contains the number of __unique issues__ associated with each file.
+from the beast2 repository directory to generate the following two files:
+   * issue_files: a sorted list of files affected by issue related commits, and
+   * issue_dist: a table containing the number of issues related to each file
+
+To place an upper bound on the age of commits considered by the script, use the `--since DATE` command line
+parameter.  For example, to consider only those commits in the
+last year (assuming the current date is June 2016) use
+
+    ./genIssueDist.sh --since 06/2015
+
 
 ## Code coverage of Beast 2 Unit tests
 
